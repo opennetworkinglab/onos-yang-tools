@@ -23,7 +23,7 @@ import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.YangSubModule;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
@@ -256,7 +256,7 @@ final class ClassDefinitionGenerator {
                 throw new TranslatorException("Expected java identity instance node");
             }
 
-            JavaFileInfo fileInfo = ((JavaFileInfoContainer) baseIdentity).getJavaFileInfo();
+            JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) baseIdentity).getJavaFileInfo();
             return PUBLIC + SPACE + ABSTRACT + SPACE + CLASS + SPACE + yangName + SPACE + EXTEND + SPACE
                     + getCapitalCase(fileInfo.getJavaName()) + SPACE +
                     OPEN_CURLY_BRACKET + NEW_LINE;

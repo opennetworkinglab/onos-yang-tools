@@ -1195,6 +1195,11 @@ public final class UtilConstants {
     public static final String APP_INSTANCE = "appInstance";
 
     /**
+     * Static attribute for instance.
+     */
+    public static final String INSTANCE = "instance";
+
+    /**
      * Static attribute for override annotation.
      */
     public static final String OVERRIDE = "@Override";

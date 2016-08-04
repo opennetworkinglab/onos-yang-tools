@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
@@ -88,7 +87,7 @@ public class TempJavaServiceFragmentFiles
      * @param javaFileInfo generated file information
      * @throws IOException when fails to create new file handle
      */
-    TempJavaServiceFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaServiceFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
         setJavaExtendsListHolder(new JavaExtendsListHolder());
         setJavaImportData(new JavaImportData());

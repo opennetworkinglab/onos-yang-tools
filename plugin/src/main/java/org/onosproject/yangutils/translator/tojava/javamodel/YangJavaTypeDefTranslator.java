@@ -19,9 +19,9 @@ import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaTypeDef;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
@@ -53,7 +53,7 @@ public class YangJavaTypeDefTranslator
      */
     public YangJavaTypeDefTranslator() {
         super();
-        setJavaFileInfo(new JavaFileInfo());
+        setJavaFileInfo(new JavaFileInfoTranslator());
         getJavaFileInfo().setGeneratedFileTypes(GENERATE_TYPEDEF_CLASS);
     }
 
@@ -63,12 +63,12 @@ public class YangJavaTypeDefTranslator
      * @return generated java file information
      */
     @Override
-    public JavaFileInfo getJavaFileInfo() {
+    public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node");
         }
-        return javaFileInfo;
+        return (JavaFileInfoTranslator) javaFileInfo;
     }
 
     /**
@@ -77,7 +77,7 @@ public class YangJavaTypeDefTranslator
      * @param javaInfo java file info object
      */
     @Override
-    public void setJavaFileInfo(JavaFileInfo javaInfo) {
+    public void setJavaFileInfo(JavaFileInfoTranslator javaInfo) {
         javaFileInfo = javaInfo;
     }
 

@@ -19,7 +19,7 @@ package org.onosproject.yangutils.translator.tojava.utils;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;

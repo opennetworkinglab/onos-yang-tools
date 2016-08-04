@@ -25,12 +25,13 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangInput;
+import org.onosproject.yangutils.datamodel.YangLeaf;
+import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeType;
 import org.onosproject.yangutils.datamodel.YangOutput;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 
@@ -59,6 +60,8 @@ public final class JavaCodeGeneratorUtil {
      * Root node.
      */
     private static YangNode rootNode;
+
+    private static int calls = 0;
 
     /**
      * Creates a java code generator utility object.
@@ -143,8 +146,8 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeExit(codeGenNode, yangPlugin);
                 } catch (Exception e) {
-                  close(codeGenNode, yangPlugin);
-                  throw new TranslatorException(e.getMessage());
+                    close(codeGenNode, yangPlugin);
+                    throw new TranslatorException(e.getMessage());
                 }
                 curTraversal = PARENT;
                 codeGenNode = codeGenNode.getParent();
@@ -297,7 +300,7 @@ public final class JavaCodeGeneratorUtil {
         } else {
 
             if (getRootNode() != null) {
-                JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) getRootNode()).getJavaFileInfo();
+                JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) getRootNode()).getJavaFileInfo();
                 if (javaFileInfo != null) {
                     searchAndDeleteTempDir(javaFileInfo.getBaseCodeGenPath() +
                             javaFileInfo.getPackageFilePath());
@@ -371,36 +374,43 @@ public final class JavaCodeGeneratorUtil {
      * @param augment augment node
      */
     private static void addCaseNodeToChoiceTarget(YangAugment augment) {
-        YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
+        calls++;
+        if (calls == 1) {
+            YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
 
-        YangPluginConfig pluginConfig = new YangPluginConfig();
-        javaCase.setName(getAugmentClassName(augment, pluginConfig) + getCapitalCase(CASE));
+            YangPluginConfig pluginConfig = new YangPluginConfig();
+            javaCase.setName(getAugmentClassName(augment, pluginConfig) + getCapitalCase(CASE));
 
-        if (augment.getListOfLeaf() != null) {
-            augment.getListOfLeaf().forEach(javaCase::addLeaf);
-            augment.getListOfLeaf().clear();
-        }
-        if (augment.getListOfLeafList() != null) {
-            augment.getListOfLeafList().forEach(javaCase::addLeafList);
-            augment.getListOfLeafList().clear();
-        }
-        YangNode child = augment.getChild();
-        List<YangNode> childNodes = new ArrayList<>();
-        while (child != null) {
-            child.setParent(javaCase);
-            childNodes.add(child);
-            child = child.getNextSibling();
-        }
-        augment.setChild(null);
-        try {
-            augment.addChild(javaCase);
-            for (YangNode node : childNodes) {
-                node.setNextSibling(null);
-                node.setPreviousSibling(null);
-                javaCase.addChild(node);
+            if (augment.getListOfLeaf() != null) {
+                for (YangLeaf leaf : augment.getListOfLeaf()) {
+                    javaCase.addLeaf(leaf);
+                }
+                augment.getListOfLeaf().clear();
             }
-        } catch (DataModelException e) {
-            System.out.print("failed to add child node due to " + javaCase.getName() + " " + e.getLocalizedMessage());
+            if (augment.getListOfLeafList() != null) {
+                for (YangLeafList leafList : augment.getListOfLeafList()) {
+                    javaCase.addLeafList(leafList);
+                }
+                augment.getListOfLeafList().clear();
+            }
+            YangNode child = augment.getChild();
+            List<YangNode> childNodes = new ArrayList<>();
+            while (child != null) {
+                child.setParent(javaCase);
+                childNodes.add(child);
+                child = child.getNextSibling();
+            }
+            augment.setChild(null);
+            try {
+                augment.addChild(javaCase);
+                for (YangNode node : childNodes) {
+                    node.setNextSibling(null);
+                    node.setPreviousSibling(null);
+                    javaCase.addChild(node);
+                }
+            } catch (DataModelException e) {
+                throw new TranslatorException("Failed to add child nodes to case node of augment " + augment.getName());
+            }
         }
     }
 }

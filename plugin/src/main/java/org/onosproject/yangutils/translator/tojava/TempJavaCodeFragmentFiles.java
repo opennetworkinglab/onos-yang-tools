@@ -20,8 +20,7 @@ import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
@@ -69,7 +68,7 @@ public class TempJavaCodeFragmentFiles {
      * @param javaFileInfo generated java file info
      * @throws IOException when fails to create new file handle
      */
-    public TempJavaCodeFragmentFiles(JavaFileInfo javaFileInfo)
+    public TempJavaCodeFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
         if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_INTERFACE_WITH_BUILDER) != 0) {

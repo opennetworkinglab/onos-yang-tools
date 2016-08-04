@@ -69,7 +69,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MISS
  */
 public class YangChoice extends YangNode
         implements YangCommonInfo, Parsable, CollisionDetector, YangAugmentableNode,
-        YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder {
+        YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201604L;
 

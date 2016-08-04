@@ -137,6 +137,26 @@ public final class GeneratedTempFileType {
     public static final int LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK = 4194304;
 
     /**
+     * Is filter content match for leaves class.
+     */
+    public static final int FILTER_CONTENT_MATCH_FOR_LEAF_MASK = 8388608;
+
+    /**
+     * Is filter content match for leaf lists class.
+     */
+    public static final int FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK = 16777216;
+
+    /**
+     * Is filter content match for nodes class.
+     */
+    public static final int FILTER_CONTENT_MATCH_FOR_NODES_MASK = 33554432;
+
+    /**
+     * Edit config class content for class.
+     */
+    public static final int EDIT_CONTENT_MASK = 67108864;
+
+    /**
      * Creates an instance of generated temp file type.
      */
     private GeneratedTempFileType() {

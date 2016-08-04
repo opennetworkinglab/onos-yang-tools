@@ -19,8 +19,7 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.File;
 import java.io.IOException;
 
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getConstructor;
@@ -49,7 +48,7 @@ public class TempJavaBeanFragmentFiles
      * @param javaFileInfo generated java file info
      * @throws IOException when fails to create new file handle
      */
-    TempJavaBeanFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaBeanFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
         super(javaFileInfo);

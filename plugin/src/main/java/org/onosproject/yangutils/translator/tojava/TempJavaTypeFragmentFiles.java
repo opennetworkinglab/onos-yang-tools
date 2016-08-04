@@ -24,8 +24,7 @@ import java.util.List;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
@@ -146,7 +145,7 @@ public class TempJavaTypeFragmentFiles
      * @param javaFileInfo generated java file info
      * @throws IOException when fails to create new file handle
      */
-    TempJavaTypeFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaTypeFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
         super(javaFileInfo);

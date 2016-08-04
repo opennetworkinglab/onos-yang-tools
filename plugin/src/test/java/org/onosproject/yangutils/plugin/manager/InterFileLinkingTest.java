@@ -41,7 +41,7 @@ import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;

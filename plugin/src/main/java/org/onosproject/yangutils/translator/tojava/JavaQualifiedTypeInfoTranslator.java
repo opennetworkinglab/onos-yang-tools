@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;

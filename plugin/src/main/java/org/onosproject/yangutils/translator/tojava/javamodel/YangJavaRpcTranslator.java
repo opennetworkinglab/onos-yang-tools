@@ -22,22 +22,22 @@ import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangOutput;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaRpc;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
+import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
-import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
+import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.updatePackageInfo;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
@@ -61,7 +61,7 @@ public class YangJavaRpcTranslator
      */
     public YangJavaRpcTranslator() {
         super();
-        setJavaFileInfo(new JavaFileInfo());
+        setJavaFileInfo(new JavaFileInfoTranslator());
     }
 
     /**
@@ -70,12 +70,12 @@ public class YangJavaRpcTranslator
      * @return generated java file information
      */
     @Override
-    public JavaFileInfo getJavaFileInfo() {
+    public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
             throw new TranslatorException("missing java info in java datamodel node");
         }
-        return javaFileInfo;
+        return (JavaFileInfoTranslator) javaFileInfo;
     }
 
     /**
@@ -84,7 +84,7 @@ public class YangJavaRpcTranslator
      * @param javaInfo java file info object
      */
     @Override
-    public void setJavaFileInfo(JavaFileInfo javaInfo) {
+    public void setJavaFileInfo(JavaFileInfoTranslator javaInfo) {
         javaFileInfo = javaInfo;
     }
 
@@ -220,7 +220,7 @@ public class YangJavaRpcTranslator
      * @return true or false
      */
     private boolean addImportToService(JavaQualifiedTypeInfoTranslator importInfo) {
-        JavaFileInfo fileInfo = ((JavaFileInfoContainer) getParent()).getJavaFileInfo();
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) getParent()).getJavaFileInfo();
 
         if (importInfo.getClassInfo().contentEquals(SERVICE)
                 || importInfo.getClassInfo().contentEquals(getCapitalCase(fileInfo.getJavaName() + SERVICE))) {

@@ -37,7 +37,7 @@ import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

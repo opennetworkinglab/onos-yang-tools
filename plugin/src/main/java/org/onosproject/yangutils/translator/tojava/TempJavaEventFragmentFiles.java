@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
@@ -149,7 +148,7 @@ public class TempJavaEventFragmentFiles
      * @param javaFileInfo generated file information
      * @throws IOException when fails to create new file handle
      */
-    TempJavaEventFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaEventFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
         setJavaExtendsListHolder(new JavaExtendsListHolder());
         setJavaImportData(new JavaImportData());
@@ -488,7 +487,7 @@ public class TempJavaEventFragmentFiles
     private File getJavaFileHandle(YangNode curNode, String name)
             throws IOException {
 
-        JavaFileInfo parentInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         return getFileObject(getDirPath(parentInfo), name, JAVA_FILE_EXTENSION,
                 parentInfo);
     }
@@ -498,7 +497,7 @@ public class TempJavaEventFragmentFiles
      *
      * @return directory path
      */
-    private String getDirPath(JavaFileInfo parentInfo) {
+    private String getDirPath(JavaFileInfoTranslator parentInfo) {
         return (parentInfo.getPackageFilePath() + SLASH + parentInfo.getJavaName()).toLowerCase();
     }
 

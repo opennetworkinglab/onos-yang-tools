@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
+import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
@@ -30,8 +31,9 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -68,6 +70,9 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_ATTRIBUTE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_GETTER_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_SETTER_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_NODES_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FROM_STRING_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
@@ -81,6 +86,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
 import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getQualifierInfoForCasesParent;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEnumsValueAttribute;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEventEnumTypeStart;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationAttributeForConstructor;
@@ -109,7 +115,8 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethodOpen;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumSignature;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilterContentMatch;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilerContentMatchClose;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilterContentMatchStart;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOmitNullValueString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOperationAttributesGetters;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOverRideString;
@@ -190,7 +197,7 @@ public final class JavaFileGenerator {
                                              boolean isAttrPresent)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
 
         String path;
         if (curNode instanceof YangModule || curNode instanceof YangSubModule) {
@@ -246,10 +253,16 @@ public final class JavaFileGenerator {
             methods.add(getYangAugmentInfoInterface());
             methods.add(getYangAugmentInfoMapInterface(javaFileInfo.getPluginConfig()));
         }
-        if (!(curNode instanceof YangChoice)) {
+        if (curNode instanceof YangCase) {
+            YangNode caseParent = curNode.getParent();
+            JavaQualifiedTypeInfo qualifiedTypeInfo = getQualifierInfoForCasesParent(caseParent,
+                    javaFileInfo.getPluginConfig());
+            methods.add(NEW_LINE + isFilterContentMatchInterface(qualifiedTypeInfo.getClassInfo()));
+        } else {
             methods.add(NEW_LINE + isFilterContentMatchInterface(className));
         }
-        if (!(curNode instanceof YangChoice) && isLeavesPresent) {
+
+        if (isLeavesPresent) {
             methods.add(NEW_LINE + isLeafValueSetInterface());
             methods.add(NEW_LINE + isSelectLeafSetInterface());
         }
@@ -272,7 +285,7 @@ public final class JavaFileGenerator {
     public static File generateBuilderInterfaceFile(File file, YangNode curNode, boolean isAttrPresent)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         boolean isLeavesPresent;
@@ -345,7 +358,7 @@ public final class JavaFileGenerator {
     public static File generateBuilderClassFile(File file, YangNode curNode,
                                                 boolean isAttrPresent) throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         boolean isLeavesPresent;
@@ -445,7 +458,7 @@ public final class JavaFileGenerator {
                                                 List<String> imports)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         boolean isLeavesPresent;
@@ -532,6 +545,7 @@ public final class JavaFileGenerator {
                                 .getBeanTempFiles(), path)
                         + getToStringMethodClose());
 
+
             } catch (IOException e) {
                 throw new IOException("No data found in temporary java code fragment files for " + className
                         + " while impl class file generation");
@@ -559,6 +573,19 @@ public final class JavaFileGenerator {
                 constructor = constructor + getOperationAttributeForConstructor();
             }
             methods.add(constructor + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE);
+
+            // add is filter content match.
+            methods.add(getIsFilterContentMatchStart(curNode, pluginConfig)
+                    + getDataFromTempFileHandle(FILTER_CONTENT_MATCH_FOR_LEAF_MASK,
+                    ((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
+                            .getBeanTempFiles(), path)
+                    + getDataFromTempFileHandle(FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK,
+                    ((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
+                            .getBeanTempFiles(), path)
+                    + getDataFromTempFileHandle(FILTER_CONTENT_MATCH_FOR_NODES_MASK,
+                    ((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
+                            .getBeanTempFiles(), path)
+                    + getIsFilerContentMatchClose());
         } catch (IOException e) {
             throw new IOException("No data found in temporary java code fragment files for " + className
                     + " while impl class file generation");
@@ -567,8 +594,7 @@ public final class JavaFileGenerator {
         methods.add(((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
                 .addDefaultConstructor(PUBLIC, DEFAULT, pluginConfig, curNode));
 
-        methods.add(builderMethod(className));
-        methods.add(getIsFilterContentMatch(curNode, pluginConfig));
+        methods.add(builderMethod(className) + NEW_LINE);
         if (isLeavesPresent) {
             methods.add(getOperationAttributesGetters());
             methods.add(getGettersForValueAndSelectLeaf());
@@ -593,7 +619,7 @@ public final class JavaFileGenerator {
     public static File generateTypeDefClassFile(File file, YangNode curNode, List<String> imports)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         // import
@@ -741,7 +767,7 @@ public final class JavaFileGenerator {
     public static File generateUnionClassFile(File file, YangNode curNode, List<String> imports)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         String className = getCapitalCase(javaFileInfo.getJavaName());
@@ -885,7 +911,7 @@ public final class JavaFileGenerator {
     public static File generateEnumClassFile(File file, YangNode curNode)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         YangPluginConfig pluginConfig = javaFileInfo.getPluginConfig();
 
         String className = javaFileInfo.getJavaName();
@@ -954,7 +980,7 @@ public final class JavaFileGenerator {
     public static File generateServiceInterfaceFile(File file, YangNode curNode, List<String> imports)
             throws IOException {
 
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
 
         TempJavaServiceFragmentFiles tempJavaServiceFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles();

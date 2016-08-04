@@ -27,68 +27,14 @@ public class JavaFileInfo implements Serializable {
     private static final long serialVersionUID = 806102633L;
 
     /**
-     * The type(s) of java source file(s) to be generated when the cached file
-     * handle is closed.
-     */
-    private transient int genFileTypes;
-
-    /**
      * Name of the module.
      */
-    private String javaName;
+    protected String javaName;
 
     /**
      * Java Package of the mapped java class.
      */
-    private String pkg;
-
-    /**
-     * File generation directory path.
-     */
-    private String relativeFilePath;
-
-    /**
-     * File generation base directory path.
-     */
-    private String codeGenDirFilePath;
-
-    /**
-     * Plugin configuration for naming convention.
-     */
-    private transient YangPluginConfig pluginConfig;
-
-    /**
-     * Returns the types of files being generated corresponding to the YANG
-     * definition.
-     *
-     * @return the types of files being generated corresponding to the YANG
-     * definition
-     */
-    public int getGeneratedFileTypes() {
-        return genFileTypes;
-    }
-
-    /**
-     * Sets the types of files being generated corresponding to the YANG
-     * definition.
-     *
-     * @param fileTypes the types of files being generated corresponding to the
-     *                  YANG definition
-     */
-    public void setGeneratedFileTypes(int fileTypes) {
-        genFileTypes = fileTypes;
-    }
-
-    /**
-     * Adds the types of files being generated corresponding to the YANG
-     * definition.
-     *
-     * @param fileTypes the types of files being generated corresponding to the
-     *                  YANG definition
-     */
-    public void addGeneratedFileTypes(int fileTypes) {
-        genFileTypes |= fileTypes;
-    }
+    protected String pkg;
 
     /**
      * Returns the java name of the node.
@@ -124,59 +70,5 @@ public class JavaFileInfo implements Serializable {
      */
     public void setPackage(String nodePackage) {
         pkg = nodePackage;
-    }
-
-    /**
-     * Sets directory package path for code generation.
-     *
-     * @param path directory package path for code generation
-     */
-    public void setPackageFilePath(String path) {
-        relativeFilePath = path;
-    }
-
-    /**
-     * Returns directory package path for code generation.
-     *
-     * @return directory package path for code generation
-     */
-    public String getPackageFilePath() {
-        return relativeFilePath;
-    }
-
-    /**
-     * Returns base directory package path for code generation.
-     *
-     * @return directory package path for code generation
-     */
-    public String getBaseCodeGenPath() {
-        return codeGenDirFilePath;
-    }
-
-    /**
-     * Sets base directory package path for code generation.
-     *
-     * @param path base directory path
-     */
-    public void setBaseCodeGenPath(String path) {
-        codeGenDirFilePath = path;
-    }
-
-    /**
-     * Returns plugin configurations.
-     *
-     * @return the pluginConfig
-     */
-    public YangPluginConfig getPluginConfig() {
-        return pluginConfig;
-    }
-
-    /**
-     * Sets plugin configurations.
-     *
-     * @param pluginConfig the pluginConfig to set
-     */
-    public void setPluginConfig(YangPluginConfig pluginConfig) {
-        this.pluginConfig = pluginConfig;
     }
 }

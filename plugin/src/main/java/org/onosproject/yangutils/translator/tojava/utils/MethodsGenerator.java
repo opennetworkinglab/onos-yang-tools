@@ -20,23 +20,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
+import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
-import org.onosproject.yangutils.datamodel.YangIsFilterContentNodes;
-import org.onosproject.yangutils.datamodel.YangLeaf;
-import org.onosproject.yangutils.datamodel.YangLeafList;
+import org.onosproject.yangutils.datamodel.YangCase;
+import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
-import org.onosproject.yangutils.datamodel.YangLeavesHolder;
-import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
-import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
-import org.onosproject.yangutils.translator.tojava.TempJavaBeanFragmentFiles;
 import org.onosproject.yangutils.utils.io.impl.JavaDocGen;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
@@ -55,8 +51,6 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
-import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.getJavaAttributeOfLeaf;
-import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.getJavaAttributeOfLeafList;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getParentNodeNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getSetOfNodeIdentifiers;
@@ -118,6 +112,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.HASH;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH_CODE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.ILLEGAL_ACCESS_EXCEPTION;
+import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTEGER_WRAPPER;
@@ -817,83 +812,110 @@ public final class MethodsGenerator {
     }
 
     /**
-     * Returns string for is filter content match method.
+     * Returns is filter content match for leaf.
      *
-     * @param curNode      current YANG node
-     * @param pluginConfig plugin configurations
-     * @return string for is filter content match method
+     * @param javaAttributeInfo java attribute
+     * @param type              data type
+     * @return is filter content match for leaf
      */
-    static String getIsFilterContentMatch(YangNode curNode, YangPluginConfig pluginConfig) {
+    public static String getIsFilerContentMatchForLeaf(JavaAttributeInfo javaAttributeInfo, YangType<?> type) {
+        String attrQualifiedType;
+        String attributeName = javaAttributeInfo.getAttributeName();
+        attrQualifiedType = getIfFilterContentMatchMethodImpl(attributeName,
+                type);
+        return EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS
+                + GET_FILTER_LEAF + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD + GET_METHOD_PREFIX
+                + OPEN_PARENTHESIS + LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() + PERIOD +
+                GET_LEAF_INDEX
+                + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS
+                + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWELVE_SPACE_INDENTATION + IF + SPACE
+                + OPEN_PARENTHESIS + attrQualifiedType + CLOSE_PARENTHESIS + SPACE
+                + OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE
+                + SEMI_COLAN + NEW_LINE + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE
+                + EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
+    }
 
-        String filterMethod = getOverRideString();
-        TempJavaBeanFragmentFiles tempFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
-                .getTempJavaCodeFragmentFiles().getBeanTempFiles();
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        if (curNode instanceof YangLeavesHolder) {
-            filterMethod = filterMethod + FOUR_SPACE_INDENTATION + PUBLIC + SPACE + BOOLEAN_DATA_TYPE
-                    + SPACE + FILTER_CONTENT_MATCH + OPEN_PARENTHESIS + getCapitalCase(javaFileInfo.getJavaName())
-                    + SPACE + APP_INSTANCE + CLOSE_PARENTHESIS + SPACE
-                    + OPEN_CURLY_BRACKET + NEW_LINE;
-            if (curNode instanceof YangAugmentableNode) {
-                filterMethod = filterMethod + getAugmentableOpParamSyntax();
-            }
+    /**
+     * Returns is filter content match for leaf.
+     *
+     * @param javaAttributeInfo java attribute
+     * @return is filter content match for leaf
+     */
+    public static String getIsFilerContentMatchForLeafList(JavaAttributeInfo javaAttributeInfo) {
+        String attributeName = javaAttributeInfo.getAttributeName();
+        return getIsFileContentMatchForLists(getCapitalCase(attributeName), true,
+                javaAttributeInfo.getImportInfo().getClassInfo());
+    }
 
-            YangLeavesHolder leavesHolder = (YangLeavesHolder) curNode;
-            List<YangLeaf> leaves = leavesHolder.getListOfLeaf();
-            List<YangLeafList> listOfLeafList = leavesHolder.getListOfLeafList();
-            String attrQualifiedType;
-            if (leaves != null) {
-                for (YangLeaf leaf : leaves) {
-                    JavaAttributeInfo javaAttributeInfo = getJavaAttributeOfLeaf(tempFragmentFiles, leaf,
-                            pluginConfig);
-                    String attributeName = javaAttributeInfo.getAttributeName();
-                    attrQualifiedType = getIfFilterContentMatchMethodImpl(attributeName,
-                            leaf.getDataType());
-                    filterMethod = filterMethod + EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS
-                            + GET_FILTER_LEAF + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD + GET_METHOD_PREFIX
-                            + OPEN_PARENTHESIS + LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() + PERIOD +
-                            GET_LEAF_INDEX
-                            + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS
-                            + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWELVE_SPACE_INDENTATION + IF + SPACE
-                            + OPEN_PARENTHESIS + attrQualifiedType + CLOSE_PARENTHESIS + SPACE
-                            + OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE
-                            + SEMI_COLAN + NEW_LINE + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE
-                            + EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE + NEW_LINE;
+    /**
+     * Returns is filter content match for leaf.
+     *
+     * @param curNode      current node
+     * @param pluginConfig plugin configurations
+     * @return is filter content match for leaf
+     */
+    static String getIsFilterContentMatchStart(YangNode curNode, YangPluginConfig pluginConfig) {
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo;
+
+        String instance = APP_INSTANCE;
+        String name = getCapitalCase(javaFileInfo.getJavaName());
+        if (curNode instanceof YangCase) {
+            instance = INSTANCE;
+            YangNode parent = curNode.getParent();
+            if (parent instanceof YangChoice) {
+                parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+                name = getCapitalCase(parentInfo.getJavaName());
+            } else if (parent instanceof YangAugment) {
+                parentInfo = ((JavaFileInfoContainer) ((YangAugment) parent).getAugmentedNode()).getJavaFileInfo();
+                if (parentInfo != null) {
+                    name = getCapitalCase(parentInfo.getJavaName());
+                } else {
+                    name = getCapitalCase(getCamelCase(((YangAugment) parent).getAugmentedNode().getName(),
+                            pluginConfig.getConflictResolver()));
                 }
             }
-
-            if (listOfLeafList != null) {
-                for (YangLeafList leafList : listOfLeafList) {
-                    JavaAttributeInfo javaAttributeInfo = getJavaAttributeOfLeafList(tempFragmentFiles, leafList,
-                            pluginConfig);
-                    String attributeName = javaAttributeInfo.getAttributeName();
-                    filterMethod = filterMethod + getIsFileContentMatchForLists(getCapitalCase(attributeName), true,
-                            javaAttributeInfo.getImportInfo().getClassInfo());
-                }
-            }
-            YangNode tempNode = curNode.getChild();
-            JavaFileInfo fileInfo;
-            String name;
-            while (tempNode != null) {
-                if (tempNode instanceof YangIsFilterContentNodes) {
-                    fileInfo = ((JavaFileInfoContainer) tempNode).getJavaFileInfo();
-                    name = getCapitalCase(fileInfo.getJavaName());
-                    if (tempNode instanceof YangList) {
-                        filterMethod = filterMethod +
-                                getIsFileContentMatchForLists(name, false, null);
-                    } else {
-
-                        filterMethod = filterMethod + getIsFilerContentMatchForChildNode(name);
-                    }
-                }
-                tempNode = tempNode.getNextSibling();
-            }
-
-            filterMethod = filterMethod + EIGHT_SPACE_INDENTATION + RETURN + SPACE + TRUE + SEMI_COLAN +
-                    NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
-
+        }
+        String filterMethod = getOverRideString() + FOUR_SPACE_INDENTATION + PUBLIC + SPACE + BOOLEAN_DATA_TYPE
+                + SPACE + FILTER_CONTENT_MATCH + OPEN_PARENTHESIS + name
+                + SPACE + instance + CLOSE_PARENTHESIS + SPACE
+                + OPEN_CURLY_BRACKET + NEW_LINE;
+        if (curNode instanceof YangCase) {
+            String caseName = getCapitalCase(javaFileInfo.getJavaName());
+            filterMethod = filterMethod + EIGHT_SPACE_INDENTATION + caseName + SPACE + APP_INSTANCE + SPACE + EQUAL
+                    + SPACE
+                    + OPEN_PARENTHESIS + caseName + CLOSE_PARENTHESIS + SPACE + instance + SEMI_COLAN + NEW_LINE;
+        }
+        if (curNode instanceof YangAugmentableNode) {
+            filterMethod = filterMethod + getAugmentableOpParamSyntax();
         }
         return filterMethod;
+    }
+
+    /**
+     * Returns is filter content match for node.
+     *
+     * @param name   attribute name
+     * @param isList if list node
+     * @return is filter content match for node
+     */
+    public static String getIsFilterContentForNodes(String name, boolean isList) {
+        name = getCapitalCase(name);
+        if (isList) {
+            return getIsFileContentMatchForLists(name, false, null);
+        } else {
+            return getIsFilerContentMatchForChildNode(name);
+        }
+    }
+
+    /**
+     * Returns is filter content match close.
+     *
+     * @return is filter content match close
+     */
+    static String getIsFilerContentMatchClose() {
+        return EIGHT_SPACE_INDENTATION + RETURN + SPACE + TRUE + SEMI_COLAN +
+                NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
     }
 
     /**
@@ -909,7 +931,7 @@ public final class MethodsGenerator {
                 OPEN_CURLY_BRACKET + NEW_LINE + TWELVE_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + APP_INSTANCE
                 + PERIOD + name + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + SPACE + EQUAL
                 + EQUAL + SPACE + NULL + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
-                SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE + NEW_LINE + TWELVE_SPACE_INDENTATION +
+                SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE + SEMI_COLAN + NEW_LINE + TWELVE_SPACE_INDENTATION +
                 CLOSE_CURLY_BRACKET + NEW_LINE;
         return method + TWELVE_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + name + OPEN_PARENTHESIS +
                 CLOSE_PARENTHESIS + PERIOD + FILTER_CONTENT_MATCH + OPEN_PARENTHESIS + APP_INSTANCE + PERIOD + name +
@@ -985,7 +1007,7 @@ public final class MethodsGenerator {
                 + RETURN + SPACE + FALSE + SEMI_COLAN + NEW_LINE + SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
                 NEW_LINE;
         return method + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE + EIGHT_SPACE_INDENTATION +
-                CLOSE_CURLY_BRACKET + NEW_LINE + NEW_LINE;
+                CLOSE_CURLY_BRACKET + NEW_LINE;
 
     }
 

@@ -30,9 +30,9 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.onosproject.yangutils.utils.UtilConstants.COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;

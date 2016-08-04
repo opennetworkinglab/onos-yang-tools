@@ -16,7 +16,7 @@
 
 package org.onosproject.yangutils.utils.io.impl;
 
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;

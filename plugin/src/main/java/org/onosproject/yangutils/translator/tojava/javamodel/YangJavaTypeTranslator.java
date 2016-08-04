@@ -18,7 +18,7 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaDataType;
 import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportClass;

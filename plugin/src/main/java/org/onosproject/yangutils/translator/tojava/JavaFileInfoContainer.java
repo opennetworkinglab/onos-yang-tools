@@ -15,8 +15,6 @@
  */
 package org.onosproject.yangutils.translator.tojava;
 
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-
 /**
  * Represents data model nodes which are required to generate java classes, need to support
  * java file info.
@@ -28,12 +26,12 @@ public interface JavaFileInfoContainer {
      *
      * @return generated java file information
      */
-    JavaFileInfo getJavaFileInfo();
+    JavaFileInfoTranslator getJavaFileInfo();
 
     /**
      * Sets the java file info object.
      *
      * @param javaInfo java file info object
      */
-    void setJavaFileInfo(JavaFileInfo javaInfo);
+    void setJavaFileInfo(JavaFileInfoTranslator javaInfo);
 }

@@ -26,8 +26,8 @@ import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangUnion;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -390,7 +390,7 @@ public final class AttributesJavaDataType {
         if (!(parent instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("invalid child node is being processed.");
         }
-        JavaFileInfo parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
         if (parentInfo.getPackage() == null) {
             updateJavaFileInfo(parent, conflictResolver);
         }

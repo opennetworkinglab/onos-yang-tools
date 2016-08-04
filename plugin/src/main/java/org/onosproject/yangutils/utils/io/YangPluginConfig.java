@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yangutils.datamodel.javadatamodel;
+package org.onosproject.yangutils.utils.io;
 
 /**
  * Representation of plugin configurations required for YANG utils.
@@ -34,7 +34,7 @@ public final class YangPluginConfig {
     /**
      * Java code generation is for sbi.
      */
-    private String codeGenerateForsbi;
+    private String codeGenerateForSbi;
 
     /**
      * Creates an object for YANG plugin config.
@@ -47,17 +47,17 @@ public final class YangPluginConfig {
      *
      * @return returns the string for code generation.
      */
-    public String getCodeGenerateForsbi() {
-        return codeGenerateForsbi;
+    public String getCodeGenerateForSbi() {
+        return codeGenerateForSbi;
     }
 
     /**
      * Sets the string sbi or nbi for code generation.
      *
-     * @param codeGenerateForsbi generation is for sbi
+     * @param codeGenerateForSbi generation is for sbi
      */
-    public void setCodeGenerateForsbi(String codeGenerateForsbi) {
-        this.codeGenerateForsbi = codeGenerateForsbi;
+    public void setCodeGenerateForSbi(String codeGenerateForSbi) {
+        this.codeGenerateForSbi = codeGenerateForSbi;
     }
 
     /**

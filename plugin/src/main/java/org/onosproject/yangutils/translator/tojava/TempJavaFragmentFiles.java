@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -27,8 +28,7 @@ import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaGroupingTranslator;
@@ -46,7 +46,11 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ATTRIBUTES_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EDIT_CONTENT_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EQUALS_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_NODES_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FROM_STRING_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
@@ -78,6 +82,9 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilerContentMatchForLeaf;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilerContentMatchForLeafList;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilterContentForNodes;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOverRideString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterString;
@@ -88,7 +95,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
-import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
@@ -96,7 +102,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
@@ -194,6 +199,26 @@ public class TempJavaFragmentFiles {
     private static final String LEAF_IDENTIFIER_ATTRIBUTES_FILE_NAME = "leafIdentifierAtr";
 
     /**
+     * File name for is filter content leaf match.
+     */
+    private static final String FILTER_CONTENT_MATCH_LEAF_FILE_NAME = "isFilterContentMatchLeafMask";
+
+    /**
+     * File name for is filter content leaf-list match.
+     */
+    private static final String FILTER_CONTENT_MATCH_LEAF_LIST_FILE_NAME = "isFilterContentMatchLeafListMask";
+
+    /**
+     * File name for is filter content node match.
+     */
+    private static final String FILTER_CONTENT_MATCH_NODE_FILE_NAME = "isFilterContentMatchNodeMask";
+
+    /**
+     * File name for edit content file.
+     */
+    private static final String EDIT_CONTENT_FILE_NAME = "editContentFile";
+
+    /**
      * File name for interface java file name suffix.
      */
     private static final String INTERFACE_FILE_NAME_SUFFIX = EMPTY_STRING;
@@ -211,7 +236,7 @@ public class TempJavaFragmentFiles {
     /**
      * Information about the java files being generated.
      */
-    private JavaFileInfo javaFileInfo;
+    private JavaFileInfoTranslator javaFileInfo;
 
     /**
      * Imported class info.
@@ -314,9 +339,24 @@ public class TempJavaFragmentFiles {
     private File leafIdAttributeTempFileHandle;
 
     /**
-     * Import info for case.
+     * Temporary file handle for is content match method for leaf-list.
      */
-    private JavaQualifiedTypeInfoTranslator caseImportInfo;
+    private File isContentMatchLeafListTempFileHandle;
+
+    /**
+     * Temporary file handle for is content match method for node.
+     */
+    private File isContentMatchNodeTempFileHandle;
+
+    /**
+     * Temporary file handle for is content match method for leaf.
+     */
+    private File isContentMatchLeafTempFileHandle;
+
+    /**
+     * Temporary file handle for edit content file.
+     */
+    private File editContentTempFileHandle;
 
     /**
      * Leaf count.
@@ -342,7 +382,7 @@ public class TempJavaFragmentFiles {
      * @param javaFileInfo generated java file information
      * @throws IOException when fails to create new file handle
      */
-    TempJavaFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
         setJavaExtendsListHolder(new JavaExtendsListHolder());
         setJavaImportData(new JavaImportData());
@@ -390,6 +430,9 @@ public class TempJavaFragmentFiles {
             addGeneratedTempFile(EQUALS_IMPL_MASK);
             addGeneratedTempFile(TO_STRING_IMPL_MASK);
             addGeneratedTempFile(ADD_TO_LIST_IMPL_MASK);
+            addGeneratedTempFile(FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK);
+            addGeneratedTempFile(FILTER_CONTENT_MATCH_FOR_LEAF_MASK);
+            addGeneratedTempFile(FILTER_CONTENT_MATCH_FOR_NODES_MASK);
         }
 
         /*
@@ -449,6 +492,18 @@ public class TempJavaFragmentFiles {
         }
         if ((getGeneratedTempFiles() & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0) {
             setLeafIdAttributeTempFileHandle(getTemporaryFileHandle(LEAF_IDENTIFIER_ATTRIBUTES_FILE_NAME));
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
+            setIsContentMatchLeafTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_FILE_NAME));
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
+            setIsContentMatchLeafListTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_LIST_FILE_NAME));
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
+            setIsContentMatchNodeTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_NODE_FILE_NAME));
+        }
+        if ((getGeneratedTempFiles() & EDIT_CONTENT_MASK) != 0) {
+            setEditContentTempFileHandle(getTemporaryFileHandle(EDIT_CONTENT_FILE_NAME));
         }
     }
 
@@ -511,7 +566,7 @@ public class TempJavaFragmentFiles {
             throw new TranslatorException("Parent node does not have file info");
         }
         JavaImportData parentImportData = tempJavaFragmentFiles.getJavaImportData();
-        JavaFileInfo fileInfo = ((JavaFileInfoContainer) targetNode).getJavaFileInfo();
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) targetNode).getJavaFileInfo();
 
         boolean isQualified;
         if ((tempJavaFragmentFiles instanceof TempJavaServiceFragmentFiles)
@@ -546,8 +601,8 @@ public class TempJavaFragmentFiles {
      * @param yangPluginConfig      plugin configurations
      * @return java attribute for leaf
      */
-    public static JavaAttributeInfo getJavaAttributeOfLeaf(TempJavaFragmentFiles tempJavaFragmentFiles, YangLeaf leaf,
-                                                           YangPluginConfig yangPluginConfig) {
+    private static JavaAttributeInfo getJavaAttributeOfLeaf(TempJavaFragmentFiles tempJavaFragmentFiles, YangLeaf leaf,
+                                                            YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leaf;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -567,9 +622,9 @@ public class TempJavaFragmentFiles {
      * @param yangPluginConfig      plugin configurations
      * @return java attribute for leaf-list
      */
-    public static JavaAttributeInfo getJavaAttributeOfLeafList(TempJavaFragmentFiles tempJavaFragmentFiles,
-                                                               YangLeafList leafList,
-                                                               YangPluginConfig yangPluginConfig) {
+    private static JavaAttributeInfo getJavaAttributeOfLeafList(TempJavaFragmentFiles tempJavaFragmentFiles,
+                                                                YangLeafList leafList,
+                                                                YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leafList;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -605,7 +660,7 @@ public class TempJavaFragmentFiles {
      *
      * @return generated java file information
      */
-    public JavaFileInfo getJavaFileInfo() {
+    public JavaFileInfoTranslator getJavaFileInfo() {
         return javaFileInfo;
     }
 
@@ -614,7 +669,7 @@ public class TempJavaFragmentFiles {
      *
      * @param javaFileInfo generated java file information
      */
-    public void setJavaFileInfo(JavaFileInfo javaFileInfo) {
+    public void setJavaFileInfo(JavaFileInfoTranslator javaFileInfo) {
         this.javaFileInfo = javaFileInfo;
     }
 
@@ -950,6 +1005,42 @@ public class TempJavaFragmentFiles {
      */
     void setJavaExtendsListHolder(JavaExtendsListHolder javaExtendsListHolder) {
         this.javaExtendsListHolder = javaExtendsListHolder;
+    }
+
+    /**
+     * Adds is filter content match for leaf.
+     *
+     * @param attr java attribute
+     * @throws IOException when fails to do IO operations
+     */
+    private void addIsFilerForLeaf(JavaAttributeInfo attr)
+            throws IOException {
+        appendToFile(getIsContentMatchLeafTempFileHandle(),
+                getIsFilerContentMatchForLeaf(attr, attr.getAttributeType()) + NEW_LINE);
+    }
+
+    /**
+     * Adds is filter content match for leaf-list.
+     *
+     * @param attr java attribute
+     * @throws IOException when fails to do IO operations
+     */
+    private void addIsFilerForLeafList(JavaAttributeInfo attr)
+            throws IOException {
+        appendToFile(getIsContentMatchLeafTempFileHandle(),
+                getIsFilerContentMatchForLeafList(attr) + NEW_LINE);
+    }
+
+    /**
+     * Adds is filter content match for nodes.
+     *
+     * @param attr java attribute
+     * @throws IOException when fails to do IO operations
+     */
+    private void addIsFilerForNode(JavaAttributeInfo attr)
+            throws IOException {
+        appendToFile(getIsContentMatchLeafTempFileHandle(),
+                getIsFilterContentForNodes(attr.getAttributeName(), attr.isListAttr()) + NEW_LINE);
     }
 
     /**
@@ -1301,8 +1392,12 @@ public class TempJavaFragmentFiles {
      * @param pluginConfig plugin configurations
      */
     void addParentInfoInCurNodeTempFile(YangNode curNode, YangPluginConfig pluginConfig) {
-        caseImportInfo = new JavaQualifiedTypeInfoTranslator();
+
+        JavaQualifiedTypeInfoTranslator caseImportInfo = new JavaQualifiedTypeInfoTranslator();
         YangNode parent = getParentNodeInGenCode(curNode);
+        if (curNode instanceof YangCase && parent instanceof YangAugment) {
+            return;
+        }
         if (!(parent instanceof JavaCodeGenerator)) {
             throw new TranslatorException("missing parent node to contain current node info in generated file");
         }
@@ -1314,7 +1409,7 @@ public class TempJavaFragmentFiles {
                 pluginConfig.getConflictResolver())));
         caseImportInfo.setPkgInfo(((JavaFileInfoContainer) parent).getJavaFileInfo().getPackage());
 
-        JavaFileInfo fileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
 
         ((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
                 .getBeanTempFiles().getJavaImportData().addImportInfo(caseImportInfo,
@@ -1409,19 +1504,15 @@ public class TempJavaFragmentFiles {
         if ((getGeneratedTempFiles() & ATTRIBUTES_MASK) != 0) {
             addAttribute(newAttrInfo, pluginConfig);
         }
-
         if ((getGeneratedTempFiles() & GETTER_FOR_INTERFACE_MASK) != 0) {
             addGetterForInterface(newAttrInfo, pluginConfig);
         }
-
         if ((getGeneratedTempFiles() & SETTER_FOR_INTERFACE_MASK) != 0) {
             addSetterForInterface(newAttrInfo, pluginConfig);
         }
-
         if ((getGeneratedTempFiles() & SETTER_FOR_CLASS_MASK) != 0) {
             addSetterImpl(newAttrInfo);
         }
-
         if ((getGeneratedTempFiles() & HASH_CODE_IMPL_MASK) != 0) {
             addHashCodeMethod(newAttrInfo);
         }
@@ -1431,18 +1522,32 @@ public class TempJavaFragmentFiles {
         if ((getGeneratedTempFiles() & TO_STRING_IMPL_MASK) != 0) {
             addToStringMethod(newAttrInfo);
         }
+        if ((getGeneratedTempFiles() & EDIT_CONTENT_MASK) != 0) {
+            //TODO: add implementation for edit content match.
+        }
         if ((getGeneratedTempFiles() & ADD_TO_LIST_IMPL_MASK) != 0 && newAttrInfo.isListAttr()) {
             addAddToListImpl(newAttrInfo);
         }
         if ((getGeneratedTempFiles() & ADD_TO_LIST_INTERFACE_MASK) != 0 && newAttrInfo.isListAttr()) {
             addAddToListInterface(newAttrInfo, pluginConfig);
         }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0
+                && newAttrInfo.getAttributeType() == null) {
+            addIsFilerForNode(newAttrInfo);
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0 && !newAttrInfo.isListAttr()
+                && newAttrInfo.getAttributeType() != null) {
+            addIsFilerForLeaf(newAttrInfo);
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0 && newAttrInfo.isListAttr()
+                && newAttrInfo.getAttributeType() != null) {
+            addIsFilerForLeafList(newAttrInfo);
+        }
         if ((getGeneratedTempFiles() & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0 && !newAttrInfo.isListAttr()
                 && newAttrInfo.getAttributeType() != null) {
             leafCount++;
             addLeafIdAttributes(newAttrInfo, leafCount, pluginConfig);
         }
-
         if (!newAttrInfo.isIntConflict() &&
                 !newAttrInfo.isLongConflict()) {
             if ((getGeneratedTempFiles() & GETTER_FOR_CLASS_MASK) != 0) {
@@ -1513,13 +1618,11 @@ public class TempJavaFragmentFiles {
             addImportsForAugmentableClass(imports, true, true);
         }
         createPackage(curNode);
-
         /*
          * Generate java code.
          */
         if ((fileType & INTERFACE_MASK) != 0 || (fileType &
                 BUILDER_INTERFACE_MASK) != 0) {
-
             /*
              * Create interface file.
              */
@@ -1544,10 +1647,6 @@ public class TempJavaFragmentFiles {
                 }
             }
             insertDataIntoJavaFile(getInterfaceJavaFileHandle(), getJavaClassDefClose());
-
-            if (curNode instanceof YangCase) {
-                removeCaseImport(imports);
-            }
             if (curNode instanceof YangAugmentableNode) {
                 addImportsForAugmentableClass(imports, false, true);
             }
@@ -1560,6 +1659,7 @@ public class TempJavaFragmentFiles {
             addBitsetImport(imports);
             if (curNode instanceof YangAugmentableNode) {
                 addImportsForAugmentableClass(imports, true, false);
+                addInvocationExceptionImport(imports);
             }
             sortImports(imports);
             /*
@@ -1568,7 +1668,6 @@ public class TempJavaFragmentFiles {
             setImplClassJavaFileHandle(getJavaFileHandle(getImplClassName(curNode)));
             setImplClassJavaFileHandle(
                     generateDefaultClassFile(getImplClassJavaFileHandle(), curNode, isAttributePresent(), imports));
-
             /*
              * Create builder class file.
              */
@@ -1599,7 +1698,6 @@ public class TempJavaFragmentFiles {
         }
     }
 
-    /*Adds import for bitset list.*/
     private void addBitsetImport(List<String> imports) {
         imports.add(getJavaImportData().getImportForToBitSet());
     }
@@ -1633,7 +1731,6 @@ public class TempJavaFragmentFiles {
                 imports.add(getJavaImportData().getHashMapImport());
             }
             imports.add(getJavaImportData().getMapImport());
-            addInvocationExceptionImport(imports);
         } else {
             if (!isInterfaceFile) {
                 imports.remove(getJavaImportData().getHashMapImport());
@@ -1641,21 +1738,6 @@ public class TempJavaFragmentFiles {
             imports.remove(getJavaImportData().getMapImport());
         }
         sortImports(imports);
-    }
-
-    /**
-     * Removes case import info from import list.
-     *
-     * @param imports list of imports
-     * @return import for class
-     */
-    private List<String> removeCaseImport(List<String> imports) {
-        if (imports != null && caseImportInfo != null) {
-            String caseImport = IMPORT + caseImportInfo.getPkgInfo() + PERIOD + caseImportInfo.getClassInfo() +
-                    SEMI_COLAN + NEW_LINE;
-            imports.remove(caseImport);
-        }
-        return imports;
     }
 
     /**
@@ -1690,7 +1772,6 @@ public class TempJavaFragmentFiles {
         if ((getGeneratedJavaFiles() & DEFAULT_CLASS_MASK) != 0) {
             closeFile(getImplClassJavaFileHandle(), isErrorOccurred);
         }
-
         /*
          * Close all temporary file handles and delete the files.
          */
@@ -1721,6 +1802,18 @@ public class TempJavaFragmentFiles {
         if ((getGeneratedTempFiles() & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0) {
             closeFile(getLeafIdAttributeTempFileHandle(), true);
         }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
+            closeFile(getIsContentMatchLeafTempFileHandle(), true);
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
+            closeFile(getIsContentMatchLeafListTempFileHandle(), true);
+        }
+        if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
+            closeFile(getIsContentMatchNodeTempFileHandle(), true);
+        }
+        if ((getGeneratedTempFiles() & EDIT_CONTENT_MASK) != 0) {
+            closeFile(getEditContentTempFileHandle(), true);
+        }
     }
 
     /**
@@ -1732,7 +1825,6 @@ public class TempJavaFragmentFiles {
      */
     boolean getIsQualifiedAccessOrAddToImportList(
             JavaQualifiedTypeInfoTranslator importInfo) {
-
         return getJavaImportData().addImportInfo(importInfo, getGeneratedJavaClassName(),
                 getJavaFileInfo().getPackage());
     }
@@ -1785,7 +1877,7 @@ public class TempJavaFragmentFiles {
     /**
      * Sets temp file handle for leaf identifier attributes.
      *
-     * @param leafIdAttributeTempFileHandle temp file handle for leaf identifier attributes.
+     * @param leafIdAttributeTempFileHandle temp file handle for leaf identifier attributes
      */
     private void setLeafIdAttributeTempFileHandle(File leafIdAttributeTempFileHandle) {
         this.leafIdAttributeTempFileHandle = leafIdAttributeTempFileHandle;
@@ -1805,7 +1897,79 @@ public class TempJavaFragmentFiles {
      *
      * @param rooNode true if root node
      */
-    public void setRooNode(boolean rooNode) {
+    void setRooNode(boolean rooNode) {
         isRooNode = rooNode;
+    }
+
+    /**
+     * Returns temp file for is content match.
+     *
+     * @return temp file for is content match
+     */
+    public File getIsContentMatchLeafTempFileHandle() {
+        return isContentMatchLeafTempFileHandle;
+    }
+
+    /**
+     * Sets temp file handle for is content match.
+     *
+     * @param isContentMatchLeafTempFileHandle temp file handle for is content match
+     */
+    private void setIsContentMatchLeafTempFileHandle(File isContentMatchLeafTempFileHandle) {
+        this.isContentMatchLeafTempFileHandle = isContentMatchLeafTempFileHandle;
+    }
+
+    /**
+     * Returns temp file for edit content file.
+     *
+     * @return temp file for edit content file
+     */
+    public File getEditContentTempFileHandle() {
+        return editContentTempFileHandle;
+    }
+
+    /**
+     * Sets temp file for edit content file.
+     *
+     * @param editContentTempFileHandle temp file for edit content file
+     */
+    private void setEditContentTempFileHandle(File editContentTempFileHandle) {
+        this.editContentTempFileHandle = editContentTempFileHandle;
+    }
+
+    /**
+     * Returns temp file for is content match.
+     *
+     * @return temp file for is content match
+     */
+    public File getIsContentMatchLeafListTempFileHandle() {
+        return isContentMatchLeafListTempFileHandle;
+    }
+
+    /**
+     * Sets temp file handle for is content match.
+     *
+     * @param isContentMatchLeafListTempFileHandle temp file handle for is content match
+     */
+    private void setIsContentMatchLeafListTempFileHandle(File isContentMatchLeafListTempFileHandle) {
+        this.isContentMatchLeafListTempFileHandle = isContentMatchLeafListTempFileHandle;
+    }
+
+    /**
+     * Returns temp file for is content match.
+     *
+     * @return temp file for is content match
+     */
+    public File getIsContentMatchNodeTempFileHandle() {
+        return isContentMatchNodeTempFileHandle;
+    }
+
+    /**
+     * Sets temp file handle for is content match.
+     *
+     * @param isContentMatchNodeTempFileHandle temp file handle for is content match
+     */
+    private void setIsContentMatchNodeTempFileHandle(File isContentMatchNodeTempFileHandle) {
+        this.isContentMatchNodeTempFileHandle = isContentMatchNodeTempFileHandle;
     }
 }

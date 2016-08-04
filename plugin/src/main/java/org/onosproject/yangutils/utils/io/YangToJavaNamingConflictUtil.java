@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yangutils.datamodel.javadatamodel;
+package org.onosproject.yangutils.utils.io;
 
 /**
  * Representation of YANG to java naming conflict resolver util.
@@ -24,22 +24,22 @@ public final class YangToJavaNamingConflictUtil {
     /**
      * Contains the replacement value for a period.
      */
-    private static String replacementForPeriodInIdentifier;
+    private String replacementForPeriodInIdentifier;
 
     /**
      * Contains the replacement value for an underscore.
      */
-    private static String replacementForUnderscoreInIdentifier;
+    private String replacementForUnderscoreInIdentifier;
 
     /**
      * Contains the replacement value for a hyphen.
      */
-    private static String replacementForHyphenInIdentifier;
+    private String replacementForHyphenInIdentifier;
 
     /**
      * Contains the prefix value for adding with the identifier.
      */
-    private static String prefixForIdentifier;
+    private String prefixForIdentifier;
 
     /**
      * Creates an object for YANG to java naming conflict util.

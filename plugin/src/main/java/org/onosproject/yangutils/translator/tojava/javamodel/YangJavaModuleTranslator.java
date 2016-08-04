@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaModule;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -62,7 +62,7 @@ public class YangJavaModuleTranslator
      */
     public YangJavaModuleTranslator() {
         super();
-        setJavaFileInfo(new JavaFileInfo());
+        setJavaFileInfo(new JavaFileInfoTranslator());
         setNotificationNodes(new ArrayList<>());
         getJavaFileInfo().setGeneratedFileTypes(GENERATE_SERVICE_AND_MANAGER | GENERATE_INTERFACE_WITH_BUILDER);
 
@@ -74,11 +74,11 @@ public class YangJavaModuleTranslator
      * @return generated java file information
      */
     @Override
-    public JavaFileInfo getJavaFileInfo() {
+    public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node");
         }
-        return javaFileInfo;
+        return (JavaFileInfoTranslator) javaFileInfo;
     }
 
     /**
@@ -87,7 +87,7 @@ public class YangJavaModuleTranslator
      * @param javaInfo java file info object
      */
     @Override
-    public void setJavaFileInfo(JavaFileInfo javaInfo) {
+    public void setJavaFileInfo(JavaFileInfoTranslator javaInfo) {
         javaFileInfo = javaInfo;
     }
 
@@ -156,8 +156,8 @@ public class YangJavaModuleTranslator
             if (isRootNodesCodeGenRequired(this)) {
                 getTempJavaCodeFragmentFiles()
                         .generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
-                if ((getJavaFileInfo().getPluginConfig().getCodeGenerateForsbi() == null)
-                        || (!getJavaFileInfo().getPluginConfig().getCodeGenerateForsbi().equals(SBI))) {
+                if ((getJavaFileInfo().getPluginConfig().getCodeGenerateForSbi() == null)
+                        || (!getJavaFileInfo().getPluginConfig().getCodeGenerateForSbi().equals(SBI))) {
                     getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_SERVICE_AND_MANAGER, this);
                 }
             }

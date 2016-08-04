@@ -32,8 +32,7 @@ import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaAugmentTranslator;
@@ -320,22 +319,7 @@ public final class YangJavaModelUtils {
 
         if (javaCodeGeneratorInfo instanceof YangCase) {
             YangNode parent = ((YangCase) javaCodeGeneratorInfo).getParent();
-            if (parent instanceof YangAugment) {
-                parent = ((YangAugment) parent).getAugmentedNode();
-            }
-            JavaQualifiedTypeInfoTranslator parentsInfo = new JavaQualifiedTypeInfoTranslator();
-            JavaFileInfo parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-            String parentName;
-            String parentPkg;
-            if (parentInfo.getPackage() != null) {
-                parentName = getCapitalCase(((JavaFileInfoContainer) parent).getJavaFileInfo().getJavaName());
-                parentPkg = ((JavaFileInfoContainer) parent).getJavaFileInfo().getPackage();
-            } else {
-                parentName = getCapitalCase(getCamelCase(parent.getName(), yangPlugin.getConflictResolver()));
-                parentPkg = getNodesPackage(parent, yangPlugin);
-            }
-            parentsInfo.setClassInfo(parentName);
-            parentsInfo.setPkgInfo(parentPkg);
+            JavaQualifiedTypeInfoTranslator parentsInfo = getQualifierInfoForCasesParent(parent, yangPlugin);
             javaCodeGeneratorInfo.getTempJavaCodeFragmentFiles().getBeanTempFiles().getJavaExtendsListHolder()
                     .addToExtendsList(parentsInfo, (YangNode) javaCodeGeneratorInfo,
                             tempJavaCodeFragmentFiles.getBeanTempFiles());
@@ -344,6 +328,38 @@ public final class YangJavaModelUtils {
                     .addParentInfoInCurNodeTempFile((YangNode) javaCodeGeneratorInfo, yangPlugin);
 
         }
+    }
+
+    /**
+     * Returns cases parent's qualified info.
+     *
+     * @param parent           parent node
+     * @param yangPluginConfig plugin configuration
+     * @return cases parent's qualified info
+     */
+    public static JavaQualifiedTypeInfoTranslator getQualifierInfoForCasesParent(YangNode parent,
+                                                                                 YangPluginConfig yangPluginConfig) {
+        String parentName;
+        String parentPkg;
+        JavaQualifiedTypeInfoTranslator parentsInfo = new JavaQualifiedTypeInfoTranslator();
+        JavaFileInfoTranslator parentInfo;
+        if (parent instanceof YangChoice) {
+            parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+        } else {
+            parent = ((YangAugment) parent).getAugmentedNode();
+            parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+        }
+        if (parentInfo.getPackage() != null) {
+            parentName = getCapitalCase(parentInfo.getJavaName());
+            parentPkg = parentInfo.getPackage();
+        } else {
+            parentName = getCapitalCase(getCamelCase(parent.getName(), yangPluginConfig.getConflictResolver()));
+            parentPkg = getNodesPackage(parent, yangPluginConfig);
+        }
+        parentsInfo.setClassInfo(parentName);
+        parentsInfo.setPkgInfo(parentPkg);
+        return parentsInfo;
+
     }
 
     /**
@@ -404,7 +420,7 @@ public final class YangJavaModelUtils {
         if (!(parentNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("missing parent java node to get current node's package");
         }
-        JavaFileInfo parentJavaFileHandle = ((JavaFileInfoContainer) parentNode).getJavaFileInfo();
+        JavaFileInfoTranslator parentJavaFileHandle = ((JavaFileInfoContainer) parentNode).getJavaFileInfo();
         pkg = parentJavaFileHandle.getPackage() + PERIOD + parentJavaFileHandle.getJavaName();
         return pkg.toLowerCase();
     }
@@ -487,7 +503,7 @@ public final class YangJavaModelUtils {
      * @param yangPluginConfig plugin configurations
      * @return augment class name
      */
-    public static String getAugmentClassName(YangAugment augment, YangPluginConfig yangPluginConfig) {
+    static String getAugmentClassName(YangAugment augment, YangPluginConfig yangPluginConfig) {
         YangNodeIdentifier yangNodeIdentifier = augment.getTargetNode().get(augment.getTargetNode().size() - 1)
                 .getNodeIdentifier();
         String name = getCapitalCase(getCamelCase(yangNodeIdentifier.getName(), yangPluginConfig

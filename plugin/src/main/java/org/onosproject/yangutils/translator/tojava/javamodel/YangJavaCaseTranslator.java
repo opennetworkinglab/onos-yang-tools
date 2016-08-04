@@ -17,13 +17,13 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.io.IOException;
 
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaCase;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfAugmentableNode;
@@ -48,7 +48,7 @@ public class YangJavaCaseTranslator
      */
     public YangJavaCaseTranslator() {
         super();
-        setJavaFileInfo(new JavaFileInfo());
+        setJavaFileInfo(new JavaFileInfoTranslator());
         getJavaFileInfo().setGeneratedFileTypes(GENERATE_INTERFACE_WITH_BUILDER);
     }
 
@@ -58,11 +58,11 @@ public class YangJavaCaseTranslator
      * @return generated java file information
      */
     @Override
-    public JavaFileInfo getJavaFileInfo() {
+    public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node");
         }
-        return javaFileInfo;
+        return (JavaFileInfoTranslator) javaFileInfo;
     }
 
     /**
@@ -71,7 +71,7 @@ public class YangJavaCaseTranslator
      * @param javaInfo java file info object
      */
     @Override
-    public void setJavaFileInfo(JavaFileInfo javaInfo) {
+    public void setJavaFileInfo(JavaFileInfoTranslator javaInfo) {
         javaFileInfo = javaInfo;
     }
 

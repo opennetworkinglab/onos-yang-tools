@@ -26,10 +26,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.utils.UtilConstants.COLAN;
@@ -208,7 +208,7 @@ public final class JavaIdentifierSyntax {
             throw new TranslatorException("current node must have java file info");
         }
         String pkgInfo;
-        JavaFileInfo javaFileInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo();
         String pkg = getAbsolutePackagePath(javaFileInfo.getBaseCodeGenPath(), javaFileInfo.getPackageFilePath());
         if (!doesPackageExist(pkg)) {
             try {

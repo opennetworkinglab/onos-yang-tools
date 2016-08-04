@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaImportData;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
@@ -74,7 +74,7 @@ public class JavaExtendsListHolder {
      */
     public void addToExtendsList(JavaQualifiedTypeInfoTranslator info, YangNode node,
                                  TempJavaFragmentFiles tempJavaFragmentFiles) {
-        JavaFileInfo fileInfo = ((JavaFileInfoContainer) node).getJavaFileInfo();
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) node).getJavaFileInfo();
 
         JavaImportData importData = tempJavaFragmentFiles.getJavaImportData();
         boolean qualified = importData.addImportInfo(info,

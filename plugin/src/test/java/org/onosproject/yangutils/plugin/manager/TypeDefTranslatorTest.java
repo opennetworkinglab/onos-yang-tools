@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 

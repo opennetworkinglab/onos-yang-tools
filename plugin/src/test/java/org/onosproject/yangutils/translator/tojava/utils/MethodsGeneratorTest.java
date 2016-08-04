@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 

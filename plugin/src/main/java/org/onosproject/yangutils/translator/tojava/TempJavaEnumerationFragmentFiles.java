@@ -25,8 +25,7 @@ import java.util.Map;
 import org.onosproject.yangutils.datamodel.YangEnum;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
 
@@ -91,7 +90,7 @@ public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
      * @param javaFileInfo generated java file info
      * @throws IOException when fails to create new file handle
      */
-    TempJavaEnumerationFragmentFiles(JavaFileInfo javaFileInfo)
+    TempJavaEnumerationFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
         super(javaFileInfo);

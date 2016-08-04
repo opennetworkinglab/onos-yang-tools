@@ -24,8 +24,8 @@ import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -181,8 +181,8 @@ public class AttributesJavaDataTypeTest {
      *
      * @return java file info
      */
-    private JavaFileInfo addStubJavaFileInfo() {
-        JavaFileInfo fileInfo = new JavaFileInfo();
+    private JavaFileInfoTranslator addStubJavaFileInfo() {
+        JavaFileInfoTranslator fileInfo = new JavaFileInfoTranslator();
         fileInfo.setJavaName("test");
         fileInfo.setPackage("target");
         return fileInfo;

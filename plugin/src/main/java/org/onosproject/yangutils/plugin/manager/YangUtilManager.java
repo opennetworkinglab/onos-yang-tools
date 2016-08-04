@@ -32,8 +32,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangPluginConfig;
-import org.onosproject.yangutils.datamodel.javadatamodel.YangToJavaNamingConflictUtil;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.linker.YangLinker;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
@@ -179,7 +179,7 @@ public class YangUtilManager
             yangPlugin.setCodeGenDir(codeGenDir);
             yangPlugin.setConflictResolver(conflictResolver);
 
-            yangPlugin.setCodeGenerateForsbi(generateJavaFileForSbi.toLowerCase());
+            yangPlugin.setCodeGenerateForSbi(generateJavaFileForSbi.toLowerCase());
             /*
              * Obtain the YANG files at a path mentioned in plugin and creates
              * YANG file information set.
