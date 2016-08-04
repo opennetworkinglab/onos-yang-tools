@@ -19,7 +19,7 @@
 
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onlab-utils</artifactId>
+        <artifactId>onos-dependencies</artifactId>
         <version>1.7.0-SNAPSHOT</version>
     </parent>
 
@@ -36,4 +36,25 @@
         <module>datamodel</module>
         <module>plugin</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
