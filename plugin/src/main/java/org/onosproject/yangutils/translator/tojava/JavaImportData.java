@@ -41,7 +41,9 @@ import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.ONOS_EVENT_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
+import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static java.util.Collections.sort;
 
 /**
@@ -53,6 +55,16 @@ public class JavaImportData {
      * Flag to denote if any list in imported.
      */
     private boolean isListToImport;
+
+    /**
+     * Flag to denote if any queue is imported due to compiler annotation.
+     */
+    private boolean isQueueToImport;
+
+    /**
+     * Flag to denote if any set is imported due to compiler annotation.
+     */
+    private boolean isSetToImport;
 
     /**
      * Sorted set of import info, to be used to maintain the set of classes to
@@ -83,6 +95,42 @@ public class JavaImportData {
      */
     void setIfListImported(boolean isList) {
         isListToImport = isList;
+    }
+
+    /**
+     * Is Queue to be imported due to compiler annotations.
+     *
+     * @return status of queue import
+     */
+    public boolean isQueueToImport() {
+        return isQueueToImport;
+    }
+
+    /**
+     * Is Set to be imported due to compiler annotations.
+     *
+     * @return status of set import
+     */
+    public boolean isSetToImport() {
+        return isSetToImport;
+    }
+
+    /**
+     * Sets the status of the queue to be imported due to compiler annotations.
+     *
+     * @param queueToImport status of queue to import
+     */
+    public void setQueueToImport(boolean queueToImport) {
+        isQueueToImport = queueToImport;
+    }
+
+    /**
+     * Sets the status of the set to be imported due to compiler annotations.
+     *
+     * @param setToImport status of set to import
+     */
+    public void setSetToImport(boolean setToImport) {
+        isSetToImport = setToImport;
     }
 
     /**
@@ -124,7 +172,7 @@ public class JavaImportData {
 
         if (newImportInfo.getClassInfo().contentEquals(className)) {
             /*
-             * if the current class name is same as the attribute class name,
+             * If the current class name is same as the attribute class name,
              * then the attribute must be accessed in a qualified manner.
              */
             return true;
@@ -157,7 +205,7 @@ public class JavaImportData {
         }
 
         /*
-         * import is added, so it is a member for non qualified access
+         * Import is added, so it is a member for non qualified access
          */
         getImportSet().add(newImportInfo);
         return false;
@@ -185,6 +233,14 @@ public class JavaImportData {
 
         if (getIfListImported()) {
             imports.add(getImportForList());
+        }
+
+        if (isQueueToImport()) {
+            imports.add(getImportForQueue());
+        }
+
+        if (isSetToImport()) {
+            imports.add(getImportForSet());
         }
 
         sort(imports);
@@ -225,6 +281,24 @@ public class JavaImportData {
      */
     String getImportForList() {
         return IMPORT + COLLECTION_IMPORTS + PERIOD + LIST + SEMI_COLAN + NEW_LINE;
+    }
+
+    /**
+     * Returns import for queue attribute.
+     *
+     * @return import for queue attribute
+     */
+    public String getImportForQueue() {
+        return IMPORT + COLLECTION_IMPORTS + PERIOD + QUEUE + SEMI_COLAN + NEW_LINE;
+    }
+
+    /**
+     * Returns import for set attribute.
+     *
+     * @return import for set attribute
+     */
+    public String getImportForSet() {
+        return IMPORT + COLLECTION_IMPORTS + PERIOD + SET + SEMI_COLAN + NEW_LINE;
     }
 
     /**

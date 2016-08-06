@@ -37,6 +37,7 @@ import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangBase;
+import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangIdentityRef;
@@ -210,6 +211,10 @@ public final class DataModelUtils {
             resolutionNode.addToResolutionList(resolutionInfo, ResolvableType.YANG_BASE);
         } else if (resolutionInfo.getEntityToResolveInfo().getEntityToResolve() instanceof YangIdentityRef) {
             resolutionNode.addToResolutionList(resolutionInfo, ResolvableType.YANG_IDENTITYREF);
+        } else if (resolutionInfo.getEntityToResolveInfo()
+                .getEntityToResolve() instanceof YangCompilerAnnotation) {
+            resolutionNode.addToResolutionList(resolutionInfo,
+                    ResolvableType.YANG_COMPILER_ANNOTATION);
         }
     }
 

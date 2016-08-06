@@ -16,7 +16,7 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import org.onosproject.yangutils.datamodel.YangAppExtendedName;
+import org.onosproject.yangutils.datamodel.YangAppExtended;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
@@ -67,7 +67,7 @@ public final class AppExtendedNameListener {
         checkStackIsNotEmpty(listener, MISSING_HOLDER, APP_EXTENDED_NAME_DATA, ctx.extendedName().getText(), ENTRY);
 
         String prefix = getValidPrefix(ctx.APP_EXTENDED().getText(), APP_EXTENDED_NAME_DATA, ctx);
-        YangAppExtendedName extendedName = new YangAppExtendedName();
+        YangAppExtended extendedName = new YangAppExtended();
         extendedName.setPrefix(prefix);
         extendedName.setYangAppExtendedName(removeQuotesAndHandleConcat(ctx.extendedName().getText()));
 

@@ -21,7 +21,7 @@ package org.onosproject.yangutils.datamodel;
  */
 public enum YangDataStructure {
 
-    MAP,
+    QUEUE,
 
     LIST,
 
@@ -33,7 +33,7 @@ public enum YangDataStructure {
      * @param name data structure name from YANG file.
      * @return YANG data structure for corresponding data structure name.
      */
-    public static YangDataStructure getType(String name) {
+    public static YangDataStructure getDataStructureType(String name) {
         name = name.replace("\"", "");
         for (YangDataStructure dataStructure : values()) {
             if (dataStructure.name().toLowerCase().equals(name)) {

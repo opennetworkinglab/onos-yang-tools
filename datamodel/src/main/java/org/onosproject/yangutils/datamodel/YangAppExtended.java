@@ -16,6 +16,8 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -23,8 +25,10 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG extended name.
  */
-public class YangAppExtendedName implements Parsable {
+public class YangAppExtended
+        implements Parsable, Serializable {
 
+    private static final long serialVersionUID = 806201602L;
     /**
      * App extended name information.
      */

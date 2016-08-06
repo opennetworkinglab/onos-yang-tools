@@ -538,7 +538,7 @@ public final class JavaFileGeneratorUtils {
             throws IOException {
 
         YangPluginConfig pluginConfig = ((JavaFileInfoContainer) curNode).getJavaFileInfo().getPluginConfig();
-        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig));
+        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig, null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType, fileName, curNode));
     }
 
@@ -555,7 +555,7 @@ public final class JavaFileGeneratorUtils {
     private static void write(File file, String fileName, int genType, JavaDocType javaDocType,
                               YangPluginConfig pluginConfig)
             throws IOException {
-        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig));
+        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig, null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType, fileName));
     }
 

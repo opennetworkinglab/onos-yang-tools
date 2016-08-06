@@ -1,0 +1,20 @@
+module test {
+    namespace "urn:ietf:params:xml:ns:yang:ietf-isis";
+    prefix isis;
+    typedef isis-instance-state-ref {
+        type leafref {
+            path "/isis-prefix-ipv4-std/"
+            +"default-metric";
+        }
+    }
+    container isis-route-content {
+        leaf metric {
+            type isis-instance-state-ref ;
+        }
+    }
+    container isis-prefix-ipv4-std {
+        leaf default-metric {
+            type string;
+        }
+    }
+}

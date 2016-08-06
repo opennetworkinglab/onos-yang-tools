@@ -386,9 +386,8 @@ public class YangDerivedInfo<T>
      */
     public ResolvableStatus resolveTypeDerivedInfo(YangType<?> baseType)
             throws DataModelException {
-        /*
-         * Check whether the referred typedef is resolved.
-         */
+
+        //Check whether the referred typedef is resolved.
         if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED && baseType.getResolvableStatus() != RESOLVED) {
             throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
         }

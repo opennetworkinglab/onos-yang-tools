@@ -16,14 +16,21 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
 /**
  * Represents data model node to maintain information defined in YANG compiler-annotation.
  */
-public class YangCompilerAnnotation implements Parsable {
+public class YangCompilerAnnotation
+        implements Parsable, YangXPathResolver, Resolvable, Serializable {
+
+    private static final long serialVersionUID = 806201602L;
 
     /**
      * App data structure information.
@@ -33,7 +40,7 @@ public class YangCompilerAnnotation implements Parsable {
     /**
      * App extended name information.
      */
-    private YangAppExtendedName yangAppExtendedName;
+    private YangAppExtended yangAppExtended;
 
     /**
      * Prefix of compiler-annotation.
@@ -44,6 +51,16 @@ public class YangCompilerAnnotation implements Parsable {
      * Path of compiler-annotation.
      */
     private String path;
+
+    /**
+     * Path of compiler-annotation.
+     */
+    List<YangAtomicPath> atomicPathList = new LinkedList<>();
+
+    /**
+     * Resolution status.
+     */
+    private ResolvableStatus resolvableStatus;
 
     /**
      * Returns the YANG app data structure information.
@@ -104,8 +121,8 @@ public class YangCompilerAnnotation implements Parsable {
      *
      * @return the YANG app extended name information
      */
-    public YangAppExtendedName getYangAppExtendedName() {
-        return yangAppExtendedName;
+    public YangAppExtended getYangAppExtendedName() {
+        return yangAppExtended;
     }
 
     /**
@@ -113,8 +130,26 @@ public class YangCompilerAnnotation implements Parsable {
      *
      * @param yangAppExtendedName the YANG app extended name to set
      */
-    public void setYangAppExtendedName(YangAppExtendedName yangAppExtendedName) {
-        this.yangAppExtendedName = yangAppExtendedName;
+    public void setYangAppExtendedName(YangAppExtended yangAppExtendedName) {
+        this.yangAppExtended = yangAppExtendedName;
+    }
+
+    /**
+     * Returns the list of atomic path.
+     *
+     * @return the list of atomic path
+     */
+    public List<YangAtomicPath> getAtomicPathList() {
+        return atomicPathList;
+    }
+
+    /**
+     * Sets the atomic path.
+     *
+     * @param atomicPathList the atomic path list to set
+     */
+    public void setAtomicPathList(List<YangAtomicPath> atomicPathList) {
+        this.atomicPathList = atomicPathList;
     }
 
     @Override
@@ -130,5 +165,21 @@ public class YangCompilerAnnotation implements Parsable {
     @Override
     public void validateDataOnExit() throws DataModelException {
         // TODO : to be implemented
+    }
+
+    @Override
+    public ResolvableStatus getResolvableStatus() {
+        return resolvableStatus;
+    }
+
+    @Override
+    public void setResolvableStatus(ResolvableStatus resolvableStatus) {
+        this.resolvableStatus = resolvableStatus;
+    }
+
+    @Override
+    public Object resolve()
+            throws DataModelException {
+        return null;
     }
 }

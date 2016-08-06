@@ -221,7 +221,7 @@ public final class MethodsGeneratorTest {
      */
     @Test
     public void getGetterForInterfaceTest() {
-        String method = getGetterForInterface(CLASS_NAME, STRING_DATA_TYPE, false, GENERATE_SERVICE_AND_MANAGER);
+        String method = getGetterForInterface(CLASS_NAME, STRING_DATA_TYPE, false, GENERATE_SERVICE_AND_MANAGER, null);
         assertThat(true, is(method.contains(STRING_DATA_TYPE + SPACE + GET_METHOD_PREFIX)));
     }
 
@@ -244,7 +244,7 @@ public final class MethodsGeneratorTest {
     @Test
     public void getSetterForInterfaceTest() {
         String method = getSetterForInterface(CLASS_NAME, STRING_DATA_TYPE, CLASS_NAME, false,
-                GENERATE_SERVICE_AND_MANAGER);
+                GENERATE_SERVICE_AND_MANAGER, null);
         assertThat(true, is(method.contains(VOID + SPACE +
                 SET_METHOD_PREFIX + "Testname")));
     }

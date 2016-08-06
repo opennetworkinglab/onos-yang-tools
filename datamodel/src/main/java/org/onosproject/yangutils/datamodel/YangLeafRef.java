@@ -379,9 +379,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
 
             if (baseType.getDataType() == YangDataTypes.LEAFREF) {
                 YangLeafRef referredLeafRefInfo = (YangLeafRef) (yangLeaf.getDataType().getDataTypeExtendedInfo());
-                /*
-                 * Check whether the referred typedef is resolved.
-                 */
+
+                //Check whether the referred typedef is resolved.
                 if (referredLeafRefInfo.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && referredLeafRefInfo.getResolvableStatus() != RESOLVED) {
                     throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
@@ -406,9 +405,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
                 }
                 setEffectiveDataType(referredLeafRefInfo.getEffectiveDataType());
             } else if (baseType.getDataType() == YangDataTypes.DERIVED) {
-                /*
-                 * Check whether the referred typedef is resolved.
-                 */
+
+                // Check whether the referred typedef is resolved.
                 if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && baseType.getResolvableStatus() != RESOLVED) {
                     throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
@@ -441,9 +439,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
 
             if (baseType.getDataType() == YangDataTypes.LEAFREF) {
                 YangLeafRef referredLeafRefInfo = (YangLeafRef) yangLeafList.getDataType().getDataTypeExtendedInfo();
-                /*
-                 * Check whether the referred typedef is resolved.
-                 */
+
+                //Check whether the referred typedef is resolved.
                 if (referredLeafRefInfo.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && referredLeafRefInfo.getResolvableStatus() != RESOLVED) {
                     throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
@@ -468,9 +465,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
                 }
                 setEffectiveDataType(referredLeafRefInfo.getEffectiveDataType());
             } else if (baseType.getDataType() == YangDataTypes.DERIVED) {
-                /*
-                 * Check whether the referred typedef is resolved.
-                 */
+
+                //Check whether the referred typedef is resolved.
                 if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && baseType.getResolvableStatus() != RESOLVED) {
                     throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");

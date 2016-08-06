@@ -54,5 +54,10 @@ public enum ResolvableType {
     /**
      * Identifies the augment.
      */
-    YANG_AUGMENT
+    YANG_AUGMENT,
+
+    /**
+     * Identifies the compiler annotations.
+     */
+    YANG_COMPILER_ANNOTATION
 }

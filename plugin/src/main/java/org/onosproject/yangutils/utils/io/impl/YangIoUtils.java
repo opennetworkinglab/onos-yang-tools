@@ -130,7 +130,8 @@ public final class YangIoUtils {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(getCopyrightHeader());
-            bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode, pluginConfig));
+            //TODO: get the compiler annotations and pass the info
+            bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode, pluginConfig, null));
             String pkg = PACKAGE + SPACE + pack + SEMI_COLAN;
             if (pkg.length() > LINE_SIZE) {
                 pkg = whenDelimiterIsPresent(pkg, LINE_SIZE);

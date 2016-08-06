@@ -165,20 +165,20 @@ public class YangList
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     * <p>
+     *
      * If no "min-elements" statement is present, it defaults to zero.
-     * <p>
+     *
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     * <p>
+     *
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     * <p>
+     *
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -209,12 +209,35 @@ public class YangList
     private List<YangIfFeature> ifFeatureList;
 
     /**
+     * Compiler Annotation.
+     */
+    private transient YangCompilerAnnotation compilerAnnotation;
+
+    /**
      * Creates a YANG list object.
      */
     public YangList() {
         super(YangNodeType.LIST_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    /**
+     * Returns the compiler annotation.
+     *
+     * @return the compiler annotation
+     */
+    public YangCompilerAnnotation getCompilerAnnotation() {
+        return compilerAnnotation;
+    }
+
+    /**
+     * Sets the compiler annotation.
+     *
+     * @param compilerAnnotation the compiler annotation to set
+     */
+    public void setCompilerAnnotation(YangCompilerAnnotation compilerAnnotation) {
+        this.compilerAnnotation = compilerAnnotation;
     }
 
     /**
@@ -549,7 +572,7 @@ public class YangList
         setDefaultConfigValueToChild(leaves, leafLists);
         validateConfig(leaves, leafLists);
 
-        /* A list must have atleast one key leaf if config is true */
+        //A list must have atleast one key leaf if config is true
         if (isConfig && (keys == null || leaves == null) && !isUsesPresentInList()
                 && !isListPresentInGrouping()) {
             throw new DataModelException("A list must have atleast one key leaf if config is true;");

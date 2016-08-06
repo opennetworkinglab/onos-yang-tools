@@ -16,7 +16,6 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -248,15 +247,12 @@ public abstract class YangNode
         YangNode curNode;
         curNode = getChild();
 
-        /*
-         * Get the predecessor child of new child
-         */
+        // Get the predecessor child of new child
         while (curNode.getNextSibling() != null) {
-
             curNode = curNode.getNextSibling();
         }
 
-        /* If the new node needs to be the last child */
+        // If the new node needs to be the last child
         if (curNode.getNextSibling() == null) {
             curNode.setNextSibling(newChild);
             newChild.setPreviousSibling(curNode);

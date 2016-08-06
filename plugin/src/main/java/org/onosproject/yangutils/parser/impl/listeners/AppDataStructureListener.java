@@ -24,7 +24,7 @@ import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yangutils.datamodel.YangDataStructure.getType;
+import static org.onosproject.yangutils.datamodel.YangDataStructure.getDataStructureType;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.APP_DATA_STRUCTURE;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
@@ -75,7 +75,7 @@ public final class AppDataStructureListener {
         checkStackIsNotEmpty(listener, MISSING_HOLDER, APP_DATA_STRUCTURE, "", ENTRY);
 
         String prefix = getValidPrefix(ctx.APP_DATA_STRUCTURE().getText(), APP_DATA_STRUCTURE, ctx);
-        YangDataStructure dataStructure = getType(ctx.appDataStructure().getText());
+        YangDataStructure dataStructure = getDataStructureType(ctx.appDataStructure().getText());
 
         YangAppDataStructure appDataStructure = new YangAppDataStructure();
         appDataStructure.setPrefix(prefix);

@@ -22,10 +22,11 @@ import java.util.List;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
+import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
-import org.onosproject.yangutils.datamodel.YangModule;
+import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
@@ -447,16 +448,12 @@ public class TempJavaFragmentFiles {
             addGeneratedTempFile(FROM_STRING_IMPL_MASK);
         }
 
-        /*
-         * Initialize temp files to generate enum class.
-         */
+        //Initialize temp files to generate enum class.
         if ((getGeneratedJavaFiles() & GENERATE_ENUM_CLASS) != 0) {
             addGeneratedTempFile(FROM_STRING_IMPL_MASK);
         }
 
-        /*
-         * Set temporary file handles.
-         */
+        //Set temporary file handles
         if ((getGeneratedTempFiles() & ATTRIBUTES_MASK) != 0) {
             setAttributesTempFileHandle(getTemporaryFileHandle(ATTRIBUTE_FILE_NAME));
         }
@@ -586,8 +583,36 @@ public class TempJavaFragmentFiles {
                     className, fileInfo.getPackage());
         }
 
-        if (isListNode) {
+        boolean collectionSetFlag = false;
+        if (curNode instanceof YangList) {
+            YangList yangList = (YangList) curNode;
+            if (yangList.getCompilerAnnotation() != null && yangList.getCompilerAnnotation()
+                    .getYangAppDataStructure() != null) {
+                switch (yangList.getCompilerAnnotation().getYangAppDataStructure().getDataStructure()) {
+                    case QUEUE: {
+                        parentImportData.setQueueToImport(true);
+                        collectionSetFlag = true;
+                        break;
+                    }
+                    case SET: {
+                        parentImportData.setSetToImport(true);
+                        collectionSetFlag = true;
+                        break;
+                    }
+                    default: {
+                        // TODO : to be implemented
+                    }
+                }
+            }
+        }
+
+        if (isListNode && !(collectionSetFlag)) {
             parentImportData.setIfListImported(true);
+        }
+
+        if (curNode instanceof YangList) {
+            return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode,
+                    ((YangList) curNode).getCompilerAnnotation());
         }
 
         return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode);
@@ -1121,9 +1146,13 @@ public class TempJavaFragmentFiles {
                         getGeneratedJavaFiles()) + NEW_LINE);
             }
         } else {
+            String appDataStructure = null;
+            if (attr.getCompilerAnnotation() != null) {
+                appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
+            }
             appendToFile(getGetterImplTempFileHandle(),
-                    getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig)
-                            + getGetterForClass(attr, getGeneratedJavaFiles()) + NEW_LINE);
+                    getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                            appDataStructure) + getGetterForClass(attr, getGeneratedJavaFiles()) + NEW_LINE);
         }
     }
 
@@ -1136,7 +1165,7 @@ public class TempJavaFragmentFiles {
      */
     private void addAddToListInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig) throws IOException {
         appendToFile(getAddToListInterfaceTempFileHandle(),
-                getJavaDoc(ADD_TO_LIST, getCapitalCase(attr.getAttributeName()), false, pluginConfig)
+                getJavaDoc(ADD_TO_LIST, getCapitalCase(attr.getAttributeName()), false, pluginConfig, null)
                         + getAddToListMethodInterface(attr) + NEW_LINE);
     }
 
@@ -1322,7 +1351,6 @@ public class TempJavaFragmentFiles {
      */
     public String getTemporaryDataFromFileHandle(File file, String absolutePath)
             throws IOException {
-
         String path = getTempDirPath(absolutePath);
         if (new File(path + file.getName()).exists()) {
             return readAppendFile(path + file.getName(), EMPTY_STRING);
@@ -1351,9 +1379,7 @@ public class TempJavaFragmentFiles {
      * @return attribute string
      */
     String parseAttribute(JavaAttributeInfo attr, YangPluginConfig pluginConfig) {
-        /*
-         * TODO: check if this utility needs to be called or move to the caller
-         */
+         //TODO: check if this utility needs to be called or move to the caller
         String attributeName = getCamelCase(attr.getAttributeName(), pluginConfig.getConflictResolver());
         String attributeAccessType = PRIVATE;
         if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
@@ -1362,10 +1388,10 @@ public class TempJavaFragmentFiles {
         if (attr.isQualifiedName()) {
             return getJavaAttributeDefinition(attr.getImportInfo().getPkgInfo(),
                     attr.getImportInfo().getClassInfo(),
-                    attributeName, attr.isListAttr(), attributeAccessType);
+                    attributeName, attr.isListAttr(), attributeAccessType, attr.getCompilerAnnotation());
         } else {
             return getJavaAttributeDefinition(null, attr.getImportInfo().getClassInfo(), attributeName,
-                    attr.isListAttr(), attributeAccessType);
+                    attr.isListAttr(), attributeAccessType, attr.getCompilerAnnotation());
         }
     }
 
@@ -1392,7 +1418,6 @@ public class TempJavaFragmentFiles {
      * @param pluginConfig plugin configurations
      */
     void addParentInfoInCurNodeTempFile(YangNode curNode, YangPluginConfig pluginConfig) {
-
         JavaQualifiedTypeInfoTranslator caseImportInfo = new JavaQualifiedTypeInfoTranslator();
         YangNode parent = getParentNodeInGenCode(curNode);
         if (curNode instanceof YangCase && parent instanceof YangAugment) {
@@ -1618,30 +1643,26 @@ public class TempJavaFragmentFiles {
             addImportsForAugmentableClass(imports, true, true);
         }
         createPackage(curNode);
-        /*
-         * Generate java code.
-         */
+
+        //Generate java code.
         if ((fileType & INTERFACE_MASK) != 0 || (fileType &
                 BUILDER_INTERFACE_MASK) != 0) {
-            /*
-             * Create interface file.
-             */
+
+            //Create interface file.
             setInterfaceJavaFileHandle(getJavaFileHandle(getJavaClassName(INTERFACE_FILE_NAME_SUFFIX)));
             setInterfaceJavaFileHandle(
                     generateInterfaceFile(getInterfaceJavaFileHandle(), imports, curNode, isAttributePresent()));
             if (!(curNode instanceof YangModule) && !(curNode instanceof YangSubModule)) {
-            /*
-             * Create builder interface file.
-             */
+
+                //Create builder interface file.
                 if ((fileType & BUILDER_INTERFACE_MASK) != 0) {
                     setBuilderInterfaceJavaFileHandle(
                             getJavaFileHandle(getJavaClassName(BUILDER_INTERFACE_FILE_NAME_SUFFIX)));
                     setBuilderInterfaceJavaFileHandle(
                             generateBuilderInterfaceFile(getBuilderInterfaceJavaFileHandle(), curNode,
                                     isAttributePresent()));
-                /*
-                 * Append builder interface file to interface file and close it.
-                 */
+
+                    //Append builder interface file to interface file and close it.
                     mergeJavaFiles(getBuilderInterfaceJavaFileHandle(), getInterfaceJavaFileHandle());
                     validateLineLength(getInterfaceJavaFileHandle());
                 }
@@ -1662,36 +1683,32 @@ public class TempJavaFragmentFiles {
                 addInvocationExceptionImport(imports);
             }
             sortImports(imports);
-            /*
-             * Create impl class file.
-             */
+
+            //Create impl class file.
             setImplClassJavaFileHandle(getJavaFileHandle(getImplClassName(curNode)));
             setImplClassJavaFileHandle(
                     generateDefaultClassFile(getImplClassJavaFileHandle(), curNode, isAttributePresent(), imports));
-            /*
-             * Create builder class file.
-             */
+
+            //Create builder class file.
             if ((fileType & BUILDER_CLASS_MASK) != 0) {
                 setBuilderClassJavaFileHandle(getJavaFileHandle(getJavaClassName(BUILDER_CLASS_FILE_NAME_SUFFIX)));
                 setBuilderClassJavaFileHandle(
                         generateBuilderClassFile(getBuilderClassJavaFileHandle(), curNode,
                                 isAttributePresent()));
-                /*
-                 * Append impl class to builder class and close it.
-                 */
+
+                //Append impl class to builder class and close it.
                 mergeJavaFiles(getBuilderClassJavaFileHandle(), getImplClassJavaFileHandle());
                 validateLineLength(getImplClassJavaFileHandle());
             }
             insertDataIntoJavaFile(getImplClassJavaFileHandle(), getJavaClassDefClose());
 
         }
-        /*
-         * Close all the file handles.
-         */
+
+        //Close all the file handles.
         freeTemporaryResources(false);
     }
 
-    /*Adds import for array list.*/
+    //Adds import for array list.
     private void addArrayListImport(List<String> imports) {
         if (imports.contains(getJavaImportData().getImportForList())) {
             imports.add(ARRAY_LIST_IMPORT);

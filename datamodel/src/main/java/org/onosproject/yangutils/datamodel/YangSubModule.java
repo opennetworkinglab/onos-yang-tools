@@ -226,7 +226,7 @@ public class YangSubModule
     /**
      * Compiler annotation list.
      */
-    private List<YangCompilerAnnotation> compilerAnnotationList;
+    private List<YangResolutionInfo> compilerAnnotationList;
 
     /**
      * extension list.
@@ -256,6 +256,7 @@ public class YangSubModule
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         extensionList = new LinkedList<>();
+        compilerAnnotationList = new LinkedList<>();
     }
 
     /**
@@ -595,8 +596,10 @@ public class YangSubModule
             return leafRefResolutionList;
         } else if (type == ResolvableType.YANG_BASE) {
             return baseResolutionList;
-        } else {
+        } else if (type == ResolvableType.YANG_IDENTITYREF) {
             return identityRefResolutionList;
+        } else {
+            return compilerAnnotationList;
         }
     }
 
@@ -617,6 +620,8 @@ public class YangSubModule
             augmentResolutionList.add(resolutionInfo);
         } else if (type == ResolvableType.YANG_IDENTITYREF) {
             identityRefResolutionList.add(resolutionInfo);
+        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
+            compilerAnnotationList.add(resolutionInfo);
         }
     }
 
@@ -637,6 +642,8 @@ public class YangSubModule
             augmentResolutionList = resolutionList;
         } else if (type == ResolvableType.YANG_IDENTITYREF) {
             identityRefResolutionList = resolutionList;
+        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
+            compilerAnnotationList = resolutionList;
         }
 
     }
@@ -696,34 +703,6 @@ public class YangSubModule
     public void setListOfFeature(List<YangFeature> listOfFeature) {
         this.listOfFeature = listOfFeature;
     }
-
-    /**
-     * Adds compiler annotation in compiler annotation list.
-     *
-     * @param compilerAnnotation the compiler annotation to be added
-     */
-    public void addCompilerAnnotation(YangCompilerAnnotation compilerAnnotation) {
-        getCompilerAnnotationList().add(compilerAnnotation);
-    }
-
-    /**
-     * Returns the compiler annotation list.
-     *
-     * @return the compiler annotation list
-     */
-    public List<YangCompilerAnnotation> getCompilerAnnotationList() {
-        return compilerAnnotationList;
-    }
-
-    /**
-     * Sets the compiler annotation list.
-     *
-     * @param compilerAnnotationList the list of compiler annotation
-     */
-    public void setCompilerAnnotationList(List<YangCompilerAnnotation> compilerAnnotationList) {
-        this.compilerAnnotationList = compilerAnnotationList;
-    }
-
 
     /**
      * Adds extension in extension list.

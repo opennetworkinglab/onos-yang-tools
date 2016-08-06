@@ -444,7 +444,7 @@ public class TempJavaEventFragmentFiles
     private void addEventEnum(String notificationName, YangPluginConfig pluginConfig)
             throws IOException {
         appendToFile(getEventEnumTempFileHandle(),
-                getJavaDoc(ENUM_ATTRIBUTE, notificationName, false, pluginConfig) + FOUR_SPACE_INDENTATION
+                getJavaDoc(ENUM_ATTRIBUTE, notificationName, false, pluginConfig, null) + FOUR_SPACE_INDENTATION
                         + getEnumJavaAttribute(notificationName).toUpperCase() + COMMA + NEW_LINE);
     }
 
@@ -464,17 +464,26 @@ public class TempJavaEventFragmentFiles
     /*Adds getter method for event in event subject class.*/
     private void addEventSubjectGetter(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
+        String appDataStructure = null;
+        if (attr.getCompilerAnnotation() != null) {
+            appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
+        }
         appendToFile(getEventSubjectGetterTempFileHandle(),
-                getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig)
-                        + getGetterForClass(attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
+                getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                        appDataStructure) + getGetterForClass(attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
     }
 
     /*Adds setter method for event in event subject class.*/
     private void addEventSubjectSetter(JavaAttributeInfo attr, YangPluginConfig pluginConfig, String className)
             throws IOException {
+        String appDataStructure = null;
+        if (attr.getCompilerAnnotation() != null) {
+            appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
+        }
         appendToFile(getEventSubjectSetterTempFileHandle(),
-                getJavaDoc(MANAGER_SETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig)
-                        + getSetterForClass(attr, className, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
+                getJavaDoc(MANAGER_SETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                        appDataStructure) + getSetterForClass(attr, className, GENERATE_EVENT_SUBJECT_CLASS)
+                        + NEW_LINE);
     }
 
     /**

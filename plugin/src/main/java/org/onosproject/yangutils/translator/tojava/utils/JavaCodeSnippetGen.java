@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava.utils;
 
 import java.util.List;
 
+import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -55,7 +56,9 @@ import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
+import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MAX_RANGE_ATTR;
@@ -110,11 +113,13 @@ public final class JavaCodeSnippetGen {
      * @param javaAttributeName    name of the attribute
      * @param isList               is list attribute
      * @param attributeAccessType  attribute access type
+     * @param compilerAnnotation compiler annotation
      * @return the textual java code for attribute definition in class
      */
     public static String getJavaAttributeDefinition(String javaAttributeTypePkg, String javaAttributeType,
                                                     String javaAttributeName, boolean isList,
-                                                    String attributeAccessType) {
+                                                    String attributeAccessType,
+                                                    YangCompilerAnnotation compilerAnnotation) {
 
         String attributeDefinition = attributeAccessType + SPACE;
 
@@ -126,13 +131,43 @@ public final class JavaCodeSnippetGen {
             attributeDefinition = attributeDefinition + javaAttributeType + SPACE + javaAttributeName + SEMI_COLAN
                     + NEW_LINE;
         } else {
-            attributeDefinition = attributeDefinition + LIST + DIAMOND_OPEN_BRACKET;
+            if (compilerAnnotation != null && compilerAnnotation.getYangAppDataStructure() != null) {
+                switch (compilerAnnotation.getYangAppDataStructure().getDataStructure()) {
+                    case QUEUE: {
+                        attributeDefinition = attributeDefinition + QUEUE + DIAMOND_OPEN_BRACKET;
+                        break;
+                    }
+                    case SET: {
+                        attributeDefinition = attributeDefinition + SET + DIAMOND_OPEN_BRACKET;
+                        break;
+                    }
+                    default: {
+                        attributeDefinition = attributeDefinition + LIST + DIAMOND_OPEN_BRACKET;
+                    }
+                }
+            } else {
+                attributeDefinition = attributeDefinition + LIST + DIAMOND_OPEN_BRACKET;
+            }
+
             if (javaAttributeTypePkg != null) {
                 attributeDefinition = attributeDefinition + javaAttributeTypePkg + PERIOD;
             }
 
-            attributeDefinition = attributeDefinition + javaAttributeType + DIAMOND_CLOSE_BRACKET + SPACE
-                    + javaAttributeName + SPACE + EQUAL + SPACE + NEW + SPACE + ARRAY_LIST + SEMI_COLAN + NEW_LINE;
+            attributeDefinition = attributeDefinition + javaAttributeType;
+
+            if (compilerAnnotation != null && compilerAnnotation.getYangAppDataStructure() != null) {
+                switch (compilerAnnotation.getYangAppDataStructure().getDataStructure()) {
+                    default: {
+                        attributeDefinition = attributeDefinition + DIAMOND_CLOSE_BRACKET + SPACE
+                                + javaAttributeName + SEMI_COLAN + NEW_LINE;
+                    }
+                }
+            } else {
+                attributeDefinition = attributeDefinition + DIAMOND_CLOSE_BRACKET + SPACE
+                        + javaAttributeName + SPACE + EQUAL + SPACE + NEW + SPACE
+                        + ARRAY_LIST + SEMI_COLAN + NEW_LINE;
+            }
+
         }
         return attributeDefinition;
     }
@@ -155,7 +190,7 @@ public final class JavaCodeSnippetGen {
      * @return string for enum's attribute
      */
     public static String generateEnumAttributeString(String name, int value, YangPluginConfig pluginConfig) {
-        return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, pluginConfig)
+        return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, pluginConfig, null)
                 + EIGHT_SPACE_INDENTATION + getEnumJavaAttribute(name).toUpperCase() + OPEN_PARENTHESIS
                 + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
     }

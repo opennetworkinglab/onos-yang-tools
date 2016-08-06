@@ -16,6 +16,7 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
+import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 
@@ -52,6 +53,11 @@ public final class JavaAttributeInfo {
      * will be use for qualified name.
      */
     private JavaQualifiedTypeInfoTranslator importInfo;
+
+    /**
+     * Compiler annotation attribute info.
+     */
+    private YangCompilerAnnotation compilerAnnotation;
 
     /**
      * If conflict occurs.
@@ -184,7 +190,25 @@ public final class JavaAttributeInfo {
     }
 
     /**
-     * Returns true if conflict between int and uInt.
+     * Returns the compiler annotation.
+     *
+     * @return compiler annotation info
+     */
+    public YangCompilerAnnotation getCompilerAnnotation() {
+        return compilerAnnotation;
+    }
+
+    /**
+     * Sets the compiler annotation.
+     *
+     * @param compilerAnnotation the compiler annotation to set
+     */
+    public void setCompilerAnnotation(YangCompilerAnnotation compilerAnnotation) {
+        this.compilerAnnotation = compilerAnnotation;
+    }
+
+    /**
+     * Returns true if conflict between int and uint.
      *
      * @return true if conflict between int and uInt
      */
@@ -244,6 +268,29 @@ public final class JavaAttributeInfo {
         newAttr.setAttributeType(attributeType);
         newAttr.setIsQualifiedAccess(isQualifiedAccess);
         newAttr.setListAttr(isListAttribute);
+
+        return newAttr;
+    }
+
+    /**
+     * Returns java attribute info.
+     *
+     * @param importInfo        java qualified type info
+     * @param attributeName     attribute name
+     * @param attributeType     attribute type
+     * @param isQualifiedAccess is the attribute a qualified access
+     * @param isListAttribute   is list attribute
+     * @param compilerAnnotation compiler annotation
+     * @return java attribute info.
+     */
+    public static JavaAttributeInfo getAttributeInfoForTheData(JavaQualifiedTypeInfoTranslator importInfo,
+                                                               String attributeName, YangType<?> attributeType,
+                                                               boolean isQualifiedAccess, boolean isListAttribute,
+                                                               YangCompilerAnnotation compilerAnnotation) {
+        JavaAttributeInfo newAttr = getAttributeInfoForTheData(importInfo, attributeName, attributeType,
+                                                               isQualifiedAccess, isListAttribute);
+
+        newAttr.setCompilerAnnotation(compilerAnnotation);
 
         return newAttr;
     }

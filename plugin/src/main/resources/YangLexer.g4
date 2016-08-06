@@ -133,7 +133,7 @@ lexer grammar YangLexer;
     PLUS : '+';
     MINUS: '-';
 
-    STRING : ((~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '"' | '\'')~( '\r' | '\n' | '\t' | ' ' | ';' | '{' )* ) | SUB_STRING );
+    STRING : ((~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '"' | '+' | '\'')~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '+')* ) | SUB_STRING );
 
     //Fragment rules
     fragment SUB_STRING : ('"' (ESC | ~["])*'"') | ('\'' (ESC | ~['])*'\'') ;

@@ -21,6 +21,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.onosproject.yangutils.datamodel.YangContainer;
+import org.onosproject.yangutils.datamodel.YangLeafRef;
+import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
@@ -146,5 +148,26 @@ public class TypeListenerTest {
         assertThat(leafInfo.getName(), is("invalid-interval"));
         assertThat(leafInfo.getDataType().getDataTypeName(), is("instance-identifier"));
         assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.INSTANCE_IDENTIFIER));
+    }
+
+    /**
+     * Checks for leaf ref path concatenation.
+     */
+    @Test
+    public void processLeafRefPathConcatenation() throws IOException, ParserException {
+
+        YangNode node = manager
+                .getDataModel("src/test/resources/leafRefPathConcatenation.yang");
+
+        assertThat((node instanceof YangModule), is(true));
+        assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
+        YangModule yangNode = (YangModule) node;
+        assertThat(yangNode.getName(), is("test"));
+
+        YangTypeDef typeDef = (YangTypeDef) yangNode.getChild();
+        assertThat(typeDef.getName(), is("isis-instance-state-ref"));
+        assertThat(typeDef.getTypeDefBaseType().getDataType(), is(YangDataTypes.LEAFREF));
+        YangLeafRef leafRef = ((YangLeafRef) typeDef.getTypeDefBaseType().getDataTypeExtendedInfo());
+        assertThat(leafRef.getPath(), is("/isis-prefix-ipv4-std/default-metric"));
     }
 }

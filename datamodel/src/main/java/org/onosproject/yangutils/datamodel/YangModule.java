@@ -85,7 +85,7 @@ public class YangModule
 
     /**
      * Reference:RFC 6020.
-     * <p>
+     *
      * The "contact" statement provides contact information for the module. The
      * argument is a string that is used to specify contact information for the
      * person or persons to whom technical queries concerning this module should
@@ -96,7 +96,7 @@ public class YangModule
 
     /**
      * Reference:RFC 6020.
-     * <p>
+     *
      * The "description" statement takes as an argument a string that contains a
      * human-readable textual description of this definition. The text is
      * provided in a language (or languages) chosen by the module developer; for
@@ -136,7 +136,7 @@ public class YangModule
 
     /**
      * Reference:RFC 6020.
-     * <p>
+     *
      * The "organization" statement defines the party responsible for this
      * module. The argument is a string that is used to specify a textual
      * description of the organization(s) under whose auspices this module was
@@ -233,7 +233,7 @@ public class YangModule
     /**
      * Compiler annotation list.
      */
-    private List<YangCompilerAnnotation> compilerAnnotationList;
+    private List<YangResolutionInfo> compilerAnnotationList;
 
     /**
      * Extension list.
@@ -569,33 +569,6 @@ public class YangModule
     }
 
     /**
-     * Adds compiler annotation in compiler-annotation list.
-     *
-     * @param compilerAnnotation the compiler-annotation to be added
-     */
-    public void addCompilerAnnotation(YangCompilerAnnotation compilerAnnotation) {
-        getCompilerAnnotationList().add(compilerAnnotation);
-    }
-
-    /**
-     * Returns the compiler annotation list.
-     *
-     * @return the compiler annotation list
-     */
-    public List<YangCompilerAnnotation> getCompilerAnnotationList() {
-        return compilerAnnotationList;
-    }
-
-    /**
-     * Sets the compiler-annotation list.
-     *
-     * @param compilerAnnotationList the list of compiler-annotation
-     */
-    public void setCompilerAnnotationList(List<YangCompilerAnnotation> compilerAnnotationList) {
-        this.compilerAnnotationList = compilerAnnotationList;
-    }
-
-    /**
      * Adds extension in extension list.
      *
      * @param extension the extension to be added
@@ -687,8 +660,10 @@ public class YangModule
             return leafRefResolutionList;
         } else if (type == ResolvableType.YANG_BASE) {
             return baseResolutionList;
-        } else {
+        } else if (type == ResolvableType.YANG_IDENTITYREF) {
             return identityRefResolutionList;
+        } else {
+            return compilerAnnotationList;
         }
     }
 
@@ -709,6 +684,8 @@ public class YangModule
             augmentResolutionList.add(resolutionInfo);
         } else if (type == ResolvableType.YANG_IDENTITYREF) {
             identityRefResolutionList.add(resolutionInfo);
+        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
+            compilerAnnotationList.add(resolutionInfo);
         }
     }
 
@@ -729,6 +706,8 @@ public class YangModule
             augmentResolutionList = resolutionList;
         } else if (type == ResolvableType.YANG_IDENTITYREF) {
             identityRefResolutionList = resolutionList;
+        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
+            compilerAnnotationList = resolutionList;
         }
 
     }

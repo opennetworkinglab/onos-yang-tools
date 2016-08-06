@@ -103,23 +103,23 @@ public class JavaCodeSnippetGenTest {
     public void testForJavaAttributeInfo() {
 
         String attributeWithoutTypePkg = getJavaAttributeDefinition(null, STRING_DATA_TYPE, YANG_NAME,
-                false, PRIVATE);
+                false, PRIVATE, null);
         assertThat(true, is(attributeWithoutTypePkg.equals(
                 PRIVATE + SPACE + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLAN + NEW_LINE)));
 
         String attributeWithTypePkg = getJavaAttributeDefinition(JAVA_LANG, STRING_DATA_TYPE, YANG_NAME,
-                false, PRIVATE);
+                false, PRIVATE, null);
         assertThat(true, is(attributeWithTypePkg.equals(PRIVATE + SPACE + JAVA_LANG + PERIOD
                 + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLAN + NEW_LINE)));
 
         String attributeWithListPkg = getJavaAttributeDefinition(JAVA_LANG, STRING_DATA_TYPE, YANG_NAME,
-                true, PRIVATE);
+                true, PRIVATE, null);
         assertThat(true, is(attributeWithListPkg.contains(
                 PRIVATE + SPACE + LIST + DIAMOND_OPEN_BRACKET + JAVA_LANG + PERIOD + STRING_DATA_TYPE
                         + DIAMOND_CLOSE_BRACKET + SPACE + YANG_NAME)));
 
         String attributeWithListWithoutPkg = getJavaAttributeDefinition(null, STRING_DATA_TYPE, YANG_NAME,
-                true, PRIVATE);
+                true, PRIVATE, null);
         assertThat(true, is(attributeWithListWithoutPkg.contains(
                 PRIVATE + SPACE + LIST + DIAMOND_OPEN_BRACKET + STRING_DATA_TYPE + DIAMOND_CLOSE_BRACKET + SPACE
                         + YANG_NAME)));
