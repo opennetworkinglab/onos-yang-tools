@@ -19,6 +19,8 @@ package org.onosproject.yangutils.datamodel;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -62,7 +64,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public class YangLeaf
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
-        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangDataNode {
+        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode {
 
     private static final long serialVersionUID = 806201635L;
 
@@ -420,4 +422,28 @@ public class YangLeaf
     public void setIfFeatureList(List<YangIfFeature> ifFeatureList) {
         this.ifFeatureList = ifFeatureList;
     }
+
+    @Override
+    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        // Returns null as there is no child to leaf.
+        return null;
+    }
+
+    @Override
+    public Set<YangSchemaNode> getMandatoryChildSet(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        // Returns null as there is no child to leaf.
+        return null;
+    }
+
+    @Override
+    public Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        // Returns null as there is no child to leaf.
+        return null;
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_LEAF_NODE;
+    }
+
 }

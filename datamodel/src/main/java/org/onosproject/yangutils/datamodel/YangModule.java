@@ -261,6 +261,11 @@ public class YangModule
         extensionList = new LinkedList<>();
     }
 
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+    }
+
     /**
      * Returns name of the module.
      *

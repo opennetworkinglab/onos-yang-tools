@@ -19,7 +19,6 @@ package org.onosproject.yangutils.datamodel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -72,7 +71,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 public class YangList
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
-        YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangDataNode,
+        YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201609L;
@@ -165,20 +164,20 @@ public class YangList
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     *
+     * <p>
      * If no "min-elements" statement is present, it defaults to zero.
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     *
+     * <p>
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -220,6 +219,11 @@ public class YangList
         super(YangNodeType.LIST_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_MULTI_INSTANCE_LEAF_NODE;
     }
 
     /**

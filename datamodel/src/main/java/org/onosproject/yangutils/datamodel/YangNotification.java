@@ -129,6 +129,11 @@ public class YangNotification
     }
 
     @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+    }
+
+    @Override
     public void detectCollidingChild(String identifierName, YangConstructType dataType)
             throws DataModelException {
         // Detect colliding child.

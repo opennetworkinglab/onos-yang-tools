@@ -18,7 +18,6 @@ package org.onosproject.yangutils.datamodel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -90,21 +89,21 @@ public class YangChoice extends YangNode
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "mandatory" statement, which is optional, takes as an argument the
      * string "true" or "false", and puts a constraint on valid data. If
      * "mandatory" is "true", at least one node from exactly one of the choice's
      * case branches MUST exist.
-     *
+     * <p>
      * If not specified, the default is "false".
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the choice's
      * closest ancestor node in the schema tree which is not a non-presence
      * container:
-     *
+     * <p>
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private String mandatory;
@@ -171,6 +170,11 @@ public class YangChoice extends YangNode
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(MISSING_CHOICE_ERROR_APP_TAG);
         yangAppErrorInfo.setErrorAppPath(ERROR_PATH_MISSING_CHOICE);
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     /**
@@ -370,7 +374,7 @@ public class YangChoice extends YangNode
 
             if (!matched) {
                 throw new DataModelException("YANG file error: default string \"" + defaultValueInString
-                                                     + "\" not matching choice \"" + getName() + "\" case.");
+                        + "\" not matching choice \"" + getName() + "\" case.");
             }
         }
     }

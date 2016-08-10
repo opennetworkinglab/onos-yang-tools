@@ -17,7 +17,6 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -105,6 +104,11 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
     public YangTypeDef() {
         super(YangNodeType.TYPEDEF_NODE);
         typeList = new LinkedList<>();
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     /**

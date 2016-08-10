@@ -15,12 +15,11 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-
-import java.io.Serializable;
 
 /*-
  * Reference RFC 6020.
@@ -67,6 +66,11 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
         super(YangNodeType.IDENTITYREF_NODE);
         baseIdentity = new YangNodeIdentifier();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     @Override

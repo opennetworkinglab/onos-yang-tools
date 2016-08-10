@@ -15,11 +15,10 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-
-import java.io.Serializable;
 
 /*-
  * Reference RFC 6020.
@@ -69,6 +68,11 @@ public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, 
     //Creates a identity type of node.
     public YangIdentity() {
         super(YangNodeType.IDENTITY_NODE);
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     /**

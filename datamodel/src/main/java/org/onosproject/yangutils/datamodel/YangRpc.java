@@ -96,6 +96,11 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
     }
 
     @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

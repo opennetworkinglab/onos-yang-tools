@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -257,6 +256,11 @@ public class YangSubModule
         listOfLeafList = new LinkedList<>();
         extensionList = new LinkedList<>();
         compilerAnnotationList = new LinkedList<>();
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
     }
 
     /**

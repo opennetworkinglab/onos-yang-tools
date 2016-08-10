@@ -16,6 +16,8 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -29,7 +31,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClo
  * Represents base class of a node in data model tree.
  */
 public abstract class YangNode
-        implements Cloneable, Serializable, YangDataNode, Comparable<YangNode> {
+        implements Cloneable, Serializable, YangSchemaNode, Comparable<YangNode> {
 
     private static final long serialVersionUID = 806201601L;
 
@@ -67,6 +69,21 @@ public abstract class YangNode
      * Flag if the node is for translation.
      */
     private boolean isToTranslate = true;
+
+    /**
+     * Map of YANG context information. It is to be consumed by YMS.
+     */
+    private Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap;
+
+    /**
+     * Set of mandatory YANG schema nodes.
+     */
+    private Set<YangSchemaNode> mandatoryChildSet;
+
+    /**
+     * Map of default schema nodes.
+     */
+    private Map<YangSchemaNodeIdentifier, YangSchemaNode> defaultChildMap;
 
     /**
      * Returns the priority of the node.
@@ -471,4 +488,72 @@ public abstract class YangNode
             throw new DataModelException("Sibling to be added is not atomic, it already has a next sibling");
         }
     }
+
+    @Override
+    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        return ysnContextInfoMap.get(dataNodeIdentifier);
+    }
+
+    @Override
+    public Set<YangSchemaNode> getMandatoryChildSet(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        return mandatoryChildSet;
+    }
+
+    @Override
+    public Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier) {
+        return defaultChildMap;
+    }
+
+    /**
+     * Adds child schema in child schema map.
+     *
+     * @param schemaNodeIdentifier      YANG schema node identifier
+     * @param yangSchemaNodeContextInfo YANG data node context information
+     */
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    /**
+     * Adds mandatory child information to set.
+     *
+     * @param yangSchemaNode YANG schema node
+     */
+    public void addToMandatoryChildSet(YangSchemaNode yangSchemaNode) {
+        mandatoryChildSet.add(yangSchemaNode);
+    }
+
+    /**
+     * Adds default child information to map.
+     *
+     * @param yangSchemaNodeIdentifier YANG schema node identifier
+     * @param yangSchemaNode           YANG schema node
+     */
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        getDefaultChildMap().put(yangSchemaNodeIdentifier, yangSchemaNode);
+    }
+
+    /**
+     * Returns default child map.
+     *
+     * @return default child map
+     */
+    public Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChildMap() {
+        return defaultChildMap;
+    }
+
+    /**
+     * Returns YANG schema node context info map.
+     *
+     * @return YANG schema node context info map
+     */
+    public Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> getYsnContextInfoMap() {
+        return ysnContextInfoMap;
+    }
+
+    @Override
+    public abstract YangSchemaNodeType getYangSchemaNodeType();
+
+
 }

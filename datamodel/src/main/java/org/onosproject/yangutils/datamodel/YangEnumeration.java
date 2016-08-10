@@ -18,7 +18,6 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -49,6 +48,11 @@ public class YangEnumeration
     public YangEnumeration() {
         super(YangNodeType.ENUMERATION_NODE);
         setEnumSet(new TreeSet<YangEnum>());
+    }
+
+    @Override
+    public YangSchemaNodeType getYangSchemaNodeType() {
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     /**
