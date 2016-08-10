@@ -20,10 +20,10 @@ import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
@@ -346,12 +346,12 @@ public final class JavaCodeSnippetGen {
                 "     * Identify the leafs whose value are explicitly set\n" +
                 "     * Applicable in protocol edit and query operation\n" +
                 "     */\n" +
-                "    private BitSet _valueLeafFlags = new BitSet();\n" +
+                "    private BitSet valueLeafFlags = new BitSet();\n" +
                 "\n" +
                 "    /**\n" +
                 "     * Identify the leafs to be selected, in a query operation\n" +
                 "     */\n" +
-                "    private BitSet _selectLeafFlags = new BitSet();\n";
+                "    private BitSet selectLeafFlags = new BitSet();\n";
     }
 
     /**
@@ -364,7 +364,7 @@ public final class JavaCodeSnippetGen {
                 "     * Specify the node specific operation in protocols like NETCONF.\n" +
                 "     * Applicable in protocol edit operation, will be ignored in query operation\n" +
                 "     */\n" +
-                "    private OperationType _operationType;\n" +
+                "    private OperationType operationType;\n" +
                 "\n";
     }
 
@@ -374,8 +374,8 @@ public final class JavaCodeSnippetGen {
      * @return operation type enum, leaf value set attribute and select leaf attribute for constructor
      */
     static String getOperationAttributeForConstructor() {
-        return "        this._valueLeafFlags = builderObject.get_valueLeafFlags();\n" +
-                "        this._selectLeafFlags = builderObject.get_selectLeafFlags();\n";
+        return "        this.valueLeafFlags = builderObject.getValueLeafFlags();\n" +
+                "        this.selectLeafFlags = builderObject.getSelectLeafFlags();\n";
     }
 
     /**
@@ -384,7 +384,7 @@ public final class JavaCodeSnippetGen {
      * @return operation type enum, leaf value set attribute and select leaf attribute for constructor
      */
     static String getOperationTypeForConstructor() {
-        return "        this._operationType = builderObject.get_operationType();\n";
+        return "        this.operationType = builderObject.getOperationType();\n";
     }
 
 }

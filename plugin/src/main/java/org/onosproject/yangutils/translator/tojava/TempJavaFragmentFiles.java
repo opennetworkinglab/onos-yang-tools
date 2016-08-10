@@ -18,22 +18,22 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
-import org.onosproject.yangutils.datamodel.YangModule;
+import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangList;
+import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaGroupingTranslator;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
@@ -519,7 +519,6 @@ public class TempJavaFragmentFiles {
         if (!(parent instanceof JavaCodeGenerator)) {
             throw new TranslatorException("missing parent node to contain current node info in generated file");
         }
-
         if (parent instanceof YangJavaGroupingTranslator) {
             /*
              * In case of grouping, there is no need to add the information, it
@@ -582,7 +581,6 @@ public class TempJavaFragmentFiles {
             isQualified = parentImportData.addImportInfo(qualifiedTypeInfo,
                     className, fileInfo.getPackage());
         }
-
         boolean collectionSetFlag = false;
         if (curNode instanceof YangList) {
             YangList yangList = (YangList) curNode;
@@ -605,16 +603,13 @@ public class TempJavaFragmentFiles {
                 }
             }
         }
-
         if (isListNode && !(collectionSetFlag)) {
             parentImportData.setIfListImported(true);
         }
-
         if (curNode instanceof YangList) {
             return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode,
                     ((YangList) curNode).getCompilerAnnotation());
         }
-
         return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode);
     }
 
@@ -1379,7 +1374,7 @@ public class TempJavaFragmentFiles {
      * @return attribute string
      */
     String parseAttribute(JavaAttributeInfo attr, YangPluginConfig pluginConfig) {
-         //TODO: check if this utility needs to be called or move to the caller
+        //TODO: check if this utility needs to be called or move to the caller
         String attributeName = getCamelCase(attr.getAttributeName(), pluginConfig.getConflictResolver());
         String attributeAccessType = PRIVATE;
         if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
@@ -1640,7 +1635,7 @@ public class TempJavaFragmentFiles {
         List<String> imports = ((JavaCodeGeneratorInfo) curNode).getTempJavaCodeFragmentFiles().getBeanTempFiles()
                 .getJavaImportData().getImports();
         if (curNode instanceof YangAugmentableNode) {
-            addImportsForAugmentableClass(imports, true, true);
+            addImportsForAugmentableClass(imports, true, true, curNode);
         }
         createPackage(curNode);
 
@@ -1669,7 +1664,7 @@ public class TempJavaFragmentFiles {
             }
             insertDataIntoJavaFile(getInterfaceJavaFileHandle(), getJavaClassDefClose());
             if (curNode instanceof YangAugmentableNode) {
-                addImportsForAugmentableClass(imports, false, true);
+                addImportsForAugmentableClass(imports, false, true, curNode);
             }
         }
         if ((fileType & BUILDER_CLASS_MASK) != 0 || (fileType & DEFAULT_CLASS_MASK) != 0) {
@@ -1677,9 +1672,18 @@ public class TempJavaFragmentFiles {
                 addImportsToStringAndHasCodeMethods(imports, true);
                 addArrayListImport(imports);
             }
-            addBitsetImport(imports);
+
+            boolean isLeavesPresent;
+            if (curNode instanceof YangLeavesHolder) {
+                YangLeavesHolder leavesHolder = (YangLeavesHolder) curNode;
+                isLeavesPresent = leavesHolder.getListOfLeaf() != null && !leavesHolder.getListOfLeaf().isEmpty()
+                        || leavesHolder.getListOfLeafList() != null && !leavesHolder.getListOfLeafList().isEmpty();
+                if (isLeavesPresent) {
+                    addBitsetImport(imports);
+                }
+            }
             if (curNode instanceof YangAugmentableNode) {
-                addImportsForAugmentableClass(imports, true, false);
+                addImportsForAugmentableClass(imports, true, false, curNode);
                 addInvocationExceptionImport(imports);
             }
             sortImports(imports);
@@ -1701,9 +1705,7 @@ public class TempJavaFragmentFiles {
                 validateLineLength(getImplClassJavaFileHandle());
             }
             insertDataIntoJavaFile(getImplClassJavaFileHandle(), getJavaClassDefClose());
-
         }
-
         //Close all the file handles.
         freeTemporaryResources(false);
     }
@@ -1741,13 +1743,18 @@ public class TempJavaFragmentFiles {
      * @param imports         import list
      * @param operations      true for adding and false for deletion
      * @param isInterfaceFile if need to add in interface file
+     * @param curNode         current node
      */
-    private void addImportsForAugmentableClass(List<String> imports, boolean operations, boolean isInterfaceFile) {
+    private void addImportsForAugmentableClass(List<String> imports, boolean operations, boolean isInterfaceFile,
+                                               YangNode curNode) {
         if (operations) {
             if (!isInterfaceFile) {
                 imports.add(getJavaImportData().getHashMapImport());
             }
-            imports.add(getJavaImportData().getMapImport());
+            // Add import for hash map only if node is not a YANG choice.
+            if (!(curNode instanceof YangChoice)) {
+                imports.add(getJavaImportData().getMapImport());
+            }
         } else {
             if (!isInterfaceFile) {
                 imports.remove(getJavaImportData().getHashMapImport());

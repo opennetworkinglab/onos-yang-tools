@@ -28,18 +28,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.FileUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
+import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_KEY_WORDS;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
+import static org.onosproject.yangutils.utils.UtilConstants.ONE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.ORG;
 import static org.onosproject.yangutils.utils.UtilConstants.PACKAGE;
@@ -61,6 +63,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.UNDER_SCORE;
+import static org.onosproject.yangutils.utils.UtilConstants.UNUSED;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUTO_PREFIX;
 import static org.onosproject.yangutils.utils.io.impl.CopyrightHeader.getCopyrightHeader;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.appendFileContents;
@@ -238,6 +241,29 @@ public final class YangIoUtils {
         }
         return stringBuilder.toString();
     }
+
+    /**
+     * Replaces the last occurrence of a string with a given string.
+     *
+     * @param valueString     string under operation
+     * @param removalString   string to be replaced
+     * @param replacingString string with which replacement is to be done
+     * @return new string
+     */
+    public static String replaceLast(String valueString, String removalString, String replacingString) {
+        StringBuilder stringBuilder = new StringBuilder(valueString);
+        int index = valueString.lastIndexOf(removalString);
+        if (index != -1) {
+            stringBuilder.replace(index, index + 1, replacingString);
+        } else {
+            stringBuilder.append(NEW_LINE + EIGHT_SPACE_INDENTATION + UNUSED + OPEN_PARENTHESIS + ONE +
+                    CLOSE_PARENTHESIS + SEMI_COLAN);
+        }
+        return stringBuilder.toString();
+
+        // TODO remove generation of ENUM if there is no leaf node.
+    }
+
 
     /**
      * Returns the directory path of the package in canonical form.

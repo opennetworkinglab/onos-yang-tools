@@ -21,18 +21,18 @@ import java.util.Map;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
-import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.JavaDocGen;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
@@ -179,6 +179,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
+import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.TO;
 import static org.onosproject.yangutils.utils.UtilConstants.TRIM_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.TRUE;
@@ -190,7 +191,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.UINT_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MIN_RANGE;
-import static org.onosproject.yangutils.utils.UtilConstants.UNDER_SCORE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF_SET;
@@ -469,7 +469,7 @@ public final class MethodsGenerator {
 
     //Returns value leaf flag setter.
     private static String getValueLeafSetString(String name) {
-        return "\n        get_valueLeafFlags().set(LeafIdentifier." + name.toUpperCase() + ".getLeafIndex());";
+        return "\n        getValueLeafFlags().set(LeafIdentifier." + name.toUpperCase() + ".getLeafIndex());";
     }
 
     /**
@@ -519,7 +519,7 @@ public final class MethodsGenerator {
      * @return getter method for interface
      */
     static String getGetterForInterface(String yangName, String returnType, boolean isList,
-                                               int generatedJavaFiles, YangCompilerAnnotation compilerAnnotation) {
+                                        int generatedJavaFiles, YangCompilerAnnotation compilerAnnotation) {
         if (!isList) {
             return getGetterInterfaceString(returnType, yangName, generatedJavaFiles);
         }
@@ -556,8 +556,8 @@ public final class MethodsGenerator {
      * @return setter method for interface
      */
     static String getSetterForInterface(String attrName, String attrType, String className,
-                                               boolean isList, int generatedJavaFiles,
-                                               YangCompilerAnnotation compilerAnnotation) {
+                                        boolean isList, int generatedJavaFiles,
+                                        YangCompilerAnnotation compilerAnnotation) {
         if (!isList) {
             return getSetterInterfaceString(className, attrName, attrType, generatedJavaFiles);
         }
@@ -958,7 +958,8 @@ public final class MethodsGenerator {
                 getSmallCase(name) + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD + IS_EMPTY +
                 CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET
                 + NEW_LINE;
-        method = method + TWELVE_SPACE_INDENTATION + IF + OPEN_PARENTHESIS + APP_INSTANCE + PERIOD + getSmallCase(name)
+        method = method + TWELVE_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + APP_INSTANCE + PERIOD +
+                getSmallCase(name)
                 + OPEN_PARENTHESIS
                 + CLOSE_PARENTHESIS + SPACE + EQUAL + EQUAL + SPACE + NULL + SPACE + "||" + SPACE +
                 getSmallCase(name) + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD + IS_EMPTY + CLOSE_PARENTHESIS +
@@ -976,7 +977,7 @@ public final class MethodsGenerator {
                     + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + BOOLEAN_DATA_TYPE + SPACE +
                     FLAG + SPACE + EQUAL + SPACE + FALSE + SEMI_COLAN + NEW_LINE;
             method = method + SIXTEEN_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS + type + SPACE +
-                    UNDER_SCORE + getSmallCase(name)
+                    TMP_VAR + getSmallCase(name)
                     + SPACE + COLAN + SPACE + APP_INSTANCE + PERIOD + getSmallCase(name) + OPEN_PARENTHESIS
                     + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
             method = method + TWENTY_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + getSmallCase(name) + PERIOD;
@@ -988,7 +989,7 @@ public final class MethodsGenerator {
                     + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + BOOLEAN_DATA_TYPE + SPACE +
                     FLAG + SPACE + EQUAL + SPACE + FALSE + SEMI_COLAN + NEW_LINE;
             method = method + SIXTEEN_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS + name + SPACE +
-                    UNDER_SCORE + getSmallCase(name)
+                    TMP_VAR + getSmallCase(name)
                     + SPACE + COLAN + SPACE + APP_INSTANCE + PERIOD + getSmallCase(name) + OPEN_PARENTHESIS
                     + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
             method = method + TWENTY_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + getSmallCase(name) + PERIOD;
@@ -998,15 +999,15 @@ public final class MethodsGenerator {
         } else {
             method = method + EQUALS_STRING;
         }
-        method = method + OPEN_PARENTHESIS + UNDER_SCORE + getSmallCase(name) + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS
+        method = method + OPEN_PARENTHESIS + TMP_VAR + getSmallCase(name) + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS
                 + SPACE +
                 OPEN_CURLY_BRACKET + NEW_LINE + TWENTY_FOUR_SPACE_INDENTATION + FLAG + SPACE + EQUAL + SPACE + TRUE +
                 SEMI_COLAN
                 + NEW_LINE + TWENTY_FOUR_SPACE_INDENTATION + BREAK + SEMI_COLAN + NEW_LINE + TWENTY_SPACE_INDENTATION
                 + CLOSE_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
 
-        method = method + SIXTEEN_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + FLAG + SPACE + EQUAL + EQUAL
-                + SPACE + FALSE + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWENTY_SPACE_INDENTATION
+        method = method + SIXTEEN_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + NOT + FLAG
+                + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWENTY_SPACE_INDENTATION
                 + RETURN + SPACE + FALSE + SEMI_COLAN + NEW_LINE + SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
                 NEW_LINE;
         return method + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE + EIGHT_SPACE_INDENTATION +
@@ -1036,12 +1037,12 @@ public final class MethodsGenerator {
                 NEW_LINE + TWENTY_FOUR_SPACE_INDENTATION + PERIOD + GET_CLASS + COMMA + SPACE +
                 getSmallCase(YANG_AUGMENTED_OP_PARAM_INFO)
                 + CLOSE_PARENTHESIS + SEMI_COLAN + NEW_LINE
-                + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + CATCH + OPEN_PARENTHESIS
+                + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + CATCH + SPACE + OPEN_PARENTHESIS
                 + NO_SUCH_METHOD_EXCEPTION + " | " + INVOCATION_TARGET_EXCEPTION + " | " + ILLEGAL_ACCESS_EXCEPTION +
                 SPACE + EXCEPTION_VAR + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE
                 + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE + SEMI_COLAN + NEW_LINE + TWELVE_SPACE_INDENTATION
                 + CLOSE_CURLY_BRACKET + NEW_LINE + TWELVE_SPACE_INDENTATION
-                + IF + OPEN_PARENTHESIS + NOT + FILTER_CONTENT_MATCH + CLOSE_PARENTHESIS +
+                + IF + SPACE + OPEN_PARENTHESIS + NOT + FILTER_CONTENT_MATCH + CLOSE_PARENTHESIS +
                 SPACE + OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + FALSE +
                 SEMI_COLAN + NEW_LINE + TWELVE_SPACE_INDENTATION
                 + CLOSE_CURLY_BRACKET + NEW_LINE + EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
@@ -1200,7 +1201,7 @@ public final class MethodsGenerator {
         return getOverRideString() + FOUR_SPACE_INDENTATION + PUBLIC + SPACE + INT + SPACE + HASH_CODE_STRING
                 + OPEN_PARENTHESIS + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
                 EIGHT_SPACE_INDENTATION
-                + RETURN + SPACE + OBJECT_STRING + SUFFIX_S + PERIOD + HASH + OPEN_PARENTHESIS + SPACE;
+                + RETURN + SPACE + OBJECT_STRING + SUFFIX_S + PERIOD + HASH + OPEN_PARENTHESIS;
     }
 
     /**
@@ -1649,7 +1650,7 @@ public final class MethodsGenerator {
                     getCapitalCase(parentName) + getCapitalCase(curNodeName), false, pluginConfig, null) +
                     getSetterForInterface(getSmallCase(AUGMENTED) + parentName +
                                     getCapitalCase(curNodeName), returnType, parentName, false,
-                                    GENERATE_SERVICE_AND_MANAGER, null) + NEW_LINE;
+                            GENERATE_SERVICE_AND_MANAGER, null) + NEW_LINE;
             methods.append(method);
         }
         return methods.toString();
@@ -1871,21 +1872,21 @@ public final class MethodsGenerator {
     static String getOperationAttributesGetters() {
         return "\n" +
                 "    /**\n" +
-                "     * Returns the _valueLeafFlags.\n" +
+                "     * Returns the valueLeafFlags.\n" +
                 "     *\n" +
-                "     * @return value of _valueLeafFlags\n" +
+                "     * @return value of valueLeafFlags\n" +
                 "     */\n" +
-                "    public BitSet get_valueLeafFlags() {\n" +
-                "        return _valueLeafFlags;\n" +
+                "    public BitSet getValueLeafFlags() {\n" +
+                "        return valueLeafFlags;\n" +
                 "    }\n" +
                 "\n" +
                 "    /**\n" +
-                "     * Returns the _selectLeafFlags.\n" +
+                "     * Returns the selectLeafFlags.\n" +
                 "     *\n" +
-                "     * @return value of _selectLeafFlags\n" +
+                "     * @return value of selectLeafFlags\n" +
                 "     */\n" +
-                "    public BitSet get_selectLeafFlags() {\n" +
-                "        return _selectLeafFlags;\n" +
+                "    public BitSet getSelectLeafFlags() {\n" +
+                "        return selectLeafFlags;\n" +
                 "    }\n" +
                 "\n";
     }
@@ -1897,12 +1898,12 @@ public final class MethodsGenerator {
      */
     static String getGetterForOperationType() {
         return "    /**\n" +
-                "     * Returns the _operationType.\n" +
+                "     * Returns the operationType.\n" +
                 "     *\n" +
-                "     * @return value of _operationType\n" +
+                "     * @return value of operationType\n" +
                 "     */\n" +
-                "    public OperationType get_operationType() {\n" +
-                "        return _operationType;\n" +
+                "    public OperationType getOperationType() {\n" +
+                "        return operationType;\n" +
                 "    }\n";
     }
 
@@ -1915,12 +1916,12 @@ public final class MethodsGenerator {
         return "\n" +
                 "    @Override\n" +
                 "    public boolean isLeafValueSet(LeafIdentifier leaf) {\n" +
-                "        return get_valueLeafFlags().get(leaf.getLeafIndex());\n" +
+                "        return getValueLeafFlags().get(leaf.getLeafIndex());\n" +
                 "    }\n" +
                 "\n" +
                 "    @Override\n" +
                 "    public boolean isSelectLeaf(LeafIdentifier leaf) {\n" +
-                "        return get_selectLeafFlags().get(leaf.getLeafIndex());\n" +
+                "        return getSelectLeafFlags().get(leaf.getLeafIndex());\n" +
                 "    }\n";
     }
 
@@ -1934,10 +1935,10 @@ public final class MethodsGenerator {
         return "    /**\n" +
                 "     * Set operation type.\n" +
                 "     *\n" +
-                "     * @param _operationType operation type\n" +
+                "     * @param operationType operation type\n" +
                 "     */\n" +
-                "    public " + name + BUILDER + " set_operationType(OperationType _operationType) {\n" +
-                "       this._operationType = _operationType;\n" +
+                "    public " + name + BUILDER + " setOperationType(OperationType operationType) {\n" +
+                "       this.operationType = operationType;\n" +
                 "        return this;\n" +
                 "    }\n";
     }
@@ -1957,7 +1958,7 @@ public final class MethodsGenerator {
         return "\n" +
                 "    " + append + "\n" +
                 "    public " + name + BUILDER + " selectLeaf(LeafIdentifier leaf) {\n" +
-                "        get_selectLeafFlags().set(leaf.getLeafIndex());\n" +
+                "        getSelectLeafFlags().set(leaf.getLeafIndex());\n" +
                 "        return this;\n" +
                 "    }\n";
     }

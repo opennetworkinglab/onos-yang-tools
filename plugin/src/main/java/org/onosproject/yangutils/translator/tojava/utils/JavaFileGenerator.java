@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
@@ -31,19 +30,19 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.translator.tojava.TempJavaEnumerationFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaEventFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaTypeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
@@ -171,6 +170,7 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.TYP
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.replaceLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
 import static java.util.Collections.sort;
@@ -226,12 +226,12 @@ public final class JavaFileGenerator {
                 //Leaf identifier enum.
                 if (isLeavesPresent) {
                     insertDataIntoJavaFile(file, NEW_LINE + getInterfaceLeafIdEnumSignature(className) + NEW_LINE +
-                            trimAtLast(trimAtLast(
+                            trimAtLast(replaceLast(
                                     getDataFromTempFileHandle(LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK,
                                             ((TempJavaCodeFragmentFilesContainer) curNode)
                                                     .getTempJavaCodeFragmentFiles()
-                                                    .getBeanTempFiles(), path), COMMA), NEW_LINE) + SEMI_COLAN
-                            + NEW_LINE + NEW_LINE + getInterfaceLeafIdEnumMethods());
+                                                    .getBeanTempFiles(), path), COMMA, SEMI_COLAN), NEW_LINE) +
+                            NEW_LINE + NEW_LINE + getInterfaceLeafIdEnumMethods());
                 }
 
                 //Getter methods.

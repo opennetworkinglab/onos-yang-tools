@@ -20,14 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT64;
@@ -526,6 +525,14 @@ public class TempJavaTypeFragmentFiles
         if ((fileType & GENERATE_TYPEDEF_CLASS) != 0) {
             addImportsToStringAndHasCodeMethods(imports, true);
             setTypedefClassJavaFileHandle(getJavaFileHandle(getJavaClassName(TYPEDEF_CLASS_FILE_NAME_SUFFIX)));
+
+            // In case if data type is binary, MoreObjects is not required and should be removed.
+            if (curNode instanceof YangTypeHolder) {
+                YangType yangType = ((YangTypeHolder) curNode).getTypeList().get(0);
+                if (yangType.getDataType() == YangDataTypes.BINARY) {
+                    imports.remove(getJavaImportData().getImportForToString());
+                }
+            }
             generateTypeDefClassFile(getTypedefClassJavaFileHandle(), curNode, imports);
         }
         /*

@@ -761,7 +761,7 @@ public final class UtilConstants {
     /**
      * Static attribute for get filter leaf flags.
      */
-    public static final String GET_FILTER_LEAF = "get_valueLeafFlags";
+    public static final String GET_FILTER_LEAF = "getValueLeafFlags";
 
     /**
      * Static attribute for getLeafIndex.
@@ -1396,6 +1396,21 @@ public final class UtilConstants {
      * Static attribute for arrayList import.
      */
     public static final String ARRAY_LIST_IMPORT = IMPORT + COLLECTION_IMPORTS + ".ArrayList;\n";
+
+    /**
+     * Static attribute for temp keyword.
+     */
+    public static final String TMP_VAR = "tmp";
+
+    /**
+     * Static attribute for unused keyword.
+     */
+    public static final String UNUSED = "UNUSED";
+
+    /**
+     * Static attribute for 1 keyword.
+     */
+    public static final String ONE = "1";
 
     /**
      * Creates an instance of util constants.
