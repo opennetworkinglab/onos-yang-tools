@@ -15,6 +15,7 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,11 +85,6 @@ public class YangSubModule
         RpcNotificationContainer, YangFeatureHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201614L;
-
-    /**
-     * Name of sub module.
-     */
-    private String name;
 
     /**
      * Module to which it belongs to.
@@ -241,7 +237,7 @@ public class YangSubModule
      * Creates a sub module node.
      */
     public YangSubModule() {
-        super(YangNodeType.SUB_MODULE_NODE);
+        super(YangNodeType.SUB_MODULE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         derivedTypeResolutionList = new LinkedList<>();
         augmentResolutionList = new LinkedList<>();
         usesResolutionList = new LinkedList<>();
@@ -259,28 +255,24 @@ public class YangSubModule
     }
 
     @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
-    }
-
-    /**
-     * Returns the YANG name of the sub module.
-     *
-     * @return YANG name of the sub module
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets YANG name of the sub module.
-     *
-     * @param subModuleName YANG name of the sub module
-     */
-    @Override
-    public void setName(String subModuleName) {
-        name = subModuleName;
     }
 
     /**
@@ -661,6 +653,7 @@ public class YangSubModule
     public void linkWithModule(Set<YangNode> yangNodeSet)
             throws DataModelException {
         getBelongsTo().linkWithModule(yangNodeSet);
+        setNameSpace(getBelongsTo().getModuleNode().getNameSpace());
     }
 
     @Override
@@ -734,4 +727,17 @@ public class YangSubModule
     public void setExtensionList(List<YangExtension> extensionList) {
         this.extensionList = extensionList;
     }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+    }
+
 }

@@ -36,8 +36,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.UNITS_
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerCollisionDetector.detectCollidingChildUtil;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
-        .constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
@@ -91,10 +90,10 @@ public final class LeafListListener {
      * (leaf-list), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafListEntry(TreeWalkListener listener,
-            GeneratedYangParser.LeafListStatementContext ctx) {
+                                            GeneratedYangParser.LeafListStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LEAF_LIST_DATA, ctx.identifier().getText(), ENTRY);
@@ -131,10 +130,10 @@ public final class LeafListListener {
      * validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafListExit(TreeWalkListener listener,
-            GeneratedYangParser.LeafListStatementContext ctx) {
+                                           GeneratedYangParser.LeafListStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LEAF_LIST_DATA, ctx.identifier().getText(), EXIT);

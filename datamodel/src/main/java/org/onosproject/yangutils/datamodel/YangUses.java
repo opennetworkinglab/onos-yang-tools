@@ -144,12 +144,32 @@ public class YangUses
      * Creates an YANG uses node.
      */
     public YangUses() {
-        super(YangNodeType.USES_NODE);
+        super(YangNodeType.USES_NODE, null);
         nodeIdentifier = new YangNodeIdentifier();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
         resolvedGroupingNodes = new LinkedList<YangNode>();
         resolvedGroupingLeaves = new LinkedList<List<YangLeaf>>();
         resolvedGroupingLeafLists = new LinkedList<List<YangLeafList>>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // Do nothing.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                     YangSchemaNode yangSchemaNode) {
+        // Do nothing.
+        // TODO
     }
 
     @Override
@@ -317,16 +337,6 @@ public class YangUses
     public void validateDataOnExit()
             throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
-    }
-
-    @Override
-    public String getName() {
-        return nodeIdentifier.getName();
-    }
-
-    @Override
-    public void setName(String name) {
-        nodeIdentifier.setName(name);
     }
 
     /**
@@ -673,12 +683,31 @@ public class YangUses
         this.ifFeatureList = ifFeatureList;
     }
 
+    /**
+     * Sets the current grouping depth.
+     *
+     * @param currentGroupingDepth current grouping depth
+     */
     public void setCurrentGroupingDepth(int currentGroupingDepth) {
         this.currentGroupingDepth = currentGroupingDepth;
     }
 
+    /**
+     * Returns the current grouping depth.
+     *
+     * @return current grouping depth
+     */
     public int getCurrentGroupingDepth() {
         return currentGroupingDepth;
     }
 
+    @Override
+    public String getName() {
+        return nodeIdentifier.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        nodeIdentifier.setName(name);
+    }
 }

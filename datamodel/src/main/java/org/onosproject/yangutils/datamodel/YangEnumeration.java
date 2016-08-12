@@ -39,15 +39,29 @@ public class YangEnumeration
     // Enumeration info set.
     private SortedSet<YangEnum> enumSet;
 
-    // Enumeration name.
-    private String name;
-
     /**
      * Creates an enumeration object.
      */
     public YangEnumeration() {
-        super(YangNodeType.ENUMERATION_NODE);
+        super(YangNodeType.ENUMERATION_NODE, null);
         setEnumSet(new TreeSet<YangEnum>());
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
@@ -84,26 +98,6 @@ public class YangEnumeration
         if (!getEnumSet().add(enumInfo)) {
             throw new DataModelException("YANG ENUM already exists");
         }
-    }
-
-    /**
-     * Returns enumeration name.
-     *
-     * @return the enumeration name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the enumeration name.
-     *
-     * @param name enumeration name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -64,11 +65,6 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
     private static final long serialVersionUID = 806201613L;
 
     /**
-     * Name of the rpc.
-     */
-    private String name;
-
-    /**
      * Description of rpc.
      */
     private String description;
@@ -92,22 +88,42 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
      * Create a rpc node.
      */
     public YangRpc() {
-        super(YangNodeType.RPC_NODE);
+        super(YangNodeType.RPC_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        /*
+         * This will maintain all child schema which are there inside input and
+         * output as input/output is non data node.
+         */
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        /*
+         * This will maintain all mandatory child which are there inside input and
+         * output as input/output is non data node.
+         */
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                     YangSchemaNode yangSchemaNode) {
+        /*
+         * This will maintain all default child which are there inside input and
+         * output as input/output is non data node.
+         */
+        // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

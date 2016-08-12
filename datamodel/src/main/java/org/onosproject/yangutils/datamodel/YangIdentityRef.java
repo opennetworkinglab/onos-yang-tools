@@ -63,9 +63,26 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
 
     // Creates a specific identityref of node.
     public YangIdentityRef() {
-        super(YangNodeType.IDENTITYREF_NODE);
+        super(YangNodeType.IDENTITYREF_NODE, null);
         baseIdentity = new YangNodeIdentifier();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override

@@ -19,7 +19,6 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
@@ -31,9 +30,9 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeType;
 import org.onosproject.yangutils.datamodel.YangOutput;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
@@ -115,6 +114,7 @@ public final class JavaCodeGeneratorUtil {
                 setCurNode(codeGenNode);
                 try {
                     generateCodeEntry(codeGenNode, yangPlugin);
+                    codeGenNode.setNameSpaceAndAddToParentSchemaMap();
                 } catch (InvalidNodeForTranslatorException e) {
                     if (codeGenNode.getNextSibling() != null) {
                         curTraversal = SIBILING;

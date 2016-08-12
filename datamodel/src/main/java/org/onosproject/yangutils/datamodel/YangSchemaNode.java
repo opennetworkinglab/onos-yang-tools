@@ -17,7 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.Map;
-import java.util.Set;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
  * Abstraction of YANG data node, used by YMS to abstractly refer the data
@@ -42,13 +42,13 @@ public interface YangSchemaNode {
     YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier);
 
     /**
-     * Returns set of mandatory child nodes, this is used by YMS to identify whether
+     * Returns count of mandatory child nodes, this is used by YMS to identify whether
      * in request all mandatory child nodes are available.
      *
-     * @param dataNodeIdentifier YANG data node identifier
-     * @return set of YANG schema nodes
+     * @return count of YANG schema nodes
+     * @throws DataModelException a violation in data model rule
      */
-    Set<YangSchemaNode> getMandatoryChildSet(YangSchemaNodeIdentifier dataNodeIdentifier);
+    int getMandatoryChildCount() throws DataModelException;
 
     /**
      * Returns map of default child nodes, this is used by YMS to identify whether

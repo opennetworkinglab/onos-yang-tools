@@ -15,6 +15,7 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -87,11 +88,6 @@ public class YangAugment
     private static final long serialVersionUID = 806201602L;
 
     /**
-     * Augment target node.
-     */
-    private String name;
-
-    /**
      * Description of augment.
      */
     private String description;
@@ -147,8 +143,43 @@ public class YangAugment
      * Create a YANG augment node.
      */
     public YangAugment() {
-        super(YangNodeType.AUGMENT_NODE);
+        super(YangNodeType.AUGMENT_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        listOfLeaf = new LinkedList<>();
+        listOfLeafList = new LinkedList<>();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
+        getAugmentedNode().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+    }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        // Set namespace for self node.
+        setNameSpace(nameSpace);
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        setLeafNameSpaceAndAddToParentSchemaMap();
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
@@ -257,10 +288,6 @@ public class YangAugment
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        if (getListOfLeaf() == null) {
-            setListOfLeaf(new LinkedList<>());
-        }
-
         getListOfLeaf().add(leaf);
     }
 
@@ -291,11 +318,19 @@ public class YangAugment
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        if (getListOfLeafList() == null) {
-            setListOfLeafList(new LinkedList<>());
-        }
-
         getListOfLeafList().add(leafList);
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 
     /**
@@ -368,26 +403,6 @@ public class YangAugment
     public void validateDataOnExit()
             throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
-    }
-
-    /**
-     * Returns the target nodes name where the augmentation is being done.
-     *
-     * @return target nodes name where the augmentation is being done
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the target nodes name where the augmentation is being done.
-     *
-     * @param name target nodes name where the augmentation is being done
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

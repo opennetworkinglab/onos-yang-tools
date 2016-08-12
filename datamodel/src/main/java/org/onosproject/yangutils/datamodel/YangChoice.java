@@ -16,6 +16,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -71,11 +72,6 @@ public class YangChoice extends YangNode
         YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201604L;
-
-    /**
-     * Name of choice.
-     */
-    private String name;
 
     /**
      * If the choice represents config data.
@@ -165,11 +161,42 @@ public class YangChoice extends YangNode
      * Create a choice node.
      */
     public YangChoice() {
-        super(YangNodeType.CHOICE_NODE);
+        super(YangNodeType.CHOICE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         yangAppErrorInfo = new YangAppErrorInfo();
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(MISSING_CHOICE_ERROR_APP_TAG);
         yangAppErrorInfo.setErrorAppPath(ERROR_PATH_MISSING_CHOICE);
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
+        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+    }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        // Set namespace for self node.
+        setNameSpace(nameSpace);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        //For non data nodes, mandatory child to be added to parent node.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        //For non data nodes, default child to be added to parent node.
+        // TODO
     }
 
     @Override
@@ -195,26 +222,6 @@ public class YangChoice extends YangNode
     @Override
     public void setWhen(YangWhen when) {
         this.when = when;
-    }
-
-    /**
-     * Returns the choice name.
-     *
-     * @return choice name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the choice name.
-     *
-     * @param name choice name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

@@ -66,4 +66,11 @@ public interface YangLeavesHolder {
      * @param leafList the leaf-list to be added
      */
     void addLeafList(YangLeafList leafList);
+
+    /**
+     * Adds namespace for leafs and leaf-list, this is used in case of
+     * submodule.
+     *
+     */
+    void setLeafNameSpaceAndAddToParentSchemaMap();
 }

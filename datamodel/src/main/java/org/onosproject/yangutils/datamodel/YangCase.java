@@ -16,6 +16,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -100,13 +101,6 @@ public class YangCase
     private static final long serialVersionUID = 806201603L;
 
     /**
-     * Case name.
-     */
-    private String name;
-
-    // TODO: default field identification for the case
-
-    /**
      * Description of case.
      */
     private String description;
@@ -147,9 +141,45 @@ public class YangCase
      * Creates a choice node.
      */
     public YangCase() {
-        super(YangNodeType.CASE_NODE);
+        super(YangNodeType.CASE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
+        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+    }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        // Set namespace for self node.
+        setNameSpace(nameSpace);
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        setLeafNameSpaceAndAddToParentSchemaMap();
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        //For non data nodes, mandatory child to be added to parent node.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        //For non data nodes, default child to be added to parent node.
+        // TODO
     }
 
     @Override
@@ -175,26 +205,6 @@ public class YangCase
     @Override
     public void setWhen(YangWhen when) {
         this.when = when;
-    }
-
-    /**
-     * Returns the case name.
-     *
-     * @return case name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the case name.
-     *
-     * @param name case name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -244,10 +254,6 @@ public class YangCase
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        if (getListOfLeaf() == null) {
-            setListOfLeaf(new LinkedList<>());
-        }
-
         getListOfLeaf().add(leaf);
     }
 
@@ -278,10 +284,6 @@ public class YangCase
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        if (getListOfLeafList() == null) {
-            setListOfLeafList(new LinkedList<YangLeafList>());
-        }
-
         getListOfLeafList().add(leafList);
     }
 
@@ -415,5 +417,17 @@ public class YangCase
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 }

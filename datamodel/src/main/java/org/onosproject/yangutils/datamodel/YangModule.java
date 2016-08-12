@@ -15,11 +15,11 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -79,13 +79,8 @@ public class YangModule
     private static final long serialVersionUID = 806201610L;
 
     /**
-     * Name of the module.
-     */
-    private String name;
-
-    /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "contact" statement provides contact information for the module. The
      * argument is a string that is used to specify contact information for the
      * person or persons to whom technical queries concerning this module should
@@ -96,7 +91,7 @@ public class YangModule
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "description" statement takes as an argument a string that contains a
      * human-readable textual description of this definition. The text is
      * provided in a language (or languages) chosen by the module developer; for
@@ -130,13 +125,8 @@ public class YangModule
     private List<YangFeature> listOfFeature;
 
     /**
-     * Name space of the module.
-     */
-    private YangNameSpace nameSpace;
-
-    /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "organization" statement defines the party responsible for this
      * module. The argument is a string that is used to specify a textual
      * description of the organization(s) under whose auspices this module was
@@ -245,7 +235,7 @@ public class YangModule
      */
     public YangModule() {
 
-        super(YangNodeType.MODULE_NODE);
+        super(YangNodeType.MODULE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         derivedTypeResolutionList = new LinkedList<>();
         augmentResolutionList = new LinkedList<>();
         usesResolutionList = new LinkedList<>();
@@ -262,28 +252,24 @@ public class YangModule
     }
 
     @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
-    }
-
-    /**
-     * Returns name of the module.
-     *
-     * @return module name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets module name.
-     *
-     * @param moduleName module name
-     */
-    @Override
-    public void setName(String moduleName) {
-        name = moduleName;
     }
 
     /**
@@ -441,24 +427,6 @@ public class YangModule
     @Override
     public void setListOfFeature(List<YangFeature> listOfFeature) {
         this.listOfFeature = listOfFeature;
-    }
-
-    /**
-     * Returns the name space of module elements.
-     *
-     * @return the nameSpace
-     */
-    public YangNameSpace getNameSpace() {
-        return nameSpace;
-    }
-
-    /**
-     * Sets the name space of module elements.
-     *
-     * @param nameSpace the nameSpace to set
-     */
-    public void setNameSpace(YangNameSpace nameSpace) {
-        this.nameSpace = nameSpace;
     }
 
     /**
@@ -742,6 +710,18 @@ public class YangModule
             if (!(subModule.getBelongsTo().getModuleNode() == this)) {
                 yangInclude.reportIncludeError();
             }
+        }
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
 }

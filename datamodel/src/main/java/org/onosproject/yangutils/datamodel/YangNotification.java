@@ -17,9 +17,9 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -83,11 +83,6 @@ public class YangNotification
     private static final long serialVersionUID = 806201611L;
 
     /**
-     * Name of the notification.
-     */
-    private String name;
-
-    /**
      * Description of notification.
      */
     private String description;
@@ -123,9 +118,26 @@ public class YangNotification
      * Create a notification node.
      */
     public YangNotification() {
-        super(YangNodeType.NOTIFICATION_NODE);
+        super(YangNodeType.NOTIFICATION_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
@@ -207,16 +219,6 @@ public class YangNotification
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public String getReference() {
         return reference;
     }
@@ -267,5 +269,17 @@ public class YangNotification
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 }

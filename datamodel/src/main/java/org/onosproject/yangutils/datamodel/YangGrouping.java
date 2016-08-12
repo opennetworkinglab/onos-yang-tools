@@ -83,11 +83,6 @@ public class YangGrouping
     private static final long serialVersionUID = 806201607L;
 
     /**
-     * Name of the grouping.
-     */
-    private String name;
-
-    /**
      * Description.
      */
     private String description;
@@ -116,34 +111,31 @@ public class YangGrouping
      * Creates the grouping node.
      */
     public YangGrouping() {
-        super(YangNodeType.GROUPING_NODE);
+        super(YangNodeType.GROUPING_NODE, null);
         listOfLeaf = new LinkedList<YangLeaf>();
         listOfLeafList = new LinkedList<YangLeafList>();
     }
 
     @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing, to be handled during linking.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // Do nothing, to be handled during linking.
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // Do nothing, to be handled during linking.
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_NON_DATA_NODE;
-    }
-
-    /**
-     * Returns YANG grouping name.
-     *
-     * @return YANG grouping name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets YANG grouping name.
-     *
-     * @param name YANG grouping name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -322,6 +314,18 @@ public class YangGrouping
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as grouping \"" +
                     getName() + "\"");
+        }
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
     // TODO  A grouping MUST NOT reference itself, neither directly nor indirectly through a chain of other groupings.

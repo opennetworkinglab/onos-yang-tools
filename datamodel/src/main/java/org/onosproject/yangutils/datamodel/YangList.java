@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -75,11 +76,6 @@ public class YangList
         YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201609L;
-
-    /**
-     * Name of the YANG list.
-     */
-    private String name;
 
     /**
      * If list maintains config data.
@@ -216,9 +212,25 @@ public class YangList
      * Creates a YANG list object.
      */
     public YangList() {
-        super(YangNodeType.LIST_NODE);
+        super(YangNodeType.LIST_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
@@ -262,26 +274,6 @@ public class YangList
     @Override
     public void setWhen(YangWhen when) {
         this.when = when;
-    }
-
-    /**
-     * Returns the YANG list name.
-     *
-     * @return YANG list name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the YANG list name.
-     *
-     * @param name YANG list name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -423,10 +415,6 @@ public class YangList
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        if (getListOfLeaf() == null) {
-            setListOfLeaf(new LinkedList<YangLeaf>());
-        }
-
         getListOfLeaf().add(leaf);
     }
 
@@ -457,10 +445,6 @@ public class YangList
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        if (getListOfLeafList() == null) {
-            setListOfLeafList(new LinkedList<YangLeafList>());
-        }
-
         getListOfLeafList().add(leafList);
     }
 
@@ -790,5 +774,17 @@ public class YangList
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 }

@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -68,6 +67,11 @@ public class YangLeafList
      * Name of leaf-list.
      */
     private String name;
+
+    /**
+     * Namespace of leaf-list.
+     */
+    private YangNameSpace namespace;
 
     /**
      * If the leaf-list is a config parameter.
@@ -448,9 +452,8 @@ public class YangLeafList
     }
 
     @Override
-    public Set<YangSchemaNode> getMandatoryChildSet(YangSchemaNodeIdentifier dataNodeIdentifier) {
-        // Returns null as there is no child to leaf list.
-        return null;
+    public int getMandatoryChildCount() throws DataModelException {
+        throw new DataModelException("TODO");
     }
 
     @Override
@@ -462,5 +465,34 @@ public class YangLeafList
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_MULTI_INSTANCE_LEAF_NODE;
+    }
+
+    /**
+     * Returns namespace of node.
+     *
+     * @return namespace of node
+     */
+    public YangNameSpace getNamespace() {
+        return namespace;
+    }
+
+    /**
+     * Sets namespace of node.
+     *
+     * @param namespace namespace of node
+     */
+    public void setNamespace(YangNameSpace namespace) {
+        this.namespace = namespace;
+    }
+
+    /**
+     * Sets leaf namespace and add itself to parent child schema map.
+     *
+     * @param nameSpace namespace
+     */
+    public void setLeafNameSpaceAndAddToParentSchemaMap(YangNameSpace nameSpace) {
+        setNamespace(nameSpace);
+        // Process addition of leaf to schema node map.
+        ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNamespace().getUri(), this);
     }
 }

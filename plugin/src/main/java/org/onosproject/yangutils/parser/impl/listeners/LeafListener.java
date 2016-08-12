@@ -40,10 +40,9 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.UNITS_
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerCollisionDetector.detectCollidingChildUtil;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
-        .constructListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_CONTENT;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.getValidIdentifier;
@@ -95,10 +94,10 @@ public final class LeafListener {
      * (leaf), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafEntry(TreeWalkListener listener,
-            GeneratedYangParser.LeafStatementContext ctx) {
+                                        GeneratedYangParser.LeafStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LEAF_DATA, ctx.identifier().getText(), ENTRY);
@@ -136,10 +135,10 @@ public final class LeafListener {
      * validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafExit(TreeWalkListener listener,
-            GeneratedYangParser.LeafStatementContext ctx) {
+                                       GeneratedYangParser.LeafStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LEAF_DATA, ctx.identifier().getText(), EXIT);
@@ -150,7 +149,7 @@ public final class LeafListener {
                 leafNode.validateDataOnExit();
             } catch (DataModelException e) {
                 throw new ParserException(constructListenerErrorMessage(INVALID_CONTENT, LEAF_DATA,
-                                                                        ctx.identifier().getText(), EXIT));
+                        ctx.identifier().getText(), EXIT));
             }
             listener.getParsedDataStack().pop();
         } else {

@@ -83,11 +83,6 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
     private YangStatusType status;
 
     /**
-     * Name of the typedef.
-     */
-    private String name;
-
-    /**
      * Units of the data type.
      */
     private String units;
@@ -102,8 +97,27 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
      * Creates a typedef node.
      */
     public YangTypeDef() {
-        super(YangNodeType.TYPEDEF_NODE);
+        super(YangNodeType.TYPEDEF_NODE, null);
         typeList = new LinkedList<>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // Do nothing, to be handled during linking.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // Do nothing, to be handled during linking.
+        // TODO
     }
 
     @Override
@@ -258,26 +272,6 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
         if (defaultValueInString != null && !defaultValueInString.isEmpty() && getTypeDefBaseType() != null) {
             getTypeDefBaseType().isValidValue(defaultValueInString);
         }
-    }
-
-    /**
-     * Returns the YANG name of the typedef.
-     *
-     * @return YANG name of the typedef
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets YANG name of the typedef.
-     *
-     * @param name YANG name of the typedef
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

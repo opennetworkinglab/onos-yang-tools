@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -95,11 +96,6 @@ public class YangContainer
     private static final long serialVersionUID = 806201605L;
 
     /**
-     * Name of the container.
-     */
-    private String name;
-
-    /**
      * If container maintains config data.
      */
     private Boolean isConfig;
@@ -156,9 +152,25 @@ public class YangContainer
      * Create a container node.
      */
     public YangContainer() {
-        super(YangNodeType.CONTAINER_NODE);
+        super(YangNodeType.CONTAINER_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
@@ -184,26 +196,6 @@ public class YangContainer
     @Override
     public void setWhen(YangWhen when) {
         this.when = when;
-    }
-
-    /**
-     * Returns the YANG name of container.
-     *
-     * @return the name of container as defined in YANG file
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the YANG name of container.
-     *
-     * @param name the name of container as defined in YANG file
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -271,11 +263,6 @@ public class YangContainer
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-
-        if (getListOfLeaf() == null) {
-            setListOfLeaf(new LinkedList<YangLeaf>());
-        }
-
         getListOfLeaf().add(leaf);
     }
 
@@ -306,13 +293,9 @@ public class YangContainer
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-
-        if (getListOfLeafList() == null) {
-            setListOfLeafList(new LinkedList<YangLeafList>());
-        }
-
         getListOfLeafList().add(leafList);
     }
+
 
     /**
      * Returns the presence string if present.
@@ -540,5 +523,17 @@ public class YangContainer
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 }

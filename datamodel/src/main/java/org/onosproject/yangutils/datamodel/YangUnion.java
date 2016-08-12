@@ -55,9 +55,6 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder {
     // List of YANG type.
     private List<YangType<?>> typeList;
 
-    // Name of union.
-    private String name;
-
     // Current child union number.
     private transient int childUnionNumber;
 
@@ -65,9 +62,28 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder {
      * Creates a YANG union node.
      */
     public YangUnion() {
-        super(YangNodeType.UNION_NODE);
+        super(YangNodeType.UNION_NODE, null);
         typeList = new LinkedList<>();
         childUnionNumber = 1;
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // Do nothing, as leaf can't come directly or indirectly below this construct.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // Do nothing, as leaf can't come directly or indirectly below this construct.
+        // TODO
     }
 
     @Override
@@ -120,26 +136,6 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder {
                     "\"leafref\"");
         }
         getTypeList().add(yangType);
-    }
-
-    /**
-     * Returns union name.
-     *
-     * @return the union name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the union name.
-     *
-     * @param name union name
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

@@ -17,7 +17,6 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -34,6 +33,16 @@ public abstract class YangNode
         implements Cloneable, Serializable, YangSchemaNode, Comparable<YangNode> {
 
     private static final long serialVersionUID = 806201601L;
+
+    /**
+     * Name of a node.
+     */
+    private String name;
+
+    /**
+     * Namespace of a node.
+     */
+    private YangNameSpace nameSpace;
 
     /**
      * Type of node.
@@ -76,9 +85,9 @@ public abstract class YangNode
     private Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap;
 
     /**
-     * Set of mandatory YANG schema nodes.
+     * Count of mandatory YANG schema nodes.
      */
-    private Set<YangSchemaNode> mandatoryChildSet;
+    private int mandatoryChildCount;
 
     /**
      * Map of default schema nodes.
@@ -108,14 +117,18 @@ public abstract class YangNode
      *
      * @return nodes name
      */
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
      * Sets the nodes name.
      *
      * @param name nodes name
      */
-    public abstract void setName(String name);
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /**
      * Creates a YANG node object.
@@ -130,8 +143,9 @@ public abstract class YangNode
      *
      * @param type of YANG node
      */
-    protected YangNode(YangNodeType type) {
+    protected YangNode(YangNodeType type, Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
         setNodeType(type);
+        this.ysnContextInfoMap = ysnContextInfoMap;
     }
 
     /**
@@ -258,21 +272,69 @@ public abstract class YangNode
         /* First child to be added */
         if (getChild() == null) {
             setChild(newChild);
-            return;
+        } else {
+
+            YangNode curNode;
+            curNode = getChild();
+
+            // Get the predecessor child of new child
+            while (curNode.getNextSibling() != null) {
+                curNode = curNode.getNextSibling();
+            }
+
+            // If the new node needs to be the last child
+            if (curNode.getNextSibling() == null) {
+                curNode.setNextSibling(newChild);
+                newChild.setPreviousSibling(curNode);
+            }
         }
+    }
 
-        YangNode curNode;
-        curNode = getChild();
+    /**
+     * Processes addition of schema node child to parent map.
+     *
+     * @param name      name of the node
+     * @param namespace namespace of the node
+     */
+    protected void processAdditionOfSchemaNodeToParentMap(String name, String namespace) {
+        processAdditionOfSchemaNodeToMap(getName(), getNameSpace().getUri(), this, getParent());
+    }
 
-        // Get the predecessor child of new child
-        while (curNode.getNextSibling() != null) {
-            curNode = curNode.getNextSibling();
-        }
+    /**
+     * Processes addition of schema node child to parent map.
+     *
+     * @param name           name of the node
+     * @param namespace      namespace of the node
+     * @param yangSchemaNode YANG schema node
+     */
+    public void processAdditionOfSchemaNodeToCurNodeMap(String name, String namespace, YangSchemaNode
+            yangSchemaNode) {
+        processAdditionOfSchemaNodeToMap(getName(), getNameSpace().getUri(), this, this);
+    }
 
-        // If the new node needs to be the last child
-        if (curNode.getNextSibling() == null) {
-            curNode.setNextSibling(newChild);
-            newChild.setPreviousSibling(curNode);
+    /**
+     * Processes addition of schema node child to map.
+     *
+     * @param name                 name of the node
+     * @param namespace            namespace of the node
+     * @param yangSchemaNode       YANG schema node
+     * @param childSchemaMapHolder child schema map holder
+     */
+    private void processAdditionOfSchemaNodeToMap(String name, String namespace, YangSchemaNode yangSchemaNode,
+                                                  YangNode childSchemaMapHolder) {
+        // Addition of node to schema node map.
+        // Create YANG schema node identifier with child node name.
+        YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        yangSchemaNodeIdentifier.setName(name);
+        yangSchemaNodeIdentifier.setNamespace(namespace);
+        // Create YANG schema node context info and set child node.
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo = new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo.setSchemaNode(yangSchemaNode);
+        // Invoke parent method to add the created entry.
+        try {
+            childSchemaMapHolder.addToChildSchemaMap(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
+        } catch (DataModelException e) {
+            //TODO
         }
     }
 
@@ -495,8 +557,8 @@ public abstract class YangNode
     }
 
     @Override
-    public Set<YangSchemaNode> getMandatoryChildSet(YangSchemaNodeIdentifier dataNodeIdentifier) {
-        return mandatoryChildSet;
+    public int getMandatoryChildCount() throws DataModelException {
+        return mandatoryChildCount;
     }
 
     @Override
@@ -505,23 +567,29 @@ public abstract class YangNode
     }
 
     /**
-     * Adds child schema in child schema map.
+     * Adds child schema in child schema map, this is used to add the schema
+     * to the map in case of leaf as a child.
      *
      * @param schemaNodeIdentifier      YANG schema node identifier
      * @param yangSchemaNodeContextInfo YANG data node context information
+     * @throws DataModelException a violation in data model rule
      */
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-    }
+    public abstract void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                             YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException;
 
     /**
-     * Adds mandatory child information to set.
-     *
-     * @param yangSchemaNode YANG schema node
+     * Increments mandatory child count.
      */
-    public void addToMandatoryChildSet(YangSchemaNode yangSchemaNode) {
-        mandatoryChildSet.add(yangSchemaNode);
+    public abstract void incrementMandatoryChildCount();
+
+    /**
+     * Sets mandatory child count.
+     *
+     * @param mandatoryChildCount value of mandatory child count
+     */
+    public void setMandatoryChildCount(int mandatoryChildCount) {
+        this.mandatoryChildCount = mandatoryChildCount;
     }
 
     /**
@@ -530,9 +598,8 @@ public abstract class YangNode
      * @param yangSchemaNodeIdentifier YANG schema node identifier
      * @param yangSchemaNode           YANG schema node
      */
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
-        getDefaultChildMap().put(yangSchemaNodeIdentifier, yangSchemaNode);
-    }
+    public abstract void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                              YangSchemaNode yangSchemaNode);
 
     /**
      * Returns default child map.
@@ -555,5 +622,44 @@ public abstract class YangNode
     @Override
     public abstract YangSchemaNodeType getYangSchemaNodeType();
 
+    /**
+     * Returns the name space of module elements.
+     *
+     * @return the nameSpace
+     */
+    public YangNameSpace getNameSpace() {
+        return nameSpace;
+    }
 
+    /**
+     * Sets the name space of module elements.
+     *
+     * @param nameSpace the nameSpace to set
+     */
+    public void setNameSpace(YangNameSpace nameSpace) {
+        this.nameSpace = nameSpace;
+    }
+
+    /**
+     * Adds namespace for self, next sibling and first child. This is used
+     * after obtaining namespace in case of submodule after performing
+     * linking.
+     */
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        if (this.getParent() != null) {
+            YangNameSpace nameSpace = this.getParent().getNameSpace();
+            // Set namespace for self node.
+            setNameSpace(nameSpace);
+            // Process addition of leaf to the child schema map of parent.
+            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace().getUri());
+        }
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        if (this instanceof YangLeavesHolder) {
+            ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
+        }
+    }
 }

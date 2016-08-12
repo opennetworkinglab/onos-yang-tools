@@ -17,9 +17,9 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -76,11 +76,6 @@ public class YangInput
     private static final long serialVersionUID = 806201608L;
 
     /**
-     * Name of the input.
-     */
-    private String name;
-
-    /**
      * List of leaves contained.
      */
     private List<YangLeaf> listOfLeaf;
@@ -96,14 +91,50 @@ public class YangInput
      * Create a rpc input node.
      */
     public YangInput() {
-        super(YangNodeType.INPUT_NODE);
+        super(YangNodeType.INPUT_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
     }
 
     @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
+        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+    }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        // Set namespace for self node.
+        setNameSpace(nameSpace);
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        setLeafNameSpaceAndAddToParentSchemaMap();
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        //For non data nodes, mandatory child to be added to parent node.
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        //For non data nodes, default child to be added to parent node.
+        // TODO
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YangSchemaNodeType.YANG_NON_DATA_NODE;
     }
 
     @Override
@@ -170,16 +201,6 @@ public class YangInput
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public void addAugmentation(YangAugmentedInfo augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
@@ -192,5 +213,17 @@ public class YangInput
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setLeafNameSpaceAndAddToParentSchemaMap() {
+        // Add namespace for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+        // Add namespace for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
     }
 }

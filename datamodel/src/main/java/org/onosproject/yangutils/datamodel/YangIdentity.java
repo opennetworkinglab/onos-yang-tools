@@ -50,9 +50,6 @@ public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, 
 
     private static final long serialVersionUID = 806201691L;
 
-    //Name of the identity.
-    private String name;
-
     //Base node of identity.
     private YangBase baseNode;
 
@@ -67,30 +64,29 @@ public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, 
 
     //Creates a identity type of node.
     public YangIdentity() {
-        super(YangNodeType.IDENTITY_NODE);
+        super(YangNodeType.IDENTITY_NODE, null);
+    }
+
+    @Override
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
+        // Do nothing.
+    }
+
+    @Override
+    public void incrementMandatoryChildCount() {
+        // TODO
+    }
+
+    @Override
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+        // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_NON_DATA_NODE;
-    }
-
-    /**
-     * Returns the name of identity.
-     *
-     * @return the identity name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of identity.
-     *
-     * @param name the identity name to set
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
