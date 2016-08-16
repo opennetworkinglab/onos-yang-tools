@@ -46,7 +46,7 @@ public class ParserException extends RuntimeException {
      * Creates a new parser exception from given message and cause.
      *
      * @param message the detail of exception in string
-     * @param cause underlying cause of the error
+     * @param cause   underlying cause of the error
      */
     public ParserException(final String message, final Throwable cause) {
         super(message, cause);
@@ -114,4 +114,5 @@ public class ParserException extends RuntimeException {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
 }

@@ -83,7 +83,7 @@ public class YangUtilsParserManager implements YangUtilsParser {
 
         // Create a listener implementation class object.
         TreeWalkListener treeWalker = new TreeWalkListener();
-
+        treeWalker.setFileName(yangFile);
         /**
          * Walk parse tree, provide call backs to methods in listener and build
          * data model tree.

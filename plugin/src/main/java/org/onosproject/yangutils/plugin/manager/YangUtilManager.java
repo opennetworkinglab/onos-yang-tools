@@ -32,14 +32,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.linker.YangLinker;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.YangUtilsParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
@@ -214,6 +214,7 @@ public class YangUtilManager
             if (getCurYangFileInfo() != null) {
                 fileName = getCurYangFileInfo().getYangFileName();
             }
+
             try {
                 translatorErrorHandler(getRootNode(), yangPlugin);
                 deleteDirectory(getDirectory(baseDir, classFileDir) + DEFAULT_PKG);

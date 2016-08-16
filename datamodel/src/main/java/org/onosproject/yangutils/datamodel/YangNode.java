@@ -17,6 +17,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -141,7 +142,8 @@ public abstract class YangNode
     /**
      * Creates a specific type of node.
      *
-     * @param type of YANG node
+     * @param type              of YANG node
+     * @param ysnContextInfoMap YSN context info map
      */
     protected YangNode(YangNodeType type, Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
         setNodeType(type);

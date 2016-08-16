@@ -38,9 +38,7 @@ public class TreeWalkListenerTest {
      */
     @Test
     public void processOrderedByStatement() throws IOException, ParserException {
-        thrown.expect(ParserException.class);
-        thrown.expectMessage("YANG file error : \"ordered-by\" is not supported in current version, please check wiki" +
-                " for YANG utils road map.");
+        // Now no exception should be thrown. logs should come.
         manager.getDataModel("src/test/resources/OrderedByStatement.yang");
     }
 
@@ -49,8 +47,7 @@ public class TreeWalkListenerTest {
      */
     @Test
     public void processAnyXmlStatement() throws IOException, ParserException {
-        thrown.expect(ParserException.class);
-        thrown.expectMessage("YANG file error : \"anyxml\" is not supported.");
+        // Now no exception should be thrown. logs should come.
         manager.getDataModel("src/test/resources/AnyxmlStatement.yang");
     }
 

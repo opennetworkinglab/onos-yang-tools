@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
@@ -109,6 +110,7 @@ import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.readAppendFile;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ADD_TO_LIST;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -1106,15 +1108,17 @@ public class TempJavaFragmentFiles {
     /**
      * Adds setter's implementation for class.
      *
-     * @param attr attribute info
+     * @param attr         attribute info
+     * @param pluginConfig
      * @throws IOException when fails to append to temporary file
      */
-    private void addSetterImpl(JavaAttributeInfo attr)
+    private void addSetterImpl(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
         if (isRooNode()) {
-            appendToFile(getSetterImplTempFileHandle(),
+            appendToFile(getSetterImplTempFileHandle(), getJavaDoc(SETTER_METHOD, attr.getAttributeName(),
+                    attr.isListAttr(), pluginConfig, null) +
                     getSetterForClass(attr, getGeneratedJavaClassName(), getGeneratedJavaFiles())
-                            + NEW_LINE);
+                    + NEW_LINE);
         } else {
             appendToFile(getSetterImplTempFileHandle(), getOverRideString() +
                     getSetterForClass(attr, getGeneratedJavaClassName(), getGeneratedJavaFiles())
@@ -1531,7 +1535,7 @@ public class TempJavaFragmentFiles {
             addSetterForInterface(newAttrInfo, pluginConfig);
         }
         if ((getGeneratedTempFiles() & SETTER_FOR_CLASS_MASK) != 0) {
-            addSetterImpl(newAttrInfo);
+            addSetterImpl(newAttrInfo, pluginConfig);
         }
         if ((getGeneratedTempFiles() & HASH_CODE_IMPL_MASK) != 0) {
             addHashCodeMethod(newAttrInfo);
@@ -1659,10 +1663,10 @@ public class TempJavaFragmentFiles {
 
                     //Append builder interface file to interface file and close it.
                     mergeJavaFiles(getBuilderInterfaceJavaFileHandle(), getInterfaceJavaFileHandle());
-                    validateLineLength(getInterfaceJavaFileHandle());
                 }
             }
             insertDataIntoJavaFile(getInterfaceJavaFileHandle(), getJavaClassDefClose());
+            validateLineLength(getInterfaceJavaFileHandle());
             if (curNode instanceof YangAugmentableNode) {
                 addImportsForAugmentableClass(imports, false, true, curNode);
             }
@@ -1702,9 +1706,9 @@ public class TempJavaFragmentFiles {
 
                 //Append impl class to builder class and close it.
                 mergeJavaFiles(getBuilderClassJavaFileHandle(), getImplClassJavaFileHandle());
-                validateLineLength(getImplClassJavaFileHandle());
             }
             insertDataIntoJavaFile(getImplClassJavaFileHandle(), getJavaClassDefClose());
+            validateLineLength(getImplClassJavaFileHandle());
         }
         //Close all the file handles.
         freeTemporaryResources(false);

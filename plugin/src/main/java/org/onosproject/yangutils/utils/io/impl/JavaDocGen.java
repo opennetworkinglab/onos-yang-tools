@@ -91,15 +91,15 @@ public final class JavaDocGen {
     /**
      * Returns java docs.
      *
-     * @param type         java doc type
-     * @param name         name of the YangNode
-     * @param isList       is list attribute
-     * @param pluginConfig plugin configurations
+     * @param type               java doc type
+     * @param name               name of the YangNode
+     * @param isList             is list attribute
+     * @param pluginConfig       plugin configurations
      * @param compilerAnnotation compiler annotations for user defined data type
      * @return javadocs.
      */
     public static String getJavaDoc(JavaDocType type, String name, boolean isList, YangPluginConfig pluginConfig,
-            String compilerAnnotation) {
+                                    String compilerAnnotation) {
 
         name = YangIoUtils.getSmallCase(getCamelCase(name, pluginConfig.getConflictResolver()));
         switch (type) {
@@ -279,13 +279,13 @@ public final class JavaDocGen {
     /**
      * Generates javaDocs for getter method.
      *
-     * @param attribute attribute
-     * @param isList    is list attribute
+     * @param attribute          attribute
+     * @param isList             is list attribute
      * @param compilerAnnotation compiler annotation
      * @return javaDocs
      */
     private static String generateForGetters(String attribute, boolean isList,
-            String compilerAnnotation) {
+                                             String compilerAnnotation) {
 
         String getter = NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + FOUR_SPACE_INDENTATION
                 + JAVA_DOC_GETTERS + attribute + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + NEW_LINE_ASTERISK
@@ -325,13 +325,13 @@ public final class JavaDocGen {
     /**
      * Generates javaDocs for setter method.
      *
-     * @param attribute attribute
-     * @param isList    is list attribute
+     * @param attribute          attribute
+     * @param isList             is list attribute
      * @param compilerAnnotation compiler annotation
      * @return javaDocs
      */
     private static String generateForSetters(String attribute, boolean isList,
-            String compilerAnnotation) {
+                                             String compilerAnnotation) {
 
         String setter = NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + FOUR_SPACE_INDENTATION
                 + JAVA_DOC_SETTERS + attribute + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + NEW_LINE_ASTERISK
@@ -374,13 +374,13 @@ public final class JavaDocGen {
     /**
      * Generates javaDocs for setter method.
      *
-     * @param attribute attribute
-     * @param isList    is list attribute
+     * @param attribute          attribute
+     * @param isList             is list attribute
      * @param compilerAnnotation compiler annotation
      * @return javaDocs
      */
     private static String generateForManagerSetters(String attribute, boolean isList,
-            String compilerAnnotation) {
+                                                    String compilerAnnotation) {
 
         String setter = NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + FOUR_SPACE_INDENTATION
                 + JAVA_DOC_MANAGER_SETTERS + attribute + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + NEW_LINE_ASTERISK
@@ -646,7 +646,7 @@ public final class JavaDocGen {
     public static String generateForGetMethodWithAttribute(String attribute) {
         return NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_GETTERS
                 + attribute + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + NEW_LINE_ASTERISK + FOUR_SPACE_INDENTATION
-                + JAVA_DOC_PARAM + attribute + SPACE + VALUE + SPACE + OF + SPACE + attribute + NEW_LINE
+                + JAVA_DOC_PARAM + getSmallCase(attribute) + SPACE + VALUE + SPACE + OF + SPACE + attribute + NEW_LINE
                 + FOUR_SPACE_INDENTATION + JAVA_DOC_RETURN + VALUE + SPACE + OF + SPACE + attribute + NEW_LINE
                 + FOUR_SPACE_INDENTATION + JAVA_DOC_END_LINE;
     }

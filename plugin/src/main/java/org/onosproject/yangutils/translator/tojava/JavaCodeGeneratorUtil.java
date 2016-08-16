@@ -19,6 +19,9 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
@@ -50,6 +53,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDelet
  */
 public final class JavaCodeGeneratorUtil {
 
+    private static final Log log = LogFactory.getLog(JavaCodeGeneratorUtil.class);
     /**
      * Current YANG node.
      */
@@ -125,6 +129,9 @@ public final class JavaCodeGeneratorUtil {
                     }
                     continue;
                 } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        e.printStackTrace();
+                    }
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -137,6 +144,9 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeExit(codeGenNode, yangPlugin);
                 } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        e.printStackTrace();
+                    }
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -146,6 +156,9 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeExit(codeGenNode, yangPlugin);
                 } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        e.printStackTrace();
+                    }
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }

@@ -16,6 +16,8 @@
 
 package org.onosproject.yangutils.parser.impl;
 
+import java.util.Stack;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -96,8 +98,6 @@ import org.onosproject.yangutils.parser.impl.listeners.ValueListener;
 import org.onosproject.yangutils.parser.impl.listeners.VersionListener;
 import org.onosproject.yangutils.parser.impl.listeners.WhenListener;
 
-import java.util.Stack;
-
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.handleUnsupportedYangConstruct;
 import static org.onosproject.yangutils.utils.UtilConstants.CURRENTLY_UNSUPPORTED;
 import static org.onosproject.yangutils.utils.UtilConstants.UNSUPPORTED_YANG_CONSTRUCT;
@@ -115,6 +115,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     // Parse tree root node
     private YangNode rootNode;
+
+    // YANG file name.
+    private String fileName;
 
     /**
      * Parent depth of grouping count for any node.
@@ -160,6 +163,24 @@ public class TreeWalkListener implements GeneratedYangListener {
      */
     public YangNode getRootNode() {
         return rootNode;
+    }
+
+    /**
+     * Returns YANG file name.
+     *
+     * @return YANG file name
+     */
+    public String getFileName() {
+        return fileName;
+    }
+
+    /**
+     * Sets YANG file name.
+     *
+     * @param fileName YANG file name
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     /**
@@ -862,7 +883,7 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterOrderedByStatement(GeneratedYangParser.OrderedByStatementContext ctx) {
-        handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx, CURRENTLY_UNSUPPORTED);
+        handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx, CURRENTLY_UNSUPPORTED, getFileName());
     }
 
     @Override
@@ -1032,7 +1053,7 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterAnyxmlStatement(GeneratedYangParser.AnyxmlStatementContext ctx) {
-        handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT);
+        handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override
@@ -1052,7 +1073,7 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterRefineStatement(GeneratedYangParser.RefineStatementContext ctx) {
-        handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT);
+        handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override
@@ -1192,7 +1213,8 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDeviationStatement(GeneratedYangParser.DeviationStatementContext ctx) {
-        handleUnsupportedYangConstruct(YangConstructType.DEVIATION_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT);
+        handleUnsupportedYangConstruct(YangConstructType.DEVIATION_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT,
+                getFileName());
     }
 
     @Override

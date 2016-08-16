@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
@@ -76,8 +77,8 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
  */
 public final class YangIoUtils {
 
-    private static final int LINE_SIZE = 118;
-    private static final int SUB_LINE_SIZE = 112;
+    private static final int LINE_SIZE = 116;
+    private static final int SUB_LINE_SIZE = 114;
     private static final int ZERO = 0;
 
     /**
@@ -402,7 +403,7 @@ public final class YangIoUtils {
     }
 
     /* When spaces are present in the given line. */
-    private static String whenSpaceIsPresent(String line, int lineSize) {
+    public static String whenSpaceIsPresent(String line, int lineSize) {
         StringBuilder stringBuilder = new StringBuilder();
         String append;
         if (line.length() > lineSize) {
@@ -416,7 +417,7 @@ public final class YangIoUtils {
         String[] strArray = stringBuilder.toString().split(NEW_LINE);
         StringBuilder tempBuilder = new StringBuilder();
         for (String str : strArray) {
-            if (str.length() > SUB_LINE_SIZE) {
+            if (str.length() > LINE_SIZE) {
                 if (str.contains(SPACE)) {
                     String[] strArr = str.split(SPACE);
                     tempBuilder = updateString(strArr, tempBuilder, SPACE, SUB_LINE_SIZE);
@@ -445,15 +446,13 @@ public final class YangIoUtils {
                 stringBuilder.append(tempString);
                 if (string.equals(PERIOD)) {
                     append = NEW_LINE + TWELVE_SPACE_INDENTATION + PERIOD + str + string;
-                    stringBuilder.append(append);
                 } else {
                     append = NEW_LINE + TWELVE_SPACE_INDENTATION + str + string;
-                    stringBuilder.append(append);
                 }
+                stringBuilder.append(append);
                 tempBuilder.delete(ZERO, tempBuilder.length());
                 tempBuilder.append(TWELVE_SPACE_INDENTATION);
             } else {
-                append = str + string;
                 stringBuilder.append(append);
             }
         }

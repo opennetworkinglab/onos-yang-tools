@@ -20,12 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.UtilConstants;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -124,11 +125,11 @@ public final class YangIoUtilsTest {
     /**
      * A private constructor is tested.
      *
-     * @throws SecurityException if any security violation is observed
-     * @throws NoSuchMethodException if when the method is not found
-     * @throws IllegalArgumentException if there is illegal argument found
-     * @throws InstantiationException if instantiation is provoked for the private constructor
-     * @throws IllegalAccessException if instance is provoked or a method is provoked
+     * @throws SecurityException         if any security violation is observed
+     * @throws NoSuchMethodException     if when the method is not found
+     * @throws IllegalArgumentException  if there is illegal argument found
+     * @throws InstantiationException    if instantiation is provoked for the private constructor
+     * @throws IllegalAccessException    if instance is provoked or a method is provoked
      * @throws InvocationTargetException when an exception occurs by the method or constructor
      */
     @Test
@@ -136,7 +137,7 @@ public final class YangIoUtilsTest {
             throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException {
 
-        Class<?>[] classesToConstruct = {YangIoUtils.class };
+        Class<?>[] classesToConstruct = {YangIoUtils.class};
         for (Class<?> clazz : classesToConstruct) {
             Constructor<?> constructor = clazz.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -205,4 +206,5 @@ public final class YangIoUtilsTest {
         pluginConfig.setConflictResolver(null);
         return pluginConfig;
     }
+
 }

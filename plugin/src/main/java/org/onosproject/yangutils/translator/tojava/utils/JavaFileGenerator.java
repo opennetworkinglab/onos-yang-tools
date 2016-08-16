@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
@@ -269,7 +270,7 @@ public final class JavaFileGenerator {
         for (String method : methods) {
             insertDataIntoJavaFile(file, method);
         }
-        return validateLineLength(file);
+        return file;
 
     }
 
@@ -342,7 +343,7 @@ public final class JavaFileGenerator {
         }
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
-        return validateLineLength(file);
+        return file;
     }
 
     /**
@@ -441,7 +442,7 @@ public final class JavaFileGenerator {
         }
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
-        return validateLineLength(file);
+        return file;
     }
 
     /**
@@ -604,7 +605,7 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, method);
         }
 
-        return validateLineLength(file);
+        return file;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
@@ -184,8 +185,8 @@ public class YangXpathLinker<T> {
      * Process absolute node path for target leaf.
      *
      * @param atomicPaths atomic path node list
-     * @param root     root node
-     * @param leafref  instance of YANG leafref
+     * @param root        root node
+     * @param leafref     instance of YANG leafref
      * @return linked target node
      */
     T processLeafRefXpathLinking(List<YangAtomicPath> atomicPaths, YangNode root, YangLeafRef leafref) {
@@ -501,6 +502,9 @@ public class YangXpathLinker<T> {
      * @return true if found
      */
     private boolean searchForAugmentInImportedNode(YangNodeIdentifier nodeId, int index) {
+        if (index == getAbsPaths().size()) {
+            return false;
+        }
         YangNodeIdentifier tempNodeId = getAbsPaths().get(index).getNodeIdentifier();
         return nodeId.getName().equals(tempNodeId.getName());
     }

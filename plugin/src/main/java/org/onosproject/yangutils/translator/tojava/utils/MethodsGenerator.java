@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava.utils;
 
 import java.util.List;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
@@ -1939,7 +1940,7 @@ public final class MethodsGenerator {
                 "     */\n" +
                 "    public " + name + BUILDER + " setOperationType(OperationType operationType) {\n" +
                 "       this.operationType = operationType;\n" +
-                "        return this;\n" +
+                "       return this;\n" +
                 "    }\n";
     }
 
