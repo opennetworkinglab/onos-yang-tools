@@ -16,13 +16,12 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
+import java.io.IOException;
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
-
-import java.io.IOException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -52,7 +51,7 @@ public class NamespaceListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/NamespaceInDoubleQuotes.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getNameSpace().getUri(), is("\"urn:ietf:params:xml:ns:yang:ietf-ospf\""));
+        assertThat(((YangModule) node).getNameSpace().getUri(), is("urn:ietf:params:xml:ns:yang:ietf-ospf"));
     }
 
     /**

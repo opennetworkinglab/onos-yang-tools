@@ -454,6 +454,11 @@ public class YangLeafList
     }
 
     @Override
+    public void isValueValid(String value) throws DataModelException {
+        getDataType().isValidValue(value);
+    }
+
+    @Override
     public int getMandatoryChildCount() throws DataModelException {
         throw new DataModelException("TODO");
     }

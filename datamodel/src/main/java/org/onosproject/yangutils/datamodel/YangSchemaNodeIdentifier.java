@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Represents YANG data node identifier which is a combination of name and namespace.
@@ -72,5 +73,23 @@ public class YangSchemaNodeIdentifier implements Serializable {
      */
     public void setNamespace(String namespace) {
         this.namespace = namespace;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof YangSchemaNodeIdentifier) {
+            final YangSchemaNodeIdentifier other = (YangSchemaNodeIdentifier) obj;
+            return Objects.equals(name, other.name) && Objects.equals(namespace, other.namespace);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, namespace);
     }
 }

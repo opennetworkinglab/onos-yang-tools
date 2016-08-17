@@ -1,0 +1,17 @@
+module Testmodule {
+    yang-version 1;
+    namespace http://huawei.com;
+    prefix Ant;
+    container testcontainer {
+        leaf testleaf {
+            type "uint16";
+        }
+        choice snack {
+            case sports-arena {
+                leaf pretzel {
+                    type empty;
+                }
+             }
+        }
+    }
+}

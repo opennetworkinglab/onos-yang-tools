@@ -17,7 +17,6 @@
 package org.onosproject.yangutils.parser.impl.listeners;
 
 import java.net.URI;
-
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNameSpace;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
@@ -30,6 +29,7 @@ import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLoc
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*
@@ -71,10 +71,10 @@ public final class NamespaceListener {
      * (namespace), perform validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processNamespaceEntry(TreeWalkListener listener,
-            GeneratedYangParser.NamespaceStatementContext ctx) {
+                                             GeneratedYangParser.NamespaceStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, NAMESPACE_DATA, ctx.string().getText(), ENTRY);
@@ -92,7 +92,7 @@ public final class NamespaceListener {
             case MODULE_DATA: {
                 YangModule module = (YangModule) tmpNode;
                 YangNameSpace uri = new YangNameSpace();
-                uri.setUri(ctx.string().getText());
+                uri.setUri(removeQuotesAndHandleConcat(ctx.string().getText()));
                 module.setNameSpace(uri);
                 break;
             }

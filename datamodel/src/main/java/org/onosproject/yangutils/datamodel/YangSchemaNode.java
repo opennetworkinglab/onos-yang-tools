@@ -42,6 +42,15 @@ public interface YangSchemaNode {
     YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier);
 
     /**
+     * Validates whether the leaf/leaf-list value is valid as per YANG. It is
+     * used by YMS to validate input value.
+     *
+     * @param value value of leaf/leaf-list
+     * @throws DataModelException a violation in data model rule
+     */
+    void isValueValid(String value) throws DataModelException;
+
+    /**
      * Returns count of mandatory child nodes, this is used by YMS to identify whether
      * in request all mandatory child nodes are available.
      *
@@ -58,4 +67,5 @@ public interface YangSchemaNode {
      * @return map of default child nodes
      */
     Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier);
+
 }

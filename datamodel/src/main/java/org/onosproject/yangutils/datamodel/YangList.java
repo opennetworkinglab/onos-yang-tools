@@ -237,7 +237,7 @@ public class YangList
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_MULTI_INSTANCE_LEAF_NODE;
+        return YangSchemaNodeType.YANG_MULTI_INSTANCE_NODE;
     }
 
     /**

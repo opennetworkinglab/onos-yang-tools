@@ -311,7 +311,7 @@ public abstract class YangNode
      */
     public void processAdditionOfSchemaNodeToCurNodeMap(String name, String namespace, YangSchemaNode
             yangSchemaNode) {
-        processAdditionOfSchemaNodeToMap(getName(), getNameSpace().getUri(), this, this);
+        processAdditionOfSchemaNodeToMap(name, namespace, yangSchemaNode, this);
     }
 
     /**
@@ -663,5 +663,10 @@ public abstract class YangNode
         if (this instanceof YangLeavesHolder) {
             ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
         }
+    }
+
+    @Override
+    public void isValueValid(String value) throws DataModelException {
+        throw new DataModelException("Value validation asked for YANG node.");
     }
 }
