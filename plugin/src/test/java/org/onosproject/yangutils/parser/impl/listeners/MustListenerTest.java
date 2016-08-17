@@ -72,4 +72,13 @@ public class MustListenerTest {
 
         assertThat(leafInfo.getListOfMust().iterator().next().getConstraint(), is("ifType != 'ethernet'"));
     }
+
+    /**
+     * Checks whether there is no parser exception when must statement is sub-statement of
+     * unsupported yang construct.
+     */
+    @Test
+    public void processUnsupportedSubStatementMust() throws IOException, ParserException {
+        YangNode node = manager.getDataModel("src/test/resources/UnsupportedYangConstructSubStatementMust.yang");
+    }
 }

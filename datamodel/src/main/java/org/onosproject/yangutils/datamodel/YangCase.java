@@ -137,6 +137,8 @@ public class YangCase
 
     private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
 
+    private boolean isAugmented;
+
     /**
      * Creates a choice node.
      */
@@ -417,6 +419,16 @@ public class YangCase
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setIsAugmented(boolean isAugmented) {
+        this.isAugmented = isAugmented;
+    }
+
+    @Override
+    public boolean isAugmented() {
+        return isAugmented;
     }
 
     @Override

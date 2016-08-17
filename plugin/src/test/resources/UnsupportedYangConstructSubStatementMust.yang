@@ -1,0 +1,17 @@
+module Test {
+    yang-version 1;
+    namespace "http://huawei.com";
+    prefix Ant;
+    list link-scope-lsa {
+        key "lsa-id adv-router";
+        description "List of OSPF link scope LSAs";
+        uses lsa {
+            refine "version/ospfv2/ospfv2" {
+                must "../../../../../../../../../../../"
+                   + "rt:type = 'ospf:ospfv2'" {
+                  description "OSPFv2 LSA.";
+                }
+            }
+        }
+    }
+}

@@ -73,14 +73,14 @@ public class YangList
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
-        YangIsFilterContentNodes {
+        YangIsFilterContentNodes, YangConfig {
 
     private static final long serialVersionUID = 806201609L;
 
     /**
      * If list maintains config data.
      */
-    private Boolean isConfig;
+    private boolean isConfig;
 
     /**
      * Description of list.
@@ -89,7 +89,7 @@ public class YangList
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "key" statement, which MUST be present if the list represents
      * configuration, and MAY be present otherwise, takes as an argument a
      * string that specifies a space-separated list of leaf identifiers of this
@@ -97,39 +97,39 @@ public class YangList
      * such leaf identifier MUST refer to a child leaf of the list. The leafs
      * can be defined directly in sub-statements to the list, or in groupings
      * used in the list.
-     * <p>
+     *
      * The combined values of all the leafs specified in the key are used to
      * uniquely identify a list entry. All key leafs MUST be given values when a
      * list entry is created. Thus, any default values in the key leafs or their
      * types are ignored. It also implies that any mandatory statement in the
      * key leafs are ignored.
-     * <p>
+     *
      * A leaf that is part of the key can be of any built-in or derived type,
      * except it MUST NOT be the built-in type "empty".
-     * <p>
+     *
      * All key leafs in a list MUST have the same value for their "config" as
      * the list itself.
-     * <p>
+     *
      * List of key leaf names.
      */
     private List<String> keyList;
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "unique" statement is used to put constraints on valid list
      * entries.  It takes as an argument a string that contains a space-
      * separated list of schema node identifiers, which MUST be given in the
      * descendant form.  Each such schema node identifier MUST refer to a leaf.
-     * <p>
+     *
      * If one of the referenced leafs represents configuration data, then
      * all of the referenced leafs MUST represent configuration data.
-     * <p>
+     *
      * The "unique" constraint specifies that the combined values of all the
      * leaf instances specified in the argument string, including leafs with
      * default values, MUST be unique within all list entry instances in
      * which all referenced leafs exist.
-     * <p>
+     *
      * List of unique leaf/leaf-list names
      */
     private List<String> uniqueList;
@@ -148,32 +148,32 @@ public class YangList
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     * <p>
+     *
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private YangMaxElement maxElements;
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     * <p>
+     *
      * If no "min-elements" statement is present, it defaults to zero.
-     * <p>
+     *
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     * <p>
+     *
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     * <p>
+     *
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -207,6 +207,8 @@ public class YangList
      * Compiler Annotation.
      */
     private transient YangCompilerAnnotation compilerAnnotation;
+
+    private boolean isAugmented;
 
     /**
      * Creates a YANG list object.
@@ -281,17 +283,19 @@ public class YangList
      *
      * @return the isConfig
      */
-    public Boolean isConfig() {
+    @Override
+    public boolean isConfig() {
         return isConfig;
     }
 
     /**
      * Sets the config flag.
      *
-     * @param isCfg the config flag
+     * @param isConfig the config flag
      */
-    public void setConfig(boolean isCfg) {
-        isConfig = isCfg;
+    @Override
+    public void setConfig(boolean isConfig) {
+        this.isConfig = isConfig;
     }
 
     /**
@@ -557,7 +561,6 @@ public class YangList
         List<YangLeaf> leaves = getListOfLeaf();
         List<YangLeafList> leafLists = getListOfLeafList();
 
-        setDefaultConfigValueToChild(leaves, leafLists);
         validateConfig(leaves, leafLists);
 
         //A list must have atleast one key leaf if config is true
@@ -566,40 +569,6 @@ public class YangList
             throw new DataModelException("A list must have atleast one key leaf if config is true;");
         } else if (keys != null) {
             validateKey(leaves, keys);
-        }
-    }
-
-    /**
-     * Sets the config's value to all leaf if leaf's config statement is not
-     * specified.
-     *
-     * @param leaves    list of leaf attributes of YANG list
-     * @param leafLists list of leaf-list attributes of YANG list
-     */
-    private void setDefaultConfigValueToChild(List<YangLeaf> leaves, List<YangLeafList> leafLists) {
-
-        /*
-         * If "config" is not specified, the default is the same as the parent
-         * schema node's "config" value.
-         */
-        if (leaves != null) {
-            for (YangLeaf leaf : leaves) {
-                if (leaf.isConfig() == null) {
-                    leaf.setConfig(isConfig);
-                }
-            }
-        }
-
-        /*
-         * If "config" is not specified, the default is the same as the parent
-         * schema node's "config" value.
-         */
-        if (leafLists != null) {
-            for (YangLeafList leafList : leafLists) {
-                if (leafList.isConfig() == null) {
-                    leafList.setConfig(isConfig);
-                }
-            }
         }
     }
 
@@ -774,6 +743,16 @@ public class YangList
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setIsAugmented(boolean isAugmented) {
+        this.isAugmented = isAugmented;
+    }
+
+    @Override
+    public boolean isAugmented() {
+        return isAugmented;
     }
 
     @Override

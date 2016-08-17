@@ -1222,6 +1222,7 @@ public class YangResolutionInfoImpl<T>
                 if (targetNode instanceof YangAugmentableNode) {
                     detectCollisionForAugmentedNode(targetNode, augment);
                     ((YangAugmentableNode) targetNode).addAugmentation(augment);
+                    ((YangAugmentableNode) targetNode).setIsAugmented(true);
                     augment.setAugmentedNode(targetNode);
                     Resolvable resolvable = (Resolvable) entityToResolve;
                     resolvable.setResolvableStatus(RESOLVED);

@@ -20,9 +20,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.onosproject.yangutils.datamodel.YangContainer;
-import org.onosproject.yangutils.datamodel.YangList;
+import org.onosproject.yangutils.datamodel.YangCase;
+import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangConfig;
+import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangNotification;
+import org.onosproject.yangutils.datamodel.YangOutput;
+import org.onosproject.yangutils.datamodel.YangRpc;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
@@ -102,18 +107,18 @@ public final class ListenerValidation {
      * @return true/false parent's config value
      */
     public static boolean getParentNodeConfig(TreeWalkListener listener) {
-
-        YangNode parentNode;
         Parsable curData = listener.getParsedDataStack().peek();
-        if (curData instanceof YangNode) {
-            parentNode = ((YangNode) curData).getParent();
-            if (parentNode instanceof YangContainer) {
-                return ((YangContainer) parentNode).isConfig();
-            } else if (parentNode instanceof YangList) {
-                return ((YangList) parentNode).isConfig();
-            }
+        YangNode parentNode = ((YangNode) curData).getParent();
+        if (curData instanceof YangConfig) {
+            return ((YangConfig) curData).isConfig();
+        } else if (curData instanceof YangRpc || curData instanceof YangOutput
+                || curData instanceof YangInput || curData instanceof YangNotification) {
+            return false;
+        } else if (curData instanceof YangCase && parentNode instanceof YangChoice) {
+            return ((YangChoice) parentNode).isConfig();
+        } else {
+            return true;
         }
-        return true;
     }
 
     /**

@@ -86,6 +86,8 @@ public class YangOutput
 
     private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
 
+    private boolean isAugmented;
+
     /**
      * Create a rpc output node.
      */
@@ -212,6 +214,16 @@ public class YangOutput
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setIsAugmented(boolean isAugmented) {
+        this.isAugmented = isAugmented;
+    }
+
+    @Override
+    public boolean isAugmented() {
+        return isAugmented;
     }
 
     @Override

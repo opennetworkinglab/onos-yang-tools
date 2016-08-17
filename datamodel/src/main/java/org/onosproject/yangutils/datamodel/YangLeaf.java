@@ -63,7 +63,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public class YangLeaf
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
-        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode {
+        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode, YangConfig {
 
     private static final long serialVersionUID = 806201635L;
 
@@ -80,7 +80,7 @@ public class YangLeaf
     /**
      * If the leaf is a config parameter.
      */
-    private Boolean isConfig;
+    private boolean isConfig;
 
     /**
      * description of leaf.
@@ -167,17 +167,19 @@ public class YangLeaf
      *
      * @return if config flag
      */
-    public Boolean isConfig() {
+    @Override
+    public boolean isConfig() {
         return isConfig;
     }
 
     /**
      * Sets the config flag.
      *
-     * @param isCfg the flag value to set
+     * @param isConfig the flag value to set
      */
-    public void setConfig(boolean isCfg) {
-        isConfig = isCfg;
+    @Override
+    public void setConfig(boolean isConfig) {
+        this.isConfig = isConfig;
     }
 
     /**

@@ -91,14 +91,15 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 public class YangContainer
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
-        YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes {
+        YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes,
+        YangConfig {
 
     private static final long serialVersionUID = 806201605L;
 
     /**
      * If container maintains config data.
      */
-    private Boolean isConfig;
+    private boolean isConfig;
 
     /**
      * Description of container.
@@ -127,6 +128,8 @@ public class YangContainer
     private String reference;
 
     private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+
+    private boolean isAugmented;
 
     /**
      * Status of the node.
@@ -203,17 +206,19 @@ public class YangContainer
      *
      * @return the isConfig
      */
-    public Boolean isConfig() {
+    @Override
+    public boolean isConfig() {
         return isConfig;
     }
 
     /**
      * Sets the config flag.
      *
-     * @param isCfg the config flag
+     * @param isConfig the config flag
      */
-    public void setConfig(boolean isCfg) {
-        isConfig = isCfg;
+    @Override
+    public void setConfig(boolean isConfig) {
+        this.isConfig = isConfig;
     }
 
     /**
@@ -386,43 +391,7 @@ public class YangContainer
             throws DataModelException {
         List<YangLeaf> leaves = getListOfLeaf();
         List<YangLeafList> leafLists = getListOfLeafList();
-
-        setDefaultConfigValueToChild(leaves, leafLists);
         validateConfig(leaves, leafLists);
-    }
-
-    /**
-     * Sets the config's value to all leaf if leaf's config statement is not
-     * specified.
-     *
-     * @param leaves    list of leaf attributes of container
-     * @param leafLists list of leaf-list attributes of container
-     */
-    private void setDefaultConfigValueToChild(List<YangLeaf> leaves, List<YangLeafList> leafLists) {
-
-        /*
-         * If "config" is not specified, the default is the same as the parent
-         * schema node's "config" value.
-         */
-        if (leaves != null) {
-            for (YangLeaf leaf : leaves) {
-                if (leaf.isConfig() == null) {
-                    leaf.setConfig(isConfig);
-                }
-            }
-        }
-
-        /*
-         * If "config" is not specified, the default is the same as the parent
-         * schema node's "config" value.
-         */
-        if (leafLists != null) {
-            for (YangLeafList leafList : leafLists) {
-                if (leafList.isConfig() == null) {
-                    leafList.setConfig(isConfig);
-                }
-            }
-        }
     }
 
     /**
@@ -523,6 +492,16 @@ public class YangContainer
     @Override
     public List<YangAugmentedInfo> getAugmentedInfoList() {
         return yangAugmentedInfo;
+    }
+
+    @Override
+    public void setIsAugmented(boolean isAugmented) {
+        this.isAugmented = isAugmented;
+    }
+
+    @Override
+    public boolean isAugmented() {
+        return isAugmented;
     }
 
     @Override

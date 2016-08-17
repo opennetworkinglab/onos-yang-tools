@@ -125,6 +125,34 @@ public class TreeWalkListener implements GeneratedYangListener {
     private int groupingDepth;
 
     /**
+     * Parent depth of unsupported yang construct count for any node.
+     */
+    private int unsupportedYangConstructDepth;
+
+    /**
+     * Returns number of unsupported yang constructs parents, by a node, at any level.
+     *
+     * @return depth of unsupported yang constructs
+     */
+    public int getUnsupportedYangConstructDepth() {
+        return unsupportedYangConstructDepth;
+    }
+
+    /**
+     * Sets number of unsupported yang constructs by a node at any level.
+     */
+    private void increaseUnsupportedYangConstructDepth() {
+        unsupportedYangConstructDepth++;
+    }
+
+    /**
+     * Sets number of unsupported yang constructs by a node at any level.
+     */
+    private void decreaseUnsupportedYangConstructDepth() {
+        unsupportedYangConstructDepth--;
+    }
+
+    /**
      * Returns number of grouping parents, by a node, at any level.
      *
      * @return depth of grouping
@@ -373,7 +401,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDescriptionStatement(GeneratedYangParser.DescriptionStatementContext ctx) {
-        DescriptionListener.processDescriptionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            DescriptionListener.processDescriptionEntry(this, ctx);
+        }
     }
 
     @Override
@@ -383,7 +413,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterReferenceStatement(GeneratedYangParser.ReferenceStatementContext ctx) {
-        ReferenceListener.processReferenceEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            ReferenceListener.processReferenceEntry(this, ctx);
+        }
     }
 
     @Override
@@ -533,7 +565,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterBaseStatement(GeneratedYangParser.BaseStatementContext ctx) {
-        BaseListener.processBaseEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            BaseListener.processBaseEntry(this, ctx);
+        }
     }
 
     @Override
@@ -573,7 +607,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterIfFeatureStatement(GeneratedYangParser.IfFeatureStatementContext ctx) {
-        IfFeatureListener.processIfFeatureEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            IfFeatureListener.processIfFeatureEntry(this, ctx);
+        }
     }
 
     @Override
@@ -583,7 +619,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterUnitsStatement(GeneratedYangParser.UnitsStatementContext ctx) {
-        UnitsListener.processUnitsEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            UnitsListener.processUnitsEntry(this, ctx);
+        }
     }
 
     @Override
@@ -603,12 +641,16 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterTypeStatement(GeneratedYangParser.TypeStatementContext ctx) {
-        TypeListener.processTypeEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            TypeListener.processTypeEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitTypeStatement(GeneratedYangParser.TypeStatementContext ctx) {
-        TypeListener.processTypeExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            TypeListener.processTypeExit(this, ctx);
+        }
     }
 
     @Override
@@ -623,17 +665,23 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDecimal64Specification(GeneratedYangParser.Decimal64SpecificationContext ctx) {
-        Decimal64Listener.processDecimal64Entry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            Decimal64Listener.processDecimal64Entry(this, ctx);
+        }
     }
 
     @Override
     public void exitDecimal64Specification(GeneratedYangParser.Decimal64SpecificationContext ctx) {
-        Decimal64Listener.processDecimal64Exit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            Decimal64Listener.processDecimal64Exit(this, ctx);
+        }
     }
 
     @Override
     public void enterFractionDigitStatement(GeneratedYangParser.FractionDigitStatementContext ctx) {
-        FractionDigitsListener.processFractionDigitsEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            FractionDigitsListener.processFractionDigitsEntry(this, ctx);
+        }
     }
 
     @Override
@@ -653,12 +701,16 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterRangeStatement(GeneratedYangParser.RangeStatementContext ctx) {
-        RangeRestrictionListener.processRangeRestrictionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            RangeRestrictionListener.processRangeRestrictionEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitRangeStatement(GeneratedYangParser.RangeStatementContext ctx) {
-        RangeRestrictionListener.processRangeRestrictionExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            RangeRestrictionListener.processRangeRestrictionExit(this, ctx);
+        }
     }
 
     @Override
@@ -683,27 +735,37 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterLengthStatement(GeneratedYangParser.LengthStatementContext ctx) {
-        LengthRestrictionListener.processLengthRestrictionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            LengthRestrictionListener.processLengthRestrictionEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitLengthStatement(GeneratedYangParser.LengthStatementContext ctx) {
-        LengthRestrictionListener.processLengthRestrictionExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            LengthRestrictionListener.processLengthRestrictionExit(this, ctx);
+        }
     }
 
     @Override
     public void enterPatternStatement(GeneratedYangParser.PatternStatementContext ctx) {
-        PatternRestrictionListener.processPatternRestrictionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            PatternRestrictionListener.processPatternRestrictionEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitPatternStatement(GeneratedYangParser.PatternStatementContext ctx) {
-        PatternRestrictionListener.processPatternRestrictionExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            PatternRestrictionListener.processPatternRestrictionExit(this, ctx);
+        }
     }
 
     @Override
     public void enterDefaultStatement(GeneratedYangParser.DefaultStatementContext ctx) {
-        DefaultListener.processDefaultEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            DefaultListener.processDefaultEntry(this, ctx);
+        }
     }
 
     @Override
@@ -713,22 +775,30 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterEnumSpecification(GeneratedYangParser.EnumSpecificationContext ctx) {
-        EnumerationListener.processEnumerationEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            EnumerationListener.processEnumerationEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitEnumSpecification(GeneratedYangParser.EnumSpecificationContext ctx) {
-        EnumerationListener.processEnumerationExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            EnumerationListener.processEnumerationExit(this, ctx);
+        }
     }
 
     @Override
     public void enterEnumStatement(GeneratedYangParser.EnumStatementContext ctx) {
-        EnumListener.processEnumEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            EnumListener.processEnumEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitEnumStatement(GeneratedYangParser.EnumStatementContext ctx) {
-        EnumListener.processEnumExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            EnumListener.processEnumExit(this, ctx);
+        }
     }
 
     @Override
@@ -743,17 +813,23 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterLeafrefSpecification(GeneratedYangParser.LeafrefSpecificationContext ctx) {
-        LeafrefListener.processLeafrefEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            LeafrefListener.processLeafrefEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitLeafrefSpecification(GeneratedYangParser.LeafrefSpecificationContext ctx) {
-        LeafrefListener.processLeafrefExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            LeafrefListener.processLeafrefExit(this, ctx);
+        }
     }
 
     @Override
     public void enterPathStatement(GeneratedYangParser.PathStatementContext ctx) {
-        PathListener.processPathEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            PathListener.processPathEntry(this, ctx);
+        }
     }
 
     @Override
@@ -763,7 +839,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterRequireInstanceStatement(GeneratedYangParser.RequireInstanceStatementContext ctx) {
-        RequireInstanceListener.processRequireInstanceEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            RequireInstanceListener.processRequireInstanceEntry(this, ctx);
+        }
     }
 
     @Override
@@ -783,42 +861,58 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterIdentityrefSpecification(GeneratedYangParser.IdentityrefSpecificationContext ctx) {
-        IdentityrefListener.processIdentityrefEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            IdentityrefListener.processIdentityrefEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitIdentityrefSpecification(GeneratedYangParser.IdentityrefSpecificationContext ctx) {
-        IdentityrefListener.processIdentityrefExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            IdentityrefListener.processIdentityrefExit(this, ctx);
+        }
     }
 
     @Override
     public void enterUnionSpecification(GeneratedYangParser.UnionSpecificationContext ctx) {
-        UnionListener.processUnionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            UnionListener.processUnionEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitUnionSpecification(GeneratedYangParser.UnionSpecificationContext ctx) {
-        UnionListener.processUnionExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            UnionListener.processUnionExit(this, ctx);
+        }
     }
 
     @Override
     public void enterBitsSpecification(GeneratedYangParser.BitsSpecificationContext ctx) {
-        BitsListener.processBitsEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            BitsListener.processBitsEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitBitsSpecification(GeneratedYangParser.BitsSpecificationContext ctx) {
-        BitsListener.processBitsExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            BitsListener.processBitsExit(this, ctx);
+        }
     }
 
     @Override
     public void enterBitStatement(GeneratedYangParser.BitStatementContext ctx) {
-        BitListener.processBitEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            BitListener.processBitEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitBitStatement(GeneratedYangParser.BitStatementContext ctx) {
-        BitListener.processBitExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            BitListener.processBitExit(this, ctx);
+        }
     }
 
     @Override
@@ -833,7 +927,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterPositionStatement(GeneratedYangParser.PositionStatementContext ctx) {
-        PositionListener.processPositionEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            PositionListener.processPositionEntry(this, ctx);
+        }
     }
 
     @Override
@@ -843,7 +939,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterStatusStatement(GeneratedYangParser.StatusStatementContext ctx) {
-        StatusListener.processStatusEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            StatusListener.processStatusEntry(this, ctx);
+        }
     }
 
     @Override
@@ -853,7 +951,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterConfigStatement(GeneratedYangParser.ConfigStatementContext ctx) {
-        ConfigListener.processConfigEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            ConfigListener.processConfigEntry(this, ctx);
+        }
     }
 
     @Override
@@ -863,7 +963,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterMandatoryStatement(GeneratedYangParser.MandatoryStatementContext ctx) {
-        MandatoryListener.processMandatoryEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            MandatoryListener.processMandatoryEntry(this, ctx);
+        }
     }
 
     @Override
@@ -873,7 +975,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterPresenceStatement(GeneratedYangParser.PresenceStatementContext ctx) {
-        PresenceListener.processPresenceEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            PresenceListener.processPresenceEntry(this, ctx);
+        }
     }
 
     @Override
@@ -893,17 +997,23 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterMustStatement(GeneratedYangParser.MustStatementContext ctx) {
-        MustListener.processMustEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            MustListener.processMustEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitMustStatement(GeneratedYangParser.MustStatementContext ctx) {
-        MustListener.processMustExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            MustListener.processMustExit(this, ctx);
+        }
     }
 
     @Override
     public void enterErrorMessageStatement(GeneratedYangParser.ErrorMessageStatementContext ctx) {
-        ErrorMessageListener.processErrorMessageEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            ErrorMessageListener.processErrorMessageEntry(this, ctx);
+        }
     }
 
     @Override
@@ -913,7 +1023,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterErrorAppTagStatement(GeneratedYangParser.ErrorAppTagStatementContext ctx) {
-        ErrorAppTagListener.processErrorAppTagMessageEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            ErrorAppTagListener.processErrorAppTagMessageEntry(this, ctx);
+        }
     }
 
     @Override
@@ -923,7 +1035,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterMinElementsStatement(GeneratedYangParser.MinElementsStatementContext ctx) {
-        MinElementsListener.processMinElementsEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            MinElementsListener.processMinElementsEntry(this, ctx);
+        }
     }
 
     @Override
@@ -933,7 +1047,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterMaxElementsStatement(GeneratedYangParser.MaxElementsStatementContext ctx) {
-        MaxElementsListener.processMaxElementsEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            MaxElementsListener.processMaxElementsEntry(this, ctx);
+        }
     }
 
     @Override
@@ -943,7 +1059,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterValueStatement(GeneratedYangParser.ValueStatementContext ctx) {
-        ValueListener.processValueEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            ValueListener.processValueEntry(this, ctx);
+        }
     }
 
     @Override
@@ -1013,7 +1131,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterUniqueStatement(GeneratedYangParser.UniqueStatementContext ctx) {
-        UniqueListener.processUniqueEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            UniqueListener.processUniqueEntry(this, ctx);
+        }
     }
 
     @Override
@@ -1053,12 +1173,13 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterAnyxmlStatement(GeneratedYangParser.AnyxmlStatementContext ctx) {
+        increaseUnsupportedYangConstructDepth();
         handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override
     public void exitAnyxmlStatement(GeneratedYangParser.AnyxmlStatementContext ctx) {
-        // do nothing.
+        decreaseUnsupportedYangConstructDepth();
     }
 
     @Override
@@ -1073,12 +1194,13 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterRefineStatement(GeneratedYangParser.RefineStatementContext ctx) {
+        increaseUnsupportedYangConstructDepth();
         handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override
     public void exitRefineStatement(GeneratedYangParser.RefineStatementContext ctx) {
-        // do nothing.
+        decreaseUnsupportedYangConstructDepth();
     }
 
     @Override
@@ -1163,12 +1285,16 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterWhenStatement(GeneratedYangParser.WhenStatementContext ctx) {
-        WhenListener.processWhenEntry(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            WhenListener.processWhenEntry(this, ctx);
+        }
     }
 
     @Override
     public void exitWhenStatement(GeneratedYangParser.WhenStatementContext ctx) {
-        WhenListener.processWhenExit(this, ctx);
+        if (getUnsupportedYangConstructDepth() == 0) {
+            WhenListener.processWhenExit(this, ctx);
+        }
     }
 
     @Override
@@ -1213,13 +1339,14 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDeviationStatement(GeneratedYangParser.DeviationStatementContext ctx) {
+        increaseUnsupportedYangConstructDepth();
         handleUnsupportedYangConstruct(YangConstructType.DEVIATION_DATA, ctx, UNSUPPORTED_YANG_CONSTRUCT,
                 getFileName());
     }
 
     @Override
     public void exitDeviationStatement(GeneratedYangParser.DeviationStatementContext ctx) {
-        // do nothing.
+        decreaseUnsupportedYangConstructDepth();
     }
 
     @Override

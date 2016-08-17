@@ -27,6 +27,7 @@ import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
+import org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation;
 
 import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CONFIG_DATA;
@@ -114,6 +115,15 @@ public final class LeafListener {
 
         YangLeaf leaf = getYangLeaf(JAVA_GENERATION);
         leaf.setLeafName(identifier);
+
+        /*
+         * If "config" is not specified, the default is the same as the parent
+         * schema node's "config" value.
+         */
+        if (ctx.configStatement().isEmpty()) {
+            boolean parentConfig = ListenerValidation.getParentNodeConfig(listener);
+            leaf.setConfig(parentConfig);
+        }
 
         Parsable tmpData = listener.getParsedDataStack().peek();
         YangLeavesHolder leavesHolder;

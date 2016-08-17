@@ -43,4 +43,18 @@ public interface YangAugmentableNode {
      * @return list of augment info
      */
     List<YangAugmentedInfo> getAugmentedInfoList();
+
+    /**
+     * Sets the isAugmented flag.
+     *
+     * @param isAugmented the flag value to set
+     */
+    void setIsAugmented(boolean isAugmented);
+
+    /**
+     * Returns the isAugmented flag.
+     *
+     * @return if isAugmented flag
+     */
+    boolean isAugmented();
 }
