@@ -28,8 +28,8 @@ import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLeafrefUnderGroupingForLeaf;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLeafrefUnderGroupingForLeafList;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeaf;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeafList;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClonedLeavesUnionEnumRef;
 
 /*-
@@ -408,8 +408,8 @@ public class YangUses
                             YangConstructType.LEAF_DATA);
                     clonedLeaf = leaf.clone();
                     if (getCurrentGroupingDepth() == 0) {
-                        YangEntityToResolveInfoImpl resolveInfo = resolveLeafrefUnderGroupingForLeaf(clonedLeaf,
-                                usesParentLeavesHolder, this);
+                        YangEntityToResolveInfoImpl resolveInfo = resolveYangConstructsUnderGroupingForLeaf(
+                                clonedLeaf, usesParentLeavesHolder, this);
                         if (resolveInfo != null) {
                             addEntityToResolve(resolveInfo);
                         }
@@ -431,7 +431,8 @@ public class YangUses
                     clonedLeafList = leafList.clone();
                     if (getCurrentGroupingDepth() == 0) {
                         YangEntityToResolveInfoImpl resolveInfo =
-                                resolveLeafrefUnderGroupingForLeafList(clonedLeafList, usesParentLeavesHolder);
+                                resolveYangConstructsUnderGroupingForLeafList(clonedLeafList,
+                                                                                   usesParentLeavesHolder, this);
                         if (resolveInfo != null) {
                             addEntityToResolve(resolveInfo);
                         }

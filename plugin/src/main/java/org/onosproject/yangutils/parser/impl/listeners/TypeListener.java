@@ -38,8 +38,10 @@ import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOL
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructExtendedListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
@@ -82,7 +84,7 @@ public final class TypeListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processTypeEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.TypeStatementContext ctx) {
+            GeneratedYangParser.TypeStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, TYPE_DATA, ctx.string().getText(), ENTRY);
@@ -136,10 +138,12 @@ public final class TypeListener {
 
                     type.setResolvableStatus(UNRESOLVED);
 
-                    // Add resolution information to the list
-                    YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangType>(type,
-                            (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangType>(type,
+                                (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                 }
                 break;
             case LEAF_LIST_DATA:
@@ -166,11 +170,13 @@ public final class TypeListener {
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
-                    // Add resolution information to the list
-                    YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangType>(type, (YangNode) parentNodeOfLeafList, errorLine,
-                                    errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        YangResolutionInfoImpl resolutionInfo =
+                                new YangResolutionInfoImpl<YangType>(type, (YangNode) parentNodeOfLeafList, errorLine,
+                                        errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                 }
                 break;
             case UNION_DATA:
@@ -196,10 +202,12 @@ public final class TypeListener {
 
                     type.setResolvableStatus(UNRESOLVED);
 
-                    // Add resolution information to the list
-                    YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangType>(type, unionNode, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        YangResolutionInfoImpl resolutionInfo =
+                                new YangResolutionInfoImpl<YangType>(type, unionNode, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                 }
 
                 break;
@@ -218,11 +226,12 @@ public final class TypeListener {
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     type.setResolvableStatus(UNRESOLVED);
-
-                    // Add resolution information to the list
-                    YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangType>(type, typeDef, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        YangResolutionInfoImpl resolutionInfo =
+                                new YangResolutionInfoImpl<YangType>(type, typeDef, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                 }
                 break;
             //TODO: deviate replacement statement.
@@ -256,7 +265,7 @@ public final class TypeListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processTypeExit(TreeWalkListener listener,
-                                       GeneratedYangParser.TypeStatementContext ctx) {
+            GeneratedYangParser.TypeStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, TYPE_DATA, ctx.string().getText(), EXIT);
@@ -275,7 +284,7 @@ public final class TypeListener {
      * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangType> resolutionInfo,
-                                            GeneratedYangParser.TypeStatementContext ctx) {
+            GeneratedYangParser.TypeStatementContext ctx) {
         try {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
@@ -291,7 +300,7 @@ public final class TypeListener {
      * @param yangDataType yang data type
      */
     private static void validateTypeSubStatementCardinality(GeneratedYangParser.TypeStatementContext ctx,
-                                                            YangDataTypes yangDataType) {
+            YangDataTypes yangDataType) {
         if (ctx.typeBodyStatements() == null || ctx.typeBodyStatements().isEmpty()) {
             ParserException parserException;
             switch (yangDataType) {
@@ -317,7 +326,7 @@ public final class TypeListener {
                     break;
                 case IDENTITYREF:
                     parserException = new ParserException("YANG file error : a type identityref" +
-                                                                  " must have base statement.");
+                            " must have base statement.");
                     break;
                 default:
                     return;

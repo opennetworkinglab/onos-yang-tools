@@ -32,6 +32,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangReferenceResolver;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.linker.YangLinker;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
@@ -45,6 +47,9 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
+import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.resolveGroupingInDefinationScope;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.addToCompilationRoot;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.copyYangFilesToTarget;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.resolveInterJarDependencies;
@@ -214,7 +219,6 @@ public class YangUtilManager
             if (getCurYangFileInfo() != null) {
                 fileName = getCurYangFileInfo().getYangFileName();
             }
-
             try {
                 translatorErrorHandler(getRootNode(), yangPlugin);
                 deleteDirectory(getDirectory(baseDir, classFileDir) + DEFAULT_PKG);
@@ -242,7 +246,8 @@ public class YangUtilManager
      *
      * @throws IOException when fails to do IO operations
      */
-    private void resolveInterJarDependency() throws IOException {
+    private void resolveInterJarDependency()
+            throws IOException {
         try {
             List<YangNode> interJarResolvedNodes = resolveInterJarDependencies(project, localRepository,
                     remoteRepository, getDirectory(baseDir, outputDirectory));
@@ -298,6 +303,13 @@ public class YangUtilManager
                     YangNode yangNode = yangUtilsParser.getDataModel(yangFileInfo.getYangFileName());
                     yangFileInfo.setRootNode(yangNode);
                     setRootNode(yangNode);
+                    resolveGroupingInDefinationScope((YangReferenceResolver) yangNode);
+                    try {
+                        ((YangReferenceResolver) yangNode).resolveSelfFileLinking(YANG_DERIVED_DATA_TYPE);
+                        ((YangReferenceResolver) yangNode).resolveSelfFileLinking(YANG_IDENTITYREF);
+                    } catch (DataModelException e) {
+                        //TODO: throw exception : throw e;
+                    }
                 } catch (ParserException e) {
                     String logInfo = "Error in file: " + e.getFileName();
                     if (e.getLineNumber() != 0) {

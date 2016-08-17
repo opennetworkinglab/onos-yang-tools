@@ -64,7 +64,7 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
  * @param <T> YANG data type info
  */
 public class YangType<T>
-        implements Parsable, Resolvable, Serializable {
+        implements Parsable, Resolvable, Serializable, LocationInfo {
 
     private static final long serialVersionUID = 8062016054L;
 
@@ -92,6 +92,29 @@ public class YangType<T>
      * "INTRA_FILE_RESOLVED".
      */
     private ResolvableStatus resolvableStatus;
+
+
+    /**
+     * Resolution for interfile grouping.
+     */
+    private boolean isTypeForInterFileGroupingResolution;
+
+    /**
+     * Resolved within the grouping where the type is used.
+     */
+    private boolean isTypeNotResolvedTillRootNode;
+
+
+    /**
+     * Error line number.
+     */
+    private transient int lineNumber;
+
+    /**
+     * Error character position in number.
+     */
+    private transient int charPositionInLine;
+
 
     /**
      * Creates a YANG type object.
@@ -276,7 +299,8 @@ public class YangType<T>
      * @param value input data value
      * @throws DataModelException a violation of data model rules
      */
-    void isValidValue(String value) throws DataModelException {
+    void isValidValue(String value)
+            throws DataModelException {
         switch (getDataType()) {
             case INT8:
             case INT16:
@@ -500,5 +524,41 @@ public class YangType<T>
         }
 
         return isMatched;
+    }
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public int getCharPosition() {
+        return charPositionInLine;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+    @Override
+    public void setCharPosition(int charPositionInLine) {
+        this.charPositionInLine = charPositionInLine;
+    }
+
+    public boolean isTypeForInterFileGroupingResolution() {
+        return isTypeForInterFileGroupingResolution;
+    }
+
+    public void setTypeForInterFileGroupingResolution(boolean typeForInterFileGroupingResolution) {
+        isTypeForInterFileGroupingResolution = typeForInterFileGroupingResolution;
+    }
+
+    public boolean isTypeNotResolvedTillRootNode() {
+        return isTypeNotResolvedTillRootNode;
+    }
+
+    public void setTypeNotResolvedTillRootNode(boolean typeNotResolvedTillRootNode) {
+        isTypeNotResolvedTillRootNode = typeNotResolvedTillRootNode;
     }
 }

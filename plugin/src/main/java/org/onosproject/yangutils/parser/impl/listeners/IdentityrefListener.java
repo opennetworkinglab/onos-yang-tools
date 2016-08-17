@@ -33,11 +33,13 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.BASE_D
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.IDENTITYREF_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructExtendedListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.getValidNodeIdentifier;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
@@ -71,7 +73,7 @@ public final class IdentityrefListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processIdentityrefEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, IDENTITYREF_DATA, "", ENTRY);
@@ -85,7 +87,7 @@ public final class IdentityrefListener {
 
             // Validate node identifier.
             YangNodeIdentifier nodeIdentifier = getValidNodeIdentifier(ctx.baseStatement().string().getText(),
-                                                                       BASE_DATA, ctx);
+                    BASE_DATA, ctx);
             identityRef.setBaseIdentity(nodeIdentifier);
             ((YangType) typeData).setDataTypeExtendedInfo(identityRef);
 
@@ -106,16 +108,17 @@ public final class IdentityrefListener {
                     // Verify parent node of leaf
                     if (!(parentNodeOfLeaf instanceof YangNode)) {
                         throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER,
-                                                                                IDENTITYREF_DATA, ctx.getText(), EXIT));
+                                IDENTITYREF_DATA, ctx.getText(), EXIT));
                     }
 
                     identityRef.setResolvableStatus(UNRESOLVED);
 
-                    // Add resolution information to the list
-                    resolutionInfo =  new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
-                                                  (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
-
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
+                                (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                     break;
                 case LEAF_LIST_DATA:
 
@@ -129,15 +132,17 @@ public final class IdentityrefListener {
                     // Verify parent node of leaf
                     if (!(parentNodeOfLeafList instanceof YangNode)) {
                         throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER,
-                                                                                IDENTITYREF_DATA, ctx.getText(), EXIT));
+                                IDENTITYREF_DATA, ctx.getText(), EXIT));
                     }
 
                     identityRef.setResolvableStatus(UNRESOLVED);
 
-                    // Add resolution information to the list
-                    resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
-                                               (YangNode) parentNodeOfLeafList, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
+                                (YangNode) parentNodeOfLeafList, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                     break;
                 case UNION_DATA:
 
@@ -146,16 +151,17 @@ public final class IdentityrefListener {
                     // Verify parent node of leaf
                     if (!(parentNodeOfUnionNode instanceof YangNode)) {
                         throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER,
-                                                                                IDENTITYREF_DATA, ctx.getText(), EXIT));
+                                IDENTITYREF_DATA, ctx.getText(), EXIT));
                     }
 
                     identityRef.setResolvableStatus(UNRESOLVED);
 
-                    // Add resolution information to the list
-                    resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
-                                              (YangNode) parentNodeOfUnionNode, errorLine, errorPosition);
-                    addToResolutionList(resolutionInfo, ctx);
-
+                    if (listener.getGroupingDepth() == 0) {
+                        // Add resolution information to the list
+                        resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
+                                (YangNode) parentNodeOfUnionNode, errorLine, errorPosition);
+                        addToResolutionList(resolutionInfo, ctx);
+                    }
                     break;
                 case TYPEDEF_DATA:
                     /**
@@ -167,11 +173,11 @@ public final class IdentityrefListener {
                     break;
                 default:
                     throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, IDENTITYREF_DATA,
-                                                                            ctx.getText(), EXIT));
+                            ctx.getText(), EXIT));
             }
             listener.getParsedDataStack().push(typeData);
             listener.getParsedDataStack().push(identityRef);
-         } else {
+        } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, IDENTITYREF_DATA, "", ENTRY));
         }
     }
@@ -184,7 +190,7 @@ public final class IdentityrefListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processIdentityrefExit(TreeWalkListener listener,
-                                       GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, IDENTITYREF_DATA, ctx.getText(), EXIT);
@@ -192,7 +198,7 @@ public final class IdentityrefListener {
         Parsable parsableType = listener.getParsedDataStack().pop();
         if (!(parsableType instanceof YangIdentityRef)) {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, IDENTITYREF_DATA,
-                                                                    ctx.getText(), EXIT));
+                    ctx.getText(), EXIT));
         }
     }
 
@@ -203,12 +209,12 @@ public final class IdentityrefListener {
      * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangIdentityRef> resolutionInfo,
-                                            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
         try {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
             throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                               IDENTITYREF_DATA, ctx.getText(), ENTRY, e.getMessage()));
+                    IDENTITYREF_DATA, ctx.getText(), ENTRY, e.getMessage()));
         }
     }
 }

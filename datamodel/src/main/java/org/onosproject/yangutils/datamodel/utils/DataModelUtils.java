@@ -226,7 +226,7 @@ public final class DataModelUtils {
      * @throws DataModelException a violation of data model rules
      */
     public static void resolveLinkingForResolutionList(List<YangResolutionInfo> resolutionList,
-                                                       YangReferenceResolver dataModelRootNode)
+            YangReferenceResolver dataModelRootNode)
             throws DataModelException {
 
         for (YangResolutionInfo resolutionInfo : resolutionList) {
@@ -242,7 +242,7 @@ public final class DataModelUtils {
      * @throws DataModelException a violation of data model rules
      */
     public static void linkInterFileReferences(List<YangResolutionInfo> resolutionList,
-                                               YangReferenceResolver dataModelRootNode)
+            YangReferenceResolver dataModelRootNode)
             throws DataModelException {
         /*
          * Run through the resolution list, find type/uses referring to inter
@@ -313,7 +313,8 @@ public final class DataModelUtils {
      * @return de-serializes YANG data-model nodes
      * @throws IOException when fails do IO operations
      */
-    public static YangNode deSerializeDataModel(String serializedFileInfo) throws IOException {
+    public static YangNode deSerializeDataModel(String serializedFileInfo)
+            throws IOException {
 
         YangNode node;
         try {
@@ -346,7 +347,7 @@ public final class DataModelUtils {
                 YangLeaf clonedLeaf = leaf.clone();
                 if (yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
-                            resolveLeafrefUnderGroupingForLeaf(clonedLeaf, leavesHolder, yangUses);
+                            resolveYangConstructsUnderGroupingForLeaf(clonedLeaf, leavesHolder, yangUses);
                     if (resolveInfo != null) {
                         yangUses.addEntityToResolve(resolveInfo);
                     }
@@ -364,7 +365,8 @@ public final class DataModelUtils {
                 YangLeafList clonedLeafList = leafList.clone();
                 if (yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
-                            resolveLeafrefUnderGroupingForLeafList(clonedLeafList, leavesHolder);
+                            resolveYangConstructsUnderGroupingForLeafList(clonedLeafList, leavesHolder,
+                                    yangUses);
                     if (resolveInfo != null) {
                         yangUses.addEntityToResolve(resolveInfo);
                     }
@@ -386,8 +388,9 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     public static YangEntityToResolveInfoImpl resolveLeafrefUnderGroupingForLeaf(YangLeaf clonedLeaf,
-                                                                                 YangLeavesHolder leafParentHolder,
-                                                                                 YangUses yangUses) throws
+            YangLeavesHolder leafParentHolder,
+            YangUses yangUses)
+            throws
             DataModelException {
         if (clonedLeaf.getDataType().getDataTypeExtendedInfo() instanceof YangLeafRef) {
             YangLeafRef leafrefForCloning = (YangLeafRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
@@ -405,14 +408,123 @@ public final class DataModelUtils {
     }
 
     /**
+     * Resolves leafRef, identityRef and derived type in leaf, which are under grouping by adding it to the resolution
+     * list.
+     *
+     * @param clonedLeaf       cloned leaf in uses from grouping
+     * @param leafParentHolder holder of the leaf from uses
+     * @param yangUses         YANG uses
+     * @return entity of leafRef/identityRef/derived type which has to be resolved
+     * @throws DataModelException data model error
+     */
+    public static YangEntityToResolveInfoImpl resolveYangConstructsUnderGroupingForLeaf(YangLeaf clonedLeaf,
+            YangLeavesHolder leafParentHolder, YangUses yangUses)
+            throws DataModelException {
+        int lineNumber;
+        int charPosition;
+        YangDataTypes dataTypes = clonedLeaf.getDataType().getDataType();
+        YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
+        switch (dataTypes) {
+            case LEAFREF:
+                YangLeafRef leafRefForCloning = (YangLeafRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
+                // Conversion of prefixes in absolute path while cloning them.
+                convertThePrefixesDuringChange(leafRefForCloning, yangUses);
+                leafRefForCloning.setParentNodeOfLeafref((YangNode) leafParentHolder);
+                yangEntityToResolveInfo.setEntityToResolve(leafRefForCloning);
+                lineNumber = leafRefForCloning.getCharPosition();
+                charPosition = leafRefForCloning.getLineNumber();
+                break;
+            case IDENTITYREF:
+                YangIdentityRef identityRef = (YangIdentityRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
+                if (identityRef.isIdentityForInterFileGroupingResolution()) {
+                    return null;
+                }
+                yangEntityToResolveInfo.setEntityToResolve(identityRef);
+                lineNumber = identityRef.getCharPosition();
+                charPosition = identityRef.getLineNumber();
+                break;
+            case DERIVED:
+                YangType type = clonedLeaf.getDataType();
+                if (type.isTypeForInterFileGroupingResolution()) {
+                    return null;
+                }
+                yangEntityToResolveInfo.setEntityToResolve(type);
+                lineNumber = type.getCharPosition();
+                charPosition = type.getLineNumber();
+                break;
+            default:
+                return null;
+        }
+        yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
+        yangEntityToResolveInfo.setCharPosition(charPosition);
+        yangEntityToResolveInfo.setLineNumber(lineNumber);
+        return yangEntityToResolveInfo;
+    }
+
+    /**
+     * Resolves leafRef, identityRef and derived type in leaf-list, which are under grouping by adding it to the
+     * resolution list.
+     *
+     * @param clonedLeafList   cloned leaf-list in uses from grouping
+     * @param leafParentHolder holder of the leaf from uses
+     * @param yangUses         YANG uses
+     * @return entity of leafRef/identityRef/derived type which has to be resolved
+     * @throws DataModelException data model error
+     */
+    public static YangEntityToResolveInfoImpl resolveYangConstructsUnderGroupingForLeafList(
+            YangLeafList clonedLeafList, YangLeavesHolder leafParentHolder, YangUses yangUses)
+            throws DataModelException {
+        int lineNumber;
+        int charPosition;
+        YangDataTypes dataTypes = clonedLeafList.getDataType().getDataType();
+        YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
+        switch (dataTypes) {
+            case LEAFREF:
+                YangLeafRef leafRefForCloning = (YangLeafRef) clonedLeafList.getDataType().getDataTypeExtendedInfo();
+                // Conversion of prefixes in absolute path while cloning them.
+                convertThePrefixesDuringChange(leafRefForCloning, yangUses);
+                leafRefForCloning.setParentNodeOfLeafref((YangNode) leafParentHolder);
+                yangEntityToResolveInfo.setEntityToResolve(leafRefForCloning);
+                lineNumber = leafRefForCloning.getCharPosition();
+                charPosition = leafRefForCloning.getLineNumber();
+                break;
+            case IDENTITYREF:
+                YangIdentityRef identityRef = (YangIdentityRef) clonedLeafList.getDataType().getDataTypeExtendedInfo();
+
+                if (identityRef.isIdentityForInterFileGroupingResolution()) {
+                    return null;
+                }
+                yangEntityToResolveInfo.setEntityToResolve(identityRef);
+                lineNumber = identityRef.getCharPosition();
+                charPosition = identityRef.getLineNumber();
+                break;
+            case DERIVED:
+                YangType type = clonedLeafList.getDataType();
+                if (type.isTypeForInterFileGroupingResolution() && type.isTypeNotResolvedTillRootNode()) {
+                    return null;
+                }
+                yangEntityToResolveInfo.setEntityToResolve(type);
+                lineNumber = type.getCharPosition();
+                charPosition = type.getLineNumber();
+                break;
+            default:
+                return null;
+        }
+        yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
+        yangEntityToResolveInfo.setCharPosition(charPosition);
+        yangEntityToResolveInfo.setLineNumber(lineNumber);
+        return yangEntityToResolveInfo;
+    }
+
+    /**
      * Converts the prefixes in all the nodes of the leafref with respect to the uses node.
      *
      * @param leafrefForCloning leafref that is to be cloned
      * @param yangUses          instance of YANG uses where cloning is done
      * @throws DataModelException data model error
      */
-    private static void convertThePrefixesDuringChange(YangLeafRef leafrefForCloning, YangUses yangUses) throws
-            DataModelException {
+    private static void convertThePrefixesDuringChange(YangLeafRef leafrefForCloning, YangUses yangUses)
+            throws DataModelException {
         List<YangAtomicPath> atomicPathList = leafrefForCloning.getAtomicPath();
         if (atomicPathList != null && !atomicPathList.isEmpty()) {
             Iterator<YangAtomicPath> atomicPathIterator = atomicPathList.listIterator();
@@ -435,7 +547,8 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     private static void assignCurrentLeafedWithNewPrefixes(String importedNodeName, YangAtomicPath atomicPath,
-                                                           YangNode node) throws DataModelException {
+            YangNode node)
+            throws DataModelException {
         while (!(node instanceof YangReferenceResolver)) {
             node = node.getParent();
             if (node == null) {
@@ -457,38 +570,14 @@ public final class DataModelUtils {
     }
 
     /**
-     * Resolves leafref in leaf-list, which are under grouping by adding it to the resolution list.
-     *
-     * @param clonedLeafList       cloned leaf-list in uses from grouping
-     * @param leafListParentHolder holder of the leaf-list from uses
-     * @return entity of leafref which has to be resolved
-     * @throws DataModelException data model error
-     */
-    public static YangEntityToResolveInfoImpl resolveLeafrefUnderGroupingForLeafList(YangLeafList clonedLeafList,
-                                                                                     YangLeavesHolder
-                                                                                             leafListParentHolder)
-            throws DataModelException {
-        if (clonedLeafList.getDataType().getDataTypeExtendedInfo() instanceof YangLeafRef) {
-            YangLeafRef leafrefForCloning = (YangLeafRef) clonedLeafList.getDataType().getDataTypeExtendedInfo();
-            leafrefForCloning.setParentNodeOfLeafref((YangNode) leafListParentHolder);
-            YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
-            yangEntityToResolveInfo.setEntityToResolve(leafrefForCloning);
-            yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafListParentHolder);
-            yangEntityToResolveInfo.setLineNumber(leafrefForCloning.getLineNumber());
-            yangEntityToResolveInfo.setCharPosition(leafrefForCloning.getCharPosition());
-            return yangEntityToResolveInfo;
-        }
-        return null;
-    }
-
-    /**
      * Clones the union or enum leaves. If there is any cloned leaves whose type is union/enum then the corresponding
      * type info needs to be updated to the cloned new type node.
      *
      * @param leavesHolder cloned leaves holder, for whom the leaves reference needs to be updated
      * @throws DataModelException when fails to do data model operations
      */
-    public static void updateClonedLeavesUnionEnumRef(YangLeavesHolder leavesHolder) throws DataModelException {
+    public static void updateClonedLeavesUnionEnumRef(YangLeavesHolder leavesHolder)
+            throws DataModelException {
         List<YangLeaf> currentListOfLeaves = leavesHolder.getListOfLeaf();
         if (currentListOfLeaves != null) {
             for (YangLeaf leaf : currentListOfLeaves) {

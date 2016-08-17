@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+
 import org.onosproject.yangutils.datamodel.Resolvable;
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.TraversalType;
@@ -286,7 +287,8 @@ public class YangResolutionInfoImpl<T>
      * Adds the leafref/identityref type to the type, which has derived type referring to
      * typedef with leafref/identityref type.
      */
-    private void addDerivedRefTypeToRefTypeResolutionList() throws DataModelException {
+    private void addDerivedRefTypeToRefTypeResolutionList()
+            throws DataModelException {
 
         YangNode potentialAncestorWithReferredNode = getEntityToResolveInfo().getHolderOfEntityToResolve();
 
@@ -377,7 +379,7 @@ public class YangResolutionInfoImpl<T>
         if (entityToResolve != null && !entityToResolve.isEmpty()) {
             Iterator<T> entityToResolveIterator = entityToResolve.listIterator();
             while (entityToResolveIterator.hasNext()) {
-                addUnresolvedEntitiesToStack(entityToResolveIterator.next());
+                addUnresolvedEntitiesToResolutionList(entityToResolveIterator.next());
             }
         }
         if (((Resolvable) getCurrentEntityToResolveFromStack()).getResolvableStatus() != INTRA_FILE_RESOLVED
@@ -393,7 +395,8 @@ public class YangResolutionInfoImpl<T>
      * @param entityToResolve entity to resolve
      * @throws DataModelException a violation of data model rules
      */
-    private void addUnresolvedEntitiesToStack(T entityToResolve) throws DataModelException {
+    private void addUnresolvedEntitiesToResolutionList(T entityToResolve)
+            throws DataModelException {
         if (entityToResolve instanceof YangEntityToResolveInfoImpl) {
             YangEntityToResolveInfoImpl entityToResolveInfo = (YangEntityToResolveInfoImpl) entityToResolve;
             if (entityToResolveInfo.getEntityToResolve() instanceof YangLeafRef) {
@@ -403,12 +406,13 @@ public class YangResolutionInfoImpl<T>
                 if (leafref.getResolvableStatus() == UNRESOLVED) {
                     leafref.setResolvableStatus(INTRA_FILE_RESOLVED);
                 }
-                // Add resolution information to the list.
-                YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<YangLeafRef>(leafref,
-                        parentNodeOfLeafref, entityToResolveInfo.getLineNumber(),
-                        entityToResolveInfo.getCharPosition());
-                addResolutionInfo(resolutionInfoImpl);
             }
+
+            // Add resolution information to the list.
+            YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<>(
+                    entityToResolveInfo.getEntityToResolve(), entityToResolveInfo.getHolderOfEntityToResolve(),
+                    entityToResolveInfo.getLineNumber(), entityToResolveInfo.getCharPosition());
+            addResolutionInfo(resolutionInfoImpl);
         }
     }
 
@@ -450,6 +454,11 @@ public class YangResolutionInfoImpl<T>
             return;
         } else {
 
+            YangType type = null;
+            if (getCurrentEntityToResolveFromStack() instanceof YangType) {
+                type = (YangType) getCurrentEntityToResolveFromStack();
+            }
+
             /**
              * Traverse up in the ancestor tree to check if the referred node is
              * defined
@@ -465,6 +474,12 @@ public class YangResolutionInfoImpl<T>
                 }
 
                 potentialAncestorWithReferredNode = potentialAncestorWithReferredNode.getParent();
+
+                if (type != null && potentialAncestorWithReferredNode != null) {
+                    if (potentialAncestorWithReferredNode.getParent() == null) {
+                        type.setTypeNotResolvedTillRootNode(true);
+                    }
+                }
             }
         }
 
@@ -719,7 +734,8 @@ public class YangResolutionInfoImpl<T>
      * @throws DataModelException data model errors
      */
     private YangNode isReferredNodeInSiblingProcessedForIdentity(YangNode potentialReferredNode,
-                                                                 String referredNodeName) throws DataModelException {
+            String referredNodeName)
+            throws DataModelException {
 
         while (potentialReferredNode != null) {
             if (potentialReferredNode instanceof YangIdentity) {
@@ -902,7 +918,8 @@ public class YangResolutionInfoImpl<T>
         return false;
     }
 
-    private boolean isFeatureDefinedInNode(YangNode node) throws DataModelException {
+    private boolean isFeatureDefinedInNode(YangNode node)
+            throws DataModelException {
         YangNodeIdentifier ifFeature = ((YangIfFeature) getCurrentEntityToResolveFromStack()).getName();
         List<YangFeature> featureList = ((YangFeatureHolder) node).getFeatureList();
         if (featureList != null && !featureList.isEmpty()) {
@@ -1209,7 +1226,7 @@ public class YangResolutionInfoImpl<T>
      * @param root            root node
      */
     private void processXPathLinking(T entityToResolve,
-                                     YangReferenceResolver root) {
+            YangReferenceResolver root) {
 
         YangXpathLinker<T> xPathLinker = new YangXpathLinker<T>();
 
@@ -1455,7 +1472,8 @@ public class YangResolutionInfoImpl<T>
      * @param resolutionInfo information about the YANG construct which has to be resolved
      * @throws DataModelException a violation of data model rules
      */
-    public void setAbsolutePathFromRelativePathInLeafref(T resolutionInfo) throws DataModelException {
+    public void setAbsolutePathFromRelativePathInLeafref(T resolutionInfo)
+            throws DataModelException {
         if (resolutionInfo instanceof YangLeafRef) {
 
             YangNode parentOfLeafref = ((YangLeafRef) resolutionInfo).getParentNodeOfLeafref();
@@ -1504,7 +1522,8 @@ public class YangResolutionInfoImpl<T>
      * @throws DataModelException a violation of data model rules
      */
     private void fillAbsolutePathValuesInLeafref(YangLeafRef leafref, String pathNameToBePrefixed,
-                                                 List<YangAtomicPath> atomicPathsInRelative) throws DataModelException {
+            List<YangAtomicPath> atomicPathsInRelative)
+            throws DataModelException {
 
         leafref.setPathType(YangPathArgType.ABSOLUTE_PATH);
         String[] pathName = new String[0];

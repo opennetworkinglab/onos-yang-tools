@@ -22,12 +22,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangAugmentedInfo;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangGrouping;
+import org.onosproject.yangutils.datamodel.YangIdentityRef;
 import org.onosproject.yangutils.datamodel.YangImport;
 import org.onosproject.yangutils.datamodel.YangInclude;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -37,9 +40,21 @@ import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
+import org.onosproject.yangutils.datamodel.YangType;
+import org.onosproject.yangutils.datamodel.YangTypeDef;
+import org.onosproject.yangutils.datamodel.YangUses;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 
+import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
+import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
+import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
+import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 
@@ -187,7 +202,8 @@ public final class YangLinkerUtils {
      * @return parent node which can hold data
      * @throws LinkerException a violation of linker rules
      */
-    static YangNode skipInvalidDataNodes(YangNode currentParent, YangLeafRef leafref) throws LinkerException {
+    static YangNode skipInvalidDataNodes(YangNode currentParent, YangLeafRef leafref)
+            throws LinkerException {
         while (currentParent instanceof YangChoice || currentParent instanceof YangCase) {
             if (currentParent.getParent() == null) {
                 throw new LinkerException("YANG file error: The target node, in the leafref path " +
@@ -206,7 +222,7 @@ public final class YangLinkerUtils {
      * @return valid node identifier
      */
     static YangNodeIdentifier getValidNodeIdentifier(String nodeIdentifierString,
-                                                     YangConstructType yangConstruct) {
+            YangConstructType yangConstruct) {
         String[] tmpData = nodeIdentifierString.split(Pattern.quote(COLON));
         if (tmpData.length == 1) {
             YangNodeIdentifier nodeIdentifier = new YangNodeIdentifier();
@@ -294,4 +310,163 @@ public final class YangLinkerUtils {
             }
         }
     }
+
+    /**
+     * Add the unresolved data under the root leve grouping to be resolved, since it will be used in interfile uses.
+     *
+     * @param referenceResolver module / sub-module
+     */
+    public static void resolveGroupingInDefinationScope(YangReferenceResolver referenceResolver) {
+        YangNode potentialInterFileGrouping = ((YangNode) referenceResolver).getChild();
+
+        while (potentialInterFileGrouping != null) {
+            if (potentialInterFileGrouping instanceof YangGrouping) {
+                addGroupingResolvableEntitiesToResolutionList((YangGrouping) potentialInterFileGrouping);
+            }
+
+            potentialInterFileGrouping = potentialInterFileGrouping.getNextSibling();
+        }
+    }
+
+    /**
+     * Add the interfile grouping resolvable entities to reesolution list.
+     *
+     * @param interFileGrouping interfile grouping
+     */
+    private static void addGroupingResolvableEntitiesToResolutionList(YangGrouping interFileGrouping) {
+        YangNode curNode = interFileGrouping;
+        TraversalType curTraversal = ROOT;
+        addResolvableLeavesToResolutionList((YangLeavesHolder) curNode);
+        curTraversal = CHILD;
+        curNode = interFileGrouping.getChild();
+        if (curNode == null) {
+            return;
+        }
+        while (curNode != interFileGrouping) {
+            if (curTraversal != PARENT) {
+                if (curNode instanceof YangGrouping || curNode instanceof YangUses) {
+                    if (curNode.getNextSibling() != null) {
+                        curTraversal = SIBILING;
+                        curNode = curNode.getNextSibling();
+                    } else {
+                        curTraversal = PARENT;
+                        curNode = curNode.getParent();
+                    }
+                    continue;
+                }
+
+                if (curNode instanceof YangLeavesHolder) {
+                    addResolvableLeavesToResolutionList((YangLeavesHolder) curNode);
+                } else if (curNode instanceof YangTypeDef) {
+                    List<YangType<?>> typeList = ((YangTypeDef) curNode).getTypeList();
+                    if (!typeList.isEmpty()) {
+                        YangType<?> type = typeList.get(0);
+                        if (type.getDataType() == DERIVED) {
+                            if (type.getResolvableStatus() != ResolvableStatus.RESOLVED) {
+
+                                type.setTypeForInterFileGroupingResolution(true);
+
+                                // Add resolution information to the list
+                                YangResolutionInfoImpl resolutionInfo =
+                                        new YangResolutionInfoImpl<YangType>(type, curNode, type.getLineNumber(),
+                                                type.getCharPosition());
+                                try {
+                                    addResolutionInfo(resolutionInfo);
+                                } catch (DataModelException e) {
+                                    throw new LinkerException("Failed to add type info in grouping to resolution ");
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (curTraversal != PARENT && curNode.getChild() != null) {
+                curTraversal = CHILD;
+                curNode = curNode.getChild();
+            } else if (curNode.getNextSibling() != null) {
+
+                curTraversal = SIBILING;
+                curNode = curNode.getNextSibling();
+            } else {
+                curTraversal = PARENT;
+                curNode = curNode.getParent();
+            }
+        }
+    }
+
+    /**
+     * Add resolvable leaves type info to resolution list.
+     *
+     * @param leavesHolder leaves holder node
+     */
+    private static void addResolvableLeavesToResolutionList(YangLeavesHolder leavesHolder) {
+        if (leavesHolder.getListOfLeaf() != null && !leavesHolder.getListOfLeaf().isEmpty()) {
+            for (YangLeaf leaf : leavesHolder.getListOfLeaf()) {
+                YangType type = leaf.getDataType();
+                if (type.getDataType() == DERIVED) {
+
+                    type.setTypeForInterFileGroupingResolution(true);
+
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(type, (YangNode) leavesHolder,
+                                    type.getLineNumber(), type.getCharPosition());
+                    try {
+                        addResolutionInfo(resolutionInfo);
+                    } catch (DataModelException e) {
+                        throw new LinkerException("Failed to add leaf type info in grouping, to resolution ");
+                    }
+                } else if (type.getDataType() == IDENTITYREF) {
+                    YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
+
+                    identityRef.setIdentityForInterFileGroupingResolution(true);
+
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
+                                    identityRef.getLineNumber(), identityRef.getCharPosition());
+                    try {
+                        addResolutionInfo(resolutionInfo);
+                    } catch (DataModelException e) {
+                        throw new LinkerException("Failed to add leaf identity ref info in grouping, to resolution ");
+                    }
+                }
+            }
+        }
+
+        if (leavesHolder.getListOfLeafList() != null && !leavesHolder.getListOfLeafList().isEmpty()) {
+            for (YangLeafList leafList : leavesHolder.getListOfLeafList()) {
+                YangType type = leafList.getDataType();
+                if (type.getDataType() == DERIVED) {
+
+                    type.setTypeForInterFileGroupingResolution(true);
+
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(type, (YangNode) leavesHolder,
+                                    type.getLineNumber(), type.getCharPosition());
+                    try {
+                        addResolutionInfo(resolutionInfo);
+                    } catch (DataModelException e) {
+                        throw new LinkerException("Failed to add leaf type info in grouping, to resolution ");
+                    }
+                } else if (type.getDataType() == IDENTITYREF) {
+                    YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
+
+                    identityRef.setIdentityForInterFileGroupingResolution(true);
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
+                                    identityRef.getLineNumber(), identityRef.getCharPosition());
+                    try {
+                        addResolutionInfo(resolutionInfo);
+                    } catch (DataModelException e) {
+                        throw new LinkerException("Failed to add leaf identity ref info in grouping, to resolution ");
+                    }
+                }
+            }
+        }
+    }
+
 }

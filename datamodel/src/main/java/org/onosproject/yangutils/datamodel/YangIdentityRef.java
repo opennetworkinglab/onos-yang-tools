@@ -16,6 +16,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
@@ -43,7 +44,9 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG identityref.
  */
-public class YangIdentityRef extends YangNode implements Parsable, Resolvable, Serializable {
+public class YangIdentityRef
+        extends YangNode
+        implements Parsable, Resolvable, Serializable, LocationInfo {
 
     private static final long serialVersionUID = 806201692L;
 
@@ -61,6 +64,17 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
      */
     private ResolvableStatus resolvableStatus;
 
+    /**
+     * Resolution for interfile grouping.
+     */
+    private boolean isIdentityForInterFileGroupingResolution;
+
+    // Error line number.
+    private transient int lineNumber;
+
+    // Error character position in number.
+    private transient int charPositionInLine;
+
     // Creates a specific identityref of node.
     public YangIdentityRef() {
         super(YangNodeType.IDENTITYREF_NODE, null);
@@ -70,7 +84,7 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -101,7 +115,8 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
     }
 
     @Override
-    public Object resolve() throws DataModelException {
+    public Object resolve()
+            throws DataModelException {
 
         // Check if the derived info is present.
         YangIdentity identity = getReferredIdentity();
@@ -191,11 +206,13 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
     }
 
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
     }
 
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
     }
 
     /**
@@ -215,4 +232,33 @@ public class YangIdentityRef extends YangNode implements Parsable, Resolvable, S
     public void setReferredIdentity(YangIdentity referredIdentity) {
         this.referredIdentity = referredIdentity;
     }
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public int getCharPosition() {
+        return charPositionInLine;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+    @Override
+    public void setCharPosition(int charPositionInLine) {
+        this.charPositionInLine = charPositionInLine;
+    }
+
+    public boolean isIdentityForInterFileGroupingResolution() {
+        return isIdentityForInterFileGroupingResolution;
+    }
+
+    public void setIdentityForInterFileGroupingResolution(boolean identityForInterFileGroupingResolution) {
+        isIdentityForInterFileGroupingResolution = identityForInterFileGroupingResolution;
+    }
+
 }
