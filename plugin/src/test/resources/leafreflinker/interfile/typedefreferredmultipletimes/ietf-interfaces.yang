@@ -1,0 +1,55 @@
+module ietf-interfaces {
+    namespace "urn:ietf:params:xml:ns:yang:ietf-interfaces";
+    prefix if;
+    typedef interface-state-ref {
+        type leafref {
+            path "/if:interfaces-state/if:interface/if:name";
+        }
+        description
+            "This type is used by data models that need to reference
+            the operationally present interfaces";
+    }
+    /*
+     * Operational state data nodes
+     */
+    container interfaces-state {
+        config false;
+        description
+            "Data nodes for the operational state of interfaces.";
+        list interface {
+            key "name";
+            description
+                "The list of interfaces on the device.
+                System-controlled interfaces created by the system are
+                always present in this list, whether they are configured or
+                not.";
+            leaf name {
+                type string;
+                description
+                    "The name of the interface.
+                    A server implementation MAY map this leaf to the ifName
+                    MIB object.  Such an implementation needs to use some
+                    mechanism to handle the differences in size and characters
+                    allowed between this leaf and ifName.  The definition of
+                    such a mechanism is outside the scope of this document.";
+                    reference "RFC 2863: The Interfaces Group MIB - ifName";
+            }
+            leaf-list higher-layer-if {
+                type interface-state-ref;
+                description
+                    "A list of references to interfaces layered on top of this
+                    interface.";
+                reference
+                    "RFC 2863: The Interfaces Group MIB - ifStackTable";
+            }
+            leaf-list lower-layer-if {
+                type interface-state-ref;
+                description
+                    "A list of references to interfaces layered underneath this
+                    interface.";
+                reference
+                    "RFC 2863: The Interfaces Group MIB - ifStackTable";
+            }
+        }
+    }
+}

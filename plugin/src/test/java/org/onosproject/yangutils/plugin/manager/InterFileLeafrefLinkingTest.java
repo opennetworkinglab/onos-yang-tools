@@ -19,17 +19,19 @@ package org.onosproject.yangutils.plugin.manager;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.ListIterator;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.onosproject.yangutils.datamodel.YangContainer;
 import org.onosproject.yangutils.datamodel.YangLeaf;
+import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangNodeType;
+import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
@@ -349,5 +351,87 @@ public class InterFileLeafrefLinkingTest {
 
         assertThat(leafref1.getEffectiveDataType().getDataType(),
                 is(YangDataTypes.DERIVED));
+    }
+
+    /**
+     * Checks self resolution when leafref under typedef been referred multiple times.
+     */
+    @Test
+    public void processLeafrefWhenUsedMultipleTimes()
+            throws IOException, ParserException {
+        String searchDir = "src/test/resources/leafreflinker/interfile/typedefreferredmultipletimes";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        YangNode selfNode = null;
+
+        // Create YANG node set
+        yangLinkerManager.createYangNodeSet(utilManager.getYangNodeSet());
+
+        // Add references to import list.
+        yangLinkerManager.addRefToYangFilesImportList(utilManager.getYangNodeSet());
+
+        updateFilePriority(utilManager.getYangNodeSet());
+
+        // Carry out inter-file linking.
+        yangLinkerManager.processInterFileLinking(utilManager.getYangNodeSet());
+
+        Iterator<YangNode> yangNodeIterator = utilManager.getYangNodeSet().iterator();
+
+        YangNode rootNode = yangNodeIterator.next();
+
+        if (rootNode.getName().equals("ietf-interfaces")) {
+            selfNode = rootNode;
+        }
+
+        // Check whether the data model tree returned is of type module.
+        assertThat((selfNode instanceof YangModule), is(true));
+
+        // Check whether the node type is set properly to module.
+        assertThat(selfNode.getNodeType(), is(YangNodeType.MODULE_NODE));
+
+        // Check whether the module name is set correctly.
+        YangModule yangNode = (YangModule) selfNode;
+        assertThat(yangNode.getName(), is("ietf-interfaces"));
+
+        YangContainer container = (YangContainer) yangNode.getChild().getNextSibling();
+
+        YangList list = (YangList) container.getChild();
+
+        ListIterator<YangLeafList> leafIterator;
+        YangLeafList leafInfo;
+
+        leafIterator = list.getListOfLeafList().listIterator();
+        leafInfo = leafIterator.next();
+
+        // Check whether the information in the leaf is correct.
+        assertThat(leafInfo.getName(), is("higher-layer-if"));
+        assertThat(leafInfo.getDataType().getDataTypeName(), is("leafref"));
+        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.LEAFREF));
+        YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
+
+        // Check whether leafref type got resolved.
+        assertThat(leafref.getResolvableStatus(),
+                is(ResolvableStatus.RESOLVED));
+
+        // Check the effective type for the leaf.
+        assertThat(leafref.getEffectiveDataType().getDataType(),
+                is(YangDataTypes.STRING));
+
+        leafInfo = leafIterator.next();
+
+        // Check whether the information in the leaf is correct.
+        assertThat(leafInfo.getName(), is("lower-layer-if"));
+        assertThat(leafInfo.getDataType().getDataTypeName(), is("leafref"));
+        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.LEAFREF));
+        YangLeafRef leafref1 = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
+
+        // Check whether leafref type got resolved.
+        assertThat(leafref1.getResolvableStatus(),
+                is(ResolvableStatus.RESOLVED));
+
+        // Check the effective type for the leaf.
+        assertThat(leafref1.getEffectiveDataType().getDataType(),
+                is(YangDataTypes.STRING));
     }
 }

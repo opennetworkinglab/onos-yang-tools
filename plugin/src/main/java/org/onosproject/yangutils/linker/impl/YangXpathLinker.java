@@ -118,6 +118,15 @@ public class YangXpathLinker<T> {
     }
 
     /**
+     * Adds target nodes paths.
+     *
+     * @param absPaths target nodes paths
+     */
+    private void addAbsPaths(YangAtomicPath absPaths) {
+        getAbsPaths().add(absPaths);
+    }
+
+    /**
      * Returns current prefix.
      *
      * @return current prefix
@@ -201,9 +210,11 @@ public class YangXpathLinker<T> {
         if (atomicPaths.size() == 1) {
             targetNode = getTargetNodewhenSizeIsOne(atomicPaths);
         } else {
-            atomicPaths.remove(atomicPaths.size() - 1);
-
-            setAbsPaths(atomicPaths);
+            for (YangAtomicPath atomicPath : atomicPaths) {
+                if (atomicPath != leafRefPath) {
+                    addAbsPaths(atomicPath);
+                }
+            }
             targetNode = parseData(root);
         }
         if (targetNode == null) {
