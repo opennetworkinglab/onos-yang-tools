@@ -33,13 +33,13 @@ import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yangutils.datamodel.YangNodeType.MODULE_NODE;
+import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
-import static org.onosproject.yangutils.datamodel.YangNodeType.MODULE_NODE;
-import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
-import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
 
 /**
  * Test cases for testing "type" intra file linking.
@@ -487,9 +487,9 @@ public class IntraFileTypeLinkingTest {
 
     /**
      * Check self resolution when type referred typedef is not available in
-     * file.
+     * file, it should not result in exception.
      */
-    @Test(expected = LinkerException.class)
+    @Test
     public void processSelfResolutionWhenTypeReferredTypedefNotDefined()
             throws IOException, LinkerException {
 
@@ -499,9 +499,10 @@ public class IntraFileTypeLinkingTest {
 
     /**
      * Checks self resolution when typedef and leaf using type are at different
-     * level where typedef is is not an ancestor of type.
+     * level where typedef is is not an ancestor of type, it should not result
+     * in exception.
      */
-    @Test(expected = LinkerException.class)
+    @Test
     public void processSelfFileLinkingTypedefNotFound()
             throws IOException, LinkerException {
 
@@ -510,8 +511,9 @@ public class IntraFileTypeLinkingTest {
 
     /**
      * Checks hierarchical self resolution with self resolution failure scenario.
+     * It should not result in exception.
      */
-    @Test(expected = LinkerException.class)
+    @Test
     public void processSelfFileLinkingWithHierarchicalTypeFailureScenario()
             throws IOException, LinkerException {
 

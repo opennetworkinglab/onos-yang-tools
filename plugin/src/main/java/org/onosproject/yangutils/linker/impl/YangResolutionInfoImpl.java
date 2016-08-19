@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-
 import org.onosproject.yangutils.datamodel.Resolvable;
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.TraversalType;
@@ -484,10 +483,10 @@ public class YangResolutionInfoImpl<T>
         }
 
         /*
-         * In case prefix is not present it's a candidate for inter-file
+         * In case prefix is not present or it's self prefix it's a candidate for inter-file
          * resolution via include list.
          */
-        if (getRefPrefix() == null) {
+        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
             ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
         }
     }
@@ -525,8 +524,11 @@ public class YangResolutionInfoImpl<T>
             return;
         }
 
-        //In case prefix is not present it's a candidate for inter-file resolution via include list.
-        if (getRefPrefix() == null) {
+        /*
+         * In case prefix is not present or it's self prefix it's a candidate for inter-file
+         * resolution via include list.
+         */
+        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
             ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
         }
     }
@@ -579,10 +581,10 @@ public class YangResolutionInfoImpl<T>
         }
 
         /*
-         * In case prefix is not present it's a candidate for inter-file
+         * In case prefix is not present or it's self prefix it's a candidate for inter-file
          * resolution via include list.
          */
-        if (getRefPrefix() == null) {
+        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
             ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
         }
     }

@@ -440,14 +440,11 @@ public class IntraFileUsesLinkingTest {
 
     /**
      * Checks the failure scenario when uses is cannot resolve its grouping.
+     * It shouldnt result in exception
      */
     @Test
     public void processSelfResolutionNestedGroupingWithUnresolvedUses()
             throws IOException, LinkerException {
-
-        thrown.expect(LinkerException.class);
-        thrown.expectMessage(
-                "YANG file error: Unable to find base grouping for given uses");
 
         YangNode node = manager
                 .getDataModel("src/test/resources/SelfResolutionNestedGroupingWithUnresolvedUses.yang");
