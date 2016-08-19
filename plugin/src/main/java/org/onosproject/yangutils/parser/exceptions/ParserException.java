@@ -114,5 +114,4 @@ public class ParserException extends RuntimeException {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
 }

@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
@@ -38,8 +39,10 @@ public interface YangSchemaNode {
      *
      * @param dataNodeIdentifier YANG data node identifier
      * @return YANG data node context information
+     * @throws DataModelException data model exception in searching the child
      */
-    YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier);
+    YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
+            throws DataModelException;
 
     /**
      * Validates whether the leaf/leaf-list value is valid as per YANG. It is
@@ -48,7 +51,8 @@ public interface YangSchemaNode {
      * @param value value of leaf/leaf-list
      * @throws DataModelException a violation in data model rule
      */
-    void isValueValid(String value) throws DataModelException;
+    void isValueValid(String value)
+            throws DataModelException;
 
     /**
      * Returns count of mandatory child nodes, this is used by YMS to identify whether
@@ -57,7 +61,8 @@ public interface YangSchemaNode {
      * @return count of YANG schema nodes
      * @throws DataModelException a violation in data model rule
      */
-    int getMandatoryChildCount() throws DataModelException;
+    int getMandatoryChildCount()
+            throws DataModelException;
 
     /**
      * Returns map of default child nodes, this is used by YMS to identify whether

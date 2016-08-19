@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
@@ -289,7 +290,7 @@ public class TempJavaTypeFragmentFiles
      * @throws IOException IO operation fail
      */
     private void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo javaAttributeInfo,
-                                                         YangPluginConfig pluginConfig, List<YangType<?>> typeList)
+            YangPluginConfig pluginConfig, List<YangType<?>> typeList)
             throws IOException {
 
         YangDataTypes attrType = javaAttributeInfo.getAttributeType().getDataType();
@@ -323,7 +324,8 @@ public class TempJavaTypeFragmentFiles
      * @throws IOException when fails to do IO operations
      */
     private void addMethodsWhenNoConflictingTypes(JavaAttributeInfo javaAttributeInfo,
-                                                  YangPluginConfig pluginConfig) throws IOException {
+            YangPluginConfig pluginConfig)
+            throws IOException {
         if ((getGeneratedTempFiles() & OF_STRING_IMPL_MASK) != 0) {
             addOfStringMethod(javaAttributeInfo, pluginConfig);
         }
@@ -339,7 +341,8 @@ public class TempJavaTypeFragmentFiles
      * @param pluginConfig plugin configurations
      * @throws IOException when fails to do IO operations
      */
-    private void addMethodsInConflictCase(YangPluginConfig pluginConfig) throws IOException {
+    private void addMethodsInConflictCase(YangPluginConfig pluginConfig)
+            throws IOException {
         JavaAttributeInfo attr = getIntAttribute();
         if (attr != null) {
             attr = getUIntAttribute();
@@ -391,7 +394,8 @@ public class TempJavaTypeFragmentFiles
      * @param pluginConfig plugin configurations
      * @throws IOException when fails to do IO operations
      */
-    private void addFromStringMethod(JavaAttributeInfo newAttrInfo, YangPluginConfig pluginConfig) throws IOException {
+    private void addFromStringMethod(JavaAttributeInfo newAttrInfo, YangPluginConfig pluginConfig)
+            throws IOException {
 
         JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = getQualifiedInfoOfFromString(newAttrInfo,
                 pluginConfig.getConflictResolver());

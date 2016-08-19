@@ -47,7 +47,8 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPrefixForId
  * Represents implementation of java code fragments temporary implementations. Maintains the temp files required
  * specific for enumeration java snippet generation.
  */
-public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
+public class TempJavaEnumerationFragmentFiles
+        extends TempJavaFragmentFiles {
 
     /**
      * File name for temporary enum class.
@@ -181,7 +182,8 @@ public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
      * @param curEnumName current YANG enum
      * @throws IOException when fails to do IO operations.
      */
-    private void addAttributesForEnumClass(String curEnumName, YangPluginConfig pluginConfig) throws IOException {
+    private void addAttributesForEnumClass(String curEnumName, YangPluginConfig pluginConfig)
+            throws IOException {
         appendToFile(getEnumClassTempFileHandle(),
                 generateEnumAttributeString(curEnumName, getEnumValue(), pluginConfig));
     }
@@ -193,7 +195,8 @@ public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
      * @param pluginConfig plugin configurations
      * @throws IOException when fails to do IO operations
      */
-    void addEnumAttributeToTempFiles(YangNode curNode, YangPluginConfig pluginConfig) throws IOException {
+    void addEnumAttributeToTempFiles(YangNode curNode, YangPluginConfig pluginConfig)
+            throws IOException {
 
         super.addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeForEnum(pluginConfig), pluginConfig);
         if (curNode instanceof YangEnumeration) {
@@ -265,7 +268,8 @@ public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
      * @throws IOException when fails to generate java files
      */
     @Override
-    public void generateJavaFile(int fileType, YangNode curNode) throws IOException {
+    public void generateJavaFile(int fileType, YangNode curNode)
+            throws IOException {
         createPackage(curNode);
         setEnumClassJavaFileHandle(getJavaFileHandle(getJavaClassName(ENUM_CLASS_FILE_NAME_SUFFIX)));
         setEnumClassJavaFileHandle(generateEnumClassFile(getEnumClassJavaFileHandle(), curNode));
@@ -279,7 +283,8 @@ public class TempJavaEnumerationFragmentFiles extends TempJavaFragmentFiles {
      * @throws IOException when failed to delete the temporary files
      */
     @Override
-    public void freeTemporaryResources(boolean isErrorOccurred) throws IOException {
+    public void freeTemporaryResources(boolean isErrorOccurred)
+            throws IOException {
         closeFile(getEnumClassJavaFileHandle(), isErrorOccurred);
         closeFile(getEnumClassTempFileHandle(), true);
         super.freeTemporaryResources(isErrorOccurred);

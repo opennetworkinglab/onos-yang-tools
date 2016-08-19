@@ -54,6 +54,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
+import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
@@ -274,7 +275,7 @@ public final class JavaCodeSnippetGen {
      * @return attribute for augmentation
      */
     static String addAugmentationAttribute() {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + MAP + DIAMOND_OPEN_BRACKET + CLASS_STRING
+        return NEW_LINE + FOUR_SPACE_INDENTATION + PROTECTED + SPACE + MAP + DIAMOND_OPEN_BRACKET + CLASS_STRING
                 + DIAMOND_OPEN_BRACKET + QUESTION_MARK + DIAMOND_CLOSE_BRACKET + COMMA + SPACE + OBJECT_STRING
                 + DIAMOND_CLOSE_BRACKET + SPACE + getSmallCase(YANG_AUGMENTED_INFO) + MAP + SPACE + EQUAL + SPACE +
                 NEW + SPACE + HASH_MAP + DIAMOND_OPEN_BRACKET + DIAMOND_CLOSE_BRACKET + OPEN_PARENTHESIS

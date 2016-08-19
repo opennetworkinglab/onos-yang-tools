@@ -323,7 +323,7 @@ public abstract class YangNode
      * @param childSchemaMapHolder child schema map holder
      */
     private void processAdditionOfSchemaNodeToMap(String name, String namespace, YangSchemaNode yangSchemaNode,
-                                                  YangNode childSchemaMapHolder) {
+            YangNode childSchemaMapHolder) {
         // Addition of node to schema node map.
         // Create YANG schema node identifier with child node name.
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
@@ -554,12 +554,19 @@ public abstract class YangNode
     }
 
     @Override
-    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier) {
-        return ysnContextInfoMap.get(dataNodeIdentifier);
+    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
+            throws DataModelException {
+        YangSchemaNodeContextInfo childSchemaContext = ysnContextInfoMap.get(dataNodeIdentifier);
+        if (childSchemaContext == null) {
+            throw new DataModelException("Requested " + dataNodeIdentifier.getName() + "is not child in "
+                    + getName());
+        }
+        return childSchemaContext;
     }
 
     @Override
-    public int getMandatoryChildCount() throws DataModelException {
+    public int getMandatoryChildCount()
+            throws DataModelException {
         return mandatoryChildCount;
     }
 
@@ -577,7 +584,7 @@ public abstract class YangNode
      * @throws DataModelException a violation in data model rule
      */
     public abstract void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                             YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException;
 
     /**
@@ -601,7 +608,7 @@ public abstract class YangNode
      * @param yangSchemaNode           YANG schema node
      */
     public abstract void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                              YangSchemaNode yangSchemaNode);
+            YangSchemaNode yangSchemaNode);
 
     /**
      * Returns default child map.
@@ -666,7 +673,8 @@ public abstract class YangNode
     }
 
     @Override
-    public void isValueValid(String value) throws DataModelException {
+    public void isValueValid(String value)
+            throws DataModelException {
         throw new DataModelException("Value validation asked for YANG node.");
     }
 }

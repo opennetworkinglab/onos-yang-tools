@@ -724,6 +724,11 @@ public final class UtilConstants {
     public static final String CLOSE_PARENTHESIS = ")";
 
     /**
+     * Static attribute for empty parameter function call.
+     */
+    public static final String EMPTY_PARAMETER_FUNCTION_CALL = "()";
+
+    /**
      * Static attribute for open curly bracket syntax.
      */
     public static final String OPEN_CURLY_BRACKET = "{";
@@ -761,7 +766,13 @@ public final class UtilConstants {
     /**
      * Static attribute for get filter leaf flags.
      */
-    public static final String GET_FILTER_LEAF = "getValueLeafFlags";
+    public static final String GET_VALUE_LEAF_FLAGS = "getValueLeafFlags";
+
+    /**
+     * Static attribute for get select filter leaf flags.
+     */
+    public static final String GET_SELECT_LEAF_FLAGS = "getSelectLeafFlags";
+
 
     /**
      * Static attribute for getLeafIndex.
@@ -777,7 +788,22 @@ public final class UtilConstants {
     /**
      * Static attribute for is filter content match method prefix.
      */
-    public static final String FILTER_CONTENT_MATCH = "isFilterContentMatch";
+    public static final String PROCESS_SUBTREE_FILTERING = "processSubtreeFiltering";
+
+    /**
+     * variable name of the subtree  filtering result builder.
+     */
+    public static final String SUBTREE_FILTERING_RESULT_BUILDER = "subTreeFilteringResultBuilder";
+
+    /**
+     * variable name of the subtree  filtering result flag.
+     */
+    public static final String IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG = "isAnySelectOrContainmentNode";
+
+    /**
+     * variable name of the subtree  filtering to select all child.
+     */
+    public static final String IS_SELECT_ALL_SCHEMA_CHILD_FLAG = "isSelectAllSchemaChild";
 
     /**
      * Static attribute for flag prefix.
@@ -842,22 +868,37 @@ public final class UtilConstants {
     /**
      * Static attribute for twelve space indentation.
      */
-    public static final String TWELVE_SPACE_INDENTATION = FOUR_SPACE_INDENTATION + EIGHT_SPACE_INDENTATION;
+    public static final String TWELVE_SPACE_INDENTATION = EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for sixteen space indentation.
      */
-    public static final String SIXTEEN_SPACE_INDENTATION = EIGHT_SPACE_INDENTATION + EIGHT_SPACE_INDENTATION;
+    public static final String SIXTEEN_SPACE_INDENTATION = TWELVE_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twenty space indentation.
      */
-    public static final String TWENTY_SPACE_INDENTATION = FOUR_SPACE_INDENTATION + SIXTEEN_SPACE_INDENTATION;
+    public static final String TWENTY_SPACE_INDENTATION = SIXTEEN_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twenty four space indentation.
      */
-    public static final String TWENTY_FOUR_SPACE_INDENTATION = EIGHT_SPACE_INDENTATION + SIXTEEN_SPACE_INDENTATION;
+    public static final String TWENTY_FOUR_SPACE_INDENTATION = TWENTY_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+
+    /**
+     * Static attribute for twenty eight space indentation.
+     */
+    public static final String TWENTY_EIGHT_SPACE_INDENTATION = TWENTY_FOUR_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+
+    /**
+     * Static attribute for thirty two space indentation.
+     */
+    public static final String THIRTY_TWO_SPACE_INDENTATION = TWENTY_EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+
+    /**
+     * continue.
+     */
+    public static final String CONTINUE = "continue";
 
     /**
      * Static attribute for generated code path.
@@ -1299,6 +1340,11 @@ public final class UtilConstants {
      * Static attribute for or operator.
      */
     public static final String OR_OPERATION = "||";
+
+    /**
+     * Static attribute for or operator.
+     */
+    public static final String AND_OPERATION = "&&";
 
     /**
      * Static attribute for YANG file error.

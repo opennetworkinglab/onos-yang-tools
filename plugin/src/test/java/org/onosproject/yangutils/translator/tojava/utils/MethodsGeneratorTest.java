@@ -67,6 +67,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.OVERRIDE;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
+import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
@@ -178,7 +179,7 @@ public final class MethodsGeneratorTest {
     public void getConstructorStartTest() {
         YangPluginConfig pluginConfig = new YangPluginConfig();
         String method = getConstructorStart(CLASS_NAME, pluginConfig, false);
-        assertThat(true, is(method.contains(PUBLIC + SPACE + "Default" + CLASS_NAME + OPEN_PARENTHESIS + CLASS_NAME
+        assertThat(true, is(method.contains(PROTECTED + SPACE + "Default" + CLASS_NAME + OPEN_PARENTHESIS + CLASS_NAME
                 + BUILDER + SPACE + BUILDER.toLowerCase() + OBJECT + CLOSE_PARENTHESIS + SPACE
                 + OPEN_CURLY_BRACKET + NEW_LINE)));
     }

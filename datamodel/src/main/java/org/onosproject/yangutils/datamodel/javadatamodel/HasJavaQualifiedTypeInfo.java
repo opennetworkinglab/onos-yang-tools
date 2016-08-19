@@ -13,29 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.onosproject.yangutils.datamodel.javadatamodel;
 
-import org.onosproject.yangutils.datamodel.YangLeaf;
-
 /**
- * Represent YANG java leaf.
+ * Represents the entity which contains the qualified type info of leaf / leaf-list.
  */
-public class YangJavaLeaf
-        extends YangLeaf
-        implements HasJavaQualifiedTypeInfo {
-
-    private static final long serialVersionUID = 208201617L;
-
-    protected JavaQualifiedTypeInfo javaQualifiedTypeInfo;
-
+public interface HasJavaQualifiedTypeInfo {
     /**
      * Returns java qualified type info.
      *
      * @return java qualified type info
      */
-    @Override
-    public JavaQualifiedTypeInfo getJavaQualifiedTypeInfo() {
-        return javaQualifiedTypeInfo;
-    }
+    JavaQualifiedTypeInfo getJavaQualifiedTypeInfo();
 }

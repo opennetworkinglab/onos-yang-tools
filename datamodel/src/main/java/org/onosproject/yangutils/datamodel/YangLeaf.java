@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -430,18 +431,20 @@ public class YangLeaf
     }
 
     @Override
-    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier) {
-        // Returns null as there is no child to leaf.
-        return null;
+    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
+            throws DataModelException {
+        throw new DataModelException("leaf cannot have any child schema nodes");
     }
 
     @Override
-    public void isValueValid(String value) throws DataModelException {
+    public void isValueValid(String value)
+            throws DataModelException {
         getDataType().isValidValue(value);
     }
 
     @Override
-    public int getMandatoryChildCount() throws DataModelException {
+    public int getMandatoryChildCount()
+            throws DataModelException {
         throw new DataModelException("Leaf can't have child.");
     }
 

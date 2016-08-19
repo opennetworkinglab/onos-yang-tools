@@ -388,8 +388,7 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     public static YangEntityToResolveInfoImpl resolveLeafrefUnderGroupingForLeaf(YangLeaf clonedLeaf,
-            YangLeavesHolder leafParentHolder,
-            YangUses yangUses)
+            YangLeavesHolder leafParentHolder, YangUses yangUses)
             throws
             DataModelException {
         if (clonedLeaf.getDataType().getDataTypeExtendedInfo() instanceof YangLeafRef) {

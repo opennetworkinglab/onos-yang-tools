@@ -84,14 +84,17 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethod;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilerContentMatchForLeaf;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilerContentMatchForLeafList;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIsFilterContentForNodes;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOverRideString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.parseBuilderInterfaceBuildMethodString;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getSubtreeFilteringForLeaf;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getSubtreeFilteringForLeafList;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getSubtreeFilteringForNode;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
@@ -344,17 +347,17 @@ public class TempJavaFragmentFiles {
     /**
      * Temporary file handle for is content match method for leaf-list.
      */
-    private File isContentMatchLeafListTempFileHandle;
+    private File getSubtreeFilteringForListTempFileHandle;
 
     /**
      * Temporary file handle for is content match method for node.
      */
-    private File isContentMatchNodeTempFileHandle;
+    private File getSubtreeFilteringForChildNodeTempFileHandle;
 
     /**
      * Temporary file handle for is content match method for leaf.
      */
-    private File isContentMatchLeafTempFileHandle;
+    private File subtreeFilteringForLeafTempFileHandle;
 
     /**
      * Temporary file handle for edit content file.
@@ -493,13 +496,15 @@ public class TempJavaFragmentFiles {
             setLeafIdAttributeTempFileHandle(getTemporaryFileHandle(LEAF_IDENTIFIER_ATTRIBUTES_FILE_NAME));
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
-            setIsContentMatchLeafTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_FILE_NAME));
+            setSubtreeFilteringForLeafTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_FILE_NAME));
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
-            setIsContentMatchLeafListTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_LIST_FILE_NAME));
+            setGetSubtreeFilteringForListTempFileHandle(
+                    getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_LIST_FILE_NAME));
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
-            setIsContentMatchNodeTempFileHandle(getTemporaryFileHandle(FILTER_CONTENT_MATCH_NODE_FILE_NAME));
+            setGetSubtreeFilteringForChildNodeTempFileHandle(
+                    getTemporaryFileHandle(FILTER_CONTENT_MATCH_NODE_FILE_NAME));
         }
         if ((getGeneratedTempFiles() & EDIT_CONTENT_MASK) != 0) {
             setEditContentTempFileHandle(getTemporaryFileHandle(EDIT_CONTENT_FILE_NAME));
@@ -515,12 +520,13 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation exception
      */
     static void addCurNodeInfoInParentTempFile(YangNode curNode,
-                                               boolean isList, YangPluginConfig pluginConfig)
+            boolean isList, YangPluginConfig pluginConfig)
             throws IOException {
         YangNode parent = getParentNodeInGenCode(curNode);
         if (!(parent instanceof JavaCodeGenerator)) {
             throw new TranslatorException("missing parent node to contain current node info in generated file");
         }
+
         if (parent instanceof YangJavaGroupingTranslator) {
             /*
              * In case of grouping, there is no need to add the information, it
@@ -528,6 +534,7 @@ public class TempJavaFragmentFiles {
              */
             return;
         }
+
         TempJavaBeanFragmentFiles tempJavaBeanFragmentFiles = ((JavaCodeGeneratorInfo) parent)
                 .getTempJavaCodeFragmentFiles().getBeanTempFiles();
 
@@ -546,8 +553,8 @@ public class TempJavaFragmentFiles {
      * @return AttributeInfo attribute details required to add in temporary files
      */
     public static JavaAttributeInfo getCurNodeAsAttributeInTarget(YangNode curNode,
-                                                                  YangNode targetNode, boolean isListNode,
-                                                                  TempJavaFragmentFiles tempJavaFragmentFiles) {
+            YangNode targetNode, boolean isListNode,
+            TempJavaFragmentFiles tempJavaFragmentFiles) {
         String curNodeName = ((JavaFileInfoContainer) curNode).getJavaFileInfo().getJavaName();
         if (curNodeName == null) {
             updateJavaFileInfo(curNode, null);
@@ -624,7 +631,7 @@ public class TempJavaFragmentFiles {
      * @return java attribute for leaf
      */
     private static JavaAttributeInfo getJavaAttributeOfLeaf(TempJavaFragmentFiles tempJavaFragmentFiles, YangLeaf leaf,
-                                                            YangPluginConfig yangPluginConfig) {
+            YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leaf;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -645,8 +652,8 @@ public class TempJavaFragmentFiles {
      * @return java attribute for leaf-list
      */
     private static JavaAttributeInfo getJavaAttributeOfLeafList(TempJavaFragmentFiles tempJavaFragmentFiles,
-                                                                YangLeafList leafList,
-                                                                YangPluginConfig yangPluginConfig) {
+            YangLeafList leafList,
+            YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leafList;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -1035,10 +1042,10 @@ public class TempJavaFragmentFiles {
      * @param attr java attribute
      * @throws IOException when fails to do IO operations
      */
-    private void addIsFilerForLeaf(JavaAttributeInfo attr)
+    private void addSubTreeFilteringForLeaf(JavaAttributeInfo attr)
             throws IOException {
-        appendToFile(getIsContentMatchLeafTempFileHandle(),
-                getIsFilerContentMatchForLeaf(attr, attr.getAttributeType()) + NEW_LINE);
+        appendToFile(getSubtreeFilteringForLeafTempFileHandle(),
+                getSubtreeFilteringForLeaf(attr, attr.getAttributeType()) + NEW_LINE);
     }
 
     /**
@@ -1047,10 +1054,10 @@ public class TempJavaFragmentFiles {
      * @param attr java attribute
      * @throws IOException when fails to do IO operations
      */
-    private void addIsFilerForLeafList(JavaAttributeInfo attr)
+    private void addSubtreeFilteringForLeafList(JavaAttributeInfo attr)
             throws IOException {
-        appendToFile(getIsContentMatchLeafTempFileHandle(),
-                getIsFilerContentMatchForLeafList(attr) + NEW_LINE);
+        appendToFile(getGetSubtreeFilteringForListTempFileHandle(),
+                getSubtreeFilteringForLeafList(attr) + NEW_LINE);
     }
 
     /**
@@ -1059,10 +1066,10 @@ public class TempJavaFragmentFiles {
      * @param attr java attribute
      * @throws IOException when fails to do IO operations
      */
-    private void addIsFilerForNode(JavaAttributeInfo attr)
+    private void addSubtreeFilteringForChildNode(JavaAttributeInfo attr)
             throws IOException {
-        appendToFile(getIsContentMatchLeafTempFileHandle(),
-                getIsFilterContentForNodes(attr.getAttributeName(), attr.isListAttr()) + NEW_LINE);
+        appendToFile(getGetSubtreeFilteringForChildNodeTempFileHandle(),
+                getSubtreeFilteringForNode(attr) + NEW_LINE);
     }
 
     /**
@@ -1108,8 +1115,7 @@ public class TempJavaFragmentFiles {
     /**
      * Adds setter's implementation for class.
      *
-     * @param attr         attribute info
-     * @param pluginConfig
+     * @param attr attribute info
      * @throws IOException when fails to append to temporary file
      */
     private void addSetterImpl(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
@@ -1162,10 +1168,11 @@ public class TempJavaFragmentFiles {
      * @param pluginConfig plugin configurations
      * @throws IOException when fails to do IO operations
      */
-    private void addAddToListInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig) throws IOException {
+    private void addAddToListInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
+            throws IOException {
         appendToFile(getAddToListInterfaceTempFileHandle(),
                 getJavaDoc(ADD_TO_LIST, getCapitalCase(attr.getAttributeName()), false, pluginConfig, null)
-                        + getAddToListMethodInterface(attr) + NEW_LINE);
+                        + getAddToListMethodInterface(attr, getGeneratedJavaClassName()) + NEW_LINE);
     }
 
     /**
@@ -1174,9 +1181,10 @@ public class TempJavaFragmentFiles {
      * @param attr attribute
      * @throws IOException when fails to do IO operations
      */
-    private void addAddToListImpl(JavaAttributeInfo attr) throws IOException {
+    private void addAddToListImpl(JavaAttributeInfo attr)
+            throws IOException {
         appendToFile(getAddToListImplTempFileHandle(),
-                getAddToListMethodImpl(attr) + NEW_LINE);
+                getAddToListMethodImpl(attr, getGeneratedJavaClassName(), isRooNode()) + NEW_LINE);
     }
 
     /**
@@ -1292,7 +1300,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException when fails to append to temporary file
      */
     void addFromStringMethod(JavaAttributeInfo javaAttributeInfo,
-                             JavaAttributeInfo fromStringAttributeInfo)
+            JavaAttributeInfo fromStringAttributeInfo)
             throws IOException {
         appendToFile(getFromStringImplTempFileHandle(), getFromStringMethod(javaAttributeInfo,
                 fromStringAttributeInfo) + NEW_LINE);
@@ -1378,7 +1386,9 @@ public class TempJavaFragmentFiles {
      * @return attribute string
      */
     String parseAttribute(JavaAttributeInfo attr, YangPluginConfig pluginConfig) {
-        //TODO: check if this utility needs to be called or move to the caller
+        /*
+         * TODO: check if this utility needs to be called or move to the caller
+         */
         String attributeName = getCamelCase(attr.getAttributeName(), pluginConfig.getConflictResolver());
         String attributeAccessType = PRIVATE;
         if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
@@ -1449,7 +1459,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     private void addLeavesInfoToTempFiles(List<YangLeaf> listOfLeaves,
-                                          YangPluginConfig yangPluginConfig, YangNode curNode)
+            YangPluginConfig yangPluginConfig, YangNode curNode)
             throws IOException {
         if (listOfLeaves != null) {
             for (YangLeaf leaf : listOfLeaves) {
@@ -1478,7 +1488,8 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     private void addLeafListInfoToTempFiles(List<YangLeafList> listOfLeafList, YangPluginConfig yangPluginConfig,
-                                            YangNode curNode) throws IOException {
+            YangNode curNode)
+            throws IOException {
         if (listOfLeafList != null) {
             for (YangLeafList leafList : listOfLeafList) {
                 if (!(leafList instanceof JavaLeafInfoContainer)) {
@@ -1505,7 +1516,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     void addCurNodeLeavesInfoToTempFiles(YangNode curNode,
-                                         YangPluginConfig yangPluginConfig)
+            YangPluginConfig yangPluginConfig)
             throws IOException {
         if (!(curNode instanceof YangLeavesHolder)) {
             throw new TranslatorException("Data model node does not have any leaves");
@@ -1557,15 +1568,15 @@ public class TempJavaFragmentFiles {
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0
                 && newAttrInfo.getAttributeType() == null) {
-            addIsFilerForNode(newAttrInfo);
+            addSubtreeFilteringForChildNode(newAttrInfo);
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0 && !newAttrInfo.isListAttr()
                 && newAttrInfo.getAttributeType() != null) {
-            addIsFilerForLeaf(newAttrInfo);
+            addSubTreeFilteringForLeaf(newAttrInfo);
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0 && newAttrInfo.isListAttr()
                 && newAttrInfo.getAttributeType() != null) {
-            addIsFilerForLeafList(newAttrInfo);
+            addSubtreeFilteringForLeafList(newAttrInfo);
         }
         if ((getGeneratedTempFiles() & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0 && !newAttrInfo.isListAttr()
                 && newAttrInfo.getAttributeType() != null) {
@@ -1750,7 +1761,7 @@ public class TempJavaFragmentFiles {
      * @param curNode         current node
      */
     private void addImportsForAugmentableClass(List<String> imports, boolean operations, boolean isInterfaceFile,
-                                               YangNode curNode) {
+            YangNode curNode) {
         if (operations) {
             if (!isInterfaceFile) {
                 imports.add(getJavaImportData().getHashMapImport());
@@ -1831,13 +1842,13 @@ public class TempJavaFragmentFiles {
             closeFile(getLeafIdAttributeTempFileHandle(), true);
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
-            closeFile(getIsContentMatchLeafTempFileHandle(), true);
+            closeFile(getSubtreeFilteringForLeafTempFileHandle(), true);
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
-            closeFile(getIsContentMatchLeafListTempFileHandle(), true);
+            closeFile(getGetSubtreeFilteringForListTempFileHandle(), true);
         }
         if ((getGeneratedTempFiles() & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
-            closeFile(getIsContentMatchNodeTempFileHandle(), true);
+            closeFile(getGetSubtreeFilteringForChildNodeTempFileHandle(), true);
         }
         if ((getGeneratedTempFiles() & EDIT_CONTENT_MASK) != 0) {
             closeFile(getEditContentTempFileHandle(), true);
@@ -1934,17 +1945,17 @@ public class TempJavaFragmentFiles {
      *
      * @return temp file for is content match
      */
-    public File getIsContentMatchLeafTempFileHandle() {
-        return isContentMatchLeafTempFileHandle;
+    public File getSubtreeFilteringForLeafTempFileHandle() {
+        return subtreeFilteringForLeafTempFileHandle;
     }
 
     /**
      * Sets temp file handle for is content match.
      *
-     * @param isContentMatchLeafTempFileHandle temp file handle for is content match
+     * @param subtreeFilteringForLeafTempFileHandle temp file handle for is content match
      */
-    private void setIsContentMatchLeafTempFileHandle(File isContentMatchLeafTempFileHandle) {
-        this.isContentMatchLeafTempFileHandle = isContentMatchLeafTempFileHandle;
+    private void setSubtreeFilteringForLeafTempFileHandle(File subtreeFilteringForLeafTempFileHandle) {
+        this.subtreeFilteringForLeafTempFileHandle = subtreeFilteringForLeafTempFileHandle;
     }
 
     /**
@@ -1970,17 +1981,17 @@ public class TempJavaFragmentFiles {
      *
      * @return temp file for is content match
      */
-    public File getIsContentMatchLeafListTempFileHandle() {
-        return isContentMatchLeafListTempFileHandle;
+    public File getGetSubtreeFilteringForListTempFileHandle() {
+        return getSubtreeFilteringForListTempFileHandle;
     }
 
     /**
      * Sets temp file handle for is content match.
      *
-     * @param isContentMatchLeafListTempFileHandle temp file handle for is content match
+     * @param getSubtreeFilteringForListTempFileHandle temp file handle for is content match
      */
-    private void setIsContentMatchLeafListTempFileHandle(File isContentMatchLeafListTempFileHandle) {
-        this.isContentMatchLeafListTempFileHandle = isContentMatchLeafListTempFileHandle;
+    private void setGetSubtreeFilteringForListTempFileHandle(File getSubtreeFilteringForListTempFileHandle) {
+        this.getSubtreeFilteringForListTempFileHandle = getSubtreeFilteringForListTempFileHandle;
     }
 
     /**
@@ -1988,16 +1999,16 @@ public class TempJavaFragmentFiles {
      *
      * @return temp file for is content match
      */
-    public File getIsContentMatchNodeTempFileHandle() {
-        return isContentMatchNodeTempFileHandle;
+    public File getGetSubtreeFilteringForChildNodeTempFileHandle() {
+        return getSubtreeFilteringForChildNodeTempFileHandle;
     }
 
     /**
      * Sets temp file handle for is content match.
      *
-     * @param isContentMatchNodeTempFileHandle temp file handle for is content match
+     * @param getSubtreeFilteringForChildNodeTempFileHandle temp file handle for is content match
      */
-    private void setIsContentMatchNodeTempFileHandle(File isContentMatchNodeTempFileHandle) {
-        this.isContentMatchNodeTempFileHandle = isContentMatchNodeTempFileHandle;
+    private void setGetSubtreeFilteringForChildNodeTempFileHandle(File getSubtreeFilteringForChildNodeTempFileHandle) {
+        this.getSubtreeFilteringForChildNodeTempFileHandle = getSubtreeFilteringForChildNodeTempFileHandle;
     }
 }
