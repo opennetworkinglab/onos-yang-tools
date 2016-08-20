@@ -73,4 +73,19 @@ public interface YangSchemaNode {
      */
     Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier);
 
+    /**
+     * Get Java class's package corresponding to the schema node.
+     *
+     * @return java package, it is null, if the Java type is a built in data type
+     */
+    String getJavaPackage();
+
+    /**
+     * Get Java class or built in data type corresponding to the schema node.
+     *
+     * @return Java class or built in data type corresponding to the schema node
+     */
+    String getJavaClassNameOrBuiltInType();
+
+
 }

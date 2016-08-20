@@ -68,7 +68,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 /**
  * Represents data model node to maintain information defined in YANG output.
  */
-public class YangOutput
+public abstract class YangOutput
         extends YangNode
         implements YangLeavesHolder, Parsable, CollisionDetector, YangAugmentableNode, YangIsFilterContentNodes {
 

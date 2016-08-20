@@ -18,6 +18,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -48,7 +49,9 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 /**
  * Represents data model node to maintain information defined in YANG union.
  */
-public class YangUnion extends YangNode implements Parsable, YangTypeHolder, CollisionDetector {
+public abstract class YangUnion
+        extends YangNode
+        implements Parsable, YangTypeHolder, CollisionDetector {
 
     private static final long serialVersionUID = 806201616L;
 
@@ -69,7 +72,7 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder, Col
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -130,7 +133,8 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder, Col
      * @throws DataModelException union member type must not be one of the
      *                            built-in types "empty" or "leafref"
      */
-    public void addType(YangType<?> yangType) throws DataModelException {
+    public void addType(YangType<?> yangType)
+            throws DataModelException {
         if (yangType.getDataType() == YangDataTypes.EMPTY || yangType.getDataType() == YangDataTypes.LEAFREF) {
             throw new DataModelException("Union member type must not be one of the built-in types \"empty\" or " +
                     "\"leafref\"");
@@ -149,7 +153,8 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder, Col
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         //TODO: implement the method.
     }
 
@@ -159,17 +164,20 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder, Col
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         //TODO: implement the method.
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         // Do nothing
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         // Do nothing
     }
 }

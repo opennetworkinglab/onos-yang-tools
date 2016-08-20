@@ -17,6 +17,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -56,7 +57,9 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 /**
  * Represents data model node to maintain information defined in YANG typedef.
  */
-public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, YangTypeHolder, CollisionDetector,
+public abstract class YangTypeDef
+        extends YangNode
+        implements YangCommonInfo, Parsable, YangTypeHolder, CollisionDetector,
         YangTranslatorOperatorNode {
 
     private static final long serialVersionUID = 806201615L;
@@ -103,7 +106,7 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -258,7 +261,8 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
     }
 
@@ -268,7 +272,8 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         if (defaultValueInString != null && !defaultValueInString.isEmpty() && getTypeDefBaseType() != null) {
             getTypeDefBaseType().isValidValue(defaultValueInString);
         }
@@ -280,13 +285,15 @@ public class YangTypeDef extends YangNode implements YangCommonInfo, Parsable, Y
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         // Asks helper to detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as typedef \""
                     + getName() + "\"");

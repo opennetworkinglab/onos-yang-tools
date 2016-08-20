@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangOutput;
 /**
  * Represents YANG java output.
  */
-public class YangJavaOutput extends YangOutput {
+public class YangJavaOutput
+        extends YangOutput {
 
     private static final long serialVersionUID = 208201611L;
 
@@ -34,5 +35,15 @@ public class YangJavaOutput extends YangOutput {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

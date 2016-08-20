@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangInput;
 /**
  * Represents YANG java input.
  */
-public class YangJavaInput extends YangInput {
+public class YangJavaInput
+        extends YangInput {
 
     private static final long serialVersionUID = 208201607L;
 
@@ -34,5 +35,15 @@ public class YangJavaInput extends YangInput {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

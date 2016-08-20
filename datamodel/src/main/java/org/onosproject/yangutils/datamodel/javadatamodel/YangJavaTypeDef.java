@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangTypeDef;
 /**
  * Represents YANG java typedef.
  */
-public class YangJavaTypeDef extends YangTypeDef {
+public class YangJavaTypeDef
+        extends YangTypeDef {
 
     private static final long serialVersionUID = 208201613L;
 
@@ -34,5 +35,15 @@ public class YangJavaTypeDef extends YangTypeDef {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

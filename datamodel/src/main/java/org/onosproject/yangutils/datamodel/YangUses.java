@@ -17,6 +17,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
@@ -65,7 +66,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClo
 /**
  * Represents data model node to maintain information defined in YANG uses.
  */
-public class YangUses
+public abstract class YangUses
         extends YangNode
         implements YangCommonInfo, Parsable, Resolvable, CollisionDetector, YangWhenHolder,
         YangIfFeatureHolder, YangTranslatorOperatorNode {
@@ -154,7 +155,7 @@ public class YangUses
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -167,7 +168,7 @@ public class YangUses
 
     @Override
     public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                     YangSchemaNode yangSchemaNode) {
+            YangSchemaNode yangSchemaNode) {
         // Do nothing.
         // TODO
     }
@@ -432,7 +433,7 @@ public class YangUses
                     if (getCurrentGroupingDepth() == 0) {
                         YangEntityToResolveInfoImpl resolveInfo =
                                 resolveYangConstructsUnderGroupingForLeafList(clonedLeafList,
-                                                                                   usesParentLeavesHolder, this);
+                                        usesParentLeavesHolder, this);
                         if (resolveInfo != null) {
                             addEntityToResolve(resolveInfo);
                         }
@@ -505,7 +506,8 @@ public class YangUses
      * @param usesHolder     holder of uses
      */
     private void addResolvedUsesInfoOfGrouping(YangUses usesInGrouping,
-                                               YangLeavesHolder usesHolder) throws DataModelException {
+            YangLeavesHolder usesHolder)
+            throws DataModelException {
         for (YangNode usesResolvedNode : usesInGrouping.getUsesResolvedNodeList()) {
             addNodeOfGrouping(usesResolvedNode);
         }
@@ -529,7 +531,8 @@ public class YangUses
      * @throws DataModelException a violation in data model rule
      */
     private List<YangLeaf> cloneLeavesList(List<YangLeaf> listOfLeaves,
-                                           YangLeavesHolder usesParentNode) throws DataModelException {
+            YangLeavesHolder usesParentNode)
+            throws DataModelException {
         if (listOfLeaves == null || listOfLeaves.size() == 0) {
             throw new DataModelException("No leaves to clone");
         }
@@ -560,7 +563,8 @@ public class YangUses
      * @return cloned list of leaf list
      */
     private List<YangLeafList> cloneListOfLeafList(List<YangLeafList> listOfLeafList,
-                                                   YangLeavesHolder usesParentNode) throws DataModelException {
+            YangLeavesHolder usesParentNode)
+            throws DataModelException {
         if (listOfLeafList == null || listOfLeafList.size() == 0) {
             throw new DataModelException("No leaf lists to clone");
         }

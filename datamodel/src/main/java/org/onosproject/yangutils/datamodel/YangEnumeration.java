@@ -18,6 +18,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -30,7 +31,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the enumeration data type information.
  */
-public class YangEnumeration
+public abstract class YangEnumeration
         extends YangNode
         implements Parsable, CollisionDetector {
 
@@ -49,7 +50,7 @@ public class YangEnumeration
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }

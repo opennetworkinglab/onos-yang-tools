@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangIdentity;
 /**
  * Represents YANG java identity.
  */
-public class YangJavaIdentity extends YangIdentity {
+public class YangJavaIdentity
+        extends YangIdentity {
 
     private static final long serialVersionUID = 208201616L;
 
@@ -34,5 +35,15 @@ public class YangJavaIdentity extends YangIdentity {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

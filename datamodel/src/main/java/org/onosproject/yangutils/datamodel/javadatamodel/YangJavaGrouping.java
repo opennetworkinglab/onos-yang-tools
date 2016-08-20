@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangGrouping;
 /**
  * Represents YANG java grouping.
  */
-public class YangJavaGrouping extends YangGrouping {
+public class YangJavaGrouping
+        extends YangGrouping {
 
     private static final long serialVersionUID = 208201606L;
 
@@ -34,5 +35,15 @@ public class YangJavaGrouping extends YangGrouping {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.onosproject.yangutils.datamodel.YangModule;
+import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaModule;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
@@ -41,7 +42,7 @@ public class BaseFileListenerTest {
         thrown.expect(ParserException.class);
         thrown.expectMessage("Internal parser error detected: Invalid holder for yangbase before processing.");
 
-        YangModule tmpModule = new YangModule();
+        YangModule tmpModule = new YangJavaModule();
         TreeWalkListener listener = new TreeWalkListener();
         listener.getParsedDataStack().push(tmpModule);
         GeneratedYangParser.YangfileContext ctx = null;
@@ -95,8 +96,8 @@ public class BaseFileListenerTest {
         thrown.expect(ParserException.class);
         thrown.expectMessage("Internal parser error detected: Invalid holder for yangbase after processing.");
 
-        YangModule tmpModule = new YangModule();
-        YangModule tmpModule2 = new YangModule();
+        YangModule tmpModule = new YangJavaModule();
+        YangModule tmpModule2 = new YangJavaModule();
         TreeWalkListener listener = new TreeWalkListener();
         listener.getParsedDataStack().push(tmpModule);
         listener.getParsedDataStack().push(tmpModule2);

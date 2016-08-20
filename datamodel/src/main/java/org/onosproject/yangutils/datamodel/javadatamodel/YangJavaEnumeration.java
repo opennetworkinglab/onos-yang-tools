@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangEnumeration;
 /**
  * Represents YANG java enumeration.
  */
-public class YangJavaEnumeration extends YangEnumeration {
+public class YangJavaEnumeration
+        extends YangEnumeration {
 
     private static final long serialVersionUID = 208201605L;
 
@@ -34,5 +35,15 @@ public class YangJavaEnumeration extends YangEnumeration {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

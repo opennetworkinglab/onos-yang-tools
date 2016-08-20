@@ -16,6 +16,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -46,7 +47,9 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG identity.
  */
-public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, Serializable {
+public abstract class YangIdentity
+        extends YangNode
+        implements YangCommonInfo, Parsable, Serializable {
 
     private static final long serialVersionUID = 806201691L;
 
@@ -69,7 +72,7 @@ public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, 
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -125,11 +128,13 @@ public class YangIdentity extends YangNode implements YangCommonInfo, Parsable, 
     }
 
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
     }
 
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
     }
 
     /**

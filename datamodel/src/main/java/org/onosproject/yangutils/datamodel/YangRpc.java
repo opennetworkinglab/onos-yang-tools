@@ -19,6 +19,7 @@ package org.onosproject.yangutils.datamodel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -59,7 +60,9 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 /**
  * Represents data model node to maintain information defined in YANG rpc.
  */
-public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
+public abstract class YangRpc
+        extends YangNode
+        implements YangCommonInfo, Parsable,
         CollisionDetector, YangIfFeatureHolder {
 
     private static final long serialVersionUID = 806201613L;
@@ -93,7 +96,7 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         /*
          * This will maintain all child schema which are there inside input and
@@ -113,7 +116,7 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
 
     @Override
     public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                     YangSchemaNode yangSchemaNode) {
+            YangSchemaNode yangSchemaNode) {
         /*
          * This will maintain all default child which are there inside input and
          * output as input/output is non data node.
@@ -127,13 +130,15 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         // Detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+            throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as rpc \""
                     + getName() + "\"");
@@ -146,12 +151,14 @@ public class YangRpc extends YangNode implements YangCommonInfo, Parsable,
     }
 
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         //TODO: implement the method.
     }
 
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         //TODO: implement the method.
     }
 

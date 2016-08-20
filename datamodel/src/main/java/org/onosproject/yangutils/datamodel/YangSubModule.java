@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -79,7 +80,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLi
 /**
  * Represents data model node to maintain information defined in YANG sub-module.
  */
-public class YangSubModule
+public abstract class YangSubModule
         extends YangNode
         implements YangLeavesHolder, YangDesc, YangReference, Parsable, CollisionDetector, YangReferenceResolver,
         RpcNotificationContainer, YangFeatureHolder, YangIsFilterContentNodes {
@@ -256,7 +257,7 @@ public class YangSubModule
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -601,7 +602,7 @@ public class YangSubModule
 
     @Override
     public void addToResolutionList(YangResolutionInfo resolutionInfo,
-                                    ResolvableType type) {
+            ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList.add(resolutionInfo);
         } else if (type == ResolvableType.YANG_USES) {
@@ -623,7 +624,7 @@ public class YangSubModule
 
     @Override
     public void setResolutionList(List<YangResolutionInfo> resolutionList,
-                                  ResolvableType type) {
+            ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList = resolutionList;
         } else if (type == ResolvableType.YANG_USES) {

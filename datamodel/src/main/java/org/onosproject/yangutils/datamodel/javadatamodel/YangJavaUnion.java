@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangUnion;
 /**
  * Represent YANG java union.
  */
-public class YangJavaUnion extends YangUnion {
+public class YangJavaUnion
+        extends YangUnion {
 
     private static final long serialVersionUID = 208201614L;
     protected JavaFileInfo javaFileInfo;
@@ -33,5 +34,15 @@ public class YangJavaUnion extends YangUnion {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

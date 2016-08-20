@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangList;
 /**
  * Represent YANG java list.
  */
-public class YangJavaList extends YangList {
+public class YangJavaList
+        extends YangList {
 
     private static final long serialVersionUID = 208201608L;
 
@@ -39,4 +40,13 @@ public class YangJavaList extends YangList {
         return javaFileInfo;
     }
 
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
+    }
 }

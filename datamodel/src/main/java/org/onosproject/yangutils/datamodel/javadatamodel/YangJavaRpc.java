@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangRpc;
 /**
  * Represents YANG java rpc.
  */
-public class YangJavaRpc extends YangRpc {
+public class YangJavaRpc
+        extends YangRpc {
 
     private static final long serialVersionUID = 208201612L;
 
@@ -34,5 +35,15 @@ public class YangJavaRpc extends YangRpc {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

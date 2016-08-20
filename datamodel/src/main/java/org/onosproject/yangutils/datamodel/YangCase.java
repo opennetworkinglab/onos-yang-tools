@@ -94,7 +94,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CASE_D
 /**
  * Represents data model node to maintain information defined in YANG case.
  */
-public class YangCase
+public abstract class YangCase
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, YangAugmentableNode,
         YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes {

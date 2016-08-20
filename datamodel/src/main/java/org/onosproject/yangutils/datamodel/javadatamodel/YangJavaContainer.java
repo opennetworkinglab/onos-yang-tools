@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangContainer;
 /**
  * Represents YANG java container.
  */
-public class YangJavaContainer extends YangContainer {
+public class YangJavaContainer
+        extends YangContainer {
 
     private static final long serialVersionUID = 208201604L;
 
@@ -34,5 +35,15 @@ public class YangJavaContainer extends YangContainer {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

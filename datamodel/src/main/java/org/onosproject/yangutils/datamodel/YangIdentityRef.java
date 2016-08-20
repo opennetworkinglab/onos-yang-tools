@@ -267,4 +267,16 @@ public class YangIdentityRef
         YangIdentityRef identityRef = (YangIdentityRef) super.clone();
         return identityRef;
     }
+
+    @Override
+    public String getJavaPackage() {
+        //TODO: throw exception
+        return null;
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        //TODO: throw exception
+        return null;
+    }
 }

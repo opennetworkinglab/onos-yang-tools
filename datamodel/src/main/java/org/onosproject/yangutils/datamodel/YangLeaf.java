@@ -62,7 +62,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents leaf data represented in YANG.
  */
-public class YangLeaf
+public abstract class YangLeaf
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode, YangConfig {
 

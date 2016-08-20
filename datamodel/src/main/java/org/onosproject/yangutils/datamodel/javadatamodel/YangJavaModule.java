@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangModule;
 /**
  * Represents YANG java module.
  */
-public class YangJavaModule extends YangModule {
+public class YangJavaModule
+        extends YangModule {
 
     private static final long serialVersionUID = 208201609L;
 
@@ -34,5 +35,15 @@ public class YangJavaModule extends YangModule {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

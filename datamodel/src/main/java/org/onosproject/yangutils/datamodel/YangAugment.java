@@ -81,7 +81,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 /**
  * Representation of data model node to maintain information defined in YANG augment.
  */
-public class YangAugment
+public abstract class YangAugment
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, YangAugmentedInfo, Resolvable,
         YangXPathResolver, YangWhenHolder, YangIfFeatureHolder, YangTranslatorOperatorNode {
@@ -152,7 +152,8 @@ public class YangAugment
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) throws DataModelException {
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            throws DataModelException {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
         yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
@@ -454,7 +455,8 @@ public class YangAugment
     }
 
     @Override
-    public Object resolve() throws DataModelException {
+    public Object resolve()
+            throws DataModelException {
         // Resolving of target node is being done in XPathLinker.
         return null;
     }

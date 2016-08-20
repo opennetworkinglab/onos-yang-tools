@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangChoice;
 /**
  * Represents YANG java choice.
  */
-public class YangJavaChoice extends YangChoice {
+public class YangJavaChoice
+        extends YangChoice {
 
     private static final long serialVersionUID = 208201603L;
 
@@ -34,5 +35,15 @@ public class YangJavaChoice extends YangChoice {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

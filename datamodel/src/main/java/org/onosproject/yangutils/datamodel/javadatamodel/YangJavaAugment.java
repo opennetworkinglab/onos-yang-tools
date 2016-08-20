@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 /**
  * Represents YANG java augment.
  */
-public class YangJavaAugment extends YangAugment {
+public class YangJavaAugment
+        extends YangAugment {
 
     private static final long serialVersionUID = 208201601L;
 
@@ -34,5 +35,16 @@ public class YangJavaAugment extends YangAugment {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

@@ -38,4 +38,14 @@ public class YangJavaLeafList
     public JavaQualifiedTypeInfo getJavaQualifiedTypeInfo() {
         return javaQualifiedTypeInfo;
     }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaQualifiedTypeInfo().getPkgInfo();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaQualifiedTypeInfo().getClassInfo();
+    }
 }

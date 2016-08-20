@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangCase;
 /**
  * Represents YANG java case.
  */
-public class YangJavaCase extends YangCase {
+public class YangJavaCase
+        extends YangCase {
 
     private static final long serialVersionUID = 208201602L;
 
@@ -34,5 +35,15 @@ public class YangJavaCase extends YangCase {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

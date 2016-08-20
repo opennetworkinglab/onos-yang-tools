@@ -69,7 +69,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 /**
  * Represents data model node to maintain information defined in YANG input.
  */
-public class YangInput
+public abstract class YangInput
         extends YangNode
         implements YangLeavesHolder, Parsable, CollisionDetector, YangAugmentableNode, YangIsFilterContentNodes {
 

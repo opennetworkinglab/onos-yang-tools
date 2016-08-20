@@ -21,7 +21,8 @@ import org.onosproject.yangutils.datamodel.YangNotification;
 /**
  * Represents YANG java notification.
  */
-public class YangJavaNotification extends YangNotification {
+public class YangJavaNotification
+        extends YangNotification {
 
     private static final long serialVersionUID = 208201610L;
 
@@ -34,5 +35,15 @@ public class YangJavaNotification extends YangNotification {
      */
     public JavaFileInfo getJavaFileInfo() {
         return javaFileInfo;
+    }
+
+    @Override
+    public String getJavaPackage() {
+        return getJavaFileInfo().getPackage();
+    }
+
+    @Override
+    public String getJavaClassNameOrBuiltInType() {
+        return getJavaFileInfo().getJavaName();
     }
 }

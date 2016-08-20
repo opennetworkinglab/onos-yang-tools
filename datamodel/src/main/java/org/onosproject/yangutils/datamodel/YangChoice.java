@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -67,7 +68,8 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MISS
 /**
  * Represents data model node to maintain information defined in YANG choice.
  */
-public class YangChoice extends YangNode
+public abstract class YangChoice
+        extends YangNode
         implements YangCommonInfo, Parsable, CollisionDetector, YangAugmentableNode,
         YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder, YangIsFilterContentNodes, YangConfig {
 
@@ -172,7 +174,7 @@ public class YangChoice extends YangNode
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
@@ -358,7 +360,8 @@ public class YangChoice extends YangNode
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
     }
 
@@ -368,7 +371,8 @@ public class YangChoice extends YangNode
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         if (defaultValueInString != null && !defaultValueInString.isEmpty()) {
             YangNode node = getChild();
             boolean matched = false;
@@ -391,7 +395,8 @@ public class YangChoice extends YangNode
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+            throws DataModelException {
 
         if (getParent() instanceof YangCase && dataType != YangConstructType.CASE_DATA) {
             ((CollisionDetector) getParent()).detectCollidingChild(identifierName, dataType);
@@ -406,7 +411,8 @@ public class YangChoice extends YangNode
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType) throws DataModelException {
+    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+            throws DataModelException {
 
         if (dataType == CHOICE_DATA) {
             if (getName().equals(identifierName)) {
