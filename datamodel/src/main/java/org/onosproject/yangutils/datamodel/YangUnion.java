@@ -48,7 +48,7 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 /**
  * Represents data model node to maintain information defined in YANG union.
  */
-public class YangUnion extends YangNode implements Parsable, YangTypeHolder {
+public class YangUnion extends YangNode implements Parsable, YangTypeHolder, CollisionDetector {
 
     private static final long serialVersionUID = 806201616L;
 
@@ -161,5 +161,15 @@ public class YangUnion extends YangNode implements Parsable, YangTypeHolder {
     @Override
     public void validateDataOnExit() throws DataModelException {
         //TODO: implement the method.
+    }
+
+    @Override
+    public void detectCollidingChild(String identifierName, YangConstructType dataType) throws DataModelException {
+        // Do nothing
+    }
+
+    @Override
+    public void detectSelfCollision(String identifierName, YangConstructType dataType) throws DataModelException {
+        // Do nothing
     }
 }

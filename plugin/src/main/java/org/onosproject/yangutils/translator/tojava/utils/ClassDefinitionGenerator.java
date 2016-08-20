@@ -23,9 +23,9 @@ import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.YangSubModule;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 
@@ -305,10 +305,11 @@ final class ClassDefinitionGenerator {
     private static String getRpcInterfaceDefinitionWhenItExtends(String yangName) {
 
         if (yangName.matches(REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE)) {
-            String[] strArray = yangName.split(SERVICE);
+            StringBuilder newString = new StringBuilder(yangName);
+            newString.replace(yangName.lastIndexOf("Service"), yangName.lastIndexOf("Service") + 7, "");
             return PUBLIC + SPACE + INTERFACE + SPACE + yangName + NEW_LINE + EIGHT_SPACE_INDENTATION
-                    + EXTEND + SPACE + LISTENER_SERVICE + DIAMOND_OPEN_BRACKET + strArray[0] + EVENT_STRING + COMMA
-                    + SPACE + strArray[0] + EVENT_LISTENER_STRING + DIAMOND_CLOSE_BRACKET + SPACE
+                    + EXTEND + SPACE + LISTENER_SERVICE + DIAMOND_OPEN_BRACKET + newString + EVENT_STRING + COMMA
+                    + SPACE + newString + EVENT_LISTENER_STRING + DIAMOND_CLOSE_BRACKET + SPACE
                     + OPEN_CURLY_BRACKET + NEW_LINE;
         }
         yangName = yangName.substring(0, yangName.length() - 7);

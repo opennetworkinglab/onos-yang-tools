@@ -223,9 +223,11 @@ public class YangUtilManager
                 translatorErrorHandler(getRootNode(), yangPlugin);
                 deleteDirectory(getDirectory(baseDir, classFileDir) + DEFAULT_PKG);
             } catch (IOException ex) {
+                e.printStackTrace();
                 throw new MojoExecutionException(
                         "Error handler failed to delete files for data model node.");
             }
+            e.printStackTrace();
             throw new MojoExecutionException(
                     "Exception occurred due to " + e.getLocalizedMessage() + " in " + fileName
                             + " YANG file.");

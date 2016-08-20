@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
@@ -186,6 +185,11 @@ public class YangLinkerManager
                 ((YangReferenceResolver) yangNode)
                         .resolveInterFileLinking(ResolvableType.YANG_COMPILER_ANNOTATION);
             } catch (DataModelException e) {
+                String errorInfo = "Error in file: " + yangNode.getName() + " at line: "
+                        + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE + e.getMessage();
+                throw new LinkerException(errorInfo);
+                // TODO add file path in exception message in util manager.
+            } catch (LinkerException e) {
                 String errorInfo = "Error in file: " + yangNode.getName() + " at line: "
                         + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE + e.getMessage();
                 throw new LinkerException(errorInfo);
