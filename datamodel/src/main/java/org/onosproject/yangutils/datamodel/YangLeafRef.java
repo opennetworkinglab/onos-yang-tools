@@ -16,17 +16,17 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
@@ -47,7 +47,8 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.INST
  *
  * @param <T> YANG leafref info
  */
-public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangIfFeatureHolder,
+public class YangLeafRef<T>
+        implements Cloneable, Parsable, Resolvable, Serializable, YangIfFeatureHolder,
         YangXPathResolver, YangAppErrorHolder, LocationInfo {
 
     private static final long serialVersionUID = 286201644L;
@@ -155,6 +156,7 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
     public void setParentNodeOfLeafref(YangNode parentNodeOfLeafref) {
         this.parentNodeOfLeafref = parentNodeOfLeafref;
     }
+
     /**
      * YANG application error information.
      */
@@ -320,12 +322,14 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
     }
 
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
     }
 
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
     }
 
@@ -350,7 +354,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
     }
 
     @Override
-    public Object resolve() throws DataModelException {
+    public Object resolve()
+            throws DataModelException {
 
         if (getReferredLeafOrLeafList() == null) {
             throw new DataModelException("Linker Error: The leafref does not refer to any leaf/leaf-list.");
@@ -371,7 +376,8 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
      * @return status of resolution
      * @throws DataModelException a violation of data model rules
      */
-    private ResolvableStatus getResolution() throws DataModelException {
+    private ResolvableStatus getResolution()
+            throws DataModelException {
 
         if (getReferredLeafOrLeafList() instanceof YangLeaf) {
             YangLeaf yangLeaf = ((YangLeaf) getReferredLeafOrLeafList());
@@ -515,5 +521,12 @@ public class YangLeafRef<T> implements Parsable, Resolvable, Serializable, YangI
     @Override
     public void setCharPosition(int charPositionInLine) {
         this.charPositionInLine = charPositionInLine;
+    }
+
+    @Override
+    public YangLeafRef<T> clone()
+            throws CloneNotSupportedException {
+        YangLeafRef<T> clonedLeafRef = (YangLeafRef<T>) super.clone();
+        return clonedLeafRef;
     }
 }

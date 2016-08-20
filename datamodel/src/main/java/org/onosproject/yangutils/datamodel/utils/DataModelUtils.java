@@ -423,6 +423,7 @@ public final class DataModelUtils {
         int charPosition;
         YangDataTypes dataTypes = clonedLeaf.getDataType().getDataType();
         YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
+
         switch (dataTypes) {
             case LEAFREF:
                 YangLeafRef leafRefForCloning = (YangLeafRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
@@ -433,6 +434,7 @@ public final class DataModelUtils {
                 lineNumber = leafRefForCloning.getCharPosition();
                 charPosition = leafRefForCloning.getLineNumber();
                 break;
+
             case IDENTITYREF:
                 YangIdentityRef identityRef = (YangIdentityRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
                 if (identityRef.isIdentityForInterFileGroupingResolution()) {
@@ -442,6 +444,7 @@ public final class DataModelUtils {
                 lineNumber = identityRef.getCharPosition();
                 charPosition = identityRef.getLineNumber();
                 break;
+
             case DERIVED:
                 YangType type = clonedLeaf.getDataType();
                 if (type.isTypeForInterFileGroupingResolution()) {
@@ -451,9 +454,11 @@ public final class DataModelUtils {
                 lineNumber = type.getCharPosition();
                 charPosition = type.getLineNumber();
                 break;
+
             default:
                 return null;
         }
+
         yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
         yangEntityToResolveInfo.setCharPosition(charPosition);
         yangEntityToResolveInfo.setLineNumber(lineNumber);
@@ -583,9 +588,14 @@ public final class DataModelUtils {
                 if (leaf.getDataType().getDataType() == YangDataTypes.ENUMERATION
                         || leaf.getDataType().getDataType() == YangDataTypes.UNION) {
                     try {
-                        updateClonedTypeRef(leaf.getDataType(), leavesHolder);
+                        YangType<?> clonedType = leaf.getDataType().clone();
+                        updateClonedTypeRef(clonedType, leavesHolder);
+                        leaf.setDataType(clonedType);
                     } catch (DataModelException e) {
                         throw e;
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                        throw new DataModelException("Could not clone Type node");
                     }
                 }
             }
@@ -598,9 +608,14 @@ public final class DataModelUtils {
                 if (leafList.getDataType().getDataType() == YangDataTypes.ENUMERATION
                         || leafList.getDataType().getDataType() == YangDataTypes.UNION) {
                     try {
-                        updateClonedTypeRef(leafList.getDataType(), leavesHolder);
+                        YangType<?> clonedType = leafList.getDataType().clone();
+                        updateClonedTypeRef(clonedType, leavesHolder);
+                        leafList.setDataType(clonedType);
                     } catch (DataModelException e) {
                         throw e;
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                        throw new DataModelException("Could not clone Type node");
                     }
                 }
             }

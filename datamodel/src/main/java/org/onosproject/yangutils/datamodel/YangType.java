@@ -64,7 +64,7 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
  * @param <T> YANG data type info
  */
 public class YangType<T>
-        implements Parsable, Resolvable, Serializable, LocationInfo {
+        implements Cloneable, Parsable, Resolvable, Serializable, LocationInfo {
 
     private static final long serialVersionUID = 8062016054L;
 
@@ -561,4 +561,12 @@ public class YangType<T>
     public void setTypeNotResolvedTillRootNode(boolean typeNotResolvedTillRootNode) {
         isTypeNotResolvedTillRootNode = typeNotResolvedTillRootNode;
     }
+
+    @Override
+    public YangType<T> clone()
+            throws CloneNotSupportedException {
+        YangType<T> clonedNode = (YangType<T>) super.clone();
+        return clonedNode;
+    }
+
 }

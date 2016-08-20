@@ -17,6 +17,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -322,7 +323,7 @@ public abstract class YangNode
      * @param childSchemaMapHolder child schema map holder
      */
     private void processAdditionOfSchemaNodeToMap(String name, String namespace, YangSchemaNode yangSchemaNode,
-                                                  YangNode childSchemaMapHolder) {
+            YangNode childSchemaMapHolder) {
         // Addition of node to schema node map.
         // Create YANG schema node identifier with child node name.
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
@@ -583,7 +584,7 @@ public abstract class YangNode
      * @throws DataModelException a violation in data model rule
      */
     public abstract void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                             YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException;
 
     /**
@@ -607,7 +608,7 @@ public abstract class YangNode
      * @param yangSchemaNode           YANG schema node
      */
     public abstract void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                              YangSchemaNode yangSchemaNode);
+            YangSchemaNode yangSchemaNode);
 
     /**
      * Returns default child map.

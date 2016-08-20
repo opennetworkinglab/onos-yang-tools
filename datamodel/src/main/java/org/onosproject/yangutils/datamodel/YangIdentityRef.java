@@ -46,7 +46,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public class YangIdentityRef
         extends YangNode
-        implements Parsable, Resolvable, Serializable, LocationInfo {
+        implements Cloneable, Parsable, Resolvable, Serializable, LocationInfo {
 
     private static final long serialVersionUID = 806201692L;
 
@@ -261,4 +261,10 @@ public class YangIdentityRef
         isIdentityForInterFileGroupingResolution = identityForInterFileGroupingResolution;
     }
 
+    @Override
+    public YangIdentityRef clone()
+            throws CloneNotSupportedException {
+        YangIdentityRef identityRef = (YangIdentityRef) super.clone();
+        return identityRef;
+    }
 }
