@@ -25,7 +25,7 @@
 
     <groupId>org.onosproject</groupId>
     <artifactId>onos-yang-tools</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7</version>
     <packaging>pom</packaging>
 
     <properties>
