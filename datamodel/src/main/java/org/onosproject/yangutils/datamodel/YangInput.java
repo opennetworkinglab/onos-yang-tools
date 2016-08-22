@@ -112,7 +112,7 @@ public abstract class YangInput
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        String nameSpace = this.getParent().getNameSpace();
         // Set namespace for self node.
         setNameSpace(nameSpace);
         /*

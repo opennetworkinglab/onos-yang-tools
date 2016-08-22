@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -69,14 +68,9 @@ public abstract class YangLeaf
     private static final long serialVersionUID = 806201635L;
 
     /**
-     * Name of leaf.
+     * YANG schema node identifier.
      */
-    private String name;
-
-    /**
-     * Namespace of leaf.
-     */
-    private YangNameSpace namespace;
+    private YangSchemaNodeIdentifier yangSchemaNodeIdentifier;
 
     /**
      * If the leaf is a config parameter.
@@ -143,24 +137,6 @@ public abstract class YangLeaf
      * Creates a YANG leaf.
      */
     public YangLeaf() {
-    }
-
-    /**
-     * Returns the name of leaf.
-     *
-     * @return the leaf name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of leaf.
-     *
-     * @param leafName the leaf name to set
-     */
-    public void setLeafName(String leafName) {
-        name = leafName;
     }
 
     /**
@@ -460,31 +436,64 @@ public abstract class YangLeaf
     }
 
     /**
-     * Returns namespace of node.
+     * Sets leaf namespace and add itself to parent child schema map.
      *
-     * @return namespace of node
+     * @param nameSpace namespace
      */
-    public YangNameSpace getNamespace() {
-        return namespace;
+    public void setLeafNameSpaceAndAddToParentSchemaMap(String nameSpace) {
+        setNameSpace(nameSpace);
+        // Process addition of leaf to schema node map.
+        ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNameSpace(), this);
+    }
+
+    @Override
+    public YangSchemaNodeIdentifier getYangSchemaNodeIdentifier() {
+        return yangSchemaNodeIdentifier;
+    }
+
+    /**
+     * Sets YANG schema node identifier.
+     *
+     * @param yangSchemaNodeIdentifier YANG schema node identifier
+     */
+    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier yangSchemaNodeIdentifier) {
+        if (this.yangSchemaNodeIdentifier == null) {
+            this.yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        this.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier;
+    }
+
+    @Override
+    public String getName() {
+        return yangSchemaNodeIdentifier.getName();
+    }
+
+    /**
+     * Sets name of node.
+     *
+     * @param name name of the node
+     */
+    public void setName(String name) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setName(name);
+    }
+
+    @Override
+    public String getNameSpace() {
+        return yangSchemaNodeIdentifier.getNameSpace();
     }
 
     /**
      * Sets namespace of node.
      *
-     * @param namespace namespace of node
+     * @param namespace namespace of the node
      */
-    public void setNamespace(YangNameSpace namespace) {
-        this.namespace = namespace;
-    }
-
-    /**
-     * Sets leaf namespace and add itself to parent child schema map.
-     *
-     * @param nameSpace namespace
-     */
-    public void setLeafNameSpaceAndAddToParentSchemaMap(YangNameSpace nameSpace) {
-        setNamespace(nameSpace);
-        // Process addition of leaf to schema node map.
-        ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNamespace().getUri(), this);
+    public void setNameSpace(String namespace) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setNameSpace(namespace);
     }
 }

@@ -67,7 +67,7 @@ public class SchemaNodeTest {
         Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap = rootNode.getYsnContextInfoMap();
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         yangSchemaNodeIdentifier.setName("testcontainer");
-        yangSchemaNodeIdentifier.setNamespace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap.get(yangSchemaNodeIdentifier), is(notNullValue()));
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo = schemaMap.get(yangSchemaNodeIdentifier);
         assertThat(yangSchemaNodeContextInfo.getSchemaNode(), is(rootNode.getChild()));
@@ -76,18 +76,18 @@ public class SchemaNodeTest {
         Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap2 = rootNode.getChild()
                 .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("testleaf");
-        yangSchemaNodeIdentifier.setNamespace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap2.get(yangSchemaNodeIdentifier), is(notNullValue()));
 
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNamespace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap2.get(yangSchemaNodeIdentifier), is(notNullValue()));
 
         assertThat(rootNode.getChild().getChild().getYsnContextInfoMap(), is(notNullValue()));
         Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap3 = rootNode.getChild().getChild()
                 .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNamespace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap3.get(yangSchemaNodeIdentifier), is(notNullValue()));
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo3 = schemaMap3.get(yangSchemaNodeIdentifier);
 
@@ -95,7 +95,7 @@ public class SchemaNodeTest {
         Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap4 = rootNode.getChild().getChild().getChild()
                 .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNamespace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap4.get(yangSchemaNodeIdentifier), is(notNullValue()));
 
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo2 = schemaMap4.get(yangSchemaNodeIdentifier);
@@ -108,4 +108,5 @@ public class SchemaNodeTest {
 
         deleteDirectory("target/schemaMap/");
     }
+
 }

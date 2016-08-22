@@ -17,7 +17,6 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
@@ -87,5 +86,24 @@ public interface YangSchemaNode {
      */
     String getJavaClassNameOrBuiltInType();
 
+    /**
+     * Returns schema node identifier.
+     *
+     * @return schema node identifier
+     */
+    YangSchemaNodeIdentifier getYangSchemaNodeIdentifier();
 
+    /**
+     * Returns name of the node.
+     *
+     * @return name of the node
+     */
+    String getName();
+
+    /**
+     * Sets name of the node.
+     *
+     * @return name of the node
+     */
+    String getNameSpace();
 }

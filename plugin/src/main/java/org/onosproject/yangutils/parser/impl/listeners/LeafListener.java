@@ -114,7 +114,7 @@ public final class LeafListener {
         detectCollidingChildUtil(listener, line, charPositionInLine, identifier, LEAF_DATA);
 
         YangLeaf leaf = getYangLeaf(JAVA_GENERATION);
-        leaf.setLeafName(identifier);
+        leaf.setName(identifier);
 
         /*
          * If "config" is not specified, the default is the same as the parent

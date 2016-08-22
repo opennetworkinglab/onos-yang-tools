@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -163,7 +162,7 @@ public abstract class YangCase
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        YangNameSpace nameSpace = this.getParent().getNameSpace();
+        String nameSpace = this.getParent().getNameSpace();
         // Set namespace for self node.
         setNameSpace(nameSpace);
         /*

@@ -19,7 +19,6 @@ package org.onosproject.yangutils.translator.tojava;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
@@ -32,13 +31,13 @@ import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaEnumerationTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
@@ -479,7 +478,7 @@ public final class YangJavaModelUtils {
         StringBuilder pkg = new StringBuilder();
         if (node instanceof YangJavaModuleTranslator) {
             YangJavaModuleTranslator module = (YangJavaModuleTranslator) node;
-            pkg.append(getRootPackage(module.getVersion(), module.getNameSpace().getUri(), module
+            pkg.append(getRootPackage(module.getVersion(), module.getNameSpace(), module
                     .getRevision().getRevDate(), yangPluginConfig.getConflictResolver()));
         } else if (node instanceof YangJavaSubModuleTranslator) {
             YangJavaSubModuleTranslator subModule = (YangJavaSubModuleTranslator) node;

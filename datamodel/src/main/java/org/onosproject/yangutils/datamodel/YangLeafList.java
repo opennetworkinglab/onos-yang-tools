@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -67,12 +66,7 @@ public abstract class YangLeafList
     /**
      * Name of leaf-list.
      */
-    private String name;
-
-    /**
-     * Namespace of leaf-list.
-     */
-    private YangNameSpace namespace;
+    private YangSchemaNodeIdentifier yangSchemaNodeIdentifier;
 
     /**
      * If the leaf-list is a config parameter.
@@ -86,32 +80,32 @@ public abstract class YangLeafList
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     *
+     * <p>
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private YangMaxElement maxElement;
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     *
+     * <p>
      * If no "min-elements" statement is present, it defaults to zero.
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     *
+     * <p>
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -162,24 +156,6 @@ public abstract class YangLeafList
     public YangLeafList() {
         setMinElements(new YangMinElement());
         setMaxElements(new YangMaxElement());
-    }
-
-    /**
-     * Returns the leaf-list name.
-     *
-     * @return the leaf-list name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the leaf-list name.
-     *
-     * @param leafListName the leaf-list name to set
-     */
-    public void setLeafName(String leafListName) {
-        name = leafListName;
     }
 
     /**
@@ -478,31 +454,64 @@ public abstract class YangLeafList
     }
 
     /**
-     * Returns namespace of node.
+     * Sets leaf namespace and add itself to parent child schema map.
      *
-     * @return namespace of node
+     * @param nameSpace namespace
      */
-    public YangNameSpace getNamespace() {
-        return namespace;
+    public void setLeafNameSpaceAndAddToParentSchemaMap(String nameSpace) {
+        setNameSpace(nameSpace);
+        // Process addition of leaf to schema node map.
+        ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNameSpace(), this);
+    }
+
+    @Override
+    public YangSchemaNodeIdentifier getYangSchemaNodeIdentifier() {
+        return yangSchemaNodeIdentifier;
+    }
+
+    /**
+     * Sets YANG schema node identifier.
+     *
+     * @param yangSchemaNodeIdentifier YANG schema node identifier
+     */
+    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier yangSchemaNodeIdentifier) {
+        if (this.yangSchemaNodeIdentifier == null) {
+            this.yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        this.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier;
+    }
+
+    @Override
+    public String getName() {
+        return yangSchemaNodeIdentifier.getName();
+    }
+
+    /**
+     * Sets name of node.
+     *
+     * @param name name of the node
+     */
+    public void setName(String name) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setName(name);
+    }
+
+    @Override
+    public String getNameSpace() {
+        return yangSchemaNodeIdentifier.getNameSpace();
     }
 
     /**
      * Sets namespace of node.
      *
-     * @param namespace namespace of node
+     * @param namespace namespace of the node
      */
-    public void setNamespace(YangNameSpace namespace) {
-        this.namespace = namespace;
-    }
-
-    /**
-     * Sets leaf namespace and add itself to parent child schema map.
-     *
-     * @param nameSpace namespace
-     */
-    public void setLeafNameSpaceAndAddToParentSchemaMap(YangNameSpace nameSpace) {
-        setNamespace(nameSpace);
-        // Process addition of leaf to schema node map.
-        ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNamespace().getUri(), this);
+    public void setNameSpace(String namespace) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setNameSpace(namespace);
     }
 }

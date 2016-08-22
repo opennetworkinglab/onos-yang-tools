@@ -18,7 +18,6 @@ package org.onosproject.yangutils.parser.impl.listeners;
 
 import java.net.URI;
 import org.onosproject.yangutils.datamodel.YangModule;
-import org.onosproject.yangutils.datamodel.YangNameSpace;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
@@ -91,9 +90,7 @@ public final class NamespaceListener {
         switch (tmpNode.getYangConstructType()) {
             case MODULE_DATA: {
                 YangModule module = (YangModule) tmpNode;
-                YangNameSpace uri = new YangNameSpace();
-                uri.setUri(removeQuotesAndHandleConcat(ctx.string().getText()));
-                module.setNameSpace(uri);
+                module.setNameSpace(removeQuotesAndHandleConcat(ctx.string().getText()));
                 break;
             }
             default:

@@ -17,7 +17,6 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.util.Stack;
-
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangIdentity;
@@ -26,12 +25,12 @@ import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangUnion;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getCurNodePackage;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
@@ -427,7 +426,7 @@ public final class AttributesJavaDataType {
             String pkg;
             if (yangNode instanceof YangJavaModuleTranslator) {
                 YangJavaModuleTranslator module = (YangJavaModuleTranslator) yangNode;
-                pkg = getRootPackage(module.getVersion(), module.getNameSpace().getUri(), module
+                pkg = getRootPackage(module.getVersion(), module.getNameSpace(), module
                         .getRevision().getRevDate(), conflictResolver);
             } else if (yangNode instanceof YangJavaSubModuleTranslator) {
                 YangJavaSubModuleTranslator submodule = (YangJavaSubModuleTranslator) yangNode;

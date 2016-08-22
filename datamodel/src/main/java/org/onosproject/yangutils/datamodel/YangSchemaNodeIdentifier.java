@@ -62,7 +62,7 @@ public class YangSchemaNodeIdentifier implements Serializable {
      *
      * @return namespace of the node
      */
-    public String getNamespace() {
+    public String getNameSpace() {
         return namespace;
     }
 
@@ -71,7 +71,7 @@ public class YangSchemaNodeIdentifier implements Serializable {
      *
      * @param namespace namespace of the node
      */
-    public void setNamespace(String namespace) {
+    public void setNameSpace(String namespace) {
         this.namespace = namespace;
     }
 

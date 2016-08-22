@@ -17,7 +17,6 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -36,14 +35,9 @@ public abstract class YangNode
     private static final long serialVersionUID = 806201601L;
 
     /**
-     * Name of a node.
+     * YANG schema node identifier.
      */
-    private String name;
-
-    /**
-     * Namespace of a node.
-     */
-    private YangNameSpace nameSpace;
+    private YangSchemaNodeIdentifier yangSchemaNodeIdentifier;
 
     /**
      * Type of node.
@@ -111,24 +105,6 @@ public abstract class YangNode
      */
     public void setPriority(int priority) {
         this.priority = priority;
-    }
-
-    /**
-     * Returns the nodes name.
-     *
-     * @return nodes name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the nodes name.
-     *
-     * @param name nodes name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -299,7 +275,7 @@ public abstract class YangNode
      * @param namespace namespace of the node
      */
     protected void processAdditionOfSchemaNodeToParentMap(String name, String namespace) {
-        processAdditionOfSchemaNodeToMap(getName(), getNameSpace().getUri(), this, getParent());
+        processAdditionOfSchemaNodeToMap(getName(), getNameSpace(), this, getParent());
     }
 
     /**
@@ -323,12 +299,12 @@ public abstract class YangNode
      * @param childSchemaMapHolder child schema map holder
      */
     private void processAdditionOfSchemaNodeToMap(String name, String namespace, YangSchemaNode yangSchemaNode,
-            YangNode childSchemaMapHolder) {
+                                                  YangNode childSchemaMapHolder) {
         // Addition of node to schema node map.
         // Create YANG schema node identifier with child node name.
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         yangSchemaNodeIdentifier.setName(name);
-        yangSchemaNodeIdentifier.setNamespace(namespace);
+        yangSchemaNodeIdentifier.setNameSpace(namespace);
         // Create YANG schema node context info and set child node.
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo = new YangSchemaNodeContextInfo();
         yangSchemaNodeContextInfo.setSchemaNode(yangSchemaNode);
@@ -584,7 +560,7 @@ public abstract class YangNode
      * @throws DataModelException a violation in data model rule
      */
     public abstract void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+                                             YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException;
 
     /**
@@ -608,7 +584,7 @@ public abstract class YangNode
      * @param yangSchemaNode           YANG schema node
      */
     public abstract void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-            YangSchemaNode yangSchemaNode);
+                                              YangSchemaNode yangSchemaNode);
 
     /**
      * Returns default child map.
@@ -628,27 +604,6 @@ public abstract class YangNode
         return ysnContextInfoMap;
     }
 
-    @Override
-    public abstract YangSchemaNodeType getYangSchemaNodeType();
-
-    /**
-     * Returns the name space of module elements.
-     *
-     * @return the nameSpace
-     */
-    public YangNameSpace getNameSpace() {
-        return nameSpace;
-    }
-
-    /**
-     * Sets the name space of module elements.
-     *
-     * @param nameSpace the nameSpace to set
-     */
-    public void setNameSpace(YangNameSpace nameSpace) {
-        this.nameSpace = nameSpace;
-    }
-
     /**
      * Adds namespace for self, next sibling and first child. This is used
      * after obtaining namespace in case of submodule after performing
@@ -657,11 +612,11 @@ public abstract class YangNode
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
         if (this.getParent() != null) {
-            YangNameSpace nameSpace = this.getParent().getNameSpace();
+            String nameSpace = this.getParent().getNameSpace();
             // Set namespace for self node.
             setNameSpace(nameSpace);
             // Process addition of leaf to the child schema map of parent.
-            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace().getUri());
+            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
         }
         /*
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
@@ -676,5 +631,56 @@ public abstract class YangNode
     public void isValueValid(String value)
             throws DataModelException {
         throw new DataModelException("Value validation asked for YANG node.");
+    }
+
+    @Override
+    public YangSchemaNodeIdentifier getYangSchemaNodeIdentifier() {
+        return yangSchemaNodeIdentifier;
+    }
+
+    /**
+     * Sets YANG schema node identifier.
+     *
+     * @param yangSchemaNodeIdentifier YANG schema node identifier
+     */
+    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier yangSchemaNodeIdentifier) {
+        if (this.yangSchemaNodeIdentifier == null) {
+            this.yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        this.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier;
+    }
+
+    @Override
+    public String getName() {
+        return yangSchemaNodeIdentifier.getName();
+    }
+
+    /**
+     * Sets name of node.
+     *
+     * @param name name of the node
+     */
+    public void setName(String name) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setName(name);
+    }
+
+    @Override
+    public String getNameSpace() {
+        return yangSchemaNodeIdentifier.getNameSpace();
+    }
+
+    /**
+     * Sets namespace of node.
+     *
+     * @param namespace namespace of the node
+     */
+    public void setNameSpace(String namespace) {
+        if (yangSchemaNodeIdentifier == null) {
+            yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
+        }
+        yangSchemaNodeIdentifier.setNameSpace(namespace);
     }
 }
