@@ -45,11 +45,11 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
-import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils
-        .getAugmentedClassNameForDataMethods;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getParentNodeNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getSetOfNodeIdentifiers;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.INT_TYPE_CONFLICT;
+import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.SHORT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
@@ -148,6 +148,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static org.onosproject.yangutils.utils.UtilConstants.SET_METHOD_PREFIX;
 import static org.onosproject.yangutils.utils.UtilConstants.SET_SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT;
+import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE;
+import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.SINGLE_QUOTE;
 import static org.onosproject.yangutils.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
@@ -165,6 +167,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.TRIM_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.TRUE;
 import static org.onosproject.yangutils.utils.UtilConstants.TRY;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MAX_RANGE;
+import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MAX_RANGE;
@@ -229,7 +233,7 @@ public final class MethodsGenerator {
      * @return getter string
      */
     public static String getGetterString(JavaAttributeInfo attr, int generatedJavaFiles,
-            YangPluginConfig pluginConfig) {
+                                         YangPluginConfig pluginConfig) {
 
         String returnType = getReturnType(attr);
         String attributeName = attr.getAttributeName();
@@ -258,7 +262,7 @@ public final class MethodsGenerator {
      * @return setter string
      */
     public static String getSetterString(JavaAttributeInfo attr, String className, int generatedJavaFiles,
-            YangPluginConfig pluginConfig) {
+                                         YangPluginConfig pluginConfig) {
 
         String attrType = getReturnType(attr);
         String attributeName = attr.getAttributeName();
@@ -298,7 +302,7 @@ public final class MethodsGenerator {
      * @return default constructor string
      */
     public static String getDefaultConstructorString(String name, String modifierType,
-            YangPluginConfig pluginConfig) {
+                                                     YangPluginConfig pluginConfig) {
         return getJavaDoc(DEFAULT_CONSTRUCTOR, name, false, pluginConfig, null)
                 + getDefaultConstructor(name, modifierType) + NEW_LINE;
     }
@@ -419,7 +423,7 @@ public final class MethodsGenerator {
      * @return setter for attribute
      */
     private static String getSetter(String className, String name, String type, int generatedJavaFiles,
-            boolean isTypeNull, boolean isList) {
+                                    boolean isTypeNull, boolean isList) {
         if (generatedJavaFiles == GENERATE_SERVICE_AND_MANAGER) {
             return FOUR_SPACE_INDENTATION + PUBLIC + SPACE + VOID + SPACE + SET_METHOD_PREFIX
                     + getCapitalCase(name) + OPEN_PARENTHESIS + type + SPACE + name + CLOSE_PARENTHESIS + SPACE +
@@ -499,7 +503,7 @@ public final class MethodsGenerator {
      * @return getter method for interface
      */
     static String getGetterForInterface(String yangName, String returnType, boolean isList,
-            int generatedJavaFiles, YangCompilerAnnotation compilerAnnotation) {
+                                        int generatedJavaFiles, YangCompilerAnnotation compilerAnnotation) {
         if (!isList) {
             return getGetterInterfaceString(returnType, yangName, generatedJavaFiles);
         }
@@ -515,7 +519,7 @@ public final class MethodsGenerator {
      * @return getter for interface
      */
     private static String getGetterInterfaceString(String returnType, String yangName,
-            int generatedJavaFiles) {
+                                                   int generatedJavaFiles) {
         if (generatedJavaFiles == GENERATE_SERVICE_AND_MANAGER) {
             return getGetMethodWithArgument(returnType, yangName);
         } else {
@@ -536,8 +540,8 @@ public final class MethodsGenerator {
      * @return setter method for interface
      */
     static String getSetterForInterface(String attrName, String attrType, String className,
-            boolean isList, int generatedJavaFiles,
-            YangCompilerAnnotation compilerAnnotation) {
+                                        boolean isList, int generatedJavaFiles,
+                                        YangCompilerAnnotation compilerAnnotation) {
         if (!isList) {
             return getSetterInterfaceString(className, attrName, attrType, generatedJavaFiles);
         }
@@ -555,10 +559,10 @@ public final class MethodsGenerator {
      * @return setter string
      */
     private static String getSetterInterfaceString(String className, String attrName, String attrType,
-            int generatedJavaFiles) {
+                                                   int generatedJavaFiles) {
         if (generatedJavaFiles == GENERATE_SERVICE_AND_MANAGER) {
             return FOUR_SPACE_INDENTATION + VOID + SPACE + SET_METHOD_PREFIX + getCapitalCase(attrName)
-                    + OPEN_PARENTHESIS + attrType + SPACE + attrName + CLOSE_PARENTHESIS + SEMI_COLAN;
+                    + OPEN_PARENTHESIS + attrType + OP_PARAM + SPACE + attrName + CLOSE_PARENTHESIS + SEMI_COLAN;
         } else {
             return FOUR_SPACE_INDENTATION + className + BUILDER + SPACE + attrName
                     + OPEN_PARENTHESIS + attrType + SPACE + attrName + CLOSE_PARENTHESIS + SEMI_COLAN;
@@ -630,7 +634,7 @@ public final class MethodsGenerator {
      * @return constructor for class
      */
     public static String getConstructor(JavaAttributeInfo attr, int generatedJavaFiles,
-            YangPluginConfig pluginConfig) {
+                                        YangPluginConfig pluginConfig) {
 
         String attributeName = attr.getAttributeName();
         String constructor;
@@ -661,7 +665,7 @@ public final class MethodsGenerator {
      * @return rpc method string
      */
     public static String getRpcServiceMethod(String rpcName, String inputName, String outputName,
-            YangPluginConfig pluginConfig) {
+                                             YangPluginConfig pluginConfig) {
 
         rpcName = getCamelCase(rpcName, pluginConfig.getConflictResolver());
         if (!inputName.equals(EMPTY_STRING)) {
@@ -681,7 +685,7 @@ public final class MethodsGenerator {
      * @return rpc method string
      */
     public static String getRpcManagerMethod(String rpcName, String inputName, String outputName,
-            YangPluginConfig pluginConfig) {
+                                             YangPluginConfig pluginConfig) {
 
         rpcName = getCamelCase(rpcName, pluginConfig.getConflictResolver());
         if (!inputName.equals(EMPTY_STRING)) {
@@ -846,7 +850,7 @@ public final class MethodsGenerator {
      * @return from string method's body string
      */
     public static String getFromStringMethod(JavaAttributeInfo attr,
-            JavaAttributeInfo fromStringAttributeInfo) {
+                                             JavaAttributeInfo fromStringAttributeInfo) {
 
         return EIGHT_SPACE_INDENTATION + getTrySubString() + NEW_LINE + TWELVE_SPACE_INDENTATION
                 + getParsedSubString(attr, fromStringAttributeInfo) + NEW_LINE + TWELVE_SPACE_INDENTATION
@@ -889,7 +893,7 @@ public final class MethodsGenerator {
      * @return sub string with parsed statement for union's from string method
      */
     private static String getParsedSubString(JavaAttributeInfo attr,
-            JavaAttributeInfo fromStringAttributeInfo) {
+                                             JavaAttributeInfo fromStringAttributeInfo) {
 
         String targetDataType = getReturnType(attr);
         if (fromStringAttributeInfo.getAttributeType().getDataType() == BITS) {
@@ -1055,7 +1059,7 @@ public final class MethodsGenerator {
      * @return of method's string and java doc for special type
      */
     public static String getOfMethodStringAndJavaDoc(JavaAttributeInfo attr, String generatedJavaClassName,
-            YangPluginConfig pluginConfig) {
+                                                     YangPluginConfig pluginConfig) {
 
         String attrType = getReturnType(attr);
         String attrName = attr.getAttributeName();
@@ -1087,8 +1091,8 @@ public final class MethodsGenerator {
      * @return string and java doc for constructor of type class
      */
     public static String getTypeConstructorStringAndJavaDoc(JavaAttributeInfo attr,
-            String generatedJavaClassName,
-            YangPluginConfig pluginConfig) {
+                                                            String generatedJavaClassName,
+                                                            YangPluginConfig pluginConfig) {
 
         String attrType = getReturnType(attr);
         String attrName = attr.getAttributeName();
@@ -1109,7 +1113,7 @@ public final class MethodsGenerator {
      */
     public static String getTypeConstructorStringAndJavaDoc(JavaAttributeInfo attr1, JavaAttributeInfo
             attr2, String generatedJavaClassName, YangPluginConfig pluginConfig, ValidatorTypeForUnionTypes type,
-            boolean addFirst) {
+                                                            boolean addFirst) {
 
         String attrType = getReturnType(attr1);
         String attrName1 = "";
@@ -1122,7 +1126,7 @@ public final class MethodsGenerator {
         }
 
         String appDataStructure = null;
-        if (attr1.getCompilerAnnotation() != null) {
+        if (attr1 != null && attr1.getCompilerAnnotation() != null) {
             appDataStructure = attr1.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
         }
         return getJavaDoc(TYPE_CONSTRUCTOR, generatedJavaClassName + " for type " + attrName1, false, pluginConfig,
@@ -1154,7 +1158,7 @@ public final class MethodsGenerator {
      * @return type constructor string
      */
     private static String getTypeConstructorString(String type, String attr1, String attr2, String className,
-            ValidatorTypeForUnionTypes validatorType, boolean addInt) {
+                                                   ValidatorTypeForUnionTypes validatorType, boolean addInt) {
 
         String constructor;
         constructor = FOUR_SPACE_INDENTATION + PUBLIC + SPACE + className + OPEN_PARENTHESIS + type + SPACE + VALUE
@@ -1285,8 +1289,8 @@ public final class MethodsGenerator {
      * @return of method
      */
     static String getEnumsOfMethod(String className, JavaAttributeInfo attr,
-            Map<String, Integer> enumMap, List<String> enumList,
-            YangPluginConfig pluginConfig) {
+                                   Map<String, Integer> enumMap, List<String> enumList,
+                                   YangPluginConfig pluginConfig) {
         String attrType = getReturnType(attr);
         String attrName = attr.getAttributeName();
 
@@ -1448,6 +1452,12 @@ public final class MethodsGenerator {
                 condition = condition + INT_MIN_RANGE + COMMA + SPACE + INT_MAX_RANGE + COMMA + SPACE + VALUE;
             } else {
                 condition = condition + UINT_MIN_RANGE + COMMA + SPACE + UINT_MAX_RANGE + COMMA + SPACE + VALUE;
+            }
+        } else if (type == SHORT_TYPE_CONFLICT) {
+            if (addFirst) {
+                condition = condition + SHORT_MIN_RANGE + COMMA + SPACE + SHORT_MAX_RANGE + COMMA + SPACE + VALUE;
+            } else {
+                condition = condition + UINT8_MIN_RANGE + COMMA + SPACE + UINT8_MAX_RANGE + COMMA + SPACE + VALUE;
             }
         } else {
             if (addFirst) {

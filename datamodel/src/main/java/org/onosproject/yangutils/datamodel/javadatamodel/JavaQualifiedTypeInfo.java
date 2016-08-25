@@ -37,21 +37,39 @@ public class JavaQualifiedTypeInfo
     protected String classInfo;
 
     /**
-     * Returns class info.
+     * Returns the imported package info.
      *
-     * @return class info
+     * @return the imported package info
+     */
+    public String getPkgInfo() {
+        return pkgInfo;
+    }
+
+    /**
+     * Sets the imported package info.
+     *
+     * @param pkgInfo the imported package info
+     */
+    public void setPkgInfo(String pkgInfo) {
+        this.pkgInfo = pkgInfo;
+    }
+
+    /**
+     * Returns the imported class/interface info.
+     *
+     * @return the imported class/interface info
      */
     public String getClassInfo() {
         return classInfo;
     }
 
     /**
-     * Returns package info.
+     * Sets the imported class/interface info.
      *
-     * @return package info
+     * @param classInfo the imported class/interface info
      */
-    public String getPkgInfo() {
-        return pkgInfo;
+    public void setClassInfo(String classInfo) {
+        this.classInfo = classInfo;
     }
 
 }

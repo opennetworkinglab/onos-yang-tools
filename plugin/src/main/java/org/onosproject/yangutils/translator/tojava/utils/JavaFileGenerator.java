@@ -206,7 +206,7 @@ public final class JavaFileGenerator {
      * @throws IOException when fails to write in file
      */
     public static File generateInterfaceFile(File file, List<String> imports, YangNode curNode,
-            boolean isAttrPresent)
+                                             boolean isAttrPresent)
             throws IOException {
 
         JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
@@ -376,7 +376,7 @@ public final class JavaFileGenerator {
      */
 
     public static File generateBuilderClassFile(File file, YangNode curNode,
-            boolean isAttrPresent)
+                                                boolean isAttrPresent)
             throws IOException {
 
         JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
@@ -490,7 +490,7 @@ public final class JavaFileGenerator {
      * @throws IOException when fails to write in file
      */
     public static File generateDefaultClassFile(File file, YangNode curNode, boolean isAttrPresent,
-            List<String> imports)
+                                                List<String> imports)
             throws IOException {
 
         JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
@@ -806,6 +806,7 @@ public final class JavaFileGenerator {
 
         boolean isIntConflict = false;
         boolean isLongConflict = false;
+        boolean isShortConflict = false;
         JavaAttributeInfo intAttr = tempJavaTypeFragmentFiles.getIntAttribute();
         if (intAttr == null) {
             intAttr = tempJavaTypeFragmentFiles.getUIntAttribute();
@@ -816,13 +817,20 @@ public final class JavaFileGenerator {
             longAttr = tempJavaTypeFragmentFiles.getULongAttribute();
         }
 
+        JavaAttributeInfo shortAttr = tempJavaTypeFragmentFiles.getShortAttribute();
+        if (shortAttr == null) {
+            shortAttr = tempJavaTypeFragmentFiles.getUInt8Attribute();
+        }
+
         if (intAttr != null) {
             isIntConflict = intAttr.isIntConflict();
         }
         if (longAttr != null) {
             isLongConflict = longAttr.isLongConflict();
         }
-
+        if (shortAttr != null) {
+            isShortConflict = shortAttr.isShortConflict();
+        }
         if (isLongConflict) {
             imports.add(tempJavaTypeFragmentFiles.getJavaImportData().getBigIntegerImport());
             sort(imports);
@@ -843,6 +851,11 @@ public final class JavaFileGenerator {
             if (isLongConflict) {
                 insertDataIntoJavaFile(file, JavaCodeSnippetGen.addStaticAttributeLongRange(PRIVATE,
                         tempJavaTypeFragmentFiles.getLongIndex() < tempJavaTypeFragmentFiles.getULongIndex()));
+            }
+
+            if (isShortConflict) {
+                insertDataIntoJavaFile(file, JavaCodeSnippetGen.addStaticAttributeShortRange(PRIVATE,
+                        tempJavaTypeFragmentFiles.getShortIndex() < tempJavaTypeFragmentFiles.getUInt8Index()));
             }
 
             insertDataIntoJavaFile(file,
@@ -913,6 +926,9 @@ public final class JavaFileGenerator {
             }
             if (isLongConflict) {
                 methods.add(getRangeValidatorMethodForUnion(BIG_INTEGER));
+            }
+            if (isShortConflict) {
+                methods.add(getRangeValidatorMethodForUnion(INT));
             }
 
         } catch (IOException e) {

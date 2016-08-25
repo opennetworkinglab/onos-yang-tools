@@ -45,7 +45,7 @@ public abstract class YangEnumeration
      */
     public YangEnumeration() {
         super(YangNodeType.ENUMERATION_NODE, null);
-        setEnumSet(new TreeSet<YangEnum>());
+        setEnumSet(new TreeSet<>());
     }
 
     @Override

@@ -29,10 +29,12 @@ import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT64;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT16;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT32;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_FOR_TYPE_MASK;
@@ -47,6 +49,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getTypeConstructorStringAndJavaDoc;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.INT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.LONG_TYPE_CONFLICT;
+import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.SHORT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
@@ -100,6 +103,16 @@ public class TempJavaTypeFragmentFiles
     private int uLongIndex = 0;
 
     /**
+     * short index in type list.
+     */
+    private int shortIndex = 0;
+
+    /**
+     * Uint8 index in type list.
+     */
+    private int uInt8Index = 0;
+
+    /**
      * Temporary file handle for of string method of class.
      */
     private File ofStringImplTempFileHandle;
@@ -128,6 +141,16 @@ public class TempJavaTypeFragmentFiles
      * Java attribute for long.
      */
     private JavaAttributeInfo longAttribute;
+
+    /**
+     * Java attribute for short.
+     */
+    private JavaAttributeInfo shortAttribute;
+
+    /**
+     * Java attribute for uint8.
+     */
+    private JavaAttributeInfo uInt8Attribute;
 
     /**
      * Java attribute for uInt.
@@ -270,7 +293,7 @@ public class TempJavaTypeFragmentFiles
      * @return java attribute
      */
     private JavaAttributeInfo getAttributeForType(YangType yangType, YangPluginConfig pluginConfig) {
-        YangJavaTypeTranslator<?> javaType = (YangJavaTypeTranslator<?>) yangType;
+        YangJavaTypeTranslator javaType = (YangJavaTypeTranslator) yangType;
         javaType.updateJavaQualifiedInfo(pluginConfig.getConflictResolver());
         String typeName = javaType.getDataTypeName();
         typeName = getCamelCase(typeName, pluginConfig.getConflictResolver());
@@ -290,12 +313,19 @@ public class TempJavaTypeFragmentFiles
      * @throws IOException IO operation fail
      */
     private void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo javaAttributeInfo,
-            YangPluginConfig pluginConfig, List<YangType<?>> typeList)
+                                                         YangPluginConfig pluginConfig, List<YangType<?>> typeList)
             throws IOException {
 
         YangDataTypes attrType = javaAttributeInfo.getAttributeType().getDataType();
 
-        if (attrType == INT32 || attrType == UINT16) {
+        if (attrType == INT16 || attrType == UINT8) {
+            boolean isShortConflict = validateForConflictingShortTypes(typeList);
+            javaAttributeInfo.setShortConflict(isShortConflict);
+            updateAttributeCondition(javaAttributeInfo);
+            if (!isShortConflict) {
+                addMethodsWhenNoConflictingTypes(javaAttributeInfo, pluginConfig);
+            }
+        } else if (attrType == INT32 || attrType == UINT16) {
             boolean isIntConflict = validateForConflictingIntTypes(typeList);
             javaAttributeInfo.setIntConflict(isIntConflict);
             updateAttributeCondition(javaAttributeInfo);
@@ -324,7 +354,7 @@ public class TempJavaTypeFragmentFiles
      * @throws IOException when fails to do IO operations
      */
     private void addMethodsWhenNoConflictingTypes(JavaAttributeInfo javaAttributeInfo,
-            YangPluginConfig pluginConfig)
+                                                  YangPluginConfig pluginConfig)
             throws IOException {
         if ((getGeneratedTempFiles() & OF_STRING_IMPL_MASK) != 0) {
             addOfStringMethod(javaAttributeInfo, pluginConfig);
@@ -382,6 +412,28 @@ public class TempJavaTypeFragmentFiles
                             + NEW_LINE);
                     addGetterImpl(getULongAttribute(), pluginConfig);
                     addFromStringMethod(getULongAttribute(), pluginConfig);
+                }
+            }
+        }
+
+        attr = getShortAttribute();
+        if (attr != null) {
+            attr = getUInt8Attribute();
+        }
+        if (attr != null) {
+            if (attr.isShortConflict()) {
+                if (getShortIndex() < getUInt8Index()) {
+                    appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getShortAttribute(),
+                            getGeneratedJavaClassName(), pluginConfig)
+                            + NEW_LINE);
+                    addGetterImpl(getShortAttribute(), pluginConfig);
+                    addFromStringMethod(getShortAttribute(), pluginConfig);
+                } else {
+                    appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getUInt8Attribute(),
+                            getGeneratedJavaClassName(), pluginConfig)
+                            + NEW_LINE);
+                    addGetterImpl(getUInt8Attribute(), pluginConfig);
+                    addFromStringMethod(getUInt8Attribute(), pluginConfig);
                 }
             }
         }
@@ -456,6 +508,19 @@ public class TempJavaTypeFragmentFiles
                         getULongAttribute(), getGeneratedJavaClassName(), pluginConfig, LONG_TYPE_CONFLICT,
                         getLongIndex()
                                 < getULongIndex()) + NEW_LINE);
+            }
+        }
+        attr = getShortAttribute();
+        if (attr != null) {
+            attr = getUInt8Attribute();
+        }
+        if (attr != null) {
+            if (attr.isShortConflict()) {
+                appendToFile(getConstructorForTypeTempFileHandle(), getTypeConstructorStringAndJavaDoc(
+                        getShortAttribute(),
+                        getUInt8Attribute(), getGeneratedJavaClassName(), pluginConfig, SHORT_TYPE_CONFLICT,
+                        getShortIndex()
+                                < getUInt8Index()) + NEW_LINE);
             }
         }
     }
@@ -555,6 +620,42 @@ public class TempJavaTypeFragmentFiles
     }
 
     /**
+     * Returns short type index from type list.
+     *
+     * @return short type index from type list
+     */
+    public int getShortIndex() {
+        return shortIndex;
+    }
+
+    /**
+     * Sets short type index from type list.
+     *
+     * @param shortIndex short type index from type list.
+     */
+    private void setShortIndex(int shortIndex) {
+        this.shortIndex = shortIndex;
+    }
+
+    /**
+     * Returns uInt type index from type list.
+     *
+     * @return uInt type index from type list
+     */
+    public int getUInt8Index() {
+        return uInt8Index;
+    }
+
+    /**
+     * Sets uInt8 type index from type list.
+     *
+     * @param uInt8Index uInt8 type index from type list.
+     */
+    private void setUInt8Index(int uInt8Index) {
+        this.uInt8Index = uInt8Index;
+    }
+
+    /**
      * Returns int type index from type list.
      *
      * @return int type index from type list
@@ -650,6 +751,29 @@ public class TempJavaTypeFragmentFiles
     }
 
     /**
+     * Validates conflict for int and uInt.
+     *
+     * @param typeList type list
+     * @return true if conflict is there
+     */
+    private boolean validateForConflictingShortTypes(List<YangType<?>> typeList) {
+        boolean isShortPresent = false;
+        boolean isUInt8Present = false;
+        for (YangType type : typeList) {
+            if (type.getDataType().equals(INT16)) {
+                setShortIndex(typeList.indexOf(type));
+                isShortPresent = true;
+            }
+            if (type.getDataType().equals(UINT8)) {
+                setUInt8Index(typeList.indexOf(type));
+                isUInt8Present = true;
+            }
+        }
+
+        return isShortPresent && isUInt8Present;
+    }
+
+    /**
      * Validates conflict for long and uLong.
      *
      * @param typeList type list
@@ -692,6 +816,14 @@ public class TempJavaTypeFragmentFiles
                 setULongAttribute(javaAttributeInfo);
             } else if (javaAttributeInfo.getAttributeType().getDataType() == INT64) {
                 setLongAttribute(javaAttributeInfo);
+            }
+
+        }
+        if (javaAttributeInfo.isShortConflict()) {
+            if (javaAttributeInfo.getAttributeType().getDataType() == UINT8) {
+                setUInt8Attribute(javaAttributeInfo);
+            } else if (javaAttributeInfo.getAttributeType().getDataType() == INT16) {
+                setShortAttribute(javaAttributeInfo);
             }
 
         }
@@ -768,4 +900,41 @@ public class TempJavaTypeFragmentFiles
     private void setULongAttribute(JavaAttributeInfo uLongAttribute) {
         this.uLongAttribute = uLongAttribute;
     }
+
+    /**
+     * Returns attribute for uInt8.
+     *
+     * @return attribute for uInt8
+     */
+    public JavaAttributeInfo getUInt8Attribute() {
+        return uInt8Attribute;
+    }
+
+    /**
+     * Sets attribute for uInt8.
+     *
+     * @param uInt8Attribute attribute for uInt8
+     */
+    private void setUInt8Attribute(JavaAttributeInfo uInt8Attribute) {
+        this.uInt8Attribute = uInt8Attribute;
+    }
+
+    /**
+     * Returns attribute for short.
+     *
+     * @return attribute for short
+     */
+    public JavaAttributeInfo getShortAttribute() {
+        return shortAttribute;
+    }
+
+    /**
+     * Sets attribute for short.
+     *
+     * @param shortAttribute attribute for short
+     */
+    private void setShortAttribute(JavaAttributeInfo shortAttribute) {
+        this.shortAttribute = shortAttribute;
+    }
+
 }

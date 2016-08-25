@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaModule;

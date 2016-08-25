@@ -66,12 +66,12 @@ public class YangDerivedInfo<T>
     /**
      * Line number of pattern restriction in YANG file.
      */
-    private int lineNumber;
+    private transient int lineNumber;
 
     /**
      * Position of pattern restriction in line.
      */
-    private int charPositionInLine;
+    private transient int charPositionInLine;
 
     /**
      * Effective built-in type, requried in case type of typedef is again a
@@ -326,7 +326,7 @@ public class YangDerivedInfo<T>
                      */
                     return RESOLVED;
                 }
-            }  else if (getEffectiveBuiltInType() == DECIMAL64) {
+            } else if (getEffectiveBuiltInType() == DECIMAL64) {
                 if (baseType.getDataTypeExtendedInfo() != null) {
                     if (((YangDecimal64) baseType.getDataTypeExtendedInfo()).getRangeRestrictedExtendedInfo() == null) {
                         resolveRangeRestriction(null);
@@ -340,7 +340,7 @@ public class YangDerivedInfo<T>
                         if (!(((YangDecimal64) baseType.getDataTypeExtendedInfo())
                                 .getRangeRestrictedExtendedInfo() instanceof YangRangeRestriction)) {
                             throw new DataModelException("Linker error: Referred typedef restriction info is" +
-                                                                 " of invalid type.");
+                                    " of invalid type.");
                         }
                         resolveRangeRestriction((YangRangeRestriction) ((YangDecimal64) baseType
                                 .getDataTypeExtendedInfo()).getRangeRestrictedExtendedInfo());
@@ -400,7 +400,7 @@ public class YangDerivedInfo<T>
             return INTRA_FILE_RESOLVED;
         }
         setEffectiveBuiltInType(((YangDerivedInfo<?>) baseType.getDataTypeExtendedInfo())
-                                        .getEffectiveBuiltInType());
+                .getEffectiveBuiltInType());
         YangDerivedInfo refDerivedInfo = (YangDerivedInfo<?>) baseType.getDataTypeExtendedInfo();
         /*
          * Check whether the effective built-in type can have range
@@ -418,7 +418,7 @@ public class YangDerivedInfo<T>
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                                         "type.");
+                            "type.");
                 }
                 resolveRangeRestriction((YangRangeRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -444,7 +444,7 @@ public class YangDerivedInfo<T>
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangStringRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                                         "type.");
+                            "type.");
                 }
                 resolveStringRestriction((YangStringRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -466,7 +466,7 @@ public class YangDerivedInfo<T>
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                                         "type.");
+                            "type.");
                 }
                 resolveBinaryRestriction((YangRangeRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -488,7 +488,7 @@ public class YangDerivedInfo<T>
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                                         "type.");
+                            "type.");
                 }
                 resolveRangeRestriction((YangRangeRestriction) refDerivedInfo
                         .getResolvedExtendedInfo());
@@ -573,7 +573,7 @@ public class YangDerivedInfo<T>
         if (rangeRestrictionString != null || patternRestriction != null) {
             DataModelException dataModelException =
                     new DataModelException("YANG file error: for binary " +
-                                                   "range restriction or pattern restriction is not allowed.");
+                            "range restriction or pattern restriction is not allowed.");
             dataModelException.setLine(lineNumber);
             dataModelException.setCharPosition(charPositionInLine);
             throw dataModelException;
@@ -683,7 +683,7 @@ public class YangDerivedInfo<T>
      * @param curRestriction self restriction
      */
     private void resolveLengthAndRangeRestriction(YangRangeRestriction refRestriction,
-            YangRangeRestriction curRestriction)
+                                                  YangRangeRestriction curRestriction)
             throws DataModelException {
         for (Object curInterval : curRestriction.getAscendingRangeIntervals()) {
             if (!(curInterval instanceof YangRangeInterval)) {

@@ -285,7 +285,7 @@ public class YangUtilManager
     /**
      * Creates YANG nodes set.
      */
-    void createYangNodeSet() {
+    public void createYangNodeSet() {
         for (YangFileInfo yangFileInfo : getYangFileInfoSet()) {
             getYangNodeSet().add(yangFileInfo.getRootNode());
         }
@@ -383,7 +383,7 @@ public class YangUtilManager
      *
      * @return the YANG file info set
      */
-    Set<YangFileInfo> getYangFileInfoSet() {
+    public Set<YangFileInfo> getYangFileInfoSet() {
         return yangFileInfoSet;
     }
 

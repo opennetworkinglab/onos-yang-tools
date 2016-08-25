@@ -60,8 +60,12 @@ import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
+import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE_ATTR;
+import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.TYPE;
+import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MAX_RANGE_ATTR;
+import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MAX_RANGE_ATTR;
@@ -114,7 +118,7 @@ public final class JavaCodeSnippetGen {
      * @param javaAttributeName    name of the attribute
      * @param isList               is list attribute
      * @param attributeAccessType  attribute access type
-     * @param compilerAnnotation compiler annotation
+     * @param compilerAnnotation   compiler annotation
      * @return the textual java code for attribute definition in class
      */
     public static String getJavaAttributeDefinition(String javaAttributeTypePkg, String javaAttributeType,
@@ -314,6 +318,24 @@ public final class JavaCodeSnippetGen {
         } else {
             return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + ULONG_MIN_RANGE_ATTR +
                     FOUR_SPACE_INDENTATION + modifier + SPACE + ULONG_MAX_RANGE_ATTR;
+        }
+    }
+
+    /**
+     * Adds attribute for long ranges.
+     *
+     * @param modifier modifier for attribute
+     * @param addFirst if need to be added first
+     * @return attribute for long ranges
+     */
+    static String addStaticAttributeShortRange(String modifier, boolean addFirst) {
+        if (addFirst) {
+            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + SHORT_MIN_RANGE_ATTR +
+                    FOUR_SPACE_INDENTATION +
+                    modifier + SPACE + SHORT_MAX_RANGE_ATTR;
+        } else {
+            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + UINT8_MIN_RANGE_ATTR +
+                    FOUR_SPACE_INDENTATION + modifier + SPACE + UINT8_MAX_RANGE_ATTR;
         }
     }
 

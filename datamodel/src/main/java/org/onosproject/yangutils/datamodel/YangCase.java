@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -135,7 +136,7 @@ public abstract class YangCase
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
 
     private boolean isAugmented;
 
@@ -143,9 +144,10 @@ public abstract class YangCase
      * Creates a choice node.
      */
     public YangCase() {
-        super(YangNodeType.CASE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.CASE_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
     }
 
     @Override
@@ -407,17 +409,17 @@ public abstract class YangCase
     }
 
     @Override
-    public void addAugmentation(YangAugmentedInfo augmentInfo) {
+    public void addAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
 
     @Override
-    public void removeAugmentation(YangAugmentedInfo augmentInfo) {
+    public void removeAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.remove(augmentInfo);
     }
 
     @Override
-    public List<YangAugmentedInfo> getAugmentedInfoList() {
+    public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
     }
 

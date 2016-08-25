@@ -25,9 +25,9 @@ import java.util.Map;
 import org.onosproject.yangutils.datamodel.YangEnum;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ENUM_IMPL_MASK;
@@ -229,7 +229,7 @@ public class TempJavaEnumerationFragmentFiles
      * @return java attribute
      */
     public JavaAttributeInfo getJavaAttributeForEnum(YangPluginConfig pluginConfig) {
-        YangJavaTypeTranslator<?> javaType = new YangJavaTypeTranslator<>();
+        YangJavaTypeTranslator javaType = new YangJavaTypeTranslator();
         javaType.setDataType(INT32);
         javaType.setDataTypeName(INT);
         javaType.updateJavaQualifiedInfo(pluginConfig.getConflictResolver());

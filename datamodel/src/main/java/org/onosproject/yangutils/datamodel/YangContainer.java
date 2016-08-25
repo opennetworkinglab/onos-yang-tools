@@ -128,7 +128,7 @@ public abstract class YangContainer
      */
     private String reference;
 
-    private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
 
     private boolean isAugmented;
 
@@ -156,14 +156,16 @@ public abstract class YangContainer
      * Create a container node.
      */
     public YangContainer() {
-        super(YangNodeType.CONTAINER_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.CONTAINER_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+        mustConstraintList = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -481,17 +483,17 @@ public abstract class YangContainer
     }
 
     @Override
-    public void addAugmentation(YangAugmentedInfo augmentInfo) {
+    public void addAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
 
     @Override
-    public void removeAugmentation(YangAugmentedInfo augmentInfo) {
+    public void removeAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.remove(augmentInfo);
     }
 
     @Override
-    public List<YangAugmentedInfo> getAugmentedInfoList() {
+    public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
     }
 

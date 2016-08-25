@@ -21,8 +21,9 @@ import org.onosproject.yangutils.datamodel.YangType;
 /**
  * Represents YANG java type.
  */
-public class YangJavaType extends YangType {
+public class YangJavaType extends YangType implements JavaQualifiedTypeInfoContainer {
 
+    private static final long serialVersionUID = 19082016001L;
     protected JavaQualifiedTypeInfo javaQualifiedTypeInfo;
 
     /**
@@ -30,7 +31,14 @@ public class YangJavaType extends YangType {
      *
      * @return java qualified type info
      */
-    public JavaQualifiedTypeInfo getJavaQualifiedTypeInfo() {
+
+    @Override
+    public JavaQualifiedTypeInfo getJavaQualifiedInfo() {
         return javaQualifiedTypeInfo;
+    }
+
+    @Override
+    public void setJavaQualifiedInfo(JavaQualifiedTypeInfo typeInfo) {
+        this.javaQualifiedTypeInfo = typeInfo;
     }
 }

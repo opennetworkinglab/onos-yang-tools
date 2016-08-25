@@ -21,8 +21,8 @@ package org.onosproject.yangutils.datamodel.exceptions;
 public class DataModelException extends Exception {
 
     private static final long serialVersionUID = 201601270658L;
-    private int lineNumber;
-    private int charPositionInLine;
+    private transient int lineNumber;
+    private transient int charPositionInLine;
 
     /**
      * Creates a data model exception with message.
@@ -37,7 +37,7 @@ public class DataModelException extends Exception {
      * Creates exception from message and cause.
      *
      * @param message the detail of exception in string
-     * @param cause underlying cause of the error
+     * @param cause   underlying cause of the error
      */
     public DataModelException(final String message, final Throwable cause) {
         super(message, cause);

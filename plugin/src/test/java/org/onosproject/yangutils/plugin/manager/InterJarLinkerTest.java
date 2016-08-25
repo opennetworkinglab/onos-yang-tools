@@ -36,15 +36,15 @@ import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.parseJarFile;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.parseJarFile;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.serializeDataModel;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
@@ -60,9 +60,6 @@ public class InterJarLinkerTest {
 
     private static final String TARGET = "target/interJarFileLinking/";
     private static final String YANG_FILES_DIR = "src/test/resources/interJarFileLinking/yangFiles/";
-    private static final String TARGET_RESOURCE_PATH = SLASH + TEMP + SLASH + YANG_RESOURCES + SLASH;
-    private static final String JAR_FILE_NAME = "onlab-test-1.7.0-SNAPSHOT.jar";
-    private static final String SER_FILE_NAME = "portPair.ser";
 
     private static final String FLOW_CLASSIFIER_FOLDER = "target/interJarFileLinking/org/onosproject"
             + "/yang/gen/v1/sfc/flowclassifier/rev20160524";
@@ -70,10 +67,12 @@ public class InterJarLinkerTest {
             + "/yang/gen/v1/sfc/portpair/rev20160524";
     private static final String FLOW_CLASSIFIER_MANAGER = FLOW_CLASSIFIER_FOLDER + SLASH + "FlowClassifierManager.java";
 
+    private MockJarFileProvider mockJarFileProvider = new MockJarFileProvider();
+
     /**
      * Unit test case for a single jar dependency.
      *
-     * @throws IOException when fails to do IO operations
+     * @throws IOException            when fails to do IO operations
      * @throws MojoExecutionException when fails to do mojo operations
      */
     @Test
@@ -84,13 +83,8 @@ public class InterJarLinkerTest {
         int size1 = utilManager.getYangFileInfoSet().size();
         utilManager.parseYangFileInfoSet();
 
-        provideTestJarFile();
+        mockJarFileProvider.provideTestJarFile(utilManager);
         utilManager.setYangFileInfoSet(removeFileInfoFromSet(utilManager.getYangFileInfoSet()));
-
-        for (String file : getListOfTestJar(TARGET)) {
-            addInterJarRootNodes(file);
-        }
-
         utilManager.resolveDependenciesUsingLinker();
 
         int size2 = utilManager.getYangFileInfoSet().size();
@@ -98,13 +92,13 @@ public class InterJarLinkerTest {
         assertThat(true, is(parseFileInfoSet(utilManager.getYangFileInfoSet().iterator())));
 
         deleteDirectory(TARGET);
-        deleteTestSerFile();
+        mockJarFileProvider.deleteTestSerFile(YANG_FILES_DIR);
     }
 
     /**
      * Unit test case for a multiple jar dependency.
      *
-     * @throws IOException when fails to do IO operations
+     * @throws IOException            when fails to do IO operations
      * @throws MojoExecutionException when fails to do mojo operations
      */
     @Test
@@ -115,11 +109,8 @@ public class InterJarLinkerTest {
         int size1 = utilManager.getYangFileInfoSet().size();
         utilManager.parseYangFileInfoSet();
 
-        provideTestJarFile();
+        mockJarFileProvider.provideTestJarFile(utilManager);
         utilManager.setYangFileInfoSet(removeFileInfoFromSet(utilManager.getYangFileInfoSet()));
-        for (String file : getListOfTestJar(TARGET)) {
-            addInterJarRootNodes(file);
-        }
 
         utilManager.resolveDependenciesUsingLinker();
         int size2 = utilManager.getYangFileInfoSet().size();
@@ -194,7 +185,7 @@ public class InterJarLinkerTest {
         testIfFlowClassifierFilesExists();
         testIfPortPairFileDoesNotExist();
         deleteDirectory(TARGET);
-        deleteTestSerFile();
+        mockJarFileProvider.deleteTestSerFile(YANG_FILES_DIR);
     }
 
     /**
@@ -234,26 +225,6 @@ public class InterJarLinkerTest {
     }
 
     /**
-     * Provides test jar files for linker.
-     *
-     * @throws IOException when fails to do IO operations
-     */
-    private void provideTestJarFile() throws IOException {
-
-        MavenProject project = new MavenProject();
-        serializeDataModel(TARGET, utilManager.getYangFileInfoSet(), project, false);
-        createTestJar();
-    }
-
-    /**
-     * Deletes serialized file.
-     */
-    private void deleteTestSerFile() {
-        File ser = new File(System.getProperty("user.dir") + SLASH + YANG_FILES_DIR + SER_FILE_NAME);
-        ser.delete();
-    }
-
-    /**
      * Parses file info list and returns true if file info list contains the serialized file info.
      *
      * @param yangFileInfoIterator file info list iterator
@@ -274,79 +245,121 @@ public class InterJarLinkerTest {
     }
 
     /**
-     * Returns list of test jar files.
-     *
-     * @param searchdir search directory
-     * @return list of test jar files
+     * Represents jar file provider for testing.
      */
-    private List<String> getListOfTestJar(String searchdir) {
-        List<String> jarFiles = new ArrayList<>();
+    private static class MockJarFileProvider {
 
-        File directory = new File(searchdir + "/");
-        File[] files = directory.listFiles();
+        private static final String TARGET = "target/interJarFileLinking/";
+        private static final String TARGET_RESOURCE_PATH = SLASH + TEMP + SLASH + YANG_RESOURCES + SLASH;
+        private static final String JAR_FILE_NAME = "onlab-test-1.7.0-SNAPSHOT.jar";
+        private static final String SER_FILE_NAME = "portPair.ser";
 
-        for (File file : files) {
-            if (!file.isDirectory()) {
-                jarFiles.add(file.toString());
+        /**
+         * Creates an instance of jar file provider.
+         */
+        MockJarFileProvider() {
+
+        }
+
+        /**
+         * Provides test jar files for linker.
+         *
+         * @throws IOException when fails to do IO operations
+         */
+        void provideTestJarFile(YangUtilManager utilManager) throws IOException {
+
+            MavenProject project = new MavenProject();
+            serializeDataModel(TARGET, utilManager.getYangFileInfoSet(), project, false);
+            createTestJar();
+
+            for (String file : getListOfTestJar(TARGET)) {
+                addInterJarRootNodes(file, utilManager);
             }
         }
 
-        return jarFiles;
-    }
-
-    /**
-     * Adds data model nodes of jar to file info set.
-     *
-     * @param jarFile jar file name
-     * @throws IOException when fails to do IO operations
-     */
-    private void addInterJarRootNodes(String jarFile) throws IOException {
-        try {
-            List<YangNode> interJarResolvedNodes = parseJarFile(jarFile, TARGET);
-
-            for (YangNode node : interJarResolvedNodes) {
-                YangFileInfo dependentFileInfo = new YangFileInfo();
-                node.setToTranslate(false);
-                dependentFileInfo.setRootNode(node);
-                dependentFileInfo.setForTranslator(false);
-                dependentFileInfo.setYangFileName(node.getName());
-                utilManager.getYangFileInfoSet().add(dependentFileInfo);
-            }
-        } catch (IOException e) {
-            throw new IOException("failed to resolve in interjar scenario.");
+        /**
+         * Deletes serialized file.
+         */
+        void deleteTestSerFile(String yangFileDir) {
+            File ser = new File(System.getProperty("user.dir") + SLASH + yangFileDir + SLASH + SER_FILE_NAME);
+            ser.delete();
         }
-    }
 
-    /**
-     * Creates a temporary test jar files.
-     */
-    private void createTestJar() {
+        /**
+         * Returns list of test jar files.
+         *
+         * @param searchDir search directory
+         * @return list of test jar files
+         */
+        private List<String> getListOfTestJar(String searchDir) {
+            List<String> jarFiles = new ArrayList<>();
 
-        File file = new File(TARGET + TARGET_RESOURCE_PATH);
-        File[] files = file.listFiles();
-        String[] source = new String[files.length];
+            File directory = new File(searchDir + "/");
+            File[] files = directory.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
-            source[i] = files[i].toString();
-        }
-        byte[] buf = new byte[1024];
-
-        try {
-            String target = TARGET + JAR_FILE_NAME;
-            JarOutputStream out = new JarOutputStream(new FileOutputStream(target));
-            for (String element : source) {
-                FileInputStream in = new FileInputStream(element);
-                out.putNextEntry(new JarEntry(element));
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
+            for (File file : files) {
+                if (!file.isDirectory()) {
+                    jarFiles.add(file.toString());
                 }
-                out.closeEntry();
-                in.close();
             }
-            out.close();
-        } catch (IOException e) {
+
+            return jarFiles;
+        }
+
+        /**
+         * Adds data model nodes of jar to file info set.
+         *
+         * @param jarFile     jar file name
+         * @param utilManager
+         * @throws IOException when fails to do IO operations
+         */
+        private void addInterJarRootNodes(String jarFile, YangUtilManager utilManager) throws IOException {
+            try {
+                List<YangNode> interJarResolvedNodes = parseJarFile(jarFile, TARGET);
+
+                for (YangNode node : interJarResolvedNodes) {
+                    YangFileInfo dependentFileInfo = new YangFileInfo();
+                    node.setToTranslate(false);
+                    dependentFileInfo.setRootNode(node);
+                    dependentFileInfo.setForTranslator(false);
+                    dependentFileInfo.setYangFileName(node.getName());
+                    utilManager.getYangFileInfoSet().add(dependentFileInfo);
+                }
+            } catch (IOException e) {
+                throw new IOException("failed to resolve in interjar scenario.");
+            }
+        }
+
+        /**
+         * Creates a temporary test jar files.
+         */
+        private void createTestJar() {
+
+            File file = new File(TARGET + TARGET_RESOURCE_PATH);
+            File[] files = file.listFiles();
+            String[] source = new String[files.length];
+
+            for (int i = 0; i < files.length; i++) {
+                source[i] = files[i].toString();
+            }
+            byte[] buf = new byte[1024];
+
+            try {
+                String target = TARGET + JAR_FILE_NAME;
+                JarOutputStream out = new JarOutputStream(new FileOutputStream(target));
+                for (String element : source) {
+                    FileInputStream in = new FileInputStream(element);
+                    out.putNextEntry(new JarEntry(element));
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    out.closeEntry();
+                    in.close();
+                }
+                out.close();
+            } catch (IOException e) {
+            }
         }
     }
-
 }

@@ -88,10 +88,11 @@ public abstract class YangRpc
     private List<YangIfFeature> ifFeatureList;
 
     /**
-     * Create a rpc node.
+     * Creates a rpc node.
      */
     public YangRpc() {
-        super(YangNodeType.RPC_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.RPC_NODE, new HashMap<>());
+        ifFeatureList = new LinkedList<>();
     }
 
     @Override

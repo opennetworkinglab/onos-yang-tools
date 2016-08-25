@@ -121,7 +121,7 @@ public final class GroupingListener {
 
             YangGrouping groupingNode = getYangGroupingNode(JAVA_GENERATION);
             groupingNode.setName(identifier);
-
+            groupingNode.setGroupingDepth(listener.getGroupingDepth());
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(groupingNode);

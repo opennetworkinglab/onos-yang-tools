@@ -26,7 +26,6 @@ import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
-import org.onosproject.yangutils.datamodel.YangAugmentedInfo;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangGrouping;
@@ -47,14 +46,17 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
 
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
+import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
+import static org.onosproject.yangutils.translator.tojava.YangDataModelFactory.getYangCaseNode;
 import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 
@@ -88,7 +90,7 @@ public final class YangLinkerUtils {
             }
         }
         if (targetNode instanceof YangChoice) {
-            //Do nothing
+            addCaseNodeToChoiceTarget(augment);
         } else {
             detectCollisionInLeaveHolders(targetNode, augment);
             while (augmentsChild != null) {
@@ -152,6 +154,79 @@ public final class YangLinkerUtils {
     }
 
     /**
+     * Adds a case node in augment when augmenting a choice node.
+     *
+     * @param augment augment node
+     */
+    private static void addCaseNodeToChoiceTarget(YangAugment augment) {
+        try {
+            YangNode child = augment.getChild();
+            List<YangNode> childNodes = new ArrayList<>();
+            while (child != null) {
+                childNodes.add(child);
+                child = child.getNextSibling();
+            }
+            augment.setChild(null);
+
+            for (YangNode node : childNodes) {
+                YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
+                javaCase.setName(node.getName());
+                augment.addChild(javaCase);
+                node.setParent(javaCase);
+                node.setNextSibling(null);
+                node.setPreviousSibling(null);
+                javaCase.addChild(node);
+            }
+            if (augment.getListOfLeaf() != null) {
+                for (YangLeaf leaf : augment.getListOfLeaf()) {
+                    YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
+                    javaCase.setName(leaf.getName());
+                    javaCase.addLeaf(leaf);
+                    augment.addChild(javaCase);
+
+                }
+                augment.getListOfLeaf().clear();
+            }
+            if (augment.getListOfLeafList() != null) {
+                for (YangLeafList leafList : augment.getListOfLeafList()) {
+                    YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
+                    javaCase.setName(leafList.getName());
+                    javaCase.addLeafList(leafList);
+                    augment.addChild(javaCase);
+                }
+                augment.getListOfLeafList().clear();
+            }
+
+        } catch (DataModelException e) {
+            throw new TranslatorException("Failed to add child nodes to case node of augment " + augment.getName());
+        }
+    }
+
+    //Detect collision between augment and choice children.
+    private void detectCollisionForChoiceNode(YangNode choice, YangNode augment) {
+        YangNode choiceChild = choice.getChild();
+        YangNode augmentChild = augment.getChild();
+
+        List<YangNode> choiceChildren = new ArrayList<>();
+        List<YangNode> augmentChildren = new ArrayList<>();
+        while (choiceChild != null) {
+            choiceChildren.add(choiceChild);
+        }
+        while (augmentChild != null) {
+            augmentChildren.add(augmentChild);
+        }
+
+        for (YangNode cChild : choiceChildren) {
+            for (YangNode aChild : augmentChildren) {
+                if (cChild.getName().equals(aChild.getName())) {
+                    throw new LinkerException("case node " + aChild.getName() + "already present in choice " +
+                            choice.getName());
+                }
+            }
+        }
+    }
+
+    /**
      * Detects collision between target nodes and its all leaf/leaf-list or child node with augmented leaf/leaf-list or
      * child node.
      *
@@ -161,10 +236,10 @@ public final class YangLinkerUtils {
     static void detectCollisionForAugmentedNode(YangNode targetNode, YangAugment augment) {
         // Detect collision for target node and augment node.
         detectCollision(targetNode, augment);
-        List<YangAugmentedInfo> yangAugmentedInfo = ((YangAugmentableNode) targetNode).getAugmentedInfoList();
+        List<YangAugment> yangAugmentedInfo = ((YangAugmentableNode) targetNode).getAugmentedInfoList();
         // Detect collision for target augment node and current augment node.
-        for (YangAugmentedInfo info : yangAugmentedInfo) {
-            detectCollision((YangAugment) info, augment);
+        for (YangAugment info : yangAugmentedInfo) {
+            detectCollision(info, augment);
         }
     }
 
@@ -222,7 +297,7 @@ public final class YangLinkerUtils {
      * @return valid node identifier
      */
     static YangNodeIdentifier getValidNodeIdentifier(String nodeIdentifierString,
-            YangConstructType yangConstruct) {
+                                                     YangConstructType yangConstruct) {
         String[] tmpData = nodeIdentifierString.split(Pattern.quote(COLON));
         if (tmpData.length == 1) {
             YangNodeIdentifier nodeIdentifier = new YangNodeIdentifier();

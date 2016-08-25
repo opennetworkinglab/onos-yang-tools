@@ -319,6 +319,48 @@ public final class UtilConstants {
     /**
      * Static attribute for minRange.
      */
+    public static final String SHORT_MIN_RANGE_ATTR = "static final int INT16_MIN_RANGE = -32768;\n";
+
+    /**
+     * Static attribute for minRange.
+     */
+    public static final String SHORT_MIN_RANGE = "INT16_MIN_RANGE";
+
+    /**
+     * Static attribute for minRange.
+     */
+    public static final String SHORT_MAX_RANGE = "INT16_MAX_RANGE";
+
+    /**
+     * Static attribute for maxRange.
+     */
+    public static final String SHORT_MAX_RANGE_ATTR = "static final int INT16_MAX_RANGE = 32767;";
+
+
+    /**
+     * Static attribute for minRange.
+     */
+    public static final String UINT8_MIN_RANGE_ATTR = "static final int UINT8_MIN_RANGE = 0;\n";
+
+    /**
+     * Static attribute for maxRange.
+     */
+    public static final String UINT8_MAX_RANGE_ATTR = "static final int UINT8_MAX_RANGE = 32767;";
+
+
+    /**
+     * Static attribute for minRange.
+     */
+    public static final String UINT8_MIN_RANGE = "UINT8_MIN_RANGE";
+
+    /**
+     * Static attribute for maxRange.
+     */
+    public static final String UINT8_MAX_RANGE = "UINT8_MAX_RANGE";
+
+    /**
+     * Static attribute for minRange.
+     */
     public static final String INT_MIN_RANGE_ATTR = "static final int INT32_MIN_RANGE = -2147483648;\n";
 
     /**

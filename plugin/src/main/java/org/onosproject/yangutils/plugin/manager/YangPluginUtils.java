@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -32,10 +33,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
 import org.slf4j.Logger;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.parseJarFile;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAR;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
@@ -48,13 +49,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Represents YANG plugin utilities.
  */
-final class YangPluginUtils {
+public final class YangPluginUtils {
 
     private static final Logger log = getLogger(YangPluginUtils.class);
 
     private static final String TARGET_RESOURCE_PATH = SLASH + TEMP + SLASH + YANG_RESOURCES + SLASH;
 
     private static final String SERIALIZED_FILE_EXTENSION = ".ser";
+    private static final String YANG_META_DATA = "YangMetaData";
 
     private YangPluginUtils() {
     }
@@ -124,8 +126,8 @@ final class YangPluginUtils {
      * @param operation   true if need to add to resource
      * @throws IOException when fails to do IO operations
      */
-    static void serializeDataModel(String directory, Set<YangFileInfo> fileInfoSet,
-                                   MavenProject project, boolean operation) throws IOException {
+    public static void serializeDataModel(String directory, Set<YangFileInfo> fileInfoSet,
+                                          MavenProject project, boolean operation) throws IOException {
 
         String serFileDirPath = directory + TARGET_RESOURCE_PATH;
         File dir = new File(serFileDirPath);
@@ -135,17 +137,17 @@ final class YangPluginUtils {
             addToProjectResource(directory + SLASH + TEMP + SLASH, project);
         }
 
+        Set<YangNode> nodes = new HashSet<>();
         for (YangFileInfo fileInfo : fileInfoSet) {
-
-            String serFileName = serFileDirPath + fileInfo.getRootNode().getName()
-                    + SERIALIZED_FILE_EXTENSION;
-            fileInfo.setSerializedFile(serFileName);
-            FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(fileInfo.getRootNode());
-            objectOutputStream.close();
-            fileOutputStream.close();
+            nodes.add(fileInfo.getRootNode());
         }
+
+        String serFileName = serFileDirPath + YANG_META_DATA + SERIALIZED_FILE_EXTENSION;
+        FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(nodes);
+        objectOutputStream.close();
+        fileOutputStream.close();
     }
 
     /**
@@ -203,7 +205,7 @@ final class YangPluginUtils {
         List<String> dependenciesJarPaths = resolveDependencyJarPath(project, localRepository, remoteRepos);
         List<YangNode> resolvedDataModelNodes = new ArrayList<>();
         for (String dependency : dependenciesJarPaths) {
-            resolvedDataModelNodes.addAll(DataModelUtils.parseJarFile(dependency, directory));
+            resolvedDataModelNodes.addAll(parseJarFile(dependency, directory));
         }
         return resolvedDataModelNodes;
     }

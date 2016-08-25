@@ -236,7 +236,7 @@ public abstract class YangModule
      */
     public YangModule() {
 
-        super(YangNodeType.MODULE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.MODULE_NODE, new HashMap<>());
         derivedTypeResolutionList = new LinkedList<>();
         augmentResolutionList = new LinkedList<>();
         usesResolutionList = new LinkedList<>();
@@ -250,11 +250,12 @@ public abstract class YangModule
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         extensionList = new LinkedList<>();
+        listOfFeature = new LinkedList<>();
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -565,8 +566,20 @@ public abstract class YangModule
      *
      * @param extensionList the list of extension
      */
-    public void setExtensionList(List<YangExtension> extensionList) {
+    protected void setExtensionList(List<YangExtension> extensionList) {
         this.extensionList = extensionList;
+    }
+
+    /**
+     * Adds to extension list.
+     *
+     * @param extension YANG extension
+     */
+    public void addToExtensionList(YangExtension extension) {
+        if (getExtensionList() == null) {
+            setExtensionList(new LinkedList<>());
+        }
+        getExtensionList().add(extension);
     }
 
     /**
@@ -643,7 +656,7 @@ public abstract class YangModule
 
     @Override
     public void addToResolutionList(YangResolutionInfo resolutionInfo,
-            ResolvableType type) {
+                                    ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList.add(resolutionInfo);
         } else if (type == ResolvableType.YANG_USES) {
@@ -665,7 +678,7 @@ public abstract class YangModule
 
     @Override
     public void setResolutionList(List<YangResolutionInfo> resolutionList,
-            ResolvableType type) {
+                                  ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList = resolutionList;
         } else if (type == ResolvableType.YANG_USES) {

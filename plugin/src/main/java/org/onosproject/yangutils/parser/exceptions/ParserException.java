@@ -22,9 +22,9 @@ package org.onosproject.yangutils.parser.exceptions;
 public class ParserException extends RuntimeException {
 
     private static final long serialVersionUID = 20160211L;
-    private int lineNumber;
-    private int charPositionInLine;
-    private String fileName;
+    private transient int lineNumber;
+    private transient int charPositionInLine;
+    private transient String fileName;
 
     /**
      * Creates a new parser exception.

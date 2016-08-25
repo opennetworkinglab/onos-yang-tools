@@ -90,7 +90,7 @@ public abstract class YangList
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "key" statement, which MUST be present if the list represents
      * configuration, and MAY be present otherwise, takes as an argument a
      * string that specifies a space-separated list of leaf identifiers of this
@@ -98,39 +98,39 @@ public abstract class YangList
      * such leaf identifier MUST refer to a child leaf of the list. The leafs
      * can be defined directly in sub-statements to the list, or in groupings
      * used in the list.
-     *
+     * <p>
      * The combined values of all the leafs specified in the key are used to
      * uniquely identify a list entry. All key leafs MUST be given values when a
      * list entry is created. Thus, any default values in the key leafs or their
      * types are ignored. It also implies that any mandatory statement in the
      * key leafs are ignored.
-     *
+     * <p>
      * A leaf that is part of the key can be of any built-in or derived type,
      * except it MUST NOT be the built-in type "empty".
-     *
+     * <p>
      * All key leafs in a list MUST have the same value for their "config" as
      * the list itself.
-     *
+     * <p>
      * List of key leaf names.
      */
     private List<String> keyList;
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "unique" statement is used to put constraints on valid list
      * entries.  It takes as an argument a string that contains a space-
      * separated list of schema node identifiers, which MUST be given in the
      * descendant form.  Each such schema node identifier MUST refer to a leaf.
-     *
+     * <p>
      * If one of the referenced leafs represents configuration data, then
      * all of the referenced leafs MUST represent configuration data.
-     *
+     * <p>
      * The "unique" constraint specifies that the combined values of all the
      * leaf instances specified in the argument string, including leafs with
      * default values, MUST be unique within all list entry instances in
      * which all referenced leafs exist.
-     *
+     * <p>
      * List of unique leaf/leaf-list names
      */
     private List<String> uniqueList;
@@ -145,36 +145,36 @@ public abstract class YangList
      */
     private List<YangLeafList> listOfLeafList;
 
-    private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     *
+     * <p>
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private YangMaxElement maxElements;
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     *
+     * <p>
      * If no "min-elements" statement is present, it defaults to zero.
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     *
+     * <p>
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -215,14 +215,18 @@ public abstract class YangList
      * Creates a YANG list object.
      */
     public YangList() {
-        super(YangNodeType.LIST_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.LIST_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+        mustConstraintList = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
+        uniqueList = new LinkedList<>();
+        keyList = new LinkedList<>();
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -364,7 +368,7 @@ public abstract class YangList
     public void addKey(String key)
             throws DataModelException {
         if (getKeyList() == null) {
-            setKeyList(new LinkedList<String>());
+            setKeyList(new LinkedList<>());
         }
 
         if (getKeyList().contains(key)) {
@@ -565,7 +569,7 @@ public abstract class YangList
         validateConfig(leaves, leafLists);
 
         //A list must have atleast one key leaf if config is true
-        if (isConfig && (keys == null || leaves == null) && !isUsesPresentInList()
+        if (isConfig && (keys.isEmpty() || leaves.isEmpty()) && !isUsesPresentInList()
                 && !isListPresentInGrouping()) {
             throw new DataModelException("A list must have atleast one key leaf if config is true;");
         } else if (keys != null) {
@@ -732,17 +736,17 @@ public abstract class YangList
     }
 
     @Override
-    public void addAugmentation(YangAugmentedInfo augmentInfo) {
+    public void addAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
 
     @Override
-    public void removeAugmentation(YangAugmentedInfo augmentInfo) {
+    public void removeAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.remove(augmentInfo);
     }
 
     @Override
-    public List<YangAugmentedInfo> getAugmentedInfoList() {
+    public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
     }
 

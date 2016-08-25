@@ -16,8 +16,8 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaLeaf;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.updateLeavesJavaQualifiedInfo;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -39,17 +39,6 @@ public class YangJavaLeafTranslator
     public YangJavaLeafTranslator() {
         super();
         setJavaQualifiedInfo(new JavaQualifiedTypeInfoTranslator());
-    }
-
-    @Override
-    public JavaQualifiedTypeInfoTranslator getJavaQualifiedInfo() {
-        return (JavaQualifiedTypeInfoTranslator) javaQualifiedTypeInfo;
-    }
-
-    @Override
-    public void setJavaQualifiedInfo(JavaQualifiedTypeInfoTranslator typeInfo) {
-        javaQualifiedTypeInfo = typeInfo;
-
     }
 
     @Override

@@ -403,7 +403,7 @@ public final class YangIoUtils {
     }
 
     /* When spaces are present in the given line. */
-    public static String whenSpaceIsPresent(String line, int lineSize) {
+    private static String whenSpaceIsPresent(String line, int lineSize) {
         StringBuilder stringBuilder = new StringBuilder();
         String append;
         if (line.length() > lineSize) {

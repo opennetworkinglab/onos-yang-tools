@@ -17,22 +17,12 @@
 package org.onosproject.yangutils.translator.tojava;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.onosproject.yangutils.datamodel.TraversalType;
-import org.onosproject.yangutils.datamodel.YangAugment;
-import org.onosproject.yangutils.datamodel.YangCase;
-import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangInput;
-import org.onosproject.yangutils.datamodel.YangLeaf;
-import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeType;
 import org.onosproject.yangutils.datamodel.YangOutput;
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
@@ -41,11 +31,6 @@ import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
-import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
-import static org.onosproject.yangutils.translator.tojava.YangDataModelFactory.getYangCaseNode;
-import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getAugmentClassName;
-import static org.onosproject.yangutils.utils.UtilConstants.CASE;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
 
 /**
@@ -53,7 +38,6 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDelet
  */
 public final class JavaCodeGeneratorUtil {
 
-    private static final Log log = LogFactory.getLog(JavaCodeGeneratorUtil.class);
     /**
      * Current YANG node.
      */
@@ -63,8 +47,6 @@ public final class JavaCodeGeneratorUtil {
      * Root node.
      */
     private static YangNode rootNode;
-
-    private static int calls = 0;
 
     /**
      * Creates a java code generator utility object.
@@ -106,11 +88,6 @@ public final class JavaCodeGeneratorUtil {
         TraversalType curTraversal = ROOT;
 
         while (codeGenNode != null) {
-            if (codeGenNode instanceof YangAugment) {
-                if (((YangAugment) codeGenNode).getAugmentedNode() instanceof YangChoice) {
-                    addCaseNodeToChoiceTarget((YangAugment) codeGenNode);
-                }
-            }
             if (curTraversal != PARENT) {
                 if (!(codeGenNode instanceof JavaCodeGenerator)) {
                     throw new TranslatorException("Unsupported node to generate code");
@@ -129,9 +106,7 @@ public final class JavaCodeGeneratorUtil {
                     }
                     continue;
                 } catch (Exception e) {
-                    if (log.isDebugEnabled()) {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -144,9 +119,7 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeExit(codeGenNode, yangPlugin);
                 } catch (Exception e) {
-                    if (log.isDebugEnabled()) {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -156,9 +129,7 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeExit(codeGenNode, yangPlugin);
                 } catch (Exception e) {
-                    if (log.isDebugEnabled()) {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                     close(codeGenNode, yangPlugin);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -381,49 +352,4 @@ public final class JavaCodeGeneratorUtil {
         return null;
     }
 
-    /**
-     * Adds a case node in augment when augmenting a choice node.
-     *
-     * @param augment augment node
-     */
-    private static void addCaseNodeToChoiceTarget(YangAugment augment) {
-        calls++;
-        if (calls == 1) {
-            YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
-
-            YangPluginConfig pluginConfig = new YangPluginConfig();
-            javaCase.setName(getAugmentClassName(augment, pluginConfig) + getCapitalCase(CASE));
-
-            if (augment.getListOfLeaf() != null) {
-                for (YangLeaf leaf : augment.getListOfLeaf()) {
-                    javaCase.addLeaf(leaf);
-                }
-                augment.getListOfLeaf().clear();
-            }
-            if (augment.getListOfLeafList() != null) {
-                for (YangLeafList leafList : augment.getListOfLeafList()) {
-                    javaCase.addLeafList(leafList);
-                }
-                augment.getListOfLeafList().clear();
-            }
-            YangNode child = augment.getChild();
-            List<YangNode> childNodes = new ArrayList<>();
-            while (child != null) {
-                child.setParent(javaCase);
-                childNodes.add(child);
-                child = child.getNextSibling();
-            }
-            augment.setChild(null);
-            try {
-                augment.addChild(javaCase);
-                for (YangNode node : childNodes) {
-                    node.setNextSibling(null);
-                    node.setPreviousSibling(null);
-                    javaCase.addChild(node);
-                }
-            } catch (DataModelException e) {
-                throw new TranslatorException("Failed to add child nodes to case node of augment " + augment.getName());
-            }
-        }
-    }
 }

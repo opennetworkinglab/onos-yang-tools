@@ -137,6 +137,8 @@ public abstract class YangLeaf
      * Creates a YANG leaf.
      */
     public YangLeaf() {
+        mustConstraintList = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
     }
 
     /**

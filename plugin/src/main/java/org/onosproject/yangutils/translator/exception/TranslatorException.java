@@ -22,7 +22,7 @@ package org.onosproject.yangutils.translator.exception;
 public class TranslatorException extends RuntimeException {
 
     private static final long serialVersionUID = 20160311L;
-    private String fileName;
+    private transient String fileName;
 
     /**
      * Create a new translator exception.
@@ -44,7 +44,7 @@ public class TranslatorException extends RuntimeException {
      * Creates a new translator exception from given message and cause.
      *
      * @param message the detail of exception in string
-     * @param cause underlying cause of the error
+     * @param cause   underlying cause of the error
      */
     public TranslatorException(final String message, final Throwable cause) {
         super(message, cause);

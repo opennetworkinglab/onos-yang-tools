@@ -28,21 +28,21 @@ public interface YangAugmentableNode {
      *
      * @param augmentInfo augment info of node
      */
-    void addAugmentation(YangAugmentedInfo augmentInfo);
+    void addAugmentation(YangAugment augmentInfo);
 
     /**
      * Removes augment info from the node.
      *
      * @param augmentInfo augment info of node
      */
-    void removeAugmentation(YangAugmentedInfo augmentInfo);
+    void removeAugmentation(YangAugment augmentInfo);
 
     /**
      * Returns list of augment info.
      *
      * @return list of augment info
      */
-    List<YangAugmentedInfo> getAugmentedInfoList();
+    List<YangAugment> getAugmentedInfoList();
 
     /**
      * Sets the isAugmented flag.

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -85,7 +86,7 @@ public abstract class YangInput
      */
     private List<YangLeafList> listOfLeafList;
 
-    private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
 
     private boolean isAugmented;
 
@@ -93,7 +94,7 @@ public abstract class YangInput
      * Create a rpc input node.
      */
     public YangInput() {
-        super(YangNodeType.INPUT_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.INPUT_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
     }
@@ -203,17 +204,17 @@ public abstract class YangInput
     }
 
     @Override
-    public void addAugmentation(YangAugmentedInfo augmentInfo) {
+    public void addAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
 
     @Override
-    public void removeAugmentation(YangAugmentedInfo augmentInfo) {
+    public void removeAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.remove(augmentInfo);
     }
 
     @Override
-    public List<YangAugmentedInfo> getAugmentedInfoList() {
+    public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
     }
 

@@ -19,6 +19,7 @@ package org.onosproject.yangutils.datamodel;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
@@ -52,17 +53,17 @@ public class YangIfFeature implements Parsable, Resolvable, Serializable {
     /**
      * if-feature argument.
      */
-    YangNodeIdentifier name;
+    private YangNodeIdentifier name;
 
     /**
      * Referred feature information.
      */
-    YangFeature referredFeature;
+    private YangFeature referredFeature;
 
     /**
      * Referred feature parent information.
      */
-    YangNode referredFeatureHolder;
+    private YangNode referredFeatureHolder;
 
     /**
      * Status of resolution. If completely resolved enum value is "RESOLVED",

@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -133,7 +134,7 @@ public abstract class YangLeafList
     /**
      * YANG Node in which the leaf is contained.
      */
-    private transient YangLeavesHolder containedIn;
+    private YangLeavesHolder containedIn;
 
     /**
      * List of must statement constraints.
@@ -154,6 +155,8 @@ public abstract class YangLeafList
      * Creates a YANG leaf-list.
      */
     public YangLeafList() {
+        mustConstraintList = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
         setMinElements(new YangMinElement());
         setMaxElements(new YangMaxElement());
     }

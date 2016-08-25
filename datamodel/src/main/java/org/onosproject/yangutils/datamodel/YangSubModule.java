@@ -238,7 +238,7 @@ public abstract class YangSubModule
      * Creates a sub module node.
      */
     public YangSubModule() {
-        super(YangNodeType.SUB_MODULE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.SUB_MODULE_NODE, new HashMap<>());
         derivedTypeResolutionList = new LinkedList<>();
         augmentResolutionList = new LinkedList<>();
         usesResolutionList = new LinkedList<>();
@@ -253,11 +253,12 @@ public abstract class YangSubModule
         listOfLeafList = new LinkedList<>();
         extensionList = new LinkedList<>();
         compilerAnnotationList = new LinkedList<>();
+        listOfFeature = new LinkedList<>();
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -602,7 +603,7 @@ public abstract class YangSubModule
 
     @Override
     public void addToResolutionList(YangResolutionInfo resolutionInfo,
-            ResolvableType type) {
+                                    ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList.add(resolutionInfo);
         } else if (type == ResolvableType.YANG_USES) {
@@ -624,7 +625,7 @@ public abstract class YangSubModule
 
     @Override
     public void setResolutionList(List<YangResolutionInfo> resolutionList,
-            ResolvableType type) {
+                                  ResolvableType type) {
         if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList = resolutionList;
         } else if (type == ResolvableType.YANG_USES) {

@@ -17,6 +17,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -112,7 +113,6 @@ public abstract class YangNode
      */
     @SuppressWarnings("unused")
     private YangNode() {
-
     }
 
     /**
@@ -373,13 +373,13 @@ public abstract class YangNode
         if (nextNodeToClone == null) {
             return;
         } else {
-            /**
+            /*
              * Root level cloning is taken care in the caller.
              */
             curTraversal = CHILD;
         }
 
-        /**
+        /*
          * Caller ensures the cloning of the root nodes
          */
         try {
@@ -394,12 +394,12 @@ public abstract class YangNode
 
                 if (curTraversal == CHILD) {
 
-                    /**
+                    /*
                      * add the new node to the cloned tree.
                      */
                     clonedTreeCurNode.addChild(newNode);
 
-                    /**
+                    /*
                      * update the cloned tree's traversal current node as the
                      * new node.
                      */
@@ -408,7 +408,7 @@ public abstract class YangNode
 
                     clonedTreeCurNode.addNextSibling(newNode);
                     clonedTreeCurNode = newNode;
-                } else if (curTraversal == PARENT) {
+                } else {
                     if (clonedTreeCurNode instanceof YangLeavesHolder) {
                         updateClonedLeavesUnionEnumRef((YangLeavesHolder) clonedTreeCurNode);
                     }
@@ -418,7 +418,7 @@ public abstract class YangNode
                 if (curTraversal != PARENT && nextNodeToClone.getChild() != null) {
                     curTraversal = CHILD;
 
-                    /**
+                    /*
                      * update the traversal's current node.
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
@@ -625,6 +625,26 @@ public abstract class YangNode
         if (this instanceof YangLeavesHolder) {
             ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
         }
+    }
+
+    /**
+     * Sets YSN context info map.
+     *
+     * @param ysnContextInfoMap YSN context info map
+     */
+    public void setYsnContextInfoMap(Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
+        this.ysnContextInfoMap = ysnContextInfoMap;
+    }
+
+    /**
+     * Adds to YSN context info map.
+     *
+     * @param yangSchemaNodeIdentifier  YANG schema node identifier
+     * @param yangSchemaNodeContextInfo YANG schema node context info
+     */
+    public void addToYsnContextInfoMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNodeContextInfo
+            yangSchemaNodeContextInfo) {
+        getYsnContextInfoMap().put(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
     @Override

@@ -96,7 +96,7 @@ public final class JavaDocGen {
      * @param isList             is list attribute
      * @param pluginConfig       plugin configurations
      * @param compilerAnnotation compiler annotations for user defined data type
-     * @return javadocs.
+     * @return javaDocs.
      */
     public static String getJavaDoc(JavaDocType type, String name, boolean isList, YangPluginConfig pluginConfig,
                                     String compilerAnnotation) {

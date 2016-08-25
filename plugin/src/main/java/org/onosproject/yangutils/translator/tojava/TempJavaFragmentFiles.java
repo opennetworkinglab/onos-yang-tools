@@ -30,6 +30,7 @@ import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangSubModule;
+import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaGroupingTranslator;
@@ -1584,7 +1585,7 @@ public class TempJavaFragmentFiles {
             addLeafIdAttributes(newAttrInfo, leafCount, pluginConfig);
         }
         if (!newAttrInfo.isIntConflict() &&
-                !newAttrInfo.isLongConflict()) {
+                !newAttrInfo.isLongConflict() && !newAttrInfo.isShortConflict()) {
             if ((getGeneratedTempFiles() & GETTER_FOR_CLASS_MASK) != 0) {
                 addGetterImpl(newAttrInfo, pluginConfig);
             }
@@ -1863,8 +1864,9 @@ public class TempJavaFragmentFiles {
      * @return status of the qualified access to the attribute
      */
     boolean getIsQualifiedAccessOrAddToImportList(
-            JavaQualifiedTypeInfoTranslator importInfo) {
-        return getJavaImportData().addImportInfo(importInfo, getGeneratedJavaClassName(),
+            JavaQualifiedTypeInfo importInfo) {
+        return getJavaImportData().addImportInfo((JavaQualifiedTypeInfoTranslator) importInfo,
+                getGeneratedJavaClassName(),
                 getJavaFileInfo().getPackage());
     }
 

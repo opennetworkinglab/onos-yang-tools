@@ -127,7 +127,7 @@ public class YangResolutionInfoImpl<T>
      * Current module/sub-module reference, will be used in inter-file/
      * inter-jar scenario to get the import/include list.
      */
-    private transient YangReferenceResolver curReferenceResolver;
+    private YangReferenceResolver curReferenceResolver;
 
     /**
      * Stack for type/uses is maintained for hierarchical references, this is
@@ -165,7 +165,7 @@ public class YangResolutionInfoImpl<T>
             throws DataModelException {
 
         setCurReferenceResolver(dataModelRootNode);
-        /**
+        /*
          * Current node to resolve, it can be a YANG type, YANG uses or YANG if-feature or
          * YANG leafref or YANG base or YANG identityref.
          */
@@ -175,7 +175,7 @@ public class YangResolutionInfoImpl<T>
         if (entityToResolve instanceof Resolvable) {
             Resolvable resolvable = (Resolvable) entityToResolve;
             if (resolvable.getResolvableStatus() == RESOLVED) {
-                /**
+                /*
                  * entity is already resolved, so nothing to do
                  */
                 return;
@@ -201,7 +201,7 @@ public class YangResolutionInfoImpl<T>
             throws DataModelException {
 
         while (getPartialResolvedStack().size() != 0) {
-            /**
+            /*
              * Current node to resolve, it can be a YANG type or YANG uses or
              * YANG if-feature or YANG leafref or YANG base or YANG identityref.
              */
@@ -737,7 +737,7 @@ public class YangResolutionInfoImpl<T>
      * @throws DataModelException data model errors
      */
     private YangNode isReferredNodeInSiblingProcessedForIdentity(YangNode potentialReferredNode,
-            String referredNodeName)
+                                                                 String referredNodeName)
             throws DataModelException {
 
         while (potentialReferredNode != null) {
@@ -1229,7 +1229,7 @@ public class YangResolutionInfoImpl<T>
      * @param root            root node
      */
     private void processXPathLinking(T entityToResolve,
-            YangReferenceResolver root) {
+                                     YangReferenceResolver root) {
 
         YangXpathLinker<T> xPathLinker = new YangXpathLinker<T>();
 
@@ -1525,7 +1525,7 @@ public class YangResolutionInfoImpl<T>
      * @throws DataModelException a violation of data model rules
      */
     private void fillAbsolutePathValuesInLeafref(YangLeafRef leafref, String pathNameToBePrefixed,
-            List<YangAtomicPath> atomicPathsInRelative)
+                                                 List<YangAtomicPath> atomicPathsInRelative)
             throws DataModelException {
 
         leafref.setPathType(YangPathArgType.ABSOLUTE_PATH);
@@ -1819,4 +1819,5 @@ public class YangResolutionInfoImpl<T>
         }
         return null;
     }
+
 }

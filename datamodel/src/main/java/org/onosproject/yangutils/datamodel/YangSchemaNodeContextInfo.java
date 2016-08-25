@@ -27,17 +27,17 @@ public class YangSchemaNodeContextInfo implements Serializable {
     private static final long serialVersionUID = 806201613L;
 
     // Current schema node
-    YangSchemaNode schemaNode;
+    private YangSchemaNode schemaNode;
 
     /*
      * Context switched schema node, it will be non null only for the scenarios
      * in which context switch is there like augment, choice etc, in this case
      * this node will point to context switched node like YangAugmentInfo.
      */
-    YangSchemaNode contextSwitchedNode;
+    private YangSchemaNode contextSwitchedNode;
 
     // Default instance of YangSchemaNodeContextInfo.
-    YangSchemaNodeContextInfo() {
+    public YangSchemaNodeContextInfo() {
     }
 
     /**
@@ -54,7 +54,7 @@ public class YangSchemaNodeContextInfo implements Serializable {
      *
      * @param schemaNode YANG schema node
      */
-    public void setSchemaNode(YangSchemaNode schemaNode) {
+    void setSchemaNode(YangSchemaNode schemaNode) {
         this.schemaNode = schemaNode;
     }
 
@@ -72,7 +72,7 @@ public class YangSchemaNodeContextInfo implements Serializable {
      *
      * @param contextSwitchedNode context switched node
      */
-    public void setContextSwitchedNode(YangSchemaNode contextSwitchedNode) {
+    void setContextSwitchedNode(YangSchemaNode contextSwitchedNode) {
         this.contextSwitchedNode = contextSwitchedNode;
     }
 }

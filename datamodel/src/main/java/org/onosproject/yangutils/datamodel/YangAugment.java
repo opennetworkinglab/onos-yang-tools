@@ -83,8 +83,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
  */
 public abstract class YangAugment
         extends YangNode
-        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, YangAugmentedInfo, Resolvable,
-        YangXPathResolver, YangWhenHolder, YangIfFeatureHolder, YangTranslatorOperatorNode {
+        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, Resolvable,
+        YangXPathResolver, YangWhenHolder, YangIfFeatureHolder {
 
     private static final long serialVersionUID = 806201602L;
 
@@ -144,15 +144,17 @@ public abstract class YangAugment
      * Create a YANG augment node.
      */
     public YangAugment() {
-        super(YangNodeType.AUGMENT_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.AUGMENT_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+        targetNode = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
@@ -164,7 +166,7 @@ public abstract class YangAugment
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        String  nameSpace = this.getParent().getNameSpace();
+        String nameSpace = this.getParent().getNameSpace();
         // Set namespace for self node.
         setNameSpace(nameSpace);
         /*

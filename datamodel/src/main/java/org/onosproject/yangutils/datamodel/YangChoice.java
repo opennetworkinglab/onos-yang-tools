@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -151,7 +152,7 @@ public abstract class YangChoice
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private List<YangAugmentedInfo> yangAugmentedInfo = new ArrayList<>();
+    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
 
     /**
      * YANG application error information.
@@ -164,8 +165,9 @@ public abstract class YangChoice
      * Create a choice node.
      */
     public YangChoice() {
-        super(YangNodeType.CHOICE_NODE, new HashMap<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo>());
+        super(YangNodeType.CHOICE_NODE, new HashMap<>());
         yangAppErrorInfo = new YangAppErrorInfo();
+        ifFeatureList = new LinkedList<>();
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(MISSING_CHOICE_ERROR_APP_TAG);
         yangAppErrorInfo.setErrorAppPath(ERROR_PATH_MISSING_CHOICE);
@@ -449,17 +451,17 @@ public abstract class YangChoice
     }
 
     @Override
-    public void addAugmentation(YangAugmentedInfo augmentInfo) {
+    public void addAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.add(augmentInfo);
     }
 
     @Override
-    public void removeAugmentation(YangAugmentedInfo augmentInfo) {
+    public void removeAugmentation(YangAugment augmentInfo) {
         yangAugmentedInfo.remove(augmentInfo);
     }
 
     @Override
-    public List<YangAugmentedInfo> getAugmentedInfoList() {
+    public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
     }
 

@@ -148,9 +148,11 @@ public abstract class YangUses
         super(YangNodeType.USES_NODE, null);
         nodeIdentifier = new YangNodeIdentifier();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
-        resolvedGroupingNodes = new LinkedList<YangNode>();
-        resolvedGroupingLeaves = new LinkedList<List<YangLeaf>>();
-        resolvedGroupingLeafLists = new LinkedList<List<YangLeafList>>();
+        resolvedGroupingNodes = new LinkedList<>();
+        resolvedGroupingLeaves = new LinkedList<>();
+        resolvedGroupingLeafLists = new LinkedList<>();
+        ifFeatureList = new LinkedList<>();
+        entityToResolveInfoList = new LinkedList<>();
     }
 
     @Override

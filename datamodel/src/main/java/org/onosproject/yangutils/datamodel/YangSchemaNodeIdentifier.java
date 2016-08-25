@@ -28,10 +28,10 @@ public class YangSchemaNodeIdentifier implements Serializable {
     private static final long serialVersionUID = 806201648L;
 
     // Name of YANG data node.
-    String name;
+    private String name;
 
     // Namespace of YANG data node.
-    String namespace;
+    private String namespace;
 
     /**
      * Creates an instance of YANG data node identifier.

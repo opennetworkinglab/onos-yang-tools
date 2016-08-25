@@ -15,7 +15,7 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import org.onosproject.yangutils.datamodel.YangType;
+import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaType;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
@@ -26,14 +26,10 @@ import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJa
 
 /**
  * Represents java information corresponding to the YANG type.
- *
- * @param <T> generic parameter for YANG java type
  */
-public class YangJavaTypeTranslator<T>
-        extends YangType<T>
+public class YangJavaTypeTranslator
+        extends YangJavaType
         implements JavaQualifiedTypeResolver {
-
-    private JavaQualifiedTypeInfoTranslator javaQualifiedAccess;
 
     /**
      * Create a YANG leaf object with java qualified access details.
@@ -45,7 +41,7 @@ public class YangJavaTypeTranslator<T>
 
     @Override
     public void updateJavaQualifiedInfo(YangToJavaNamingConflictUtil conflictResolver) {
-        JavaQualifiedTypeInfoTranslator importInfo = getJavaQualifiedInfo();
+        JavaQualifiedTypeInfoTranslator importInfo = (JavaQualifiedTypeInfoTranslator) getJavaQualifiedInfo();
 
         /*
          * Type is added as an attribute in the class.
@@ -58,7 +54,7 @@ public class YangJavaTypeTranslator<T>
              */
             importInfo.setClassInfo(className);
             String classPkg = getJavaImportPackage(this,
-                    false,  conflictResolver);
+                    false, conflictResolver);
             if (classPkg == null) {
                 throw new TranslatorException("import package cannot be null when the class is used");
             }
@@ -77,13 +73,4 @@ public class YangJavaTypeTranslator<T>
         setJavaQualifiedInfo(importInfo);
     }
 
-    @Override
-    public JavaQualifiedTypeInfoTranslator getJavaQualifiedInfo() {
-        return javaQualifiedAccess;
-    }
-
-    @Override
-    public void setJavaQualifiedInfo(JavaQualifiedTypeInfoTranslator typeInfo) {
-        javaQualifiedAccess = typeInfo;
-    }
 }

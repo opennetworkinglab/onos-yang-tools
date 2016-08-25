@@ -55,7 +55,7 @@ public class YangCompilerAnnotation
     /**
      * Path of compiler-annotation.
      */
-    List<YangAtomicPath> atomicPathList = new LinkedList<>();
+    private List<YangAtomicPath> atomicPathList = new LinkedList<>();
 
     /**
      * Resolution status.

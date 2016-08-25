@@ -37,7 +37,6 @@ public class YangJavaAugment
         return javaFileInfo;
     }
 
-
     @Override
     public String getJavaPackage() {
         return getJavaFileInfo().getPackage();

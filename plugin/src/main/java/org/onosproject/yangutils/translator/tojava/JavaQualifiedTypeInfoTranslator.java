@@ -21,10 +21,10 @@ import java.util.Objects;
 
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import com.google.common.base.MoreObjects;
 
@@ -42,6 +42,7 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
      * Creates a java qualified type info object.
      */
     public JavaQualifiedTypeInfoTranslator() {
+        super();
     }
 
     /**
@@ -87,7 +88,7 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
      */
     public static void updateLeavesJavaQualifiedInfo(JavaLeafInfoContainer leaf) {
 
-        JavaQualifiedTypeInfoTranslator importInfo = leaf.getJavaQualifiedInfo();
+        JavaQualifiedTypeInfoTranslator importInfo = (JavaQualifiedTypeInfoTranslator) leaf.getJavaQualifiedInfo();
 
         if (leaf.getDataType() == null) {
             throw new TranslatorException("missing data type of leaf " + leaf.getName());

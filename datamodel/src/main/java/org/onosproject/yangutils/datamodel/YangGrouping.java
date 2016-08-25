@@ -109,12 +109,17 @@ public abstract class YangGrouping
     private YangStatusType status;
 
     /**
+     * Grouping depth.
+     */
+    private int groupingDepth;
+
+    /**
      * Creates the grouping node.
      */
     public YangGrouping() {
         super(YangNodeType.GROUPING_NODE, null);
-        listOfLeaf = new LinkedList<YangLeaf>();
-        listOfLeafList = new LinkedList<YangLeafList>();
+        listOfLeaf = new LinkedList<>();
+        listOfLeafList = new LinkedList<>();
     }
 
     @Override
@@ -330,4 +335,22 @@ public abstract class YangGrouping
         }
     }
     // TODO  A grouping MUST NOT reference itself, neither directly nor indirectly through a chain of other groupings.
+
+    /**
+     * Returns grouping depth.
+     *
+     * @return grouping depth
+     */
+    public int getGroupingDepth() {
+        return groupingDepth;
+    }
+
+    /**
+     * Sets grouping depth.
+     *
+     * @param groupingDepth grouping depth
+     */
+    public void setGroupingDepth(int groupingDepth) {
+        this.groupingDepth = groupingDepth;
+    }
 }

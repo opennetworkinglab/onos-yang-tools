@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2016 Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,21 @@
 package org.onosproject.yangutils.datamodel.javadatamodel;
 
 /**
- * Represents the entity which contains the qualified type info of leaf / leaf-list.
+ * Maintain the java qualified access details for an attribute or a class.
  */
-public interface HasJavaQualifiedTypeInfo {
+public interface JavaQualifiedTypeInfoContainer {
+
     /**
-     * Returns java qualified type info.
+     * Obtain the java qualified details.
      *
-     * @return java qualified type info
+     * @return java qualified type details
      */
-    JavaQualifiedTypeInfo getJavaQualifiedTypeInfo();
+    JavaQualifiedTypeInfo getJavaQualifiedInfo();
+
+    /**
+     * Assign the qualified type info.
+     *
+     * @param typeInfo qualified type information
+     */
+    void setJavaQualifiedInfo(JavaQualifiedTypeInfo typeInfo);
 }

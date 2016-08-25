@@ -313,7 +313,7 @@ public class YangXpathLinker<T> {
      */
     private YangLeaf searchReferredLeaf(YangNode targetNode, String leafName) {
         if (!(targetNode instanceof YangLeavesHolder)) {
-            throw new LinkerException("Refered node " + targetNode.getName() +
+            throw new LinkerException("Referred node " + targetNode.getName() +
                     "should be of type leaves holder ");
         }
         YangLeavesHolder holder = (YangLeavesHolder) targetNode;
@@ -337,7 +337,7 @@ public class YangXpathLinker<T> {
      */
     private YangLeafList searchReferredLeafList(YangNode targetNode, String leafListName) {
         if (!(targetNode instanceof YangLeavesHolder)) {
-            throw new LinkerException("Refered node " + targetNode.getName() +
+            throw new LinkerException("Referred node " + targetNode.getName() +
                     "should be of type leaves holder ");
         }
         YangLeavesHolder holder = (YangLeavesHolder) targetNode;

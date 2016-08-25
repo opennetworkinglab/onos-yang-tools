@@ -226,7 +226,7 @@ public final class DataModelUtils {
      * @throws DataModelException a violation of data model rules
      */
     public static void resolveLinkingForResolutionList(List<YangResolutionInfo> resolutionList,
-            YangReferenceResolver dataModelRootNode)
+                                                       YangReferenceResolver dataModelRootNode)
             throws DataModelException {
 
         for (YangResolutionInfo resolutionInfo : resolutionList) {
@@ -242,14 +242,16 @@ public final class DataModelUtils {
      * @throws DataModelException a violation of data model rules
      */
     public static void linkInterFileReferences(List<YangResolutionInfo> resolutionList,
-            YangReferenceResolver dataModelRootNode)
+                                               YangReferenceResolver dataModelRootNode)
             throws DataModelException {
         /*
          * Run through the resolution list, find type/uses referring to inter
          * file typedef/grouping, ask for linking.
          */
-        for (YangResolutionInfo resolutionInfo : resolutionList) {
-            resolutionInfo.linkInterFile(dataModelRootNode);
+        if (resolutionList != null) {
+            for (YangResolutionInfo resolutionInfo : resolutionList) {
+                resolutionInfo.linkInterFile(dataModelRootNode);
+            }
         }
     }
 
@@ -313,21 +315,19 @@ public final class DataModelUtils {
      * @return de-serializes YANG data-model nodes
      * @throws IOException when fails do IO operations
      */
-    public static YangNode deSerializeDataModel(String serializedFileInfo)
-            throws IOException {
+    private static Set<YangNode> deSerializeDataModel(String serializedFileInfo) throws IOException {
 
-        YangNode node;
+        Set<YangNode> nodes;
         try {
             FileInputStream fileInputStream = new FileInputStream(serializedFileInfo);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            node = (YangNode) objectInputStream.readObject();
+            nodes = (Set<YangNode>) objectInputStream.readObject();
             objectInputStream.close();
             fileInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
             throw new IOException(serializedFileInfo + " not found.");
         }
-
-        return node;
+        return nodes;
     }
 
     /**
@@ -345,7 +345,7 @@ public final class DataModelUtils {
             List<YangLeaf> clonedLeavesList = new LinkedList<>();
             for (YangLeaf leaf : currentListOfLeaves) {
                 YangLeaf clonedLeaf = leaf.clone();
-                if (yangUses.getCurrentGroupingDepth() == 0) {
+                if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
                             resolveYangConstructsUnderGroupingForLeaf(clonedLeaf, leavesHolder, yangUses);
                     if (resolveInfo != null) {
@@ -363,7 +363,7 @@ public final class DataModelUtils {
             List<YangLeafList> clonedListOfLeafList = new LinkedList<>();
             for (YangLeafList leafList : currentListOfLeafList) {
                 YangLeafList clonedLeafList = leafList.clone();
-                if (yangUses.getCurrentGroupingDepth() == 0) {
+                if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
                             resolveYangConstructsUnderGroupingForLeafList(clonedLeafList, leavesHolder,
                                     yangUses);
@@ -388,7 +388,7 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     public static YangEntityToResolveInfoImpl resolveLeafrefUnderGroupingForLeaf(YangLeaf clonedLeaf,
-            YangLeavesHolder leafParentHolder, YangUses yangUses)
+                                                                                 YangLeavesHolder leafParentHolder, YangUses yangUses)
             throws
             DataModelException {
         if (clonedLeaf.getDataType().getDataTypeExtendedInfo() instanceof YangLeafRef) {
@@ -417,7 +417,7 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     public static YangEntityToResolveInfoImpl resolveYangConstructsUnderGroupingForLeaf(YangLeaf clonedLeaf,
-            YangLeavesHolder leafParentHolder, YangUses yangUses)
+                                                                                        YangLeavesHolder leafParentHolder, YangUses yangUses)
             throws DataModelException {
         int lineNumber;
         int charPosition;
@@ -551,7 +551,7 @@ public final class DataModelUtils {
      * @throws DataModelException data model error
      */
     private static void assignCurrentLeafedWithNewPrefixes(String importedNodeName, YangAtomicPath atomicPath,
-            YangNode node)
+                                                           YangNode node)
             throws DataModelException {
         while (!(node instanceof YangReferenceResolver)) {
             node = node.getParent();
@@ -694,7 +694,7 @@ public final class DataModelUtils {
                 }
                 fileOutputStream.close();
                 inputStream.close();
-                nodes.add(deSerializeDataModel(serializedFile.toString()));
+                nodes.addAll(deSerializeDataModel(serializedFile.toString()));
             }
         }
         jar.close();

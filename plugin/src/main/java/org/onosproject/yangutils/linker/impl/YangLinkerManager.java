@@ -43,7 +43,7 @@ public class YangLinkerManager
      * Set of all the YANG nodes, corresponding to the YANG files parsed by
      * parser.
      */
-    Set<YangNode> yangNodeSet = new HashSet<>();
+    private Set<YangNode> yangNodeSet = new HashSet<>();
 
     /**
      * Returns set of YANG node.

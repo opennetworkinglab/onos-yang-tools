@@ -22,10 +22,10 @@ package org.onosproject.yangutils.translator.exception;
 public class InvalidNodeForTranslatorException extends RuntimeException {
 
     private static final long serialVersionUID = 20160311L;
-    private String fileName;
+    private transient String fileName;
 
     /**
-     * Create a new exception.
+     * Creates a new exception.
      */
     public InvalidNodeForTranslatorException() {
         super();

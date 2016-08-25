@@ -27,6 +27,11 @@ public enum ValidatorTypeForUnionTypes {
     INT_TYPE_CONFLICT,
 
     /**
+     * When conflict is there for int16 and uInt8.
+     */
+    SHORT_TYPE_CONFLICT,
+
+    /**
      * When conflict is there for int64 and uInt32.
      */
     LONG_TYPE_CONFLICT

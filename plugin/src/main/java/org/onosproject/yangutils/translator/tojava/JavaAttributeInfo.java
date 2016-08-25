@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava;
 
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangType;
+import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.isTypeLeafref;
@@ -68,6 +69,11 @@ public final class JavaAttributeInfo {
      * If conflict occurs.
      */
     private boolean isLongConflict;
+
+    /**
+     * If conflict occurs.
+     */
+    private boolean isShortConflict;
 
     /**
      * Creates a java attribute info object.
@@ -244,6 +250,24 @@ public final class JavaAttributeInfo {
     }
 
     /**
+     * Returns true if conflict between short and uint8.
+     *
+     * @return true if conflict between short and uint8
+     */
+    public boolean isShortConflict() {
+        return isShortConflict;
+    }
+
+    /**
+     * Sets true if conflict between short and uint8.
+     *
+     * @param shortConflict true if conflict between short and uint8
+     */
+    public void setShortConflict(boolean shortConflict) {
+        isShortConflict = shortConflict;
+    }
+
+    /**
      * Returns java attribute info.
      *
      * @param importInfo        java qualified type info
@@ -253,7 +277,7 @@ public final class JavaAttributeInfo {
      * @param isListAttribute   is list attribute
      * @return java attribute info.
      */
-    public static JavaAttributeInfo getAttributeInfoForTheData(JavaQualifiedTypeInfoTranslator importInfo,
+    public static JavaAttributeInfo getAttributeInfoForTheData(JavaQualifiedTypeInfo importInfo,
                                                                String attributeName,
                                                                YangType<?> attributeType, boolean isQualifiedAccess,
                                                                boolean isListAttribute) {
@@ -263,7 +287,7 @@ public final class JavaAttributeInfo {
         }
         attributeName = isTypeNameLeafref(attributeName, attributeType);
         JavaAttributeInfo newAttr = new JavaAttributeInfo();
-        newAttr.setImportInfo(importInfo);
+        newAttr.setImportInfo((JavaQualifiedTypeInfoTranslator) importInfo);
         newAttr.setAttributeName(attributeName);
         newAttr.setAttributeType(attributeType);
         newAttr.setIsQualifiedAccess(isQualifiedAccess);
@@ -275,11 +299,11 @@ public final class JavaAttributeInfo {
     /**
      * Returns java attribute info.
      *
-     * @param importInfo        java qualified type info
-     * @param attributeName     attribute name
-     * @param attributeType     attribute type
-     * @param isQualifiedAccess is the attribute a qualified access
-     * @param isListAttribute   is list attribute
+     * @param importInfo         java qualified type info
+     * @param attributeName      attribute name
+     * @param attributeType      attribute type
+     * @param isQualifiedAccess  is the attribute a qualified access
+     * @param isListAttribute    is list attribute
      * @param compilerAnnotation compiler annotation
      * @return java attribute info.
      */
@@ -288,7 +312,7 @@ public final class JavaAttributeInfo {
                                                                boolean isQualifiedAccess, boolean isListAttribute,
                                                                YangCompilerAnnotation compilerAnnotation) {
         JavaAttributeInfo newAttr = getAttributeInfoForTheData(importInfo, attributeName, attributeType,
-                                                               isQualifiedAccess, isListAttribute);
+                isQualifiedAccess, isListAttribute);
 
         newAttr.setCompilerAnnotation(compilerAnnotation);
 
