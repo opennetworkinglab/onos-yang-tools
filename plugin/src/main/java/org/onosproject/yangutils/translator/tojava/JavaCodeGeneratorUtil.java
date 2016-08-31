@@ -90,7 +90,9 @@ public final class JavaCodeGeneratorUtil {
         while (codeGenNode != null) {
             if (curTraversal != PARENT) {
                 if (!(codeGenNode instanceof JavaCodeGenerator)) {
-                    throw new TranslatorException("Unsupported node to generate code");
+                    throw new TranslatorException("Unsupported node to generate code " +
+                            codeGenNode.getName() + " in " + codeGenNode.getLineNumber() + " at "
+                            + codeGenNode.getCharPosition() + " in " + codeGenNode.getFileName());
                 }
                 setCurNode(codeGenNode);
                 try {
@@ -155,7 +157,9 @@ public final class JavaCodeGeneratorUtil {
         } else {
             close(codeGenNode, yangPlugin);
             throw new TranslatorException(
-                    "Generated data model node cannot be translated to target language code");
+                    "Generated data model node cannot be translated to target language code for " +
+                            codeGenNode.getName() + " in " + codeGenNode.getLineNumber()
+                            + " at " + codeGenNode.getCharPosition() + " in " + codeGenNode.getFileName());
         }
     }
 
@@ -175,7 +179,9 @@ public final class JavaCodeGeneratorUtil {
         } else {
             close(codeGenNode, pluginConfig);
             throw new TranslatorException(
-                    "Generated data model node cannot be translated to target language code");
+                    "Generated data model node cannot be translated to target language code for " +
+                            codeGenNode.getName() + " in " + codeGenNode.getLineNumber()
+                            + " at " + codeGenNode.getCharPosition() + " in " + codeGenNode.getFileName());
         }
     }
 
@@ -281,18 +287,17 @@ public final class JavaCodeGeneratorUtil {
         if (node instanceof JavaCodeGenerator && ((TempJavaCodeFragmentFilesContainer) node)
                 .getTempJavaCodeFragmentFiles() != null) {
             ((TempJavaCodeFragmentFilesContainer) node).getTempJavaCodeFragmentFiles().freeTemporaryResources(true);
-        } else {
-
-            if (getRootNode() != null) {
-                JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) getRootNode()).getJavaFileInfo();
-                if (javaFileInfo != null) {
-                    searchAndDeleteTempDir(javaFileInfo.getBaseCodeGenPath() +
-                            javaFileInfo.getPackageFilePath());
-                } else {
-                    searchAndDeleteTempDir(yangPlugin.getCodeGenDir());
-                }
+        }
+        if (getRootNode() != null) {
+            JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) getRootNode()).getJavaFileInfo();
+            if (javaFileInfo.getPackage() != null) {
+                searchAndDeleteTempDir(javaFileInfo.getBaseCodeGenPath() +
+                        javaFileInfo.getPackageFilePath());
+            } else {
+                searchAndDeleteTempDir(yangPlugin.getCodeGenDir());
             }
         }
+
     }
 
     /**

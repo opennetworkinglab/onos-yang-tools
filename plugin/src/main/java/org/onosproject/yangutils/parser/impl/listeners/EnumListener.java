@@ -107,6 +107,10 @@ public final class EnumListener {
 
         YangEnum enumNode = new YangEnum();
         enumNode.setNamedValue(getValidNamedValue(ctx.string().getText()));
+
+        enumNode.setLineNumber(ctx.getStart().getLine());
+        enumNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+        enumNode.setFileName(listener.getFileName());
         listener.getParsedDataStack().push(enumNode);
     }
 

@@ -50,4 +50,18 @@ public interface LocationInfo {
      * @param charPositionInLine character position of YANG construct in file
      */
     void setCharPosition(int charPositionInLine);
+
+    /**
+     * Returns YANG file name.
+     *
+     * @return YANG file name
+     */
+    String getFileName();
+
+    /**
+     * Sets YANG file name
+     *
+     * @param name YANG file name
+     */
+    void setFileName(String name);
 }

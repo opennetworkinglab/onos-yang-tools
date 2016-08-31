@@ -368,7 +368,10 @@ public abstract class YangCase
             throws DataModelException {
         if (!(getParent() instanceof YangChoice || getParent() instanceof YangAugment)) {
             throw new DataModelException("Internal Data Model Tree Error: Invalid/Missing holder in case " +
-                    getName());
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName());
         }
         // Traverse up in tree to ask parent choice start collision detection.
         ((CollisionDetector) getParent()).detectCollidingChild(identifierName, dataType);
@@ -381,7 +384,10 @@ public abstract class YangCase
         if (dataType == CASE_DATA) {
             if (getName().equals(identifierName)) {
                 throw new DataModelException("YANG File Error: Identifier collision detected in case \"" +
-                        getName() + "\"");
+                        getName() + " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
             return;
         }

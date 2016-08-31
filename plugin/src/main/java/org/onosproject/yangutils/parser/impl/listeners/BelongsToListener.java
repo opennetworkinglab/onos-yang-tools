@@ -93,6 +93,7 @@ public final class BelongsToListener {
         int errorPosition = ctx.getStart().getCharPositionInLine();
         belongstoNode.setLineNumber(errorLine);
         belongstoNode.setCharPosition(errorPosition);
+        belongstoNode.setFileName(listener.getFileName());
 
         // Push belongsto into the stack.
         listener.getParsedDataStack().push(belongstoNode);

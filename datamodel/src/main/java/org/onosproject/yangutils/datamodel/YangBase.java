@@ -15,10 +15,10 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
-
-import java.io.Serializable;
 
 /**
  * Reference RFC 6020.
@@ -39,7 +39,7 @@ import java.io.Serializable;
 /**
  * Represents data model node to maintain information defined in YANG base.
  */
- public class YangBase implements Resolvable, Serializable {
+public class YangBase extends DefaultLocationInfo implements Resolvable, Serializable {
 
     private static final long serialVersionUID = 806201693L;
 

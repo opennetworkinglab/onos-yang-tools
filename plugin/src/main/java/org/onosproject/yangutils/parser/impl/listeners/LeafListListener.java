@@ -111,7 +111,9 @@ public final class LeafListListener {
 
         YangLeafList leafList = getYangLeafList(JAVA_GENERATION);
         leafList.setName(identifier);
-
+        leafList.setLineNumber(line);
+        leafList.setCharPosition(charPositionInLine);
+        leafList.setFileName(listener.getFileName());
         /*
          * If "config" is not specified, the default is the same as the parent
          * schema node's "config" value.

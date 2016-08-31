@@ -63,8 +63,8 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
  *
  * @param <T> YANG data type info
  */
-public class YangType<T>
-        implements Cloneable, Parsable, Resolvable, Serializable, LocationInfo {
+public class YangType<T> extends DefaultLocationInfo
+        implements Cloneable, Parsable, Resolvable, Serializable {
 
     private static final long serialVersionUID = 8062016054L;
 
@@ -103,18 +103,6 @@ public class YangType<T>
      * Resolved within the grouping where the type is used.
      */
     private boolean isTypeNotResolvedTillRootNode;
-
-
-    /**
-     * Error line number.
-     */
-    private transient int lineNumber;
-
-    /**
-     * Error character position in number.
-     */
-    private transient int charPositionInLine;
-
 
     /**
      * Creates a YANG type object.
@@ -274,13 +262,21 @@ public class YangType<T>
          * Check whether the data type is derived.
          */
         if (getDataType() != DERIVED) {
-            throw new DataModelException("Linker Error: Resolve should only be called for derived data types.");
+            throw new DataModelException("Linker Error: Resolve should only be called for derived data types. "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
 
         // Check if the derived info is present.
         YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) getDataTypeExtendedInfo();
         if (derivedInfo == null) {
-            throw new DataModelException("Linker Error: Derived information is missing.");
+            throw new DataModelException("Linker Error: Derived information is missing. " + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
+
         }
 
         // Initiate the resolution
@@ -524,26 +520,6 @@ public class YangType<T>
         }
 
         return isMatched;
-    }
-
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPositionInLine;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        this.charPositionInLine = charPositionInLine;
     }
 
     public boolean isTypeForInterFileGroupingResolution() {

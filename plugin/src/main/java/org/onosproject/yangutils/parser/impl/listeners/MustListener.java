@@ -86,6 +86,9 @@ public final class MustListener {
             YangMust must = new YangMust();
             must.setConstraint(constraint);
 
+            must.setLineNumber(ctx.getStart().getLine());
+            must.setCharPosition(ctx.getStart().getCharPositionInLine());
+            must.setFileName(listener.getFileName());
             YangMustHolder mustHolder = (YangMustHolder) tmpNode;
             mustHolder.addMust(must);
 

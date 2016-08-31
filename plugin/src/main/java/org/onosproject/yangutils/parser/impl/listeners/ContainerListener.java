@@ -124,6 +124,9 @@ public final class ContainerListener {
         YangContainer container = getYangContainerNode(JAVA_GENERATION);
         container.setName(identifier);
 
+        container.setLineNumber(line);
+        container.setCharPosition(charPositionInLine);
+        container.setFileName(listener.getFileName());
         /*
          * If "config" is not specified, the default is the same as the parent
          * schema node's "config" value.

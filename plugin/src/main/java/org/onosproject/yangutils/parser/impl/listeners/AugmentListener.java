@@ -118,7 +118,9 @@ public final class AugmentListener {
         if (curData instanceof YangModule || curData instanceof YangSubModule || curData instanceof YangUses) {
             YangNode curNode = (YangNode) curData;
             YangAugment yangAugment = getYangAugmentNode(JAVA_GENERATION);
-
+            yangAugment.setLineNumber(line);
+            yangAugment.setCharPosition(charPositionInLine);
+            yangAugment.setFileName(listener.getFileName());
             //validateTargetNodePath(targetNodes, curNode, ctx);
             // TODO: handle in linker.
 

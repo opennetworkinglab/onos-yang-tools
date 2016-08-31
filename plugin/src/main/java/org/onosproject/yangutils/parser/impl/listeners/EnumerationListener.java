@@ -102,6 +102,9 @@ public final class EnumerationListener {
 
         if (listener.getParsedDataStack().peek() instanceof YangType) {
             YangEnumeration enumerationNode = getYangEnumerationNode(JAVA_GENERATION);
+            enumerationNode.setLineNumber(ctx.getStart().getLine());
+            enumerationNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+            enumerationNode.setFileName(listener.getFileName());
             Parsable typeData = listener.getParsedDataStack().pop();
 
             // Check for stack to be non empty.

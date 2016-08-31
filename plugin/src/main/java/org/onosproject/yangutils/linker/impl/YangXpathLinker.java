@@ -63,6 +63,7 @@ public class YangXpathLinker<T> {
     private YangNode rootNode;
     private Map<YangAtomicPath, PrefixResolverType> prefixResolverTypes;
     private String curPrefix;
+    private String constructsParentsPrefix;
 
     /**
      * Creates an instance of x-path linker.
@@ -163,6 +164,24 @@ public class YangXpathLinker<T> {
     }
 
     /**
+     * Returns unresolved construct's parent's prefix.
+     *
+     * @return unresolved construct's parent's prefix
+     */
+    private String getConstructsParentsPrefix() {
+        return constructsParentsPrefix;
+    }
+
+    /**
+     * Sets unresolved construct's parent's prefix.
+     *
+     * @param constructsParentsPrefix unresolved construct's parent's prefix
+     */
+    private void setConstructsParentsPrefix(String constructsParentsPrefix) {
+        this.constructsParentsPrefix = constructsParentsPrefix;
+    }
+
+    /**
      * Adds node to resolved nodes.
      *
      * @param path absolute path
@@ -237,6 +256,7 @@ public class YangXpathLinker<T> {
                             + leafref.getPath());
                     linkerException.setCharPosition(leafref.getCharPosition());
                     linkerException.setLine(leafref.getLineNumber());
+                    linkerException.setFileName(leafref.getFileName());
                     throw linkerException;
                 }
             }
@@ -261,6 +281,7 @@ public class YangXpathLinker<T> {
                         "leafref path " + leafref.getPath() + ", is invalid.");
                 linkerException.setCharPosition(leafref.getCharPosition());
                 linkerException.setLine(leafref.getLineNumber());
+                linkerException.setFileName(leafref.getFileName());
                 throw linkerException;
             }
         }
@@ -314,7 +335,8 @@ public class YangXpathLinker<T> {
     private YangLeaf searchReferredLeaf(YangNode targetNode, String leafName) {
         if (!(targetNode instanceof YangLeavesHolder)) {
             throw new LinkerException("Referred node " + targetNode.getName() +
-                    "should be of type leaves holder ");
+                    "should be of type leaves holder in " + targetNode.getLineNumber() +
+                    " at " + targetNode.getCharPosition() + " in " + targetNode.getFileName());
         }
         YangLeavesHolder holder = (YangLeavesHolder) targetNode;
         List<YangLeaf> leaves = holder.getListOfLeaf();
@@ -338,7 +360,8 @@ public class YangXpathLinker<T> {
     private YangLeafList searchReferredLeafList(YangNode targetNode, String leafListName) {
         if (!(targetNode instanceof YangLeavesHolder)) {
             throw new LinkerException("Referred node " + targetNode.getName() +
-                    "should be of type leaves holder ");
+                    "should be of type leaves holder in " + targetNode.getLineNumber() +
+                    " at " + targetNode.getCharPosition() + " in " + targetNode.getFileName());
         }
         YangLeavesHolder holder = (YangLeavesHolder) targetNode;
         List<YangLeafList> leavesList = holder.getListOfLeafList();
@@ -360,6 +383,7 @@ public class YangXpathLinker<T> {
      */
     private YangNode parseData(YangNode root) {
         String rootPrefix = getRootsPrefix(root);
+        setConstructsParentsPrefix(rootPrefix);
         Iterator<YangAtomicPath> pathIterator = getAbsPaths().iterator();
         YangAtomicPath path = pathIterator.next();
         if (path.getNodeIdentifier().getPrefix() != null
@@ -382,27 +406,28 @@ public class YangXpathLinker<T> {
         Stack<YangNode> linkerStack = new Stack<>();
         Iterator<YangAtomicPath> pathIterator = getAbsPaths().iterator();
         YangAtomicPath tempPath = pathIterator.next();
+        YangNodeIdentifier nodeId;
         setCurPrefix(tempPath.getNodeIdentifier().getPrefix());
         int index = 0;
         YangNode tempAugment;
         do {
-
+            nodeId = tempPath.getNodeIdentifier();
             if (tempPath.getNodeIdentifier().getPrefix() == null) {
                 tempAugment = resolveIntraFileAugment(tempPath, root);
             } else {
                 tempAugment = resolveInterFileAugment(tempPath, root);
             }
-
             if (tempAugment != null) {
                 linkerStack.push(tempNode);
                 tempNode = tempAugment;
             }
 
-            tempNode = searchTargetNode(tempNode, tempPath.getNodeIdentifier());
+            tempNode = searchTargetNode(tempNode, nodeId);
+
             if (tempNode == null && linkerStack.size() != 0) {
                 tempNode = linkerStack.peek();
                 linkerStack.pop();
-                tempNode = searchTargetNode(tempNode, tempPath.getNodeIdentifier());
+                tempNode = searchTargetNode(tempNode, nodeId);
             }
 
             if (tempNode != null) {
@@ -558,6 +583,9 @@ public class YangXpathLinker<T> {
             }
         }
 
+        if (nodeId.getName() != null && nodeId.getPrefix().equals(getConstructsParentsPrefix())) {
+            return getRootNode();
+        }
         return root;
     }
 

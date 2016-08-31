@@ -33,7 +33,8 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
 /**
  * Represents the restriction for length data type.
  */
-public class YangLengthRestriction implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
+public class YangLengthRestriction extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
 
     /*-
      * Reference RFC 6020.

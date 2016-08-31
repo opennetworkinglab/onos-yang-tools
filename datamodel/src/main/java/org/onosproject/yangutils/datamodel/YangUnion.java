@@ -137,7 +137,10 @@ public abstract class YangUnion
             throws DataModelException {
         if (yangType.getDataType() == YangDataTypes.EMPTY || yangType.getDataType() == YangDataTypes.LEAFREF) {
             throw new DataModelException("Union member type must not be one of the built-in types \"empty\" or " +
-                    "\"leafref\"");
+                    "\"leafref\"" + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
         getTypeList().add(yangType);
     }

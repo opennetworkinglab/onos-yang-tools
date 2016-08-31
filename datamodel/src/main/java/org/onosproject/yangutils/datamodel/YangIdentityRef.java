@@ -46,7 +46,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public class YangIdentityRef
         extends YangNode
-        implements Cloneable, Parsable, Resolvable, Serializable, LocationInfo {
+        implements Cloneable, Parsable, Resolvable, Serializable {
 
     private static final long serialVersionUID = 806201692L;
 
@@ -68,12 +68,6 @@ public class YangIdentityRef
      * Resolution for interfile grouping.
      */
     private boolean isIdentityForInterFileGroupingResolution;
-
-    // Error line number.
-    private transient int lineNumber;
-
-    // Error character position in number.
-    private transient int charPositionInLine;
 
     // Creates a specific identityref of node.
     public YangIdentityRef() {
@@ -122,7 +116,11 @@ public class YangIdentityRef
         YangIdentity identity = getReferredIdentity();
 
         if (identity == null) {
-            throw new DataModelException("Linker Error: Identity information is missing.");
+            throw new DataModelException("Linker Error: Identity information is missing. " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
 
         while (identity.getBaseNode() != null) {
@@ -231,26 +229,6 @@ public class YangIdentityRef
      */
     public void setReferredIdentity(YangIdentity referredIdentity) {
         this.referredIdentity = referredIdentity;
-    }
-
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPositionInLine;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        this.charPositionInLine = charPositionInLine;
     }
 
     public boolean isIdentityForInterFileGroupingResolution() {

@@ -21,7 +21,8 @@ import java.util.List;
 /**
  * Representation of data model node to maintain relative path defined in YANG path-arg.
  */
-public class YangRelativePath implements Serializable {
+public class YangRelativePath extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201690L;
 

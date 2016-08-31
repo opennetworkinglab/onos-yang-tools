@@ -100,6 +100,9 @@ public final class UnionListener {
             YangUnion unionNode = getYangUnionNode(JAVA_GENERATION);
             Parsable typeData = listener.getParsedDataStack().pop();
 
+            unionNode.setLineNumber(ctx.getStart().getLine());
+            unionNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+            unionNode.setFileName(listener.getFileName());
             // Check for stack to be non empty.
             checkStackIsNotEmpty(listener, MISSING_HOLDER, UNION_DATA, "", ENTRY);
 

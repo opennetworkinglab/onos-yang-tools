@@ -19,15 +19,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaIdentity;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaImportData;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
@@ -37,6 +37,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerato
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
  * Represents input information extended to support java code generation.
@@ -73,7 +74,11 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -129,7 +134,11 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
 
             if (getBaseNode() != null && getBaseNode().getReferredIdentity() != null) {
                 if (!(getBaseNode().getReferredIdentity() instanceof YangJavaIdentityTranslator)) {
-                    throw new TranslatorException("Failed to prepare generate code entry for base node");
+                    throw new TranslatorException("Failed to prepare generate code entry for base node "
+                            + getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName());
                 }
                 YangJavaIdentityTranslator baseIdentity = (YangJavaIdentityTranslator) getBaseNode()
                         .getReferredIdentity();
@@ -146,10 +155,15 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             File file = getFileObject(path, className, JAVA_FILE_EXTENSION, getJavaFileInfo());
 
             initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
+            file = validateLineLength(file);
             closeFile(file, false);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for identity node " + this.getName());
+                    "Failed to prepare generate code entry for identity node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName());
         }
     }
 

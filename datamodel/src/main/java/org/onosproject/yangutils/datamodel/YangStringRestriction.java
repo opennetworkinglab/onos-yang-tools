@@ -35,7 +35,8 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
 /**
  * Represents the restriction for string data type.
  */
-public class YangStringRestriction implements YangDesc, YangReference, Parsable, Serializable {
+public class YangStringRestriction extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable {
 
     /*-
      * Reference RFC 6020.

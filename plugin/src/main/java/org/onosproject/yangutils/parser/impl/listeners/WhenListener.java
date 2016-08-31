@@ -88,6 +88,10 @@ public final class WhenListener {
             YangWhen when = new YangWhen();
             when.setCondition(condition);
 
+            when.setLineNumber(ctx.getStart().getLine());
+            when.setCharPosition(ctx.getStart().getCharPositionInLine());
+            when.setFileName(listener.getFileName());
+
             whenHolder.setWhen(when);
             listener.getParsedDataStack().push(when);
         } else {

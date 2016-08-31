@@ -112,6 +112,10 @@ public final class BitListener {
 
         YangBit bitNode = new YangBit();
         bitNode.setBitName(identifier);
+
+        bitNode.setLineNumber(ctx.getStart().getLine());
+        bitNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+        bitNode.setFileName(listener.getFileName());
         listener.getParsedDataStack().push(bitNode);
     }
 

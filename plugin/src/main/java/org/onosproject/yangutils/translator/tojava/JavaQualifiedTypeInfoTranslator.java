@@ -91,7 +91,8 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
         JavaQualifiedTypeInfoTranslator importInfo = (JavaQualifiedTypeInfoTranslator) leaf.getJavaQualifiedInfo();
 
         if (leaf.getDataType() == null) {
-            throw new TranslatorException("missing data type of leaf " + leaf.getName());
+            throw new TranslatorException("missing data type of leaf " + leaf.getName()
+                    + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
         }
 
         /*
@@ -109,7 +110,9 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
             String classPkg = getJavaImportPackage(leaf.getDataType(),
                     leaf.isLeafList(), leaf.getConflictResolveConfig());
             if (classPkg == null) {
-                throw new TranslatorException("import package cannot be null when the class is used");
+                throw new TranslatorException("import package cannot be null when the class is used for "
+                        + leaf.getName()
+                        + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
             }
             importInfo.setPkgInfo(classPkg);
         } else {
@@ -119,7 +122,9 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
              */
             String dataTypeName = AttributesJavaDataType.getJavaDataType(leaf.getDataType());
             if (dataTypeName == null) {
-                throw new TranslatorException("not supported data type");
+                throw new TranslatorException("not supported data type for "
+                        + leaf.getName()
+                        + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
             }
             importInfo.setClassInfo(dataTypeName);
         }
@@ -144,7 +149,9 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
 
         if (!(curNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("missing java file information to get the package details "
-                    + "of attribute corresponding to child node");
+                    + "of attribute corresponding to child node " + curNode.getName() +
+                    " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition() + " in " +
+                    curNode.getFileName());
         }
 
         importInfo.setClassInfo(attributeName);

@@ -76,7 +76,11 @@ public class YangJavaModuleTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -130,7 +134,11 @@ public class YangJavaModuleTranslator
             generateCodeOfRootNode(this, yangPlugin, modulePkg);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for module node " + getName());
+                    "Failed to prepare generate code entry for module node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -167,7 +175,11 @@ public class YangJavaModuleTranslator
             searchAndDeleteTempDir(getJavaFileInfo().getPluginConfig().getCodeGenDir() +
                     getJavaFileInfo().getPackageFilePath());
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for module node " + getName());
+            throw new TranslatorException("Failed to generate code for module node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

@@ -19,14 +19,14 @@ import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaTypeDef;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
@@ -66,7 +66,11 @@ public class YangJavaTypeDefTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -111,19 +115,25 @@ public class YangJavaTypeDefTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         YangType typeInTypeDef = this.getTypeDefBaseType();
+        InvalidNodeForTranslatorException exception = new InvalidNodeForTranslatorException();
+        exception.setFileName(this.getFileName());
+        exception.setCharPosition(this.getCharPosition());
+        exception.setLine(this.getLineNumber());
         if (typeInTypeDef.getDataType() == DERIVED) {
             YangDerivedInfo derivedInfo = (YangDerivedInfo) typeInTypeDef.getDataTypeExtendedInfo();
             if (derivedInfo.getEffectiveBuiltInType() == LEAFREF) {
-                throw new InvalidNodeForTranslatorException();
+                throw exception;
             }
         } else if (typeInTypeDef.getDataType() == LEAFREF) {
-            throw new InvalidNodeForTranslatorException();
+            throw exception;
         }
         try {
             generateCodeOfNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for typedef node " + getName());
+                    "Failed to prepare generate code entry for typedef node " + getName()
+                            + "in " + getLineNumber() + " at " + getCharPosition() + " in " + getFileName()
+                            + " " + e.getLocalizedMessage());
         }
 
     }
@@ -138,7 +148,10 @@ public class YangJavaTypeDefTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_TYPEDEF_CLASS, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for typedef node " + getName());
+            throw new TranslatorException(
+                    "Failed to prepare generate code for typedef node " + getName()
+                            + "in " + getLineNumber() + " at " + getCharPosition() + " in " + getFileName()
+                            + " " + e.getLocalizedMessage());
         }
     }
 

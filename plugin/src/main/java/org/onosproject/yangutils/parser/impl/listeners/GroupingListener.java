@@ -122,6 +122,10 @@ public final class GroupingListener {
             YangGrouping groupingNode = getYangGroupingNode(JAVA_GENERATION);
             groupingNode.setName(identifier);
             groupingNode.setGroupingDepth(listener.getGroupingDepth());
+
+            groupingNode.setLineNumber(line);
+            groupingNode.setCharPosition(charPositionInLine);
+            groupingNode.setFileName(listener.getFileName());
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(groupingNode);

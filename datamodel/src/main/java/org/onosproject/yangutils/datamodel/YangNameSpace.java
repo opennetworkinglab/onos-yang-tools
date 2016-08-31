@@ -34,7 +34,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents name space to be used for the XML data tree.
  */
-public class YangNameSpace implements Parsable, Serializable {
+public class YangNameSpace extends DefaultLocationInfo
+        implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201647L;
 

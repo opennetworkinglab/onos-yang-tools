@@ -46,7 +46,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG if-feature.
  */
-public class YangIfFeature implements Parsable, Resolvable, Serializable {
+public class YangIfFeature extends DefaultLocationInfo
+        implements Parsable, Resolvable, Serializable {
 
     private static final long serialVersionUID = 806201635L;
 

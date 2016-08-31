@@ -86,6 +86,9 @@ public final class ShortCaseListener {
 
         YangCase caseNode = getYangCaseNode(JAVA_GENERATION);
 
+        caseNode.setLineNumber(ctx.getStart().getLine());
+        caseNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+        caseNode.setFileName(listener.getFileName());
         if (ctx.containerStatement() != null) {
             caseNode.setName(getValidIdentifier(ctx.containerStatement().identifier().getText(), CASE_DATA, ctx));
             errorConstructContext = ctx.containerStatement();

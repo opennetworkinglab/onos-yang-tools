@@ -140,8 +140,11 @@ public final class DataModelUtils {
         }
         for (YangLeaf leaf : listOfLeaf) {
             if (leaf.getName().equals(identifierName)) {
-                throw new DataModelException("YANG file error: Duplicate input identifier detected, same as leaf \""
-                        + leaf.getName() + "\"");
+                throw new DataModelException("YANG file error: Duplicate input identifier detected, same as leaf \"" +
+                        leaf.getName() + " in " +
+                        leaf.getLineNumber() + " at " +
+                        leaf.getCharPosition() +
+                        " in " + leaf.getFileName() + "\"");
             }
         }
     }
@@ -162,7 +165,10 @@ public final class DataModelUtils {
         for (YangLeafList leafList : listOfLeafList) {
             if (leafList.getName().equals(identifierName)) {
                 throw new DataModelException("YANG file error: Duplicate input identifier detected, same as leaf " +
-                        "list \"" + leafList.getName() + "\"");
+                        "list \"" + leafList.getName() + " in " +
+                        leafList.getLineNumber() + " at " +
+                        leafList.getCharPosition() +
+                        " in " + leafList.getFileName() + "\"");
             }
         }
     }
@@ -595,7 +601,11 @@ public final class DataModelUtils {
                         throw e;
                     } catch (CloneNotSupportedException e) {
                         e.printStackTrace();
-                        throw new DataModelException("Could not clone Type node");
+                        throw new DataModelException("Could not clone Type node " +
+                                leaf.getDataType().getDataTypeName() + " in " +
+                                leaf.getDataType().getLineNumber() + " at " +
+                                leaf.getDataType().getCharPosition() +
+                                " in " + leaf.getDataType().getFileName() + "\"");
                     }
                 }
             }
@@ -615,7 +625,11 @@ public final class DataModelUtils {
                         throw e;
                     } catch (CloneNotSupportedException e) {
                         e.printStackTrace();
-                        throw new DataModelException("Could not clone Type node");
+                        throw new DataModelException("Could not clone Type node " +
+                                leafList.getDataType().getDataTypeName() + " in " +
+                                leafList.getDataType().getLineNumber() + " at " +
+                                leafList.getDataType().getCharPosition() +
+                                " in " + leafList.getDataType().getFileName() + "\"");
                     }
                 }
             }
@@ -631,7 +645,11 @@ public final class DataModelUtils {
     private static void updateClonedTypeRef(YangType dataType, YangLeavesHolder leavesHolder)
             throws DataModelException {
         if (!(leavesHolder instanceof YangNode)) {
-            throw new DataModelException("Data model error: cloned leaves holder is not a node");
+            throw new DataModelException("Data model error: cloned leaves holder is not a node " +
+                    " in " +
+                    leavesHolder.getLineNumber() + " at " +
+                    leavesHolder.getCharPosition() +
+                    " in " + leavesHolder.getFileName() + "\"");
         }
         YangNode potentialTypeNode = ((YangNode) leavesHolder).getChild();
         while (potentialTypeNode != null) {
@@ -650,7 +668,12 @@ public final class DataModelUtils {
             potentialTypeNode = potentialTypeNode.getNextSibling();
         }
 
-        throw new DataModelException("Data model error: cloned leaves type is not found");
+        throw new DataModelException("Data model error: cloned leaves type is not found " +
+                dataType.getDataTypeName() + " in " +
+                dataType.getLineNumber() + " at " +
+                dataType.getCharPosition() +
+                " in " + dataType.getFileName() + "\"");
+
     }
 
     /**

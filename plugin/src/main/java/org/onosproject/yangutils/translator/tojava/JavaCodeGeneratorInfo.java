@@ -16,6 +16,8 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
+import org.onosproject.yangutils.datamodel.LocationInfo;
+
 /**
  * Represents YANG java info containing interface for java code generator, java
  * file information, java import data and temp java code fragment files. This
@@ -23,5 +25,5 @@ package org.onosproject.yangutils.translator.tojava;
  * entry function.
  */
 public interface JavaCodeGeneratorInfo
-        extends JavaFileInfoContainer, TempJavaCodeFragmentFilesContainer {
+        extends JavaFileInfoContainer, TempJavaCodeFragmentFilesContainer, LocationInfo {
 }

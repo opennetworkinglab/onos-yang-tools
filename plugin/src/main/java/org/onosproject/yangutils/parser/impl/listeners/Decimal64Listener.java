@@ -112,6 +112,10 @@ public final class Decimal64Listener {
                     (YangType<YangDecimal64<YangRangeRestriction>>) tmpNode;
             YangDecimal64 decimal64Node = new YangDecimal64();
             typeNode.setDataTypeExtendedInfo(decimal64Node);
+
+            decimal64Node.setLineNumber(ctx.getStart().getLine());
+            decimal64Node.setCharPosition(ctx.getStart().getCharPositionInLine());
+            decimal64Node.setFileName(listener.getFileName());
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, DECIMAL64_DATA, "", ENTRY));
         }

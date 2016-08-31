@@ -151,8 +151,11 @@ public abstract class YangInput
     public void detectSelfCollision(String identifierName, YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as input \""
-                    + getName() + "\"");
+            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as input \"" +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
     }
 

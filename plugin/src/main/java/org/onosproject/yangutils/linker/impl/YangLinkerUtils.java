@@ -54,6 +54,7 @@ import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
 import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.getYangConstructType;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yangutils.translator.tojava.YangDataModelFactory.getYangCaseNode;
@@ -118,7 +119,8 @@ public final class YangLinkerUtils {
                     if (targetLeaf.getName().equals(leaf.getName())) {
                         throw new LinkerException("target node " + targetNode.getName()
                                 + " contains augmented leaf " + leaf.getName() + " in module "
-                                + parent.getName());
+                                + parent.getName() + " in " + targetNode.getLineNumber()
+                                + " at " + targetNode.getCharPosition() + " in " + targetNode.getFileName());
                     }
                 }
             }
@@ -130,7 +132,8 @@ public final class YangLinkerUtils {
                     if (targetLeafList.getName().equals(leafList.getName())) {
                         throw new LinkerException("target node " + targetNode.getName()
                                 + " contains augmented leaf-list" + leafList.getName() + " in module "
-                                + parent.getName());
+                                + parent.getName() + " in " + targetNode.getLineNumber()
+                                + " at " + targetNode.getCharPosition() + " in " + targetNode.getFileName());
                     }
                 }
             }
@@ -144,8 +147,9 @@ public final class YangLinkerUtils {
             while (targetNodesChild != null) {
                 if (targetNodesChild.getName().equals(augmentsChild.getName())) {
                     throw new LinkerException("target node " + targetName
-                            + " contains augmented child node" + augmentsChild.getName() + " in module "
-                            + parentName);
+                            + " contains augmented child node " + augmentsChild.getName() + " in module "
+                            + parentName + " in " + targetNodesChild.getLineNumber()
+                            + " at " + targetNodesChild.getCharPosition() + " in " + targetNodesChild.getFileName());
                 }
                 targetNodesChild = targetNodesChild.getNextSibling();
             }
@@ -198,7 +202,9 @@ public final class YangLinkerUtils {
             }
 
         } catch (DataModelException e) {
-            throw new TranslatorException("Failed to add child nodes to case node of augment " + augment.getName());
+            throw new TranslatorException("Failed to add child nodes to case node of augment " + augment.getName()
+                    + " in " + augment.getLineNumber() + " at "
+                    + augment.getCharPosition() + " in " + augment.getFileName());
         }
     }
 
@@ -220,7 +226,8 @@ public final class YangLinkerUtils {
             for (YangNode aChild : augmentChildren) {
                 if (cChild.getName().equals(aChild.getName())) {
                     throw new LinkerException("case node " + aChild.getName() + "already present in choice " +
-                            choice.getName());
+                            choice.getName() + " in " + cChild.getLineNumber() + " at " + cChild.getCharPosition()
+                            + " in " + cChild.getFileName());
                 }
             }
         }
@@ -261,8 +268,6 @@ public final class YangLinkerUtils {
                 listOfPathName.add(atomicPath.getNodeIdentifier().getName());
             }
         }
-
-
         for (int countOfAncestor = 0; countOfAncestor < remainingAncestors; countOfAncestor++) {
             listOfPathName.remove(listOfPathName.size() - 1);
         }
@@ -282,7 +287,8 @@ public final class YangLinkerUtils {
         while (currentParent instanceof YangChoice || currentParent instanceof YangCase) {
             if (currentParent.getParent() == null) {
                 throw new LinkerException("YANG file error: The target node, in the leafref path " +
-                        leafref.getPath() + ", is invalid.");
+                        leafref.getPath() + ", is invalid." + " in " + leafref.getLineNumber()
+                        + " at " + leafref.getCharPosition() + " in " + leafref.getFileName());
             }
             currentParent = currentParent.getParent();
         }
@@ -310,7 +316,7 @@ public final class YangLinkerUtils {
             return nodeIdentifier;
         } else {
             throw new LinkerException("YANG file error : " +
-                    YangConstructType.getYangConstructType(yangConstruct) + " name " + nodeIdentifierString +
+                    getYangConstructType(yangConstruct) + " name " + nodeIdentifierString +
                     " is not valid.");
         }
     }
@@ -326,15 +332,15 @@ public final class YangLinkerUtils {
 
         if (identifier.length() > IDENTIFIER_LENGTH) {
             throw new LinkerException("YANG file error : " +
-                    YangConstructType.getYangConstructType(yangConstruct) + " name " + identifier + " is " +
+                    getYangConstructType(yangConstruct) + " name " + identifier + " is " +
                     "greater than 64 characters.");
         } else if (!IDENTIFIER_PATTERN.matcher(identifier).matches()) {
             throw new LinkerException("YANG file error : " +
-                    YangConstructType.getYangConstructType(yangConstruct) + " name " + identifier + " is not " +
+                    getYangConstructType(yangConstruct) + " name " + identifier + " is not " +
                     "valid.");
         } else if (identifier.toLowerCase().startsWith(XML)) {
             throw new LinkerException("YANG file error : " +
-                    YangConstructType.getYangConstructType(yangConstruct) + " identifier " + identifier +
+                    getYangConstructType(yangConstruct) + " identifier " + identifier +
                     " must not start with (('X'|'x') ('M'|'m') ('L'|'l')).");
         } else {
             return identifier;
@@ -448,7 +454,13 @@ public final class YangLinkerUtils {
                                 try {
                                     addResolutionInfo(resolutionInfo);
                                 } catch (DataModelException e) {
-                                    throw new LinkerException("Failed to add type info in grouping to resolution ");
+                                    String errorInfo = "Error in file: " + curNode.getName() + " in " +
+                                            curNode.getFileName() + " at " +
+                                            "line: " + e.getLineNumber() +
+                                            " at position: " + e.getCharPositionInLine()
+                                            + e.getLocalizedMessage();
+                                    throw new LinkerException("Failed to add type info in grouping to resolution "
+                                            + errorInfo);
                                 }
                             }
                         }
@@ -485,7 +497,7 @@ public final class YangLinkerUtils {
 
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangType>(type, (YangNode) leavesHolder,
+                            new YangResolutionInfoImpl<>(type, (YangNode) leavesHolder,
                                     type.getLineNumber(), type.getCharPosition());
                     try {
                         addResolutionInfo(resolutionInfo);

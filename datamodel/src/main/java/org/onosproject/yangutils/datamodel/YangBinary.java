@@ -28,7 +28,8 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
  * The binary built-in type represents any binary data,
  * i.e., a sequence of octets.
  */
-public class YangBinary implements YangBuiltInDataTypeInfo<YangBinary>, Serializable, Comparable<YangBinary> {
+public class YangBinary extends DefaultLocationInfo implements YangBuiltInDataTypeInfo<YangBinary>,
+        Serializable, Comparable<YangBinary> {
 
     private static final long serialVersionUID = 2106201608L;
 

@@ -21,7 +21,8 @@ import java.io.Serializable;
 /**
  * Represents YANG node identifier which is a combination of prefix and name.
  */
-public class YangNodeIdentifier implements Serializable {
+public class YangNodeIdentifier extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201648L;
 

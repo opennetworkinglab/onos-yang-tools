@@ -75,18 +75,20 @@ public final class MinElementsListener {
 
         int minElementValue = getValidNonNegativeIntegerValue(ctx.minValue().getText(), MIN_ELEMENT_DATA, ctx);
 
+        YangMinElement minElement = new YangMinElement();
+
+        minElement.setMinElement(minElementValue);
+        minElement.setLineNumber(ctx.getStart().getLine());
+        minElement.setCharPosition(ctx.getStart().getCharPositionInLine());
+        minElement.setFileName(listener.getFileName());
         Parsable tmpData = listener.getParsedDataStack().peek();
         switch (tmpData.getYangConstructType()) {
             case LEAF_LIST_DATA:
                 YangLeafList leafList = (YangLeafList) tmpData;
-                YangMinElement minLeafListElement = new YangMinElement();
-                minLeafListElement.setMinElement(minElementValue);
-                leafList.setMinElements(minLeafListElement);
+                leafList.setMinElements(minElement);
                 break;
             case LIST_DATA:
                 YangList yangList = (YangList) tmpData;
-                YangMinElement minElement = new YangMinElement();
-                minElement.setMinElement(minElementValue);
                 yangList.setMinElements(minElement);
                 break;
             default:

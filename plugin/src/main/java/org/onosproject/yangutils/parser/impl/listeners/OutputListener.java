@@ -93,6 +93,10 @@ public final class OutputListener {
 
             YangOutput yangOutput = getYangOutputNode(JAVA_GENERATION);
             yangOutput.setName(((YangRpc) curData).getName() + OUTPUT_KEYWORD);
+
+            yangOutput.setLineNumber(ctx.getStart().getLine());
+            yangOutput.setCharPosition(ctx.getStart().getCharPositionInLine());
+            yangOutput.setFileName(listener.getFileName());
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(yangOutput);

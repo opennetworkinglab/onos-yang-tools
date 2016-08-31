@@ -22,7 +22,8 @@ import java.io.Serializable;
  * Abstraction of YANG data node context information, used by YMS to abstractly
  * refer the YANG data nodes schema context information.
  */
-public class YangSchemaNodeContextInfo implements Serializable {
+public class YangSchemaNodeContextInfo extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201613L;
 

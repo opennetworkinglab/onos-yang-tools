@@ -69,6 +69,10 @@ public final class DataStructureKeyListener {
         Parsable tmpData = listener.getParsedDataStack().peek();
         if (listener.getParsedDataStack().peek() instanceof YangAppDataStructure) {
             YangAppDataStructure dataStructure = (YangAppDataStructure) tmpData;
+
+            dataStructure.setLineNumber(ctx.getStart().getLine());
+            dataStructure.setCharPosition(ctx.getStart().getCharPositionInLine());
+            dataStructure.setFileName(listener.getFileName());
             String tmpKeyValue = removeQuotesAndHandleConcat(ctx.string().getText());
             if (tmpKeyValue.contains(SPACE)) {
                 String[] keyValues = tmpKeyValue.split(SPACE);

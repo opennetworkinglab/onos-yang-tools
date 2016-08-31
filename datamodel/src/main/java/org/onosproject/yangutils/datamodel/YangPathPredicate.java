@@ -20,7 +20,8 @@ import java.io.Serializable;
 /**
  * Representation of data model node to maintain path predicate in YANG absolute-path or relative-path.
  */
-public class YangPathPredicate<T> implements Serializable {
+public class YangPathPredicate<T> extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201689L;
 

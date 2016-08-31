@@ -46,7 +46,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the information about the revision.
  */
-public class YangRevision implements YangDesc, YangReference, Parsable, Serializable {
+public class YangRevision extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable {
 
     private static final long serialVersionUID = 8062016052L;
 

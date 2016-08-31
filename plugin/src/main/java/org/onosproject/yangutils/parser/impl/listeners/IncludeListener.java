@@ -90,6 +90,7 @@ public final class IncludeListener {
         int errorPosition = ctx.getStart().getCharPositionInLine();
         includeNode.setLineNumber(errorLine);
         includeNode.setCharPosition(errorPosition);
+        includeNode.setFileName(listener.getFileName());
 
         listener.getParsedDataStack().push(includeNode);
     }

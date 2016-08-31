@@ -525,7 +525,9 @@ public class TempJavaFragmentFiles {
             throws IOException {
         YangNode parent = getParentNodeInGenCode(curNode);
         if (!(parent instanceof JavaCodeGenerator)) {
-            throw new TranslatorException("missing parent node to contain current node info in generated file");
+            throw new TranslatorException("missing parent node to contain current node info in generated file "
+                    + parent.getName() + " in " + parent.getLineNumber() + " at " + parent.getCharPosition()
+                    + " in " + parent.getFileName());
         }
 
         if (parent instanceof YangJavaGroupingTranslator) {
@@ -569,7 +571,9 @@ public class TempJavaFragmentFiles {
         JavaQualifiedTypeInfoTranslator qualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(curNode,
                 getCapitalCase(curNodeName));
         if (!(targetNode instanceof TempJavaCodeFragmentFilesContainer)) {
-            throw new TranslatorException("Parent node does not have file info");
+            throw new TranslatorException("Parent node does not have file info "
+                    + targetNode.getName() + " in " + targetNode.getLineNumber() + " at " + targetNode.getCharPosition()
+                    + " in " + targetNode.getFileName());
         }
         JavaImportData parentImportData = tempJavaFragmentFiles.getJavaImportData();
         JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) targetNode).getJavaFileInfo();
@@ -1332,7 +1336,8 @@ public class TempJavaFragmentFiles {
                 throw new IOException("failed to create temporary file for " + fileName);
             }
         } else {
-            throw new IOException(fileName + " is reused due to YANG naming");
+            throw new IOException(fileName + " is reused due to YANG naming. probably your previous build would have " +
+                    "failed");
         }
         return file;
     }
@@ -1438,7 +1443,9 @@ public class TempJavaFragmentFiles {
         }
         if (!(curNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("missing java file information to get the package details "
-                    + "of attribute corresponding to child node");
+                    + "of attribute corresponding to child node " +
+                    curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
+                    + " in " + curNode.getFileName());
         }
         caseImportInfo.setClassInfo(getCapitalCase(getCamelCase(parent.getName(),
                 pluginConfig.getConflictResolver())));
@@ -1465,7 +1472,10 @@ public class TempJavaFragmentFiles {
         if (listOfLeaves != null) {
             for (YangLeaf leaf : listOfLeaves) {
                 if (!(leaf instanceof JavaLeafInfoContainer)) {
-                    throw new TranslatorException("Leaf does not have java information");
+                    throw new TranslatorException("Leaf does not have java information " +
+                            leaf.getName() + " in " + leaf.getLineNumber() + " at " +
+                            leaf.getCharPosition()
+                            + " in " + leaf.getFileName());
                 }
                 if (curNode instanceof YangModule || curNode instanceof YangSubModule) {
                     TempJavaBeanFragmentFiles tempJavaBeanFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
@@ -1494,7 +1504,9 @@ public class TempJavaFragmentFiles {
         if (listOfLeafList != null) {
             for (YangLeafList leafList : listOfLeafList) {
                 if (!(leafList instanceof JavaLeafInfoContainer)) {
-                    throw new TranslatorException("Leaf-list does not have java information");
+                    throw new TranslatorException("Leaf-list does not have java information " +
+                            curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
+                            + " in " + curNode.getFileName());
                 }
                 if (curNode instanceof YangModule || curNode instanceof YangSubModule) {
                     TempJavaBeanFragmentFiles tempJavaBeanFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
@@ -1520,7 +1532,9 @@ public class TempJavaFragmentFiles {
                                          YangPluginConfig yangPluginConfig)
             throws IOException {
         if (!(curNode instanceof YangLeavesHolder)) {
-            throw new TranslatorException("Data model node does not have any leaves");
+            throw new TranslatorException("Data model node does not have any leaves " +
+                    curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
+                    + " in " + curNode.getFileName());
         }
         YangLeavesHolder leavesHolder = (YangLeavesHolder) curNode;
         addLeavesInfoToTempFiles(leavesHolder.getListOfLeaf(), yangPluginConfig, curNode);

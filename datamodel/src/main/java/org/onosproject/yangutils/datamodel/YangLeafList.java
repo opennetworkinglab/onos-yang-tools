@@ -57,7 +57,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents leaf-list data represented in YANG.
  */
-public abstract class YangLeafList
+public abstract class YangLeafList extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangConfig {
@@ -430,7 +430,11 @@ public abstract class YangLeafList
     @Override
     public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
             throws DataModelException {
-        throw new DataModelException("leaf cannot have any child schema nodes");
+        throw new DataModelException("leaf cannot have any child schema nodes" +
+                getName() + " in " +
+                getLineNumber() + " at " +
+                getCharPosition() +
+                " in " + getFileName() + "\"");
     }
 
     @Override
@@ -442,7 +446,10 @@ public abstract class YangLeafList
     @Override
     public int getMandatoryChildCount()
             throws DataModelException {
-        throw new DataModelException("TODO");
+        throw new DataModelException("leaf list can't have child " + getName() + " in " +
+                getLineNumber() + " at " +
+                getCharPosition() +
+                " in " + getFileName() + "\"");
     }
 
     @Override

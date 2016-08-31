@@ -96,6 +96,9 @@ public final class SubModuleListener {
         YangSubModule yangSubModule = getYangSubModuleNode(JAVA_GENERATION);
         yangSubModule.setName(identifier);
 
+        yangSubModule.setLineNumber(ctx.getStart().getLine());
+        yangSubModule.setCharPosition(ctx.getStart().getCharPositionInLine());
+        yangSubModule.setFileName(listener.getFileName());
         if (ctx.submoduleBody().submoduleHeaderStatement().yangVersionStatement() == null) {
             yangSubModule.setVersion((byte) 1);
         }
@@ -155,7 +158,7 @@ public final class SubModuleListener {
             LinkerException linkerException = new LinkerException(e.getMessage());
             linkerException.setLine(e.getLineNumber());
             linkerException.setCharPosition(e.getCharPositionInLine());
-
+            linkerException.setFileName(listener.getFileName());
             throw linkerException;
         }
     }

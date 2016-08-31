@@ -80,6 +80,9 @@ public final class AppDataStructureListener {
         YangAppDataStructure appDataStructure = new YangAppDataStructure();
         appDataStructure.setPrefix(prefix);
         appDataStructure.setDataStructure(dataStructure);
+        appDataStructure.setLineNumber(ctx.getStart().getLine());
+        appDataStructure.setCharPosition(ctx.getStart().getCharPositionInLine());
+        appDataStructure.setFileName(listener.getFileName());
 
         Parsable curData = listener.getParsedDataStack().peek();
         if (curData instanceof YangCompilerAnnotation) {

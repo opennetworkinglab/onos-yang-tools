@@ -18,12 +18,15 @@ package org.onosproject.yangutils.datamodel.utils.builtindatatype;
 
 import java.io.Serializable;
 
+import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
+
 /**
  * Handles the YANG's int8 data type processing.
  *
  * int8 represents integer values between -9223372036854775808 and 9223372036854775807, inclusively.
  */
-public class YangInt64 implements YangBuiltInDataTypeInfo<YangInt64>, Serializable {
+public class YangInt64 extends DefaultLocationInfo
+        implements YangBuiltInDataTypeInfo<YangInt64>, Serializable {
 
     private static final long serialVersionUID = 8006201665L;
 

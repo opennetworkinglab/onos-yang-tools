@@ -334,6 +334,12 @@ public final class JavaFileGeneratorUtils {
                                                   String pkg, YangPluginConfig pluginConfig)
             throws IOException {
 
+        if (file.exists()) {
+            throw new IOException(" file " + file.getName() + " is already generated." +
+                    "please check whether multiple yang files has same module/submodule \"name\" and \"namespace\"" +
+                    "or You may have generated code of previous build present in your directory.");
+        }
+
         boolean isFileCreated;
         try {
             isFileCreated = file.createNewFile();
@@ -360,6 +366,11 @@ public final class JavaFileGeneratorUtils {
                                                   YangNode curNode, String className)
             throws IOException {
 
+        if (file.exists()) {
+            throw new IOException(" file " + file.getName() + " is already generated." +
+                    "please check whether multiple yang files has same module/submodule \"name\" and \"namespace\"" +
+                    "or You may have generated code of previous build present in your directory.");
+        }
         boolean isFileCreated;
         try {
             isFileCreated = file.createNewFile();

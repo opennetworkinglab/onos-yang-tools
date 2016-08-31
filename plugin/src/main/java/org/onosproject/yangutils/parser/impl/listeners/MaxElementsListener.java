@@ -78,19 +78,21 @@ public final class MaxElementsListener {
 
         int maxElementsValue = getValidMaxElementValue(ctx);
 
+        YangMaxElement maxElement = new YangMaxElement();
+        maxElement.setMaxElement(maxElementsValue);
+
+        maxElement.setLineNumber(ctx.getStart().getLine());
+        maxElement.setCharPosition(ctx.getStart().getCharPositionInLine());
+        maxElement.setFileName(listener.getFileName());
         Parsable tmpData = listener.getParsedDataStack().peek();
         switch (tmpData.getYangConstructType()) {
             case LEAF_LIST_DATA:
                 YangLeafList leafList = (YangLeafList) tmpData;
-                YangMaxElement maxLeafListElement = new YangMaxElement();
-                maxLeafListElement.setMaxElement(maxElementsValue);
-                leafList.setMaxElements(maxLeafListElement);
+                leafList.setMaxElements(maxElement);
                 break;
             case LIST_DATA:
                 YangList yangList = (YangList) tmpData;
-                YangMaxElement maxListElement = new YangMaxElement();
-                maxListElement.setMaxElement(maxElementsValue);
-                yangList.setMaxElements(maxListElement);
+                yangList.setMaxElements(maxElement);
                 break;
             default:
                 throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, MAX_ELEMENT_DATA, "", ENTRY));

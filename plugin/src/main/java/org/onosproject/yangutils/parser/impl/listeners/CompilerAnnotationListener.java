@@ -91,6 +91,9 @@ public final class CompilerAnnotationListener {
         compilerAnnotation.setPrefix(prefix);
         compilerAnnotation.setPath(removeQuotesAndHandleConcat(ctx.string().getText()));
 
+        compilerAnnotation.setLineNumber(ctx.getStart().getLine());
+        compilerAnnotation.setCharPosition(ctx.getStart().getCharPositionInLine());
+        compilerAnnotation.setFileName(listener.getFileName());
         // Validate augment argument string
         List<YangAtomicPath> targetNodes = getValidAbsoluteSchemaNodeId(ctx.string().getText(),
                                                                         COMPILER_ANNOTATION_DATA, ctx);

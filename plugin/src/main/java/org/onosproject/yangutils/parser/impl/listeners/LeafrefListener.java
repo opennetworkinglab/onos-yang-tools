@@ -102,6 +102,7 @@ public final class LeafrefListener {
 
         leafRef.setLineNumber(errorLine);
         leafRef.setCharPosition(errorPosition);
+        leafRef.setFileName(listener.getFileName());
         Parsable typeData = listener.getParsedDataStack().pop();
 
         if (!(typeData instanceof YangType)) {

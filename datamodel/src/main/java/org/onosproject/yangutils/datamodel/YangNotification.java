@@ -161,7 +161,10 @@ public abstract class YangNotification
             throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as notification \""
-                    + getName() + "\"");
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
     }
 

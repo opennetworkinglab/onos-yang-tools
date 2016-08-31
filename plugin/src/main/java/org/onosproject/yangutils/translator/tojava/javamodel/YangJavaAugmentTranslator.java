@@ -18,13 +18,13 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.YangChoice;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaAugment;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfAugmentableNode;
@@ -61,7 +61,11 @@ public class YangJavaAugmentTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -107,7 +111,11 @@ public class YangJavaAugmentTranslator
         try {
             generateCodeOfAugmentableNode(this, yangPlugin);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for augmentable node " + getName());
+            throw new TranslatorException("Failed to generate code for augmentable node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -123,7 +131,11 @@ public class YangJavaAugmentTranslator
                 getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
             }
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for augmentable node " + getName());
+            throw new TranslatorException("Failed to generate code for augmentable node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

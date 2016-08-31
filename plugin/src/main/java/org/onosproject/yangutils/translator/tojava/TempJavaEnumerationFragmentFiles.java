@@ -218,7 +218,9 @@ public class TempJavaEnumerationFragmentFiles
                 addJavaSnippetInfoToApplicableTempFiles(curEnum.getNamedValue(), pluginConfig);
             }
         } else {
-            throw new TranslatorException("current node should be of enumeration type.");
+            throw new TranslatorException("current node should be of enumeration type. " +
+                    curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
+                    + " in " + curNode.getFileName());
         }
     }
 

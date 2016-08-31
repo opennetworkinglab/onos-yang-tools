@@ -23,6 +23,7 @@ public class DataModelException extends Exception {
     private static final long serialVersionUID = 201601270658L;
     private transient int lineNumber;
     private transient int charPositionInLine;
+    private transient String fileName;
 
     /**
      * Creates a data model exception with message.
@@ -86,5 +87,23 @@ public class DataModelException extends Exception {
      */
     public void setCharPosition(int charPosition) {
         this.charPositionInLine = charPosition;
+    }
+
+    /**
+     * Returns YANG file name of the exception.
+     *
+     * @return YANG file name of the exception
+     */
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    /**
+     * Sets file name in datamodel exception.
+     *
+     * @param fileName YANG file name
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

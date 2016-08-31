@@ -23,7 +23,8 @@ import java.util.Objects;
  * Represents YANG data node identifier which is a combination of name and namespace.
  * Namespace will be present only if node is module/sub-module or augmented node.
  */
-public class YangSchemaNodeIdentifier implements Serializable {
+public class YangSchemaNodeIdentifier extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201648L;
 

@@ -28,7 +28,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG compiler-annotation.
  */
-public class YangCompilerAnnotation
+public class YangCompilerAnnotation extends DefaultLocationInfo
         implements Parsable, YangXPathResolver, Resolvable, Serializable {
 
     private static final long serialVersionUID = 806201602L;

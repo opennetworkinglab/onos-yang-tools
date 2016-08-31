@@ -71,6 +71,9 @@ public final class AppExtendedNameListener {
         extendedName.setPrefix(prefix);
         extendedName.setYangAppExtendedName(removeQuotesAndHandleConcat(ctx.extendedName().getText()));
 
+        extendedName.setLineNumber(ctx.getStart().getLine());
+        extendedName.setCharPosition(ctx.getStart().getCharPositionInLine());
+        extendedName.setFileName(listener.getFileName());
         Parsable curData = listener.getParsedDataStack().peek();
         if (curData instanceof YangCompilerAnnotation) {
             YangCompilerAnnotation compilerAnnotation = ((YangCompilerAnnotation) curData);

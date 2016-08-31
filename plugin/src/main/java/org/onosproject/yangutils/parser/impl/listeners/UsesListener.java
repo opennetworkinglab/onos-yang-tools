@@ -135,6 +135,10 @@ public final class UsesListener {
                 || curData instanceof YangNotification) {
 
             YangUses usesNode = getYangUsesNode(JAVA_GENERATION);
+
+            usesNode.setLineNumber(ctx.getStart().getLine());
+            usesNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+            usesNode.setFileName(listener.getFileName());
             YangNodeIdentifier nodeIdentifier = getValidNodeIdentifier(ctx.string().getText(), USES_DATA, ctx);
             usesNode.setNodeIdentifier(nodeIdentifier);
             usesNode.setCurrentGroupingDepth(listener.getGroupingDepth());

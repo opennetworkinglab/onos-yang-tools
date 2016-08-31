@@ -23,7 +23,7 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
  *
  * @param <T> type of resolution entity uses / type
  */
-public interface YangResolutionInfo<T> extends LocationInfo {
+public interface YangResolutionInfo<T> {
 
     /**
      * Resolves linking with all the ancestors node for a resolution info.

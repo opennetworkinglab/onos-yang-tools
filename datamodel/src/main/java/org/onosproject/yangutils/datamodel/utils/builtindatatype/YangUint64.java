@@ -19,12 +19,15 @@ package org.onosproject.yangutils.datamodel.utils.builtindatatype;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
+
 /**
  * Handles the YANG's Uint16 data type processing.
  *
  * Uint64 represents integer values between 0 and 18446744073709551615, inclusively.
  */
-public class YangUint64 implements YangBuiltInDataTypeInfo<YangUint64>, Serializable {
+public class YangUint64 extends DefaultLocationInfo
+        implements YangBuiltInDataTypeInfo<YangUint64>, Serializable {
 
     private static final long serialVersionUID = 8006201661L;
 

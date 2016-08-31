@@ -23,7 +23,7 @@ import java.util.List;
  * data holders of leaf or leaf list. Used in leaves parsing or attribute code
  * generation.
  */
-public interface YangLeavesHolder {
+public interface YangLeavesHolder extends LocationInfo {
 
     /**
      * Returns the list of leaves from data holder like container / list.

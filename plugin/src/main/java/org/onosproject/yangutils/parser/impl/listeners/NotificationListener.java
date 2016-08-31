@@ -113,6 +113,10 @@ public final class NotificationListener {
 
             YangNotification notification = getYangNotificationNode(JAVA_GENERATION);
             notification.setName(identifier);
+
+            notification.setLineNumber(ctx.getStart().getLine());
+            notification.setCharPosition(ctx.getStart().getCharPositionInLine());
+            notification.setFileName(listener.getFileName());
             ((RpcNotificationContainer) curData).setNotificationPresenceFlag(true);
             YangNode curNode = (YangNode) curData;
             try {

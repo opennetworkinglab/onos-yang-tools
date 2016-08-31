@@ -24,7 +24,8 @@ import java.io.Serializable;
 /**
  * Represents max element data represented in YANG.
  */
-public class YangMaxElement implements YangAppErrorHolder, Serializable {
+public class YangMaxElement extends DefaultLocationInfo
+        implements YangAppErrorHolder, Serializable {
 
     private static final long serialVersionUID = 807201694L;
 

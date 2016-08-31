@@ -23,6 +23,8 @@ public class InvalidNodeForTranslatorException extends RuntimeException {
 
     private static final long serialVersionUID = 20160311L;
     private transient String fileName;
+    private transient int lineNumber;
+    private transient int charPosition;
 
     /**
      * Creates a new exception.
@@ -69,9 +71,45 @@ public class InvalidNodeForTranslatorException extends RuntimeException {
     }
 
     /**
-     * Sets file name in translator exception.
+     * Returns line number of the exception.
      *
-     * @param fileName generated file name
+     * @return line number of the exception
+     */
+    public int getLineNumber() {
+        return this.lineNumber;
+    }
+
+    /**
+     * Returns position of the exception.
+     *
+     * @return position of the exception
+     */
+    public int getCharPositionInLine() {
+        return this.charPosition;
+    }
+
+    /**
+     * Sets line number of YANG file.
+     *
+     * @param line line number of YANG file
+     */
+    public void setLine(int line) {
+        this.lineNumber = line;
+    }
+
+    /**
+     * Sets position of exception.
+     *
+     * @param charPosition position of exception
+     */
+    public void setCharPosition(int charPosition) {
+        this.charPosition = charPosition;
+    }
+
+    /**
+     * Sets file name in exception.
+     *
+     * @param fileName YANG file name
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;

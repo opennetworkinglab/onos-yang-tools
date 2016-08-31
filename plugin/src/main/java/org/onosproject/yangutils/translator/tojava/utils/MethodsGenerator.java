@@ -1356,7 +1356,11 @@ public final class MethodsGenerator {
             case DERIVED:
                 return targetDataType + PERIOD + FROM_STRING_METHOD_NAME;
             default:
-                throw new TranslatorException("given data type is not supported.");
+                throw new TranslatorException("given data type is not supported. " +
+                        yangType.getDataTypeName() + " in " +
+                        yangType.getLineNumber() + " at " +
+                        yangType.getCharPosition()
+                        + " in " + yangType.getFileName());
         }
     }
 
@@ -1432,7 +1436,8 @@ public final class MethodsGenerator {
         } else {
             method = method + EIGHT_SPACE_INDENTATION
                     + RETURN + SPACE + VALUE + SPACE + DIAMOND_CLOSE_BRACKET + EQUAL + SPACE + MIN_RANGE + SPACE + AND +
-                    AND + SPACE + VALUE + DIAMOND_OPEN_BRACKET + EQUAL + SPACE + MAX_RANGE + SEMI_COLAN + NEW_LINE;
+                    AND + SPACE + VALUE + SPACE + DIAMOND_OPEN_BRACKET + EQUAL + SPACE + MAX_RANGE + SEMI_COLAN +
+                    NEW_LINE;
         }
         return method + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
     }

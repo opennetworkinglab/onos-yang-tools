@@ -87,6 +87,10 @@ public final class IfFeatureListener {
         YangIfFeature ifFeature = new YangIfFeature();
         ifFeature.setName(nodeIdentifier);
         ifFeature.setResolvableStatus(UNRESOLVED);
+
+        ifFeature.setLineNumber(ctx.getStart().getLine());
+        ifFeature.setCharPosition(ctx.getStart().getCharPositionInLine());
+        ifFeature.setFileName(listener.getFileName());
         YangIfFeatureHolder ifFeatureHolder;
 
         // Obtain the node of the stack.

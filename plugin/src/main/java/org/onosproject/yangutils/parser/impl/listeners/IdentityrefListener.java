@@ -94,6 +94,9 @@ public final class IdentityrefListener {
             int errorLine = ctx.getStart().getLine();
             int errorPosition = ctx.getStart().getCharPositionInLine();
 
+            identityRef.setLineNumber(errorLine);
+            identityRef.setCharPosition(errorPosition);
+            identityRef.setFileName(listener.getFileName());
             Parsable tmpData = listener.getParsedDataStack().peek();
             switch (tmpData.getYangConstructType()) {
                 case LEAF_DATA:

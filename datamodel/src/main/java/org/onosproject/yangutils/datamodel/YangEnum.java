@@ -51,7 +51,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the ENUM data type information.
  */
-public class YangEnum implements YangCommonInfo, Parsable, Comparable<YangEnum>, Serializable {
+public class YangEnum extends DefaultLocationInfo implements YangCommonInfo, Parsable, Comparable<YangEnum>,
+        Serializable {
 
     private static final long serialVersionUID = 806201643L;
 

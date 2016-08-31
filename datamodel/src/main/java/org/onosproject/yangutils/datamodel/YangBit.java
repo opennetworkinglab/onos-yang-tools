@@ -47,7 +47,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the bit data type information.
  */
-public class YangBit implements YangCommonInfo, Parsable, Serializable {
+public class YangBit extends DefaultLocationInfo implements YangCommonInfo, Parsable, Serializable {
 
     private static final long serialVersionUID = 806201640L;
 

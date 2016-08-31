@@ -73,8 +73,11 @@ public class YangJavaNotificationTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java " +
-                                                  "datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -117,14 +120,11 @@ public class YangJavaNotificationTranslator
      * @throws TranslatorException translator operation fail
      */
     @Override
-    public void generateCodeEntry(YangPluginConfig yangPlugin)
-            throws TranslatorException {
+    public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
 
         /*
-         * As part of the notification support the following files needs to
-         * be generated.
-         * 1) Subject of the notification(event), this is simple interface with
-         * builder class.
+         * As part of the notification support the following files needs to be generated.
+         * 1) Subject of the notification(event), this is simple interface with builder class.
          * 2) Event class extending "AbstractEvent" and defining event type enum.
          * 3) Event listener interface extending "EventListener".
          *
@@ -138,8 +138,11 @@ public class YangJavaNotificationTranslator
             addNotificationToExtendsList();
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for notification " +
-                            "node " + getName());
+                    "Failed to prepare generate code entry for notification node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -174,11 +177,12 @@ public class YangJavaNotificationTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for " +
-                                                  "notification node " +
-                                                  getName());
+            throw new TranslatorException("Failed to generate code for notification node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
-
     }
 
     @Override

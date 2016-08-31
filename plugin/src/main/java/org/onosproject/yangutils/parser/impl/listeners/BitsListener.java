@@ -89,6 +89,10 @@ public final class BitsListener {
 
         if (listener.getParsedDataStack().peek() instanceof YangType) {
             YangBits bitsNode = new YangBits();
+
+            bitsNode.setLineNumber(ctx.getStart().getLine());
+            bitsNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+            bitsNode.setFileName(listener.getFileName());
             Parsable typeData = listener.getParsedDataStack().pop();
 
             // Check for stack to be non empty.

@@ -52,7 +52,8 @@ import java.util.List;
  * Represents pattern restriction information. The regular expression restriction on string
  * data type.
  */
-public class YangPatternRestriction implements Serializable, YangAppErrorHolder {
+public class YangPatternRestriction extends DefaultLocationInfo
+        implements Serializable, YangAppErrorHolder {
 
     private static final long serialVersionUID = 806201649L;
 

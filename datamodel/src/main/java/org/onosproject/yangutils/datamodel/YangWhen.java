@@ -47,7 +47,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents information defined in YANG when.
  */
-public class YangWhen implements YangDesc, YangReference, Parsable, Serializable {
+public class YangWhen extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable {
 
     private static final long serialVersionUID = 806201646L;
 

@@ -43,8 +43,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.findRefer
 /**
  * Represents the information about the included sub-modules.
  */
-public class YangInclude
-        implements Parsable, LocationInfo, Serializable {
+public class YangInclude extends DefaultLocationInfo
+        implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201644L;
 
@@ -63,12 +63,6 @@ public class YangInclude
      * Reference to node which is included.
      */
     private YangNode includedNode;
-
-    // Error Line number.
-    private transient int lineNumber;
-
-    // Error character position.
-    private transient int charPosition;
 
     /**
      * Creates a YANG include.
@@ -154,26 +148,6 @@ public class YangInclude
         this.includedNode = includedNode;
     }
 
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPosition;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        charPosition = charPositionInLine;
-    }
-
     /**
      * Adds reference to an include.
      *
@@ -221,6 +195,7 @@ public class YangInclude
                 includedSubModuleName + "with a given revision is not found.");
         exception.setLine(getLineNumber());
         exception.setCharPosition(getCharPosition());
+        exception.setFileName(getFileName());
         throw exception;
     }
 
@@ -238,6 +213,7 @@ public class YangInclude
                 "to sub-module belonging to the same parent module.");
         exception.setLine(getLineNumber());
         exception.setCharPosition(getCharPosition());
+        exception.setFileName(getFileName());
         throw exception;
     }
 }

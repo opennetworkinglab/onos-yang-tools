@@ -17,13 +17,13 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.io.IOException;
 
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaUnion;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
@@ -60,7 +60,10 @@ public class YangJavaUnionTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new RuntimeException("Missing java info in java datamodel node");
+            throw new RuntimeException("Missing java info in java datamodel node " + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -108,7 +111,10 @@ public class YangJavaUnionTranslator
             generateCodeOfNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for union node " + getName());
+                    "Failed to prepare generate code entry for union node " + getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
 
     }
@@ -123,7 +129,10 @@ public class YangJavaUnionTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_UNION_CLASS, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for union node " + getName());
+            throw new TranslatorException("Failed to generate code for union node " + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 }

@@ -88,6 +88,9 @@ public final class FeatureListener {
             YangFeature feature = new YangFeature();
             feature.setName(identifier);
 
+            feature.setLineNumber(ctx.getStart().getLine());
+            feature.setCharPosition(ctx.getStart().getCharPositionInLine());
+            feature.setFileName(listener.getFileName());
             featureHolder.addFeatureList(feature);
             listener.getParsedDataStack().push(feature);
         } else {

@@ -151,7 +151,10 @@ public abstract class YangOutput
             throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate identifier detected, same as output \""
-                    + getName() + "\"");
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
     }
 

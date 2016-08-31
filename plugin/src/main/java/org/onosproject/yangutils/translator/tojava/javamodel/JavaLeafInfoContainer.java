@@ -15,15 +15,16 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
+import org.onosproject.yangutils.datamodel.LocationInfo;
 import org.onosproject.yangutils.datamodel.YangType;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfoContainer;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 /**
  * Represent java based identification of the YANG leaves.
  */
 public interface JavaLeafInfoContainer
-        extends JavaQualifiedTypeInfoContainer {
+        extends JavaQualifiedTypeInfoContainer, LocationInfo {
     /**
      * Retrieves the data type of the leaf.
      *

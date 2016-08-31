@@ -43,6 +43,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_KEY_WORDS;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.ONE;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.ORG;
 import static org.onosproject.yangutils.utils.UtilConstants.PACKAGE;
@@ -77,8 +78,8 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
  */
 public final class YangIoUtils {
 
-    private static final int LINE_SIZE = 116;
-    private static final int SUB_LINE_SIZE = 114;
+    private static final int LINE_SIZE = 118;
+    private static final int SUB_LINE_SIZE = 116;
     private static final int ZERO = 0;
 
     /**
@@ -311,7 +312,7 @@ public final class YangIoUtils {
         try {
             appendFileContents(appendFile, srcFile);
         } catch (IOException e) {
-            throw new IOException("Failed to append " + appendFile + " in " + srcFile);
+            throw new IOException("Failed to merge " + appendFile + " in " + srcFile);
         }
     }
 
@@ -437,8 +438,31 @@ public final class YangIoUtils {
         StringBuilder tempBuilder = new StringBuilder();
         String append;
         for (String str : strArray) {
-            append = str + string;
-            tempBuilder.append(append);
+            if (strArray[strArray.length - 1].contains(OPEN_CURLY_BRACKET)) {
+                if (str.equals(strArray[strArray.length - 2])
+                        && !str.equals(strArray[0])
+                        && tempBuilder.length() < SUB_LINE_SIZE) {
+                    String tempString = stringBuilder.toString();
+                    stringBuilder.delete(ZERO, stringBuilder.length());
+                    tempString = trimAtLast(tempString, string);
+                    stringBuilder.append(tempString);
+                    if (string.equals(PERIOD)) {
+                        append = NEW_LINE + TWELVE_SPACE_INDENTATION + PERIOD + str + string;
+                    } else {
+                        append = NEW_LINE + TWELVE_SPACE_INDENTATION + str + string;
+                    }
+                    stringBuilder.append(append);
+                    append = EMPTY_STRING;
+                    tempBuilder.delete(ZERO, tempBuilder.length());
+                    tempBuilder.append(TWELVE_SPACE_INDENTATION);
+                } else {
+                    append = str + string;
+                    tempBuilder.append(append);
+                }
+            } else {
+                append = str + string;
+                tempBuilder.append(append);
+            }
             if (tempBuilder.length() > lineSize) {
                 String tempString = stringBuilder.toString();
                 stringBuilder.delete(ZERO, stringBuilder.length());

@@ -90,6 +90,10 @@ public final class BaseListener {
         int errorLine = ctx.getStart().getLine();
         int errorPosition = ctx.getStart().getCharPositionInLine();
 
+        yangBase.setLineNumber(errorLine);
+        yangBase.setCharPosition(errorPosition);
+        yangBase.setFileName(listener.getFileName());
+
         // Add resolution information to the list
         YangResolutionInfoImpl resolutionInfo =
                 new YangResolutionInfoImpl<YangBase>(yangBase, (YangNode) tmpData, errorLine, errorPosition);

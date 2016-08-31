@@ -97,7 +97,11 @@ public abstract class YangEnumeration
     public void addEnumInfo(YangEnum enumInfo)
             throws DataModelException {
         if (!getEnumSet().add(enumInfo)) {
-            throw new DataModelException("YANG ENUM already exists");
+            throw new DataModelException("YANG ENUM already exists " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
     }
 

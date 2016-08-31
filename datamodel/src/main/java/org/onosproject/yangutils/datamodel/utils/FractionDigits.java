@@ -16,10 +16,11 @@
 
 package org.onosproject.yangutils.datamodel.utils;
 
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
+import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
  * The "fraction-digits" statement, which is a substatement to the
@@ -56,7 +57,7 @@ import java.util.ArrayList;
 /**
  * Represents the decimal64 value range based on fraction-digits.
  */
-public final class FractionDigits {
+public final class FractionDigits extends DefaultLocationInfo {
 
     public static class Range {
         private double min;

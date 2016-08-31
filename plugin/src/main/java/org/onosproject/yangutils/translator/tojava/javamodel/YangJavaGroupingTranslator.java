@@ -15,14 +15,14 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaGrouping;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
+import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 /**
  * Represents grouping information extended to support java code generation.
@@ -55,7 +55,11 @@ public class YangJavaGroupingTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -94,7 +98,11 @@ public class YangJavaGroupingTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
-        throw new InvalidNodeForTranslatorException();
+        InvalidNodeForTranslatorException exception = new InvalidNodeForTranslatorException();
+        exception.setFileName(this.getFileName());
+        exception.setCharPosition(this.getCharPosition());
+        exception.setLine(this.getLineNumber());
+        throw exception;
     }
 
     @Override

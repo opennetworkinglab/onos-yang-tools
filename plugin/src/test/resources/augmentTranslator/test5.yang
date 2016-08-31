@@ -1,0 +1,25 @@
+module test5 {  
+    namespace "test:test";  
+    prefix test5 ;  
+           
+    import test{  
+       prefix test;
+    }        
+    organization "";  
+    contact "";  
+       
+    description   
+       "Defines basic service types for L3VPN service.";  
+       
+    revision "2015-12-16" {  
+       reference "";  
+    }  
+                    
+    augment /test:cont1 {
+        leaf leaf1 {
+           type int32;
+         }
+    }
+
+}
+    

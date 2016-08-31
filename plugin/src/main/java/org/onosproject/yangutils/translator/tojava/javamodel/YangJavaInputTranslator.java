@@ -18,13 +18,13 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.io.IOException;
 
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaInput;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfAugmentableNode;
@@ -61,7 +61,11 @@ public class YangJavaInputTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("missing java info in java datamodel node");
+            throw new TranslatorException("missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -109,7 +113,11 @@ public class YangJavaInputTranslator
             generateCodeOfAugmentableNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for input node " + getName());
+                    "Failed to prepare generate code entry for input node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -123,7 +131,11 @@ public class YangJavaInputTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for input node " + getName());
+            throw new TranslatorException("Failed to generate code for input node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

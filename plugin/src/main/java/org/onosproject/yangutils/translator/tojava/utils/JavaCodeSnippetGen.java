@@ -412,4 +412,12 @@ public final class JavaCodeSnippetGen {
         return "        this.onosYangNodeOperationType = builderObject.onosYangNodeOperationType();\n";
     }
 
+    /**
+     * Returns attribute in constructor for yang augmented info map.
+     *
+     * @return attribute in constructor for yang augmented info map
+     */
+    static String getYangAugmentedMapObjectForConstruct() {
+        return "        this.yangAugmentedInfoMap = builderObject.yangAugmentedInfoMap();\n";
+    }
 }

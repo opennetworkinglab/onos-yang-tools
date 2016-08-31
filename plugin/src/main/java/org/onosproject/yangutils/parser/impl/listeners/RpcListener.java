@@ -111,6 +111,10 @@ public final class RpcListener {
 
             YangNode curNode = (YangNode) curData;
             YangRpc yangRpc = getYangRpcNode(JAVA_GENERATION);
+
+            yangRpc.setLineNumber(ctx.getStart().getLine());
+            yangRpc.setCharPosition(ctx.getStart().getCharPositionInLine());
+            yangRpc.setFileName(listener.getFileName());
             yangRpc.setName(identifier);
             try {
                 curNode.addChild(yangRpc);

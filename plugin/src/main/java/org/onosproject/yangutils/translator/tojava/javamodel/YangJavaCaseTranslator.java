@@ -60,7 +60,11 @@ public class YangJavaCaseTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node" +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -108,7 +112,11 @@ public class YangJavaCaseTranslator
             generateCodeOfAugmentableNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for case node " + getName());
+                    "Failed to prepare generate code entry for case node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -120,7 +128,11 @@ public class YangJavaCaseTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for case node " + getName());
+            throw new TranslatorException("Failed to generate code for case node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

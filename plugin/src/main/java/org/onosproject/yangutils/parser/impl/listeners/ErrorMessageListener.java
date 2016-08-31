@@ -74,6 +74,10 @@ public final class ErrorMessageListener {
         if (tmpNode instanceof YangAppErrorHolder) {
             YangAppErrorInfo yangAppErrorInfo = ((YangAppErrorHolder) tmpNode).getAppErrorInfo();
             yangAppErrorInfo.setErrorMessage(errorMessage);
+
+            yangAppErrorInfo.setLineNumber(ctx.getStart().getLine());
+            yangAppErrorInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+            yangAppErrorInfo.setFileName(listener.getFileName());
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, ERROR_MESSAGE_DATA,
                     ctx.string().getText(), ENTRY));

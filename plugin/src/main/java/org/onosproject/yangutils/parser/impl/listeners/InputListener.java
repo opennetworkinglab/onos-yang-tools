@@ -93,6 +93,10 @@ public final class InputListener {
 
             YangInput yangInput = getYangInputNode(JAVA_GENERATION);
             yangInput.setName(((YangRpc) curData).getName() + INPUT_KEYWORD);
+
+            yangInput.setLineNumber(ctx.getStart().getLine());
+            yangInput.setCharPosition(ctx.getStart().getCharPositionInLine());
+            yangInput.setFileName(listener.getFileName());
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(yangInput);

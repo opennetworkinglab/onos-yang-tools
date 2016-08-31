@@ -23,11 +23,11 @@ import org.onosproject.yangutils.datamodel.YangBelongsTo;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaSubModule;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
@@ -80,7 +80,11 @@ public class YangJavaSubModuleTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -144,7 +148,11 @@ public class YangJavaSubModuleTranslator
             generateCodeOfRootNode(this, yangPlugin, subModulePkg);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "failed to prepare generate code entry for submodule node " + getName());
+                    "failed to prepare generate code entry for submodule node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
 
     }
@@ -181,7 +189,11 @@ public class YangJavaSubModuleTranslator
             searchAndDeleteTempDir(getJavaFileInfo().getPluginConfig().getCodeGenDir() +
                     getJavaFileInfo().getPackageFilePath());
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for submodule node " + getName());
+            throw new TranslatorException("Failed to generate code for submodule node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

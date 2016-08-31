@@ -129,7 +129,9 @@ public final class ListListener {
 
         YangList yangList = getYangListNode(JAVA_GENERATION);
         yangList.setName(identifier);
-
+        yangList.setLineNumber(line);
+        yangList.setCharPosition(charPositionInLine);
+        yangList.setFileName(listener.getFileName());
         /*
          * If "config" is not specified, the default is the same as the parent
          * schema node's "config" value.

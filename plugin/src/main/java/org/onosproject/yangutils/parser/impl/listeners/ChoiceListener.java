@@ -129,7 +129,9 @@ public final class ChoiceListener {
 
             YangChoice choiceNode = getYangChoiceNode(JAVA_GENERATION);
             choiceNode.setName(identifier);
-
+            choiceNode.setLineNumber(line);
+            choiceNode.setCharPosition(charPositionInLine);
+            choiceNode.setFileName(listener.getFileName());
             /*
              * If "config" is not specified, the default is the same as the parent
              * schema node's "config" value.

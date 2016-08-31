@@ -26,7 +26,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents data model node to maintain information defined in YANG app-data-structure.
  */
-public class YangAppDataStructure
+public class YangAppDataStructure extends DefaultLocationInfo
         implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201602L;

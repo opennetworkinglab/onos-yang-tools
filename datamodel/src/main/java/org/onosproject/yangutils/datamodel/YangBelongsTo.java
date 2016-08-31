@@ -51,7 +51,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.findRefer
 /**
  * Represents the belongs-to data type information.
  */
-public class YangBelongsTo implements Parsable, LocationInfo, Serializable {
+public class YangBelongsTo extends DefaultLocationInfo implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201639L;
 
@@ -76,12 +76,6 @@ public class YangBelongsTo implements Parsable, LocationInfo, Serializable {
      * any included submodules can be accessed by using the prefix.
      */
     private String prefix;
-
-    // Error Line number.
-    private transient int lineNumber;
-
-    // Error character position.
-    private transient int charPosition;
 
     /**
      * Create a belongs to object.
@@ -174,26 +168,6 @@ public class YangBelongsTo implements Parsable, LocationInfo, Serializable {
         // TODO auto-generated method stub, to be implemented by parser
     }
 
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPosition;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        charPosition = charPositionInLine;
-    }
-
     /**
      * Links the belongs to with a module.
      *
@@ -211,7 +185,10 @@ public class YangBelongsTo implements Parsable, LocationInfo, Serializable {
             }
         }
         DataModelException exception = new DataModelException("YANG file error : Module " + belongsToModuleName +
-                "to which sub-module belongs to is not found.");
+                "to which sub-module belongs to is not found. " + " in " +
+                getLineNumber() + " at " +
+                getCharPosition() +
+                " in " + getFileName());
         exception.setLine(getLineNumber());
         exception.setCharPosition(getCharPosition());
         throw exception;

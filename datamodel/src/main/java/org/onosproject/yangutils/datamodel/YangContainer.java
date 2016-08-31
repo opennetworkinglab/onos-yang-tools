@@ -16,14 +16,14 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 
@@ -415,7 +415,10 @@ public abstract class YangContainer
             for (YangLeaf leaf : leaves) {
                 if (leaf.isConfig()) {
                     throw new DataModelException("If a container has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\".");
+                                                         "it can have \"config\" set to \"true\"." + getName() + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition() +
+                                                         " in " + getFileName() + "\"");
                 }
             }
         }
@@ -424,7 +427,11 @@ public abstract class YangContainer
             for (YangLeafList leafList : leafLists) {
                 if (leafList.isConfig()) {
                     throw new DataModelException("If a container has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\".");
+                                                         "it can have \"config\" set to \"true\"." +
+                                                         getName() + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition() +
+                                                         " in " + getFileName() + "\"");
                 }
             }
         }
@@ -441,8 +448,11 @@ public abstract class YangContainer
     public void detectSelfCollision(String identifierName, YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as container \""
-                    + getName() + "\"");
+            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as container \"" +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
     }
 

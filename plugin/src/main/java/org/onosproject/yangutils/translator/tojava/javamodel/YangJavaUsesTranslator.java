@@ -55,7 +55,10 @@ public class YangJavaUsesTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java datamodel node " + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -93,7 +96,11 @@ public class YangJavaUsesTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
-        throw new InvalidNodeForTranslatorException();
+        InvalidNodeForTranslatorException exception = new InvalidNodeForTranslatorException();
+        exception.setFileName(this.getFileName());
+        exception.setCharPosition(this.getCharPosition());
+        exception.setLine(this.getLineNumber());
+        throw exception;
     }
 
     @Override

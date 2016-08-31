@@ -115,6 +115,9 @@ public final class LeafListener {
 
         YangLeaf leaf = getYangLeaf(JAVA_GENERATION);
         leaf.setName(identifier);
+        leaf.setLineNumber(line);
+        leaf.setCharPosition(charPositionInLine);
+        leaf.setFileName(listener.getFileName());
 
         /*
          * If "config" is not specified, the default is the same as the parent

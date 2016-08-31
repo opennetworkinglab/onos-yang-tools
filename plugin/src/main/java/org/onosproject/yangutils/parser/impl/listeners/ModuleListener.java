@@ -91,6 +91,9 @@ public final class ModuleListener {
 
         YangModule yangModule = getYangModuleNode(JAVA_GENERATION);
         yangModule.setName(identifier);
+        yangModule.setLineNumber(ctx.getStart().getLine());
+        yangModule.setCharPosition(ctx.getStart().getCharPositionInLine());
+        yangModule.setFileName(listener.getFileName());
 
         if (ctx.moduleBody().moduleHeaderStatement().yangVersionStatement() == null) {
             yangModule.setVersion((byte) 1);
@@ -149,6 +152,7 @@ public final class ModuleListener {
             LinkerException linkerException = new LinkerException(e.getMessage());
             linkerException.setLine(e.getLineNumber());
             linkerException.setCharPosition(e.getCharPositionInLine());
+            linkerException.setFileName(listener.getFileName());
             throw linkerException;
         }
     }

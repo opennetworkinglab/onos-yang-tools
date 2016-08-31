@@ -80,6 +80,10 @@ public final class ExtensionListener {
         String identifier = getValidIdentifier(ctx.identifier().getText(), EXTENSION_DATA, ctx);
 
         YangExtension extension = new YangExtension();
+
+        extension.setLineNumber(ctx.getStart().getLine());
+        extension.setCharPosition(ctx.getStart().getCharPositionInLine());
+        extension.setFileName(listener.getFileName());
         extension.setName(identifier);
 
         Parsable curData = listener.getParsedDataStack().peek();

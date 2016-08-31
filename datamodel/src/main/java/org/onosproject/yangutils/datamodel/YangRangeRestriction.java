@@ -59,7 +59,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <T> range type (data type)
  */
-public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
+public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends DefaultLocationInfo
         implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
 
     private static final long serialVersionUID = 8062016051L;
@@ -117,10 +117,18 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
      */
     public T getMinRestrictedvalue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
-            throw new DataModelException("No range restriction info");
+            throw new DataModelException("No range restriction info "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
         if (getAscendingRangeIntervals().isEmpty()) {
-            throw new DataModelException("No range interval info");
+            throw new DataModelException("No range interval info "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
         return getAscendingRangeIntervals().get(0).getStartValue();
     }
@@ -133,10 +141,18 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
      */
     public T getMaxRestrictedvalue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
-            throw new DataModelException("No range restriction info");
+            throw new DataModelException("No range restriction info "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
         if (getAscendingRangeIntervals().isEmpty()) {
-            throw new DataModelException("No range interval info");
+            throw new DataModelException("No range interval info "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
         return getAscendingRangeIntervals()
                 .get(getAscendingRangeIntervals().size() - 1).getEndValue();
@@ -168,7 +184,11 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
 
         if (newInterval.getStartValue().compareTo(curMaxvalue) < 1) {
             throw new DataModelException(
-                    "New added range interval is lesser than the old interval(s)");
+                    "New added range interval is lesser than the old interval(s) "
+                            + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + "\"");
         }
 
         getAscendingRangeIntervals()
@@ -188,7 +208,11 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
                 || getAscendingRangeIntervals().isEmpty()) {
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
-            throw new DataModelException("Range interval missing in range restriction.");
+            throw new DataModelException("Range interval missing in range restriction. "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
 
         }
 
@@ -219,7 +243,11 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
                 || getAscendingRangeIntervals().isEmpty()) {
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
-            throw new DataModelException("Range interval missing in range restriction.");
+            throw new DataModelException("Range interval missing in range restriction. "
+                    + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
 
         for (YangRangeInterval<T> interval : getAscendingRangeIntervals()) {
@@ -230,7 +258,11 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
                 return true;
             }
         }
-        throw new DataModelException("Range interval doesn't fall within the referred restriction ranges");
+        throw new DataModelException("Range interval doesn't fall within the referred restriction ranges "
+                + " in " +
+                getLineNumber() + " at " +
+                getCharPosition()
+                + " in " + getFileName() + "\"");
     }
 
     /**

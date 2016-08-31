@@ -22,13 +22,13 @@ import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangOutput;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaRpc;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
@@ -73,7 +73,11 @@ public class YangJavaRpcTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("missing java info in java datamodel node");
+            throw new TranslatorException("missing java info in java datamodel node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -113,7 +117,11 @@ public class YangJavaRpcTranslator
         try {
             updatePackageInfo(this, yangPlugin);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to prepare generate code entry for RPC node " + getName());
+            throw new TranslatorException("Failed to prepare generate code entry for RPC node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -130,7 +138,11 @@ public class YangJavaRpcTranslator
 
         // Parent should be holder of rpc or notification.
         if (!(parent instanceof RpcNotificationContainer)) {
-            throw new TranslatorException("parent node of rpc can only be module or sub-module");
+            throw new TranslatorException("parent node of rpc can only be module or sub-module " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
 
         /*
@@ -151,13 +163,22 @@ public class YangJavaRpcTranslator
             } else if (yangNode instanceof YangOutput) {
                 javaAttributeInfoOfOutput = getChildNodeAsAttributeInParentService(yangNode, this);
             } else {
-                throw new TranslatorException("RPC should contain only input/output child nodes.");
+                throw new TranslatorException("RPC should contain only input/output child nodes. " +
+                        yangNode.getName() + " in " +
+                        yangNode.getLineNumber() + " at " +
+                        yangNode.getCharPosition()
+                        + " in " + yangNode.getFileName());
+
             }
             yangNode = yangNode.getNextSibling();
         }
 
         if (!(parent instanceof TempJavaCodeFragmentFilesContainer)) {
-            throw new TranslatorException("missing parent temp file handle");
+            throw new TranslatorException("missing parent temp file handle " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName());
         }
 
         /*
@@ -170,7 +191,11 @@ public class YangJavaRpcTranslator
                             ((JavaFileInfoContainer) parent).getJavaFileInfo().getPluginConfig(), getName());
 
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for RPC node " + getName());
+            throw new TranslatorException("Failed to generate code for RPC node " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
         // No file will be generated during RPC exit.
     }

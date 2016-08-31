@@ -262,7 +262,8 @@ public class IntraFileUsesLinkingTest {
 
         thrown.expect(LinkerException.class);
         thrown.expectMessage(
-                "YANG file error: Duplicate input identifier detected, same as leaf \"zip-code\"");
+                "YANG file error: Duplicate input identifier detected, same as leaf \"zip-code in 7 at 13 in " +
+                        "src/test/resources/SelfResolutionGroupingReferencingItselfFailureScenerio.yang\"");
         YangNode node = manager
                 .getDataModel("src/test/resources/SelfResolutionGroupingReferencingItselfFailureScenerio.yang");
 
@@ -372,7 +373,8 @@ public class IntraFileUsesLinkingTest {
 
         thrown.expect(ParserException.class);
         thrown.expectMessage(
-                "YANG file error: Duplicate input identifier detected, same as uses \"failure\"");
+                "YANG file error: Duplicate input identifier detected, same as uses \"failure in 10 at 13 in" +
+                        " src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang\"");
         YangNode node = manager
                 .getDataModel("src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
     }

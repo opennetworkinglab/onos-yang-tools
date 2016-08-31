@@ -50,7 +50,8 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MUST
 /**
  * Represents information defined in YANG must.
  */
-public class YangMust implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
+public class YangMust extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
 
     private static final long serialVersionUID = 806201646L;
 

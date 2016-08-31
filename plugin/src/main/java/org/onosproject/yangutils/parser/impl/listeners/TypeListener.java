@@ -104,6 +104,9 @@ public final class TypeListener {
         type.setNodeIdentifier(nodeIdentifier);
         type.setDataType(yangDataTypes);
 
+        type.setLineNumber(ctx.getStart().getLine());
+        type.setCharPosition(ctx.getStart().getCharPositionInLine());
+        type.setFileName(listener.getFileName());
         // Set default require instance value as true for instance identifier.
         setDefaultRequireInstanceForInstanceIdentifier(type);
 

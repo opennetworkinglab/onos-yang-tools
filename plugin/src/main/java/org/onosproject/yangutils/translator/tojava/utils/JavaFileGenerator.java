@@ -281,7 +281,8 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.replaceLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils
         .validateLineLength;
-
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen
+        .getYangAugmentedMapObjectForConstruct;
 import static java.util.Collections.sort;
 
 /**
@@ -805,6 +806,9 @@ public final class JavaFileGenerator {
             if (isLeavesPresent) {
                 constructor =
                         constructor + getOperationAttributeForConstructor();
+            }
+            if (curNode instanceof YangAugmentableNode) {
+                constructor = constructor + getYangAugmentedMapObjectForConstruct();
             }
             methods.add(
                     constructor + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +

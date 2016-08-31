@@ -24,7 +24,8 @@ import java.io.Serializable;
 /**
  * Represents minimum element data represented in YANG.
  */
-public class YangMinElement implements YangAppErrorHolder, Serializable {
+public class YangMinElement extends DefaultLocationInfo
+        implements YangAppErrorHolder, Serializable {
 
     private static final long serialVersionUID = 807201695L;
 

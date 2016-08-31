@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
 import org.onosproject.yangutils.datamodel.Resolvable;
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.TraversalType;
@@ -103,7 +104,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.TYPEDEF_LINKER_ERROR
  *
  * @param <T> type of resolution entity uses / type
  */
-public class YangResolutionInfoImpl<T>
+public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         implements YangResolutionInfo<T>, Serializable {
 
     private static final long serialVersionUID = 806201658L;
@@ -112,16 +113,6 @@ public class YangResolutionInfoImpl<T>
      * Information about the entity that needs to be resolved.
      */
     private YangEntityToResolveInfoImpl<T> entityToResolveInfo;
-
-    /**
-     * Error line number.
-     */
-    private transient int lineNumber;
-
-    /**
-     * Error character position in number.
-     */
-    private transient int charPosition;
 
     /**
      * Current module/sub-module reference, will be used in inter-file/
@@ -548,7 +539,11 @@ public class YangResolutionInfoImpl<T>
         int currentParentCount = 1;
         while (currentParentCount < ancestorCount) {
             if (currentParent.getParent() == null) {
-                throw new DataModelException("YANG file error: The target node of leafref is invalid.");
+                throw new DataModelException("YANG file error: The target node of leafref is invalid."
+                        + currentParent.getName() + " in " +
+                        currentParent.getLineNumber() + " at " +
+                        currentParent.getCharPosition()
+                        + " in " + currentParent.getFileName() + "\"");
             }
             currentParent = currentParent.getParent();
             currentParentCount = currentParentCount + 1;
@@ -719,7 +714,11 @@ public class YangResolutionInfoImpl<T>
                     if (potentialReferredNode.getParent() instanceof YangRpc) {
                         potentialReferredNode = potentialReferredNode.getNextSibling();
                     } else {
-                        throw new DataModelException("YANG file error: The target node of leafref is invalid.");
+                        throw new DataModelException("YANG file error: The target node of leafref is invalid. "
+                                + potentialReferredNode.getName() + " in " +
+                                potentialReferredNode.getLineNumber() + " at " +
+                                potentialReferredNode.getCharPosition()
+                                + " in " + potentialReferredNode.getFileName() + "\"");
                     }
                 }
                 return potentialReferredNode;
@@ -770,7 +769,11 @@ public class YangResolutionInfoImpl<T>
              */
             return currentReferredNode.getName().contentEquals(nameOfNodeinPath);
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than leafref");
+            throw new DataModelException("Data Model Exception: Entity to resolved is other than leafref "
+                    + currentReferredNode.getName() + " in " +
+                    currentReferredNode.getLineNumber() + " at " +
+                    currentReferredNode.getCharPosition()
+                    + " in " + currentReferredNode.getFileName() + "\"");
         }
     }
 
@@ -791,7 +794,11 @@ public class YangResolutionInfoImpl<T>
             //Check if name of node name matches with the current reference node.
             return currentReferredNode.getName().contentEquals(nameOfIdentityRefBase);
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than identityref");
+            throw new DataModelException("Data Model Exception: Entity to resolved is other than identityref"
+                    + currentReferredNode.getName() + " in " +
+                    currentReferredNode.getLineNumber() + " at " +
+                    currentReferredNode.getCharPosition()
+                    + " in " + currentReferredNode.getFileName() + "\"");
         }
     }
 
@@ -875,7 +882,11 @@ public class YangResolutionInfoImpl<T>
             }
         } else {
             throw new DataModelException("Data Model Exception: Entity to resolved is other than type/" +
-                    "uses/base/identityref");
+                    "uses/base/identityref"
+                    + potentialReferredNode.getName() + " in " +
+                    potentialReferredNode.getLineNumber() + " at " +
+                    potentialReferredNode.getCharPosition()
+                    + " in " + potentialReferredNode.getFileName() + "\"");
         }
         return false;
     }
@@ -916,7 +927,11 @@ public class YangResolutionInfoImpl<T>
                 return true;
             }
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses");
+            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses "
+                    + node.getName() + " in " +
+                    node.getLineNumber() + " at " +
+                    node.getCharPosition()
+                    + " in " + node.getFileName() + "\"");
         }
         return false;
     }
@@ -965,7 +980,11 @@ public class YangResolutionInfoImpl<T>
             ((YangIdentityRef) getCurrentEntityToResolveFromStack()).setReferredIdentity((YangIdentity) referredNode);
         } else {
             throw new DataModelException("Data Model Exception: Entity to resolved is other than type" +
-                    "/uses/base/identityref");
+                    "/uses/base/identityref"
+                    + referredNode.getName() + " in " +
+                    referredNode.getLineNumber() + " at " +
+                    referredNode.getCharPosition()
+                    + " in " + referredNode.getFileName() + "\"");
         }
 
         // Sets the resolution status in inside the type/uses.
@@ -1004,7 +1023,11 @@ public class YangResolutionInfoImpl<T>
             addUnResolvedIfFeatureToStack(referredNode);
         } else if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
             // do nothing , referred node is already set
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses");
+            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses "
+                    + referredNode.getName() + " in " +
+                    referredNode.getLineNumber() + " at " +
+                    referredNode.getCharPosition()
+                    + " in " + referredNode.getFileName() + "\"");
         } else if ((getCurrentEntityToResolveFromStack() instanceof YangBase) ||
                 (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef)) {
 
@@ -1012,7 +1035,11 @@ public class YangResolutionInfoImpl<T>
             addUnResolvedBaseToStack(referredNode);
         } else {
             throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses/" +
-                    "base/identityref");
+                    "base/identityref " + referredNode.getName() + " in " +
+                    referredNode.getLineNumber() + " at " +
+                    referredNode.getCharPosition()
+                    + " in " + referredNode.getFileName() + "\"");
+
         }
     }
 
@@ -1147,26 +1174,6 @@ public class YangResolutionInfoImpl<T>
         this.entityToResolveInfo = entityToResolveInfo;
     }
 
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPosition;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        this.charPosition = charPositionInLine;
-    }
-
     /**
      * Returns current module/sub-module reference, will be used in inter-file/
      * inter-jar scenario to get the import/include list.
@@ -1248,10 +1255,16 @@ public class YangResolutionInfoImpl<T>
                     resolvable.setResolvableStatus(RESOLVED);
                 } else {
                     throw new LinkerException("Invalid target node type " + targetNode.getNodeType() + " for "
-                            + augment.getName());
+                            + augment.getName() + " for " + targetNode.getName() +
+                            "in " + targetNode.getLineNumber()
+                            + " at " + targetNode.getCharPosition() +
+                            " in " + targetNode.getFileName());
                 }
             } else {
-                throw new LinkerException("Failed to link " + augment.getName());
+                throw new LinkerException("Failed to link " + augment.getName() +
+                        "in " + augment.getLineNumber()
+                        + " at " + augment.getCharPosition() +
+                        " in " + augment.getFileName());
             }
         } else if (entityToResolve instanceof YangCompilerAnnotation) {
             YangNode targetNode;
@@ -1267,18 +1280,21 @@ public class YangResolutionInfoImpl<T>
                     resolvable.setResolvableStatus(RESOLVED);
                 } else {
                     throw new LinkerException("Invalid target node type " + targetNode.getNodeType() + " for compiler" +
-                            " annotation " + ca.getPath());
+                            " annotation " + ca.getPath() + " in " + ca.getLineNumber() + " at "
+                            + ca.getCharPosition() + " in " + ca.getFileName());
                 }
             } else {
-                throw new LinkerException("Failed to link compiler annotation " + ca.getPath());
+                throw new LinkerException("Failed to link compiler annotation " + ca.getPath()
+                        + " in " + ca.getLineNumber() + " at "
+                        + ca.getCharPosition() + " in " + ca.getFileName());
             }
         } else if (entityToResolve instanceof YangLeafRef) {
             YangLeafRef leafRef = (YangLeafRef) entityToResolve;
             Object target = xPathLinker.processLeafRefXpathLinking(leafRef.getAtomicPath(),
                     (YangNode) root, leafRef);
             if (target != null) {
-                YangLeaf leaf = null;
-                YangLeafList leafList = null;
+                YangLeaf leaf;
+                YangLeafList leafList;
                 leafRef.setReferredLeafOrLeafList(target);
                 if (target instanceof YangLeaf) {
                     leaf = (YangLeaf) target;
@@ -1297,6 +1313,7 @@ public class YangResolutionInfoImpl<T>
                         + leafRef.getPath());
                 linkerException.setCharPosition(leafRef.getCharPosition());
                 linkerException.setLine(leafRef.getLineNumber());
+                linkerException.setFileName(leafRef.getFileName());
                 throw linkerException;
             }
         }
@@ -1554,6 +1571,7 @@ public class YangResolutionInfoImpl<T>
                     "leafref path " + leafref.getPath() + ", is invalid.");
             dataModelException.setCharPosition(leafref.getCharPosition());
             dataModelException.setLine(leafref.getLineNumber());
+            dataModelException.setFileName(leafref.getFileName());
             throw dataModelException;
         }
     }
@@ -1582,7 +1600,11 @@ public class YangResolutionInfoImpl<T>
                 if (currentSkippedParent == currentParent) {
                     if (currentParent.getParent() == null) {
                         throw new DataModelException("YANG file error: The target node, in the leafref path "
-                                + leafref.getPath() + ", is invalid.");
+                                + leafref.getPath() + ", is invalid."
+                                + " in " +
+                                leafref.getLineNumber() + " at " +
+                                leafref.getCharPosition()
+                                + " in " + leafref.getFileName() + "\"");
                     }
                     currentParent = currentParent.getParent();
                 } else {

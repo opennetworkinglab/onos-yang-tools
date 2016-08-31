@@ -22,7 +22,8 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangBuiltInData
  *
  * @param <T> range type based on the data type
  */
-public class YangRangeInterval<T extends YangBuiltInDataTypeInfo<T>> implements Serializable {
+public class YangRangeInterval<T extends YangBuiltInDataTypeInfo<T>> extends DefaultLocationInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806201650L;
 

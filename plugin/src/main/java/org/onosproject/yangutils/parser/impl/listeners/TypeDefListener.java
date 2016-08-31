@@ -130,6 +130,9 @@ public final class TypeDefListener {
         YangTypeDef typeDefNode = getYangTypeDefNode(JAVA_GENERATION);
         typeDefNode.setName(identifier);
 
+        typeDefNode.setLineNumber(ctx.getStart().getLine());
+        typeDefNode.setCharPosition(ctx.getStart().getCharPositionInLine());
+        typeDefNode.setFileName(listener.getFileName());
         Parsable curData = listener.getParsedDataStack().peek();
 
         if (curData instanceof YangModule || curData instanceof YangSubModule || curData instanceof YangContainer

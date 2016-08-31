@@ -47,9 +47,9 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.INST
  *
  * @param <T> YANG leafref info
  */
-public class YangLeafRef<T>
+public class YangLeafRef<T> extends DefaultLocationInfo
         implements Cloneable, Parsable, Resolvable, Serializable, YangIfFeatureHolder,
-        YangXPathResolver, YangAppErrorHolder, LocationInfo {
+        YangXPathResolver, YangAppErrorHolder {
 
     private static final long serialVersionUID = 286201644L;
 
@@ -105,16 +105,6 @@ public class YangLeafRef<T>
      * Parent node of the leafref's leaf.
      */
     private YangNode parentNodeOfLeafref;
-
-    /**
-     * Error line number.
-     */
-    private transient int lineNumber;
-
-    /**
-     * Error character position in number.
-     */
-    private transient int charPositionInLine;
 
     /**
      * Prefix in the nodes of the leafref path and its imported node name.
@@ -358,7 +348,11 @@ public class YangLeafRef<T>
             throws DataModelException {
 
         if (getReferredLeafOrLeafList() == null) {
-            throw new DataModelException("Linker Error: The leafref does not refer to any leaf/leaf-list.");
+            throw new DataModelException("Linker Error: The leafref does not refer to any leaf/leaf-list." +
+                    " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
 
         // Initiate the resolution
@@ -389,7 +383,11 @@ public class YangLeafRef<T>
                 //Check whether the referred typedef is resolved.
                 if (referredLeafRefInfo.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && referredLeafRefInfo.getResolvableStatus() != RESOLVED) {
-                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
+                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type." +
+                            " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
 
                 /*
@@ -415,7 +413,11 @@ public class YangLeafRef<T>
                 // Check whether the referred typedef is resolved.
                 if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && baseType.getResolvableStatus() != RESOLVED) {
-                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
+                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type." +
+                            " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
                 /*
                  * Check if the referred typedef is intra file resolved, if yes
@@ -449,7 +451,11 @@ public class YangLeafRef<T>
                 //Check whether the referred typedef is resolved.
                 if (referredLeafRefInfo.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && referredLeafRefInfo.getResolvableStatus() != RESOLVED) {
-                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
+                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type." +
+                            " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
                 /*
                  * Check if the referred typedef is intra file resolved, if yes
@@ -475,7 +481,11 @@ public class YangLeafRef<T>
                 //Check whether the referred typedef is resolved.
                 if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED
                         && baseType.getResolvableStatus() != RESOLVED) {
-                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type.");
+                    throw new DataModelException("Linker Error: Referred typedef is not resolved for type." +
+                            " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
                 /*
                  * Check if the referred typedef is intra file resolved, if yes
@@ -499,28 +509,12 @@ public class YangLeafRef<T>
             }
             return RESOLVED;
         } else {
-            throw new DataModelException("Linker Error: The leafref must refer only to leaf/leaf-list.");
+            throw new DataModelException("Linker Error: The leafref must refer only to leaf/leaf-list." +
+                    " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
-    }
-
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPositionInLine;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        this.charPositionInLine = charPositionInLine;
     }
 
     @Override

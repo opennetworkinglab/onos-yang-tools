@@ -373,7 +373,11 @@ public abstract class YangList
 
         if (getKeyList().contains(key)) {
             throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                    "   key");
+                    "   key" +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
 
         getKeyList().add(key);
@@ -392,7 +396,11 @@ public abstract class YangList
         }
         if (getUniqueList().contains(unique)) {
             throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                    "   unique");
+                    "   unique" +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
         getUniqueList().add(unique);
     }
@@ -571,7 +579,11 @@ public abstract class YangList
         //A list must have atleast one key leaf if config is true
         if (isConfig && (keys.isEmpty() || leaves.isEmpty()) && !isUsesPresentInList()
                 && !isListPresentInGrouping()) {
-            throw new DataModelException("A list must have atleast one key leaf if config is true;");
+            throw new DataModelException("A list must have atleast one key leaf if config is true; " +
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         } else if (keys != null) {
             validateKey(leaves, keys);
         }
@@ -595,7 +607,11 @@ public abstract class YangList
             for (YangLeaf leaf : leaves) {
                 if (leaf.isConfig()) {
                     throw new DataModelException("If a list has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\".");
+                            "it can have \"config\" set to \"true\"." +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
             }
         }
@@ -604,7 +620,10 @@ public abstract class YangList
             for (YangLeafList leafList : leafLists) {
                 if (leafList.isConfig()) {
                     throw new DataModelException("If a list has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\".");
+                            "it can have \"config\" set to \"true\"." + getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
                 }
             }
         }
@@ -632,7 +651,11 @@ public abstract class YangList
                     if (key.equals(leaf.getName())) {
                         if (leaf.getDataType().getDataType() == YangDataTypes.EMPTY) {
                             throw new DataModelException(" A leaf that is part of the key must not be the built-in " +
-                                    "type \"empty\".");
+                                    "type \"empty\"." +
+                                    getName() + " in " +
+                                    getLineNumber() + " at " +
+                                    getCharPosition() +
+                                    " in " + getFileName() + "\"");
                         }
                         leafFound = true;
                         keyLeaves.add(leaf);
@@ -642,7 +665,11 @@ public abstract class YangList
             }
 
             if (!leafFound && !isUsesPresentInList() && !isListPresentInGrouping()) {
-                throw new DataModelException("An identifier, in key, must refer to a child leaf of the list");
+                throw new DataModelException("An identifier, in key, must refer to a child leaf of the list" +
+                        getName() + " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
             leafFound = false;
         }
@@ -654,7 +681,11 @@ public abstract class YangList
         for (YangLeaf keyLeaf : keyLeaves) {
             if (isConfig != keyLeaf.isConfig()) {
                 throw new DataModelException("All key leafs in a list must have the same value for their" +
-                        " \"config\" as the list itself.");
+                        " \"config\" as the list itself." +
+                        getName() + " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
         }
     }
@@ -671,7 +702,10 @@ public abstract class YangList
             throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as list \"" +
-                    getName() + "\"");
+                    getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
     }
 

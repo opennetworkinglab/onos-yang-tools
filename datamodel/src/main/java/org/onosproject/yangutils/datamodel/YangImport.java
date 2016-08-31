@@ -69,8 +69,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.findRefer
 /**
  * Represents the information about the imported modules.
  */
-public class YangImport
-        implements Parsable, LocationInfo, Serializable {
+public class YangImport extends DefaultLocationInfo
+        implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201642L;
 
@@ -98,12 +98,6 @@ public class YangImport
      * Reference to node which is imported.
      */
     private YangNode importedNode;
-
-    // Error Line number.
-    private transient int lineNumber;
-
-    // Error character position.
-    private transient int charPosition;
 
     /**
      * Creates a YANG import.
@@ -218,26 +212,6 @@ public class YangImport
         this.importedNode = importedNode;
     }
 
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPosition;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        charPosition = charPositionInLine;
-    }
-
     /**
      * Adds reference to an import.
      *
@@ -284,6 +258,7 @@ public class YangImport
                 + importedModuleName + " with revision " + importedModuleRevision + " is not found.");
         exception.setLine(getLineNumber());
         exception.setCharPosition(getCharPosition());
+        exception.setFileName(getFileName());
         throw exception;
     }
 }

@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * Represents data model to maintain yang app error information.
  */
-public class YangAppErrorInfo implements Serializable {
+public class YangAppErrorInfo extends DefaultLocationInfo implements Serializable {
 
     private static final long serialVersionUID = 807201693L;
 

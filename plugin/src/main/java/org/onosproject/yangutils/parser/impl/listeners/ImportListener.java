@@ -90,6 +90,7 @@ public final class ImportListener {
         int errorPosition = ctx.getStart().getCharPositionInLine();
         importNode.setLineNumber(errorLine);
         importNode.setCharPosition(errorPosition);
+        importNode.setFileName(listener.getFileName());
 
         // Push import node to the stack.
         listener.getParsedDataStack().push(importNode);

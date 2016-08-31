@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.util.Stack;
+
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangIdentity;
@@ -110,7 +111,11 @@ public final class AttributesJavaDataType {
             case LEAFREF:
                 return getJavaDataType(getReferredTypeFromLeafref(yangType));
             default:
-                throw new TranslatorException("given data type is not supported.");
+                throw new TranslatorException("given data type is not supported. " +
+                        yangType.getDataTypeName() + " in " +
+                        yangType.getLineNumber() + " at " +
+                        yangType.getCharPosition()
+                        + " in " + yangType.getFileName());
         }
     }
 
@@ -178,7 +183,11 @@ public final class AttributesJavaDataType {
                     return getCapitalCase(
                             getCamelCase(yangType.getDataTypeName(), pluginConfig));
                 default:
-                    throw new TranslatorException("given data type is not supported.");
+                    throw new TranslatorException("given data type is not supported ." +
+                            yangType.getDataTypeName() + " in " +
+                            yangType.getLineNumber() + " at " +
+                            yangType.getCharPosition()
+                            + " in " + yangType.getFileName());
             }
         } else {
             switch (type) {
@@ -263,7 +272,11 @@ public final class AttributesJavaDataType {
                 case DERIVED:
                     return getTypeDefsPackage(yangType, conflictResolver);
                 default:
-                    throw new TranslatorException("given data type is not supported.");
+                    throw new TranslatorException("given data type is not supported. " +
+                            yangType.getDataTypeName() + " in " +
+                            yangType.getLineNumber() + " at " +
+                            yangType.getCharPosition()
+                            + " in " + yangType.getFileName());
             }
         } else {
             switch (type) {
@@ -304,11 +317,19 @@ public final class AttributesJavaDataType {
     private static String getTypeDefsPackage(YangType<?> type, YangToJavaNamingConflictUtil conflictResolver) {
         Object var = type.getDataTypeExtendedInfo();
         if (!(var instanceof YangDerivedInfo)) {
-            throw new TranslatorException("type should have been derived.");
+            throw new TranslatorException("type should have been derived. " +
+                    type.getDataTypeName() + " in " +
+                    type.getLineNumber() + " at " +
+                    type.getCharPosition()
+                    + " in " + type.getFileName());
         }
 
         if (!(((YangDerivedInfo<?>) var).getReferredTypeDef() != null)) {
-            throw new TranslatorException("derived info is not an instance of typedef.");
+            throw new TranslatorException("derived info is not an instance of typedef. " +
+                    type.getDataTypeName() + " in " +
+                    type.getLineNumber() + " at " +
+                    type.getCharPosition()
+                    + " in " + type.getFileName());
         }
 
         YangJavaTypeDefTranslator typedef = (YangJavaTypeDefTranslator) ((YangDerivedInfo<?>) var).getReferredTypeDef();
@@ -328,7 +349,11 @@ public final class AttributesJavaDataType {
     private static String getUnionPackage(YangType<?> type, YangToJavaNamingConflictUtil conflictResolver) {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangUnion)) {
-            throw new TranslatorException("type should have been union.");
+            throw new TranslatorException("type should have been union. " +
+                    type.getDataTypeName() + " in " +
+                    type.getLineNumber() + " at " +
+                    type.getCharPosition()
+                    + " in " + type.getFileName());
         }
 
         YangJavaUnionTranslator union = (YangJavaUnionTranslator) type.getDataTypeExtendedInfo();
@@ -348,7 +373,11 @@ public final class AttributesJavaDataType {
     private static String getEnumsPackage(YangType<?> type, YangToJavaNamingConflictUtil conflictResolver) {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangEnumeration)) {
-            throw new TranslatorException("type should have been enumeration.");
+            throw new TranslatorException("type should have been enumeration. " +
+                    type.getDataTypeName() + " in " +
+                    type.getLineNumber() + " at " +
+                    type.getCharPosition()
+                    + " in " + type.getFileName());
         }
         YangJavaEnumerationTranslator enumeration = (YangJavaEnumerationTranslator) type.getDataTypeExtendedInfo();
         if (enumeration.getJavaFileInfo().getPackage() == null) {
@@ -367,7 +396,11 @@ public final class AttributesJavaDataType {
     private static String getIdentityRefPackage(YangType<?> type, YangToJavaNamingConflictUtil conflictResolver) {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangIdentityRef)) {
-            throw new TranslatorException("type should have been identityref.");
+            throw new TranslatorException("type should have been identityref. " +
+                    type.getDataTypeName() + " in " +
+                    type.getLineNumber() + " at " +
+                    type.getCharPosition()
+                    + " in " + type.getFileName());
         }
         YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
         YangJavaIdentityTranslator identity = (YangJavaIdentityTranslator) (identityRef.getReferredIdentity());
@@ -387,7 +420,11 @@ public final class AttributesJavaDataType {
     private static String getPackageFromParent(YangNode parent,
                                                YangToJavaNamingConflictUtil conflictResolver) {
         if (!(parent instanceof JavaFileInfoContainer)) {
-            throw new TranslatorException("invalid child node is being processed.");
+            throw new TranslatorException("invalid child node is being processed. " +
+                    parent.getName() + " in " +
+                    parent.getLineNumber() + " at " +
+                    parent.getCharPosition()
+                    + " in " + parent.getFileName());
         }
         JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
         if (parentInfo.getPackage() == null) {
@@ -434,7 +471,12 @@ public final class AttributesJavaDataType {
                         submodule.getNameSpaceFromModule(submodule.getBelongsTo()),
                         submodule.getRevision().getRevDate(), conflictResolver);
             } else {
-                throw new TranslatorException("Invalid root node of data model tree");
+                throw new TranslatorException("Invalid root node of data model tree " +
+                        yangNode.getName() + " in " +
+                        yangNode.getLineNumber() + " at " +
+                        yangNode.getCharPosition()
+                        + " in " + yangNode.getFileName());
+
             }
 
             ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()

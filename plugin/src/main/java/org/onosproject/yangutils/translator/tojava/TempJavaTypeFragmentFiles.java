@@ -274,7 +274,10 @@ public class TempJavaTypeFragmentFiles
         if (typeList != null) {
             for (YangType<?> yangType : typeList) {
                 if (!(yangType instanceof YangJavaTypeTranslator)) {
-                    throw new TranslatorException("Type does not have Java info");
+                    throw new TranslatorException("Type does not have Java info " +
+                            yangType.getDataTypeName() + " in " + yangType.getLineNumber() + " at " + yangType
+                            .getCharPosition()
+                            + " in " + yangType.getFileName());
                 }
                 JavaAttributeInfo javaAttributeInfo = getAttributeForType(yangType, pluginConfig);
                 addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfo,

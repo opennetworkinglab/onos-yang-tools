@@ -227,7 +227,10 @@ public final class YangJavaModelUtils {
         } else if (javaCodeGeneratorInfo instanceof YangChoice) {
             /*Do nothing, only the interface needs to be generated*/
         } else {
-            throw new TranslatorException("Unsupported Node Translation");
+            throw new TranslatorException("Unsupported Node Translation "
+                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
     }
 
@@ -242,7 +245,10 @@ public final class YangJavaModelUtils {
                                           YangPluginConfig yangPluginConfig)
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
-            throw new TranslatorException("translation is not supported for the node");
+            throw new TranslatorException("translation is not supported for the node "
+                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
         createTempFragmentFile(javaCodeGeneratorInfo);
         updateTempFragmentFiles(javaCodeGeneratorInfo, yangPluginConfig);
@@ -288,7 +294,10 @@ public final class YangJavaModelUtils {
                                                      YangPluginConfig yangPlugin, boolean isMultiInstance)
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
-            throw new TranslatorException("Invalid node for translation");
+            throw new TranslatorException("Invalid node for translation " +
+                    javaCodeGeneratorInfo.getLineNumber() + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
 
         /*
@@ -313,7 +322,10 @@ public final class YangJavaModelUtils {
                                                      YangPluginConfig yangPlugin)
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
-            throw new TranslatorException("invalid node for translation");
+            throw new TranslatorException("invalid node for translation " +
+                    javaCodeGeneratorInfo.getLineNumber() + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
 
         generateCodeOfNode(javaCodeGeneratorInfo, yangPlugin);
@@ -375,7 +387,10 @@ public final class YangJavaModelUtils {
                                           YangPluginConfig yangPluginConfig)
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
-            throw new TranslatorException("invalid node for translation");
+            throw new TranslatorException("invalid node for translation "
+                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
         updatePackageInfo(javaCodeGeneratorInfo, yangPluginConfig);
         generateTempFiles(javaCodeGeneratorInfo, yangPluginConfig);
@@ -393,7 +408,10 @@ public final class YangJavaModelUtils {
                                               YangPluginConfig yangPluginConfig, String rootPkg)
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
-            throw new TranslatorException("invalid node for translation");
+            throw new TranslatorException("invalid node for translation " + javaCodeGeneratorInfo.getLineNumber()
+                    + " at " +
+                    javaCodeGeneratorInfo.getCharPosition()
+                    + " in " + javaCodeGeneratorInfo.getFileName());
         }
         updatePackageInfo(javaCodeGeneratorInfo, yangPluginConfig, rootPkg);
 
@@ -415,12 +433,20 @@ public final class YangJavaModelUtils {
         String pkg;
         if (!(curNode instanceof JavaFileInfoContainer)
                 || curNode.getParent() == null) {
-            throw new TranslatorException("missing parent node to get current node's package");
+            throw new TranslatorException("missing parent node to get current node's package " +
+                    curNode.getName() + " in " +
+                    curNode.getLineNumber() + " at " +
+                    curNode.getCharPosition()
+                    + " in " + curNode.getFileName());
         }
 
         YangNode parentNode = DataModelUtils.getParentNodeInGenCode(curNode);
         if (!(parentNode instanceof JavaFileInfoContainer)) {
-            throw new TranslatorException("missing parent java node to get current node's package");
+            throw new TranslatorException("missing parent java node to get current node's package " +
+                    curNode.getName() + " in " +
+                    curNode.getLineNumber() + " at " +
+                    curNode.getCharPosition()
+                    + " in " + curNode.getFileName());
         }
         JavaFileInfoTranslator parentJavaFileHandle = ((JavaFileInfoContainer) parentNode).getJavaFileInfo();
         pkg = parentJavaFileHandle.getPackage() + PERIOD + parentJavaFileHandle.getJavaName();
@@ -457,6 +483,26 @@ public final class YangJavaModelUtils {
             }
         }
         return booleanData.contains(true);
+    }
+
+    /**
+     * Returns true if only augment nodes present in module.
+     *
+     * @param curNode root node
+     * @return true if only augment nodes present in module
+     */
+    public static boolean isOnlyAugmentNodeInRoot(YangNode curNode) {
+        List<Boolean> booleanData = new ArrayList<>();
+        curNode = curNode.getChild();
+        while (curNode != null) {
+            if (curNode instanceof YangAugment) {
+                booleanData.add(true);
+            } else {
+                booleanData.add(false);
+            }
+            curNode = curNode.getNextSibling();
+        }
+        return !booleanData.contains(false);
     }
 
     /**

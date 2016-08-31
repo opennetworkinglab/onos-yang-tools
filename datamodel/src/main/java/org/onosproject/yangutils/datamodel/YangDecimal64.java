@@ -31,7 +31,7 @@ import java.util.ListIterator;
 /**
  * Represents YANG decimal 64.
  */
-public class YangDecimal64<T>
+public class YangDecimal64<T> extends DefaultLocationInfo
         implements YangBuiltInDataTypeInfo<YangDecimal64>, Parsable, Serializable, Comparable<YangDecimal64> {
 
     private static final long serialVersionUID = 8006201668L;
@@ -247,12 +247,21 @@ public class YangDecimal64<T>
             }
             // If range is not matched then throw error
             if (!isMatched) {
-                throw new DataModelException("YANG file error : decimal64 validation failed.");
+                throw new DataModelException("YANG file error : decimal64 validation failed. " +
+                        " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
         } else {
             // Check value is in fraction-digits decimal64 value range
             if (!FractionDigits.isValueInDecimal64Range(this.value, getFractionDigit())) {
-                throw new DataModelException("YANG file error : decimal64 validation failed.");
+                throw new DataModelException("YANG file error : decimal64 validation failed. " +
+                        " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
+
             }
         }
     }
@@ -274,13 +283,21 @@ public class YangDecimal64<T>
         while (rangeListIterator.hasNext()) {
             YangRangeInterval rangeInterval = rangeListIterator.next();
             if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getStartValue()).getValue(),
-                                                         getFractionDigit()))) {
-                throw new DataModelException("YANG file error : range validation failed.");
+                    getFractionDigit()))) {
+                throw new DataModelException("YANG file error : range validation failed. " +
+                        " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
 
             if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getEndValue()).getValue(),
-                                                         getFractionDigit()))) {
-                throw new DataModelException("YANG file error : range validation failed.");
+                    getFractionDigit()))) {
+                throw new DataModelException("YANG file error : range validation failed. " +
+                        " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName() + "\"");
             }
         }
     }

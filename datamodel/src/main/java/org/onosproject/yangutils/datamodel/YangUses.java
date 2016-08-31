@@ -385,7 +385,11 @@ public abstract class YangUses
         YangGrouping referredGrouping = getRefGroup();
 
         if (referredGrouping == null) {
-            throw new DataModelException("YANG uses linker error, cannot resolve uses");
+            throw new DataModelException("YANG uses linker error, cannot resolve uses " + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
+
         } else {
             /*
              * if referredGrouping has uses which is not resolved then set the status
@@ -399,7 +403,11 @@ public abstract class YangUses
         YangNode usesParentNode = getParentNodeInGenCode(this);
         if (!(usesParentNode instanceof YangLeavesHolder)
                 || !(usesParentNode instanceof CollisionDetector)) {
-            throw new DataModelException("YANG uses holder construct is wrong");
+            throw new DataModelException("YANG uses holder construct is wrong "
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
 
         YangLeavesHolder usesParentLeavesHolder = (YangLeavesHolder) usesParentNode;
@@ -536,7 +544,11 @@ public abstract class YangUses
                                            YangLeavesHolder usesParentNode)
             throws DataModelException {
         if (listOfLeaves == null || listOfLeaves.size() == 0) {
-            throw new DataModelException("No leaves to clone");
+            throw new DataModelException("No leaves to clone "
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
 
         List<YangLeaf> newLeavesList = new LinkedList<YangLeaf>();
@@ -568,7 +580,11 @@ public abstract class YangUses
             YangLeavesHolder usesParentNode)
             throws DataModelException {
         if (listOfLeafList == null || listOfLeafList.size() == 0) {
-            throw new DataModelException("No leaf lists to clone");
+            throw new DataModelException("No leaf lists to clone "
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
 
         List<YangLeafList> newListOfLeafList = new LinkedList<YangLeafList>();
@@ -611,7 +627,10 @@ public abstract class YangUses
 
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as uses \""
-                    + getName() + "\"");
+                    + getName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition()
+                    + " in " + getFileName() + "\"");
         }
     }
 

@@ -22,7 +22,8 @@ import java.io.Serializable;
  *
  * @param <T> type of entity being resolved, uses / grouping
  */
-public class YangEntityToResolveInfoImpl<T> implements YangEntityToResolveInfo<T>, Serializable, LocationInfo {
+public class YangEntityToResolveInfoImpl<T> extends DefaultLocationInfo
+        implements YangEntityToResolveInfo<T>, Serializable {
 
     private static final long serialVersionUID = 806201659L;
 
@@ -35,16 +36,6 @@ public class YangEntityToResolveInfoImpl<T> implements YangEntityToResolveInfo<T
      * Holder of the YANG construct for which resolution has to be carried out.
      */
     private YangNode holderOfEntityToResolve;
-
-    /**
-     * Error line number.
-     */
-    private transient int lineNumber;
-
-    /**
-     * Error character position in number.
-     */
-    private transient int charPositionInLine;
 
     @Override
     public T getEntityToResolve() {
@@ -66,23 +57,4 @@ public class YangEntityToResolveInfoImpl<T> implements YangEntityToResolveInfo<T
         this.holderOfEntityToResolve = holderOfEntityToResolve;
     }
 
-    @Override
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public int getCharPosition() {
-        return charPositionInLine;
-    }
-
-    @Override
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public void setCharPosition(int charPositionInLine) {
-        this.charPositionInLine = charPositionInLine;
-    }
 }

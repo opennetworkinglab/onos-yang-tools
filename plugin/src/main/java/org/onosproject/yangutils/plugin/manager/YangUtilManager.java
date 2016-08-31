@@ -16,13 +16,6 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -45,7 +38,14 @@ import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURCES;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import static org.apache.maven.plugins.annotations.LifecyclePhase.PROCESS_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
 import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
@@ -59,6 +59,8 @@ import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
+import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
@@ -69,8 +71,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirP
  * Execution phase is generate-sources.
  * requiresDependencyResolution at compile time.
  */
-@Mojo(name = "yang2java", defaultPhase = GENERATE_SOURCES, requiresDependencyResolution = COMPILE,
-        requiresProject = true)
+@Mojo(name = "yang2java", defaultPhase = PROCESS_SOURCES, requiresDependencyResolution = COMPILE)
 public class YangUtilManager
         extends AbstractMojo {
 
@@ -83,6 +84,7 @@ public class YangUtilManager
     private YangLinker yangLinker = new YangLinkerManager();
     private YangFileInfo curYangFileInfo = new YangFileInfo();
     private Set<YangNode> yangNodeSet = new HashSet<>();
+
     /**
      * Source directory for YANG files.
      */
@@ -170,8 +172,8 @@ public class YangUtilManager
             /*
              * For deleting the generated code in previous build.
              */
-            deleteDirectory(getDirectory(baseDir, outputDirectory));
-
+            deleteDirectory(getDirectory(baseDir, outputDirectory + SLASH + TEMP));
+            deleteDirectory(getDirectory(baseDir, outputDirectory + SLASH + YANG_RESOURCES));
             String searchDir = getDirectory(baseDir, yangFilesDir);
             String codeGenDir = getDirectory(baseDir, classFileDir) + SLASH;
 
@@ -227,7 +229,7 @@ public class YangUtilManager
                 throw new MojoExecutionException(
                         "Error handler failed to delete files for data model node.");
             }
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoExecutionException(
                     "Exception occurred due to " + e.getLocalizedMessage() + " in " + fileName
                             + " YANG file.");
@@ -320,7 +322,7 @@ public class YangUtilManager
 
                     }
                     if (e.getMessage() != null) {
-                        logInfo = logInfo + NEW_LINE + e.getMessage();
+                        logInfo = logInfo + NEW_LINE + e.getLocalizedMessage();
                     }
                     getLog().info(logInfo);
                     throw e;

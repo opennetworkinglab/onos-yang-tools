@@ -82,6 +82,9 @@ public final class IdentityListener {
         YangIdentity identity = getYangIdentityNode(JAVA_GENERATION);
         identity.setName(identifier);
 
+        identity.setLineNumber(ctx.getStart().getLine());
+        identity.setCharPosition(ctx.getStart().getCharPositionInLine());
+        identity.setFileName(listener.getFileName());
         Parsable curData = listener.getParsedDataStack().peek();
         if (curData instanceof YangModule || curData instanceof YangSubModule) {
             YangNode curNode = (YangNode) curData;

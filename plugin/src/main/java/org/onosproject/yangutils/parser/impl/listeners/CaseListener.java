@@ -108,6 +108,9 @@ public final class CaseListener {
         if (curData instanceof YangChoice || curData instanceof YangAugment) {
             YangCase caseNode = getYangCaseNode(JAVA_GENERATION);
             caseNode.setName(identifier);
+            caseNode.setLineNumber(line);
+            caseNode.setCharPosition(charPositionInLine);
+            caseNode.setFileName(listener.getFileName());
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(caseNode);

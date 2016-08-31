@@ -18,12 +18,15 @@ package org.onosproject.yangutils.datamodel.utils.builtindatatype;
 
 import java.io.Serializable;
 
+import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
+
 /**
  * Handles the YANG's int16 data type processing.
  *
  * int16 represents integer values between -32768 and 32767, inclusively.
  */
-public class YangInt16 implements YangBuiltInDataTypeInfo<YangInt16>, Serializable {
+public class YangInt16 extends DefaultLocationInfo
+        implements YangBuiltInDataTypeInfo<YangInt16>, Serializable {
 
     private static final long serialVersionUID = 8006201667L;
 

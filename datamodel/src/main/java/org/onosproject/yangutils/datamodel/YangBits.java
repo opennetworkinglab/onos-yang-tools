@@ -37,7 +37,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the bits data type information.
  */
-public class YangBits implements Parsable, Serializable {
+public class YangBits extends DefaultLocationInfo implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201641L;
     private static final String SPACE = " ";
@@ -105,7 +105,11 @@ public class YangBits implements Parsable, Serializable {
             bit = bitNameMap.get(bitName);
             if (bit == null) {
                 throw new DataModelException("YANG file error: Unable to find " +
-                                                     "corresponding bit position for bit name: " + bitName);
+                        "corresponding bit position for bit name: " + bitName +
+                        " in " +
+                        getLineNumber() + " at " +
+                        getCharPosition() +
+                        " in " + getFileName());
             }
             bitDataSet.set(bit.getPosition());
         }
@@ -176,11 +180,17 @@ public class YangBits implements Parsable, Serializable {
     public void addBitInfo(YangBit bitInfo) throws DataModelException {
         if (bitNameMap.put(bitInfo.getBitName(), bitInfo) != null) {
             throw new DataModelException("YANG file error: Duplicate bit name detected, same as bit name \""
-                                                 + bitInfo.getBitName() + "\"");
+                    + bitInfo.getBitName() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
         if (bitPositionMap.put(bitInfo.getPosition(), bitInfo) != null) {
             throw new DataModelException("YANG file error: Duplicate bit position detected, same as bit position \""
-                    + bitInfo.getPosition() + "\"");
+                    + bitInfo.getPosition() + " in " +
+                    getLineNumber() + " at " +
+                    getCharPosition() +
+                    " in " + getFileName() + "\"");
         }
     }
 

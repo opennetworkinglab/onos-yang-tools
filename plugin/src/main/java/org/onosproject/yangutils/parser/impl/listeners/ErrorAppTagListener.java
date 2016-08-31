@@ -73,6 +73,10 @@ public final class ErrorAppTagListener {
         if (tmpNode instanceof YangAppErrorHolder) {
             YangAppErrorInfo yangAppErrorInfo = ((YangAppErrorHolder) tmpNode).getAppErrorInfo();
             yangAppErrorInfo.setErrorAppTag(errorMessage);
+
+            yangAppErrorInfo.setLineNumber(ctx.getStart().getLine());
+            yangAppErrorInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+            yangAppErrorInfo.setFileName(listener.getFileName());
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, ERROR_APP_TAG_DATA,
                     ctx.string().getText(), ENTRY));
