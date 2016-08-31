@@ -46,4 +46,9 @@ public class YangJavaIdentity
     public String getJavaClassNameOrBuiltInType() {
         return getJavaFileInfo().getJavaName();
     }
+
+    @Override
+    public String getJavaAttributeName() {
+        return getJavaFileInfo().getJavaAttributeName();
+    }
 }

@@ -97,7 +97,7 @@ public abstract class YangRpc
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         /*
          * This will maintain all child schema which are there inside input and
@@ -117,7 +117,7 @@ public abstract class YangRpc
 
     @Override
     public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-            YangSchemaNode yangSchemaNode) {
+                                     YangSchemaNode yangSchemaNode) {
         /*
          * This will maintain all default child which are there inside input and
          * output as input/output is non data node.

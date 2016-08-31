@@ -101,10 +101,10 @@ public final class ChoiceListener {
      * (choice), perform validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processChoiceEntry(TreeWalkListener listener,
-            GeneratedYangParser.ChoiceStatementContext ctx) {
+                                          GeneratedYangParser.ChoiceStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CHOICE_DATA, ctx.identifier().getText(), ENTRY);
@@ -124,7 +124,7 @@ public final class ChoiceListener {
 
         if (curData instanceof YangModule || curData instanceof YangSubModule || curData instanceof YangContainer
                 || curData instanceof YangList || curData instanceof YangCase || curData instanceof YangGrouping
-                || curData instanceof YangAugment  || curData instanceof YangInput || curData instanceof YangOutput
+                || curData instanceof YangAugment || curData instanceof YangInput || curData instanceof YangOutput
                 || curData instanceof YangNotification) {
 
             YangChoice choiceNode = getYangChoiceNode(JAVA_GENERATION);

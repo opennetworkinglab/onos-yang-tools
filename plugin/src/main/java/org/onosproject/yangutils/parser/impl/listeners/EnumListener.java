@@ -98,7 +98,7 @@ public final class EnumListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processEnumEntry(TreeWalkListener listener, GeneratedYangParser.EnumStatementContext ctx) {
 
@@ -123,7 +123,7 @@ public final class EnumListener {
      * validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processEnumExit(TreeWalkListener listener, GeneratedYangParser.EnumStatementContext ctx) {
 

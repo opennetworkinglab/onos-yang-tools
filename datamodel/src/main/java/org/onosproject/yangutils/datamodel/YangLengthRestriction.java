@@ -18,17 +18,17 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
+
 /*-
  * Reference RFC 6020.
  *
  * Binary can be restricted with "length" statements alone.
  *
  */
-
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
 
 /**
  * Represents the restriction for length data type.

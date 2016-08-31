@@ -74,10 +74,10 @@ public final class ShortCaseListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processShortCaseEntry(TreeWalkListener listener,
-            GeneratedYangParser.ShortCaseStatementContext ctx) {
+                                             GeneratedYangParser.ShortCaseStatementContext ctx) {
 
         ParseTree errorConstructContext;
 
@@ -128,10 +128,10 @@ public final class ShortCaseListener {
      * validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processShortCaseExit(TreeWalkListener listener,
-            GeneratedYangParser.ShortCaseStatementContext ctx) {
+                                            GeneratedYangParser.ShortCaseStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, SHORT_CASE_DATA, "", EXIT);

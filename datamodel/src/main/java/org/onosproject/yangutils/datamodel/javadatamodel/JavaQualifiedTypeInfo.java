@@ -37,6 +37,10 @@ public class JavaQualifiedTypeInfo
     protected String classInfo;
 
     /**
+     * attribute name being used.
+     */
+    protected String javaAttributeName;
+    /**
      * Returns the imported package info.
      *
      * @return the imported package info
@@ -72,4 +76,21 @@ public class JavaQualifiedTypeInfo
         this.classInfo = classInfo;
     }
 
+    /**
+     * Retrieve Java attribute name.
+     *
+     * @return Java attribute name
+     */
+    public String getJavaAttributeName() {
+        return javaAttributeName;
+    }
+
+    /**
+     * Assign Java attribute name.
+     *
+     * @param javaAttributeName Java attribute name
+     */
+    public void setJavaAttributeName(String javaAttributeName) {
+        this.javaAttributeName = javaAttributeName;
+    }
 }

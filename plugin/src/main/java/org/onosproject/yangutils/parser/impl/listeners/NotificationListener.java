@@ -86,10 +86,10 @@ public final class NotificationListener {
      * (notification), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processNotificationEntry(TreeWalkListener listener,
-                                       GeneratedYangParser.NotificationStatementContext ctx) {
+                                                GeneratedYangParser.NotificationStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA, ctx.identifier().getText(), ENTRY);
@@ -128,10 +128,10 @@ public final class NotificationListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processNotificationExit(TreeWalkListener listener,
-                                      GeneratedYangParser.NotificationStatementContext ctx) {
+                                               GeneratedYangParser.NotificationStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA, ctx.identifier().getText(), EXIT);

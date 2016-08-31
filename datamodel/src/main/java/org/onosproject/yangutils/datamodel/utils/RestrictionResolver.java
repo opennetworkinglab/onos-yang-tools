@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel.utils;
 
 import java.util.regex.Pattern;
+
 import org.onosproject.yangutils.datamodel.YangRangeInterval;
 import org.onosproject.yangutils.datamodel.YangRangeRestriction;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;

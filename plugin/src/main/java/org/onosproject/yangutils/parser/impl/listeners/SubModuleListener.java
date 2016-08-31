@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.parser.impl.listeners;
 
 import java.util.Date;
+
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
 import org.onosproject.yangutils.datamodel.YangRevision;
@@ -154,6 +155,7 @@ public final class SubModuleListener {
             LinkerException linkerException = new LinkerException(e.getMessage());
             linkerException.setLine(e.getLineNumber());
             linkerException.setCharPosition(e.getCharPositionInLine());
+
             throw linkerException;
         }
     }

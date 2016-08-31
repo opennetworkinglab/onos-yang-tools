@@ -521,7 +521,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation exception
      */
     static void addCurNodeInfoInParentTempFile(YangNode curNode,
-            boolean isList, YangPluginConfig pluginConfig)
+                                               boolean isList, YangPluginConfig pluginConfig)
             throws IOException {
         YangNode parent = getParentNodeInGenCode(curNode);
         if (!(parent instanceof JavaCodeGenerator)) {
@@ -554,8 +554,8 @@ public class TempJavaFragmentFiles {
      * @return AttributeInfo attribute details required to add in temporary files
      */
     public static JavaAttributeInfo getCurNodeAsAttributeInTarget(YangNode curNode,
-            YangNode targetNode, boolean isListNode,
-            TempJavaFragmentFiles tempJavaFragmentFiles) {
+                                                                  YangNode targetNode, boolean isListNode,
+                                                                  TempJavaFragmentFiles tempJavaFragmentFiles) {
         String curNodeName = ((JavaFileInfoContainer) curNode).getJavaFileInfo().getJavaName();
         if (curNodeName == null) {
             updateJavaFileInfo(curNode, null);
@@ -632,7 +632,7 @@ public class TempJavaFragmentFiles {
      * @return java attribute for leaf
      */
     private static JavaAttributeInfo getJavaAttributeOfLeaf(TempJavaFragmentFiles tempJavaFragmentFiles, YangLeaf leaf,
-            YangPluginConfig yangPluginConfig) {
+                                                            YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leaf;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -653,8 +653,8 @@ public class TempJavaFragmentFiles {
      * @return java attribute for leaf-list
      */
     private static JavaAttributeInfo getJavaAttributeOfLeafList(TempJavaFragmentFiles tempJavaFragmentFiles,
-            YangLeafList leafList,
-            YangPluginConfig yangPluginConfig) {
+                                                                YangLeafList leafList,
+                                                                YangPluginConfig yangPluginConfig) {
         JavaLeafInfoContainer javaLeaf = (JavaLeafInfoContainer) leafList;
         javaLeaf.setConflictResolveConfig(yangPluginConfig.getConflictResolver());
         javaLeaf.updateJavaQualifiedInfo();
@@ -1301,7 +1301,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException when fails to append to temporary file
      */
     void addFromStringMethod(JavaAttributeInfo javaAttributeInfo,
-            JavaAttributeInfo fromStringAttributeInfo)
+                             JavaAttributeInfo fromStringAttributeInfo)
             throws IOException {
         appendToFile(getFromStringImplTempFileHandle(), getFromStringMethod(javaAttributeInfo,
                 fromStringAttributeInfo) + NEW_LINE);
@@ -1460,7 +1460,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     private void addLeavesInfoToTempFiles(List<YangLeaf> listOfLeaves,
-            YangPluginConfig yangPluginConfig, YangNode curNode)
+                                          YangPluginConfig yangPluginConfig, YangNode curNode)
             throws IOException {
         if (listOfLeaves != null) {
             for (YangLeaf leaf : listOfLeaves) {
@@ -1489,7 +1489,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     private void addLeafListInfoToTempFiles(List<YangLeafList> listOfLeafList, YangPluginConfig yangPluginConfig,
-            YangNode curNode)
+                                            YangNode curNode)
             throws IOException {
         if (listOfLeafList != null) {
             for (YangLeafList leafList : listOfLeafList) {
@@ -1517,7 +1517,7 @@ public class TempJavaFragmentFiles {
      * @throws IOException IO operation fail
      */
     void addCurNodeLeavesInfoToTempFiles(YangNode curNode,
-            YangPluginConfig yangPluginConfig)
+                                         YangPluginConfig yangPluginConfig)
             throws IOException {
         if (!(curNode instanceof YangLeavesHolder)) {
             throw new TranslatorException("Data model node does not have any leaves");
@@ -1762,7 +1762,7 @@ public class TempJavaFragmentFiles {
      * @param curNode         current node
      */
     private void addImportsForAugmentableClass(List<String> imports, boolean operations, boolean isInterfaceFile,
-            YangNode curNode) {
+                                               YangNode curNode) {
         if (operations) {
             if (!isInterfaceFile) {
                 imports.add(getJavaImportData().getHashMapImport());

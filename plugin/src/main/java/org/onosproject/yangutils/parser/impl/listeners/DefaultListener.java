@@ -71,10 +71,10 @@ public final class DefaultListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processDefaultEntry(TreeWalkListener listener,
-            GeneratedYangParser.DefaultStatementContext ctx) {
+                                           GeneratedYangParser.DefaultStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, DEFAULT_DATA, ctx.string().getText(), ENTRY);

@@ -100,10 +100,10 @@ public final class BitListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processBitEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.BitStatementContext ctx) {
+                                       GeneratedYangParser.BitStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, BIT_DATA, ctx.identifier().getText(), ENTRY);
@@ -120,10 +120,10 @@ public final class BitListener {
      * validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processBitExit(TreeWalkListener listener,
-                                       GeneratedYangParser.BitStatementContext ctx) {
+                                      GeneratedYangParser.BitStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, BIT_DATA, ctx.identifier().getText(), EXIT);

@@ -46,4 +46,9 @@ public class YangJavaAugment
     public String getJavaClassNameOrBuiltInType() {
         return getJavaFileInfo().getJavaName();
     }
+
+    @Override
+    public String getJavaAttributeName() {
+        return getJavaFileInfo().getJavaAttributeName();
+    }
 }

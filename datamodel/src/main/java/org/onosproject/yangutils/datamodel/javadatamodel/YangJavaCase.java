@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel.javadatamodel;
 
 import org.onosproject.yangutils.datamodel.YangCase;
+import org.onosproject.yangutils.datamodel.YangNode;
 
 /**
  * Represents YANG java case.
@@ -45,5 +46,15 @@ public class YangJavaCase
     @Override
     public String getJavaClassNameOrBuiltInType() {
         return getJavaFileInfo().getJavaName();
+    }
+
+    @Override
+    public String getJavaAttributeName() {
+        YangNode parent = getParent();
+        if (parent instanceof YangJavaChoice) {
+            return ((YangJavaChoice) parent).getJavaFileInfo()
+                    .getJavaAttributeName();
+        }
+        throw new RuntimeException("Attribute name is not applicable ");
     }
 }

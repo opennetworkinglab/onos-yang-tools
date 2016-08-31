@@ -108,7 +108,7 @@ public final class IdentityListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processIdentityExit(TreeWalkListener listener,
-                                       GeneratedYangParser.IdentityStatementContext ctx) {
+                                           GeneratedYangParser.IdentityStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, IDENTITY_DATA, ctx.identifier().getText(), EXIT);

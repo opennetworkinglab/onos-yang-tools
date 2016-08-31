@@ -94,10 +94,10 @@ public final class AugmentListener {
      * (augment), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processAugmentEntry(TreeWalkListener listener,
-            GeneratedYangParser.AugmentStatementContext ctx) {
+                                           GeneratedYangParser.AugmentStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, AUGMENT_DATA, ctx.augment().getText(), ENTRY);
@@ -151,10 +151,10 @@ public final class AugmentListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processAugmentExit(TreeWalkListener listener,
-            GeneratedYangParser.AugmentStatementContext ctx) {
+                                          GeneratedYangParser.AugmentStatementContext ctx) {
 
         //Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, AUGMENT_DATA, ctx.augment().getText(), EXIT);

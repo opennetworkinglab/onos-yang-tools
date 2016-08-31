@@ -90,10 +90,10 @@ public final class GroupingListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processGroupingEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.GroupingStatementContext ctx) {
+                                            GeneratedYangParser.GroupingStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, GROUPING_DATA, ctx.identifier().getText(), ENTRY);
@@ -144,7 +144,7 @@ public final class GroupingListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processGroupingExit(TreeWalkListener listener,
-                                         GeneratedYangParser.GroupingStatementContext ctx) {
+                                           GeneratedYangParser.GroupingStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, GROUPING_DATA, ctx.identifier().getText(), EXIT);

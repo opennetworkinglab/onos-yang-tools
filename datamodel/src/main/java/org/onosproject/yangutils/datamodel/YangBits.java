@@ -204,7 +204,7 @@ public class YangBits implements Parsable, Serializable {
                 return null;
             }
             if (bits.isEmpty()) {
-                bits =  bit.getBitName();
+                bits = bit.getBitName();
             } else {
                 bits += " " + bit.getBitName();
             }

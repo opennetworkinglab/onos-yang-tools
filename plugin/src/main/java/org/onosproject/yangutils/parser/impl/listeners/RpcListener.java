@@ -88,10 +88,10 @@ public final class RpcListener {
      * (rpc), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processRpcEntry(TreeWalkListener listener,
-                                             GeneratedYangParser.RpcStatementContext ctx) {
+                                       GeneratedYangParser.RpcStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, RPC_DATA, ctx.identifier().getText(), ENTRY);
@@ -130,12 +130,12 @@ public final class RpcListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processRpcExit(TreeWalkListener listener,
-                                            GeneratedYangParser.RpcStatementContext ctx) {
+                                      GeneratedYangParser.RpcStatementContext ctx) {
 
-         //Check for stack to be non empty.
+        //Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, RPC_DATA, ctx.identifier().getText(), EXIT);
 
         if (!(listener.getParsedDataStack().peek() instanceof YangRpc)) {

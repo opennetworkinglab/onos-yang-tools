@@ -135,7 +135,7 @@ public final class JavaFileGeneratorUtils {
      * @return file object
      */
     public static File getFileObject(String filePath, String fileName, String extension,
-            JavaFileInfoTranslator handler) {
+                                     JavaFileInfoTranslator handler) {
         return new File(handler.getBaseCodeGenPath() + filePath + SLASH + fileName + extension);
     }
 
@@ -149,7 +149,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when failed to get the data from temporary file handle
      */
     static String getDataFromTempFileHandle(int generatedTempFiles,
-            TempJavaFragmentFiles tempJavaFragmentFiles, String absolutePath)
+                                            TempJavaFragmentFiles tempJavaFragmentFiles, String absolutePath)
             throws IOException {
 
         TempJavaTypeFragmentFiles typeFragmentFiles = null;
@@ -331,7 +331,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when fails to generate a file
      */
     public static void initiateJavaFileGeneration(File file, String className, int genType, List<String> imports,
-            String pkg, YangPluginConfig pluginConfig)
+                                                  String pkg, YangPluginConfig pluginConfig)
             throws IOException {
 
         boolean isFileCreated;
@@ -357,7 +357,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when fails to generate a file
      */
     public static void initiateJavaFileGeneration(File file, int genType, List<String> imports,
-            YangNode curNode, String className)
+                                                  YangNode curNode, String className)
             throws IOException {
 
         boolean isFileCreated;
@@ -383,7 +383,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when fails to do IO operations
      */
     private static void appendContents(File file, int genType, List<String> importsList, YangNode curNode,
-            String className)
+                                       String className)
             throws IOException {
 
         JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
@@ -452,7 +452,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when fails to append contents
      */
     private static void appendContents(File file, String fileName, int genType, List<String> importsList, String pkg,
-            YangPluginConfig pluginConfig)
+                                       YangPluginConfig pluginConfig)
             throws IOException {
 
         String pkgString = parsePackageString(pkg, importsList);
@@ -553,7 +553,7 @@ public final class JavaFileGeneratorUtils {
      * @throws IOException when fails to write into a file
      */
     private static void write(File file, String fileName, int genType, JavaDocType javaDocType,
-            YangPluginConfig pluginConfig)
+                              YangPluginConfig pluginConfig)
             throws IOException {
         insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig, null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType, fileName));
@@ -654,7 +654,7 @@ public final class JavaFileGeneratorUtils {
      * @return qualified type info of augmented node
      */
     private static JavaQualifiedTypeInfoTranslator getQualifiedTypeInfoOfAugmentedNode(YangNode augmentedNode,
-            String curNodeName, YangPluginConfig pluginConfig) {
+                                                                                       String curNodeName, YangPluginConfig pluginConfig) {
         JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(augmentedNode,
                 getCapitalCase(curNodeName));
         if (javaQualifiedTypeInfo.getPkgInfo() == null) {
@@ -672,7 +672,7 @@ public final class JavaFileGeneratorUtils {
      * @return true if present in imports
      */
     private static boolean validateQualifiedInfoOfAugmentedNode(JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo,
-            JavaImportData importData) {
+                                                                JavaImportData importData) {
         for (JavaQualifiedTypeInfoTranslator curImportInfo : importData.getImportSet()) {
             if (curImportInfo.getClassInfo()
                     .contentEquals(javaQualifiedTypeInfo.getClassInfo())) {

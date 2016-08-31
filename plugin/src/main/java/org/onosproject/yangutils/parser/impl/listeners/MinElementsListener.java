@@ -65,7 +65,7 @@ public final class MinElementsListener {
      * tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processMinElementsEntry(TreeWalkListener listener,
                                                GeneratedYangParser.MinElementsStatementContext ctx) {

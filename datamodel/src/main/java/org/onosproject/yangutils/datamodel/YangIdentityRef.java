@@ -257,8 +257,10 @@ public class YangIdentityRef
         return isIdentityForInterFileGroupingResolution;
     }
 
-    public void setIdentityForInterFileGroupingResolution(boolean identityForInterFileGroupingResolution) {
-        isIdentityForInterFileGroupingResolution = identityForInterFileGroupingResolution;
+    public void setIdentityForInterFileGroupingResolution(
+            boolean identityForInterFileGroupingResolution) {
+        isIdentityForInterFileGroupingResolution =
+                identityForInterFileGroupingResolution;
     }
 
     @Override
@@ -279,4 +281,10 @@ public class YangIdentityRef
         //TODO: throw exception
         return null;
     }
+
+    @Override
+    public String getJavaAttributeName() {
+        throw new RuntimeException("Attribute name is not applicable ");
+    }
+
 }

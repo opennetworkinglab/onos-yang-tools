@@ -167,7 +167,7 @@ public final class UnionListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processUnionExit(TreeWalkListener listener,
-                                       GeneratedYangParser.UnionSpecificationContext ctx) {
+                                        GeneratedYangParser.UnionSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, UNION_DATA, "", EXIT);

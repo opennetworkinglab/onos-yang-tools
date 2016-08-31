@@ -58,10 +58,10 @@ public final class BaseListener {
      * input matching the grammar rule (base).
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processBaseEntry(TreeWalkListener listener,
-                                          GeneratedYangParser.BaseStatementContext ctx) {
+                                        GeneratedYangParser.BaseStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, BASE_DATA, ctx.string().getText(), ENTRY);
@@ -100,7 +100,7 @@ public final class BaseListener {
      * Add to resolution list.
      *
      * @param resolutionInfo resolution information
-     * @param ctx context object of the grammar rule
+     * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangBase> resolutionInfo,
                                             GeneratedYangParser.BaseStatementContext ctx) {

@@ -94,7 +94,7 @@ public abstract class YangSubModule
 
     /**
      * Reference RFC 6020.
-     * <p>
+     *
      * The "contact" statement provides contact information for the module. The
      * argument is a string that is used to specify contact information for the
      * person or persons to whom technical queries concerning this module should

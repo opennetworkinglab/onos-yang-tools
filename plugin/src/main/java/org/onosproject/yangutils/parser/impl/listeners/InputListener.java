@@ -80,10 +80,10 @@ public final class InputListener {
      * (input), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processInputEntry(TreeWalkListener listener,
-            GeneratedYangParser.InputStatementContext ctx) {
+                                         GeneratedYangParser.InputStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, INPUT_DATA, "", ENTRY);
@@ -112,10 +112,10 @@ public final class InputListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processInputExit(TreeWalkListener listener,
-            GeneratedYangParser.InputStatementContext ctx) {
+                                        GeneratedYangParser.InputStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, INPUT_DATA, "", EXIT);

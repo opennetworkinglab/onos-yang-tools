@@ -46,4 +46,9 @@ public class YangJavaUses
     public String getJavaClassNameOrBuiltInType() {
         return getJavaFileInfo().getJavaName();
     }
+
+    @Override
+    public String getJavaAttributeName() {
+        throw new RuntimeException("Attribute name is not applicable ");
+    }
 }

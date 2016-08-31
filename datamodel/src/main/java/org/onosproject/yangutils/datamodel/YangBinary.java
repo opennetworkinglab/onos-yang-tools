@@ -69,7 +69,7 @@ public class YangBinary implements YangBuiltInDataTypeInfo<YangBinary>, Serializ
      */
     public String toString() {
         return Base64.getEncoder()
-                     .encodeToString(binaryData);
+                .encodeToString(binaryData);
     }
 
     @Override

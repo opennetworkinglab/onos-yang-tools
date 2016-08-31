@@ -123,6 +123,8 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
             }
             importInfo.setClassInfo(dataTypeName);
         }
+
+        leaf.getJavaQualifiedInfo().setJavaAttributeName(leaf.getJavaName(null));
     }
 
     /**

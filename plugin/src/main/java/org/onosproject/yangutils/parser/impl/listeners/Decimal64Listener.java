@@ -98,10 +98,10 @@ public final class Decimal64Listener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processDecimal64Entry(TreeWalkListener listener,
-            GeneratedYangParser.Decimal64SpecificationContext ctx) {
+                                             GeneratedYangParser.Decimal64SpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, DECIMAL64_DATA, "", ENTRY);

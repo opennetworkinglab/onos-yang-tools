@@ -22,7 +22,8 @@ import java.io.Serializable;
  * Represents cached java file handle, which supports the addition of member attributes and
  * methods.
  */
-public class JavaFileInfo implements Serializable {
+public class JavaFileInfo
+        implements Serializable {
 
     private static final long serialVersionUID = 806102633L;
 
@@ -32,9 +33,14 @@ public class JavaFileInfo implements Serializable {
     protected String javaName;
 
     /**
-     * Java Package of the mapped java class.
+     * Java package of the mapped java class.
      */
     protected String pkg;
+
+    /**
+     * Java attribute name;
+     */
+    protected String javaAttributeName;
 
     /**
      * Returns the java name of the node.
@@ -71,4 +77,23 @@ public class JavaFileInfo implements Serializable {
     public void setPackage(String nodePackage) {
         pkg = nodePackage;
     }
+
+    /**
+     * Retrieve Java attribute name.
+     *
+     * @return Java attribute name
+     */
+    public String getJavaAttributeName() {
+        return javaAttributeName;
+    }
+
+    /**
+     * Assign the Java attribute Name.
+     *
+     * @param javaAttributeName Java attribute name
+     */
+    public void setJavaAttributeName(String javaAttributeName) {
+        this.javaAttributeName = javaAttributeName;
+    }
+
 }

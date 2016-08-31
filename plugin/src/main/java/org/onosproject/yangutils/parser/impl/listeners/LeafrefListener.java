@@ -87,10 +87,10 @@ public final class LeafrefListener {
      * (leafref), perform validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafrefEntry(TreeWalkListener listener,
-            GeneratedYangParser.LeafrefSpecificationContext ctx) {
+                                           GeneratedYangParser.LeafrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LEAFREF_DATA, "", ENTRY);
@@ -189,10 +189,10 @@ public final class LeafrefListener {
      * validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processLeafrefExit(TreeWalkListener listener,
-            GeneratedYangParser.LeafrefSpecificationContext ctx) {
+                                          GeneratedYangParser.LeafrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, LEAFREF_DATA, "", EXIT);

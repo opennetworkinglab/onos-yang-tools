@@ -108,10 +108,10 @@ public final class ListListener {
      * (list), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processListEntry(TreeWalkListener listener,
-            GeneratedYangParser.ListStatementContext ctx) {
+                                        GeneratedYangParser.ListStatementContext ctx) {
 
         YangNode curNode;
 
@@ -164,10 +164,10 @@ public final class ListListener {
      * validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processListExit(TreeWalkListener listener,
-            GeneratedYangParser.ListStatementContext ctx) {
+                                       GeneratedYangParser.ListStatementContext ctx) {
 
         checkStackIsNotEmpty(listener, MISSING_HOLDER, LIST_DATA, ctx.identifier().getText(), EXIT);
 

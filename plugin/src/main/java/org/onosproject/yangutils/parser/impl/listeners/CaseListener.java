@@ -84,10 +84,10 @@ public final class CaseListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processCaseEntry(TreeWalkListener listener,
-            GeneratedYangParser.CaseStatementContext ctx) {
+                                        GeneratedYangParser.CaseStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CASE_DATA, ctx.identifier().getText(), ENTRY);
@@ -127,10 +127,10 @@ public final class CaseListener {
      * validations and update the data model tree.
      *
      * @param listener Listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processCaseExit(TreeWalkListener listener,
-            GeneratedYangParser.CaseStatementContext ctx) {
+                                       GeneratedYangParser.CaseStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CASE_DATA, ctx.identifier().getText(), EXIT);

@@ -84,7 +84,7 @@ public final class TypeListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processTypeEntry(TreeWalkListener listener,
-            GeneratedYangParser.TypeStatementContext ctx) {
+                                        GeneratedYangParser.TypeStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, TYPE_DATA, ctx.string().getText(), ENTRY);
@@ -265,7 +265,7 @@ public final class TypeListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processTypeExit(TreeWalkListener listener,
-            GeneratedYangParser.TypeStatementContext ctx) {
+                                       GeneratedYangParser.TypeStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, TYPE_DATA, ctx.string().getText(), EXIT);
@@ -284,7 +284,7 @@ public final class TypeListener {
      * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangType> resolutionInfo,
-            GeneratedYangParser.TypeStatementContext ctx) {
+                                            GeneratedYangParser.TypeStatementContext ctx) {
         try {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
@@ -300,7 +300,7 @@ public final class TypeListener {
      * @param yangDataType yang data type
      */
     private static void validateTypeSubStatementCardinality(GeneratedYangParser.TypeStatementContext ctx,
-            YangDataTypes yangDataType) {
+                                                            YangDataTypes yangDataType) {
         if (ctx.typeBodyStatements() == null || ctx.typeBodyStatements().isEmpty()) {
             ParserException parserException;
             switch (yangDataType) {

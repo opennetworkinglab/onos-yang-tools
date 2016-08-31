@@ -74,6 +74,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ENUM_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
+
 import static java.util.Collections.sort;
 
 /**
@@ -350,12 +351,13 @@ public final class JavaCodeSnippetGen {
                 "     * Specify the node specific operation in protocols like NETCONF.\n" +
                 "     * Applicable in protocol edit operation, not applicable in query operation\n" +
                 "     */\n" +
-                "    public enum OperationType {\n" +
+                "    public enum OnosYangNodeOperationType {\n" +
                 "        MERGE,\n" +
                 "        REPLACE,\n" +
                 "        CREATE,\n" +
                 "        DELETE,\n" +
-                "        REMOVE\n" +
+                "        REMOVE,\n" +
+                "        NONE\n" +
                 "    }\n";
     }
 
@@ -387,7 +389,7 @@ public final class JavaCodeSnippetGen {
                 "     * Specify the node specific operation in protocols like NETCONF.\n" +
                 "     * Applicable in protocol edit operation, will be ignored in query operation\n" +
                 "     */\n" +
-                "    private OperationType operationType;\n" +
+                "    private OnosYangNodeOperationType onosYangNodeOperationType;\n" +
                 "\n";
     }
 
@@ -407,7 +409,7 @@ public final class JavaCodeSnippetGen {
      * @return operation type enum, leaf value set attribute and select leaf attribute for constructor
      */
     static String getOperationTypeForConstructor() {
-        return "        this.operationType = builderObject.getOperationType();\n";
+        return "        this.onosYangNodeOperationType = builderObject.onosYangNodeOperationType();\n";
     }
 
 }

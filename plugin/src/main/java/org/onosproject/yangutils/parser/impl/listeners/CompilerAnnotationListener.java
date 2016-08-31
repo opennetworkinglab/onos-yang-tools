@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.parser.impl.listeners;
 
 import java.util.List;
+
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangModule;
@@ -138,7 +139,7 @@ public final class CompilerAnnotationListener {
      * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangCompilerAnnotation> resolutionInfo,
-            GeneratedYangParser.CompilerAnnotationStatementContext ctx) {
+                                            GeneratedYangParser.CompilerAnnotationStatementContext ctx) {
 
         try {
             addResolutionInfo(resolutionInfo);

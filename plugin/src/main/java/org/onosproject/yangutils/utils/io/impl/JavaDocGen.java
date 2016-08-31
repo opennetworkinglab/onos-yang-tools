@@ -662,7 +662,9 @@ public final class JavaDocGen {
                 + JAVA_DOC_ADD_TO_LIST + attribute + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + NEW_LINE_ASTERISK
                 + FOUR_SPACE_INDENTATION + JAVA_DOC_PARAM + VALUE + SPACE;
         javadoc = javadoc + VALUE + SPACE + OF + SPACE;
-        javadoc = javadoc + attribute + NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_END_LINE;
+        javadoc = javadoc + attribute + NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_RETURN + BUILDER_OBJECT
+                + attribute
+                + NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_END_LINE;
         return javadoc;
     }
 

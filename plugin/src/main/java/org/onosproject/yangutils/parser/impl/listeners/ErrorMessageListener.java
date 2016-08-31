@@ -63,7 +63,7 @@ public final class ErrorMessageListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processErrorMessageEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.ErrorMessageStatementContext ctx) {
+                                                GeneratedYangParser.ErrorMessageStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, ERROR_MESSAGE_DATA, ctx.string().getText(), ENTRY);

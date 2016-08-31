@@ -157,7 +157,7 @@ public abstract class YangUses
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -170,7 +170,7 @@ public abstract class YangUses
 
     @Override
     public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-            YangSchemaNode yangSchemaNode) {
+                                     YangSchemaNode yangSchemaNode) {
         // Do nothing.
         // TODO
     }
@@ -508,7 +508,7 @@ public abstract class YangUses
      * @param usesHolder     holder of uses
      */
     private void addResolvedUsesInfoOfGrouping(YangUses usesInGrouping,
-            YangLeavesHolder usesHolder)
+                                               YangLeavesHolder usesHolder)
             throws DataModelException {
         for (YangNode usesResolvedNode : usesInGrouping.getUsesResolvedNodeList()) {
             addNodeOfGrouping(usesResolvedNode);
@@ -533,7 +533,7 @@ public abstract class YangUses
      * @throws DataModelException a violation in data model rule
      */
     private List<YangLeaf> cloneLeavesList(List<YangLeaf> listOfLeaves,
-            YangLeavesHolder usesParentNode)
+                                           YangLeavesHolder usesParentNode)
             throws DataModelException {
         if (listOfLeaves == null || listOfLeaves.size() == 0) {
             throw new DataModelException("No leaves to clone");

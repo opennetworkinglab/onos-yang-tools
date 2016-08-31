@@ -81,32 +81,32 @@ public abstract class YangLeafList
 
     /**
      * Reference:RFC 6020.
-     * <p>
+     *
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     * <p>
+     *
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private YangMaxElement maxElement;
 
     /**
      * Reference:RFC 6020.
-     * <p>
+     *
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     * <p>
+     *
      * If no "min-elements" statement is present, it defaults to zero.
-     * <p>
+     *
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     * <p>
+     *
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     * <p>
+     *
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;

@@ -73,7 +73,7 @@ public final class IdentityrefListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processIdentityrefEntry(TreeWalkListener listener,
-            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+                                               GeneratedYangParser.IdentityrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, IDENTITYREF_DATA, "", ENTRY);
@@ -190,7 +190,7 @@ public final class IdentityrefListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processIdentityrefExit(TreeWalkListener listener,
-            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+                                              GeneratedYangParser.IdentityrefSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_CURRENT_HOLDER, IDENTITYREF_DATA, ctx.getText(), EXIT);
@@ -209,7 +209,7 @@ public final class IdentityrefListener {
      * @param ctx            context object of the grammar rule
      */
     private static void addToResolutionList(YangResolutionInfoImpl<YangIdentityRef> resolutionInfo,
-            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
+                                            GeneratedYangParser.IdentityrefSpecificationContext ctx) {
         try {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {

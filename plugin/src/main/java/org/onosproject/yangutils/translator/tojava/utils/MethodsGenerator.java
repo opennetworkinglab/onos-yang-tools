@@ -1539,6 +1539,7 @@ public final class MethodsGenerator {
                 "     * @param " + getSmallCase(name) + SPACE + getSmallCase(name) + SPACE + "being passed to check" +
                 " for" +
                 " content match\n" +
+                "     * @param isSelectAllSchemaChild is select all schema child\n" +
                 "     * @return match result\n" +
                 "     */\n";
         return method + FOUR_SPACE_INDENTATION + name + SPACE + PROCESS_SUBTREE_FILTERING +
@@ -1590,6 +1591,7 @@ public final class MethodsGenerator {
                 "     * Set a leaf to be selected.\n" +
                 "     *\n" +
                 "     * @param leaf leaf needs to be selected\n" +
+                "     * @return builder object for select leaf\n" +
                 "     */\n";
         return method + FOUR_SPACE_INDENTATION + name + BUILDER + SPACE + SET_SELECT_LEAF + OPEN_PARENTHESIS
                 + LEAF_IDENTIFIER + SPACE + "leaf" + CLOSE_PARENTHESIS + SEMI_COLAN + NEW_LINE;
@@ -1661,13 +1663,13 @@ public final class MethodsGenerator {
      */
     static String getGetterForOperationType() {
         return "    /**\n" +
-                "     * Returns the operationType.\n" +
+                "     * Returns the onosYangNodeOperationType.\n" +
                 "     *\n" +
-                "     * @return value of operationType\n" +
+                "     * @return value of onosYangNodeOperationType\n" +
                 "     */\n" +
-                "    public OperationType getOperationType() {\n" +
-                "        return operationType;\n" +
-                "    }\n";
+                "    public OnosYangNodeOperationType onosYangNodeOperationType() {\n" +
+                "        return onosYangNodeOperationType;\n" +
+                "    }\n\n";
     }
 
     /**
@@ -1696,14 +1698,16 @@ public final class MethodsGenerator {
      */
     static String getSetterForOperationType(String name) {
         return "    /**\n" +
-                "     * Set operation type.\n" +
+                "     * Set node operation type.\n" +
                 "     *\n" +
-                "     * @param operationType operation type\n" +
+                "     * @param onosYangNodeOperationType node operation type\n" +
+                "     * @return builder object for node operation type\n" +
                 "     */\n" +
-                "    public " + name + BUILDER + " setOperationType(OperationType operationType) {\n" +
-                "       this.operationType = operationType;\n" +
+                "    public " + name + BUILDER + " onosYangNodeOperationType(OnosYangNodeOperationType " +
+                "onosYangNodeOperationType) {\n" +
+                "       this.onosYangNodeOperationType = onosYangNodeOperationType;\n" +
                 "       return this;\n" +
-                "    }\n";
+                "    }\n\n";
     }
 
     /**

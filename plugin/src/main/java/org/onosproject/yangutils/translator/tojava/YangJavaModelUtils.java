@@ -32,13 +32,13 @@ import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaEnumerationTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
@@ -78,6 +78,8 @@ public final class YangJavaModelUtils {
             javaCodeGeneratorInfo.getJavaFileInfo()
                     .setJavaName(getCamelCase(((YangNode) javaCodeGeneratorInfo).getName(),
                             yangPluginConfig.getConflictResolver()));
+            javaCodeGeneratorInfo.getJavaFileInfo().setJavaAttributeName(javaCodeGeneratorInfo
+                    .getJavaFileInfo().getJavaName());
             javaCodeGeneratorInfo.getJavaFileInfo().setPackage(getCurNodePackage((YangNode) javaCodeGeneratorInfo));
         }
         javaCodeGeneratorInfo.getJavaFileInfo().setPackageFilePath(

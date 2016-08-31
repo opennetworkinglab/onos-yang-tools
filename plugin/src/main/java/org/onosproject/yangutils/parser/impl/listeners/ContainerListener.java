@@ -103,10 +103,10 @@ public final class ContainerListener {
      * (container), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processContainerEntry(TreeWalkListener listener,
-            GeneratedYangParser.ContainerStatementContext ctx) {
+                                             GeneratedYangParser.ContainerStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CONTAINER_DATA, ctx.identifier().getText(), ENTRY);
@@ -158,10 +158,10 @@ public final class ContainerListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processContainerExit(TreeWalkListener listener,
-            GeneratedYangParser.ContainerStatementContext ctx) {
+                                            GeneratedYangParser.ContainerStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CONTAINER_DATA, ctx.identifier().getText(), EXIT);

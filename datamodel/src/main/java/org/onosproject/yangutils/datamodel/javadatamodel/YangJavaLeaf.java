@@ -21,7 +21,9 @@ import org.onosproject.yangutils.datamodel.YangLeaf;
 /**
  * Represent YANG java leaf.
  */
-public class YangJavaLeaf extends YangLeaf implements JavaQualifiedTypeInfoContainer {
+public class YangJavaLeaf
+        extends YangLeaf
+        implements JavaQualifiedTypeInfoContainer {
 
     private static final long serialVersionUID = 208201617L;
 
@@ -53,5 +55,10 @@ public class YangJavaLeaf extends YangLeaf implements JavaQualifiedTypeInfoConta
     @Override
     public String getJavaClassNameOrBuiltInType() {
         return getJavaQualifiedInfo().getClassInfo();
+    }
+
+    @Override
+    public String getJavaAttributeName() {
+        return getJavaQualifiedInfo().getJavaAttributeName();
     }
 }

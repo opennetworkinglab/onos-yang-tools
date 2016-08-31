@@ -92,10 +92,10 @@ public final class EnumerationListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processEnumerationEntry(TreeWalkListener listener,
-            GeneratedYangParser.EnumSpecificationContext ctx) {
+                                               GeneratedYangParser.EnumSpecificationContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, ENUMERATION_DATA, "", ENTRY);
