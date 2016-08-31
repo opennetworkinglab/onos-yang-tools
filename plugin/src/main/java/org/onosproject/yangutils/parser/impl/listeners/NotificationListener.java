@@ -16,6 +16,7 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
@@ -92,9 +93,11 @@ public final class NotificationListener {
                                                 GeneratedYangParser.NotificationStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA, ctx.identifier().getText(), ENTRY);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA,
+                             ctx.identifier().getText(), ENTRY);
 
-        String identifier = getValidIdentifier(ctx.identifier().getText(), NOTIFICATION_DATA, ctx);
+        String identifier = getValidIdentifier(ctx.identifier().getText(),
+                                               NOTIFICATION_DATA, ctx);
 
         // Validate sub statement cardinality.
         validateSubStatementsCardinality(ctx);
@@ -102,13 +105,15 @@ public final class NotificationListener {
         // Check for identifier collision
         int line = ctx.getStart().getLine();
         int charPositionInLine = ctx.getStart().getCharPositionInLine();
-        detectCollidingChildUtil(listener, line, charPositionInLine, identifier, NOTIFICATION_DATA);
+        detectCollidingChildUtil(listener, line, charPositionInLine, identifier,
+                                 NOTIFICATION_DATA);
 
         Parsable curData = listener.getParsedDataStack().peek();
         if (curData instanceof YangModule || curData instanceof YangSubModule) {
 
             YangNotification notification = getYangNotificationNode(JAVA_GENERATION);
             notification.setName(identifier);
+            ((RpcNotificationContainer) curData).setNotificationPresenceFlag(true);
             YangNode curNode = (YangNode) curData;
             try {
                 curNode.addChild(notification);
@@ -119,7 +124,7 @@ public final class NotificationListener {
             listener.getParsedDataStack().push(notification);
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, NOTIFICATION_DATA,
-                    ctx.identifier().getText(), ENTRY));
+                                                                    ctx.identifier().getText(), ENTRY));
         }
     }
 
@@ -134,13 +139,14 @@ public final class NotificationListener {
                                                GeneratedYangParser.NotificationStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA, ctx.identifier().getText(), EXIT);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, NOTIFICATION_DATA,
+                             ctx.identifier().getText(), EXIT);
 
         if (listener.getParsedDataStack().peek() instanceof YangNotification) {
             listener.getParsedDataStack().pop();
         } else {
             throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, NOTIFICATION_DATA,
-                    ctx.identifier().getText(), EXIT));
+                                                                    ctx.identifier().getText(), EXIT));
         }
     }
 
@@ -151,10 +157,13 @@ public final class NotificationListener {
      */
     private static void validateSubStatementsCardinality(GeneratedYangParser.NotificationStatementContext ctx) {
 
-        validateCardinalityMaxOne(ctx.statusStatement(), STATUS_DATA, NOTIFICATION_DATA, ctx.identifier().getText());
-        validateCardinalityMaxOne(ctx.descriptionStatement(), DESCRIPTION_DATA, NOTIFICATION_DATA,
-                ctx.identifier().getText());
-        validateCardinalityMaxOne(ctx.referenceStatement(), REFERENCE_DATA, NOTIFICATION_DATA,
-                ctx.identifier().getText());
+        validateCardinalityMaxOne(ctx.statusStatement(), STATUS_DATA,
+                                  NOTIFICATION_DATA, ctx.identifier().getText());
+        validateCardinalityMaxOne(ctx.descriptionStatement(),
+                                  DESCRIPTION_DATA, NOTIFICATION_DATA,
+                                  ctx.identifier().getText());
+        validateCardinalityMaxOne(ctx.referenceStatement(), REFERENCE_DATA,
+                                  NOTIFICATION_DATA,
+                                  ctx.identifier().getText());
     }
 }

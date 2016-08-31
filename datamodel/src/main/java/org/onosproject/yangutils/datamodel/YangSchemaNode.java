@@ -17,7 +17,6 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
@@ -41,8 +40,7 @@ public interface YangSchemaNode {
      * @return YANG data node context information
      * @throws DataModelException data model exception in searching the child
      */
-    YangSchemaNodeContextInfo getChildSchema(
-            YangSchemaNodeIdentifier dataNodeIdentifier)
+    YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
             throws DataModelException;
 
     /**
@@ -56,8 +54,8 @@ public interface YangSchemaNode {
             throws DataModelException;
 
     /**
-     * Returns count of mandatory child nodes, this is used by YMS to
-     * identify whether in request all mandatory child nodes are available.
+     * Returns count of mandatory child nodes, this is used by YMS to identify
+     * whether in request all mandatory child nodes are available.
      *
      * @return count of YANG schema nodes
      * @throws DataModelException a violation in data model rule
@@ -66,20 +64,18 @@ public interface YangSchemaNode {
             throws DataModelException;
 
     /**
-     * Returns map of default child nodes, this is used by YMS to identify
-     * whether in request all default child nodes are available.
+     * Returns map of default child nodes, this is used by YMS to identify whether
+     * in request all default child nodes are available.
      *
      * @param dataNodeIdentifier YANG data node identifier
      * @return map of default child nodes
      */
-    Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(
-            YangSchemaNodeIdentifier dataNodeIdentifier);
+    Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier);
 
     /**
      * Get Java class's package corresponding to the schema node.
      *
-     * @return java package, it is null, if the Java type is a built in data
-     * type
+     * @return java package, it is null, if the Java type is a built in data type
      */
     String getJavaPackage();
 
@@ -117,4 +113,26 @@ public interface YangSchemaNode {
      * @return name of the node
      */
     String getNameSpace();
+
+    /**
+     * Checks for the presence of notification in module/sub-module. Exception
+     * will be thrown if this is called for any other node type.
+     *
+     * @return true if notification is present, false otherwise
+     * @throws DataModelException a violation in data model rule
+     */
+    boolean isNotificationPresent() throws DataModelException;
+
+    /**
+     * Returns notification shcema node corresponding to the name of notification
+     * as per the generated code enumeration. This is to be used for notification
+     * processing in YMS.
+     *
+     * @param notificationNameInEnum notification name as per the generated
+     *                               code enumeration.
+     * @return notification schema node
+     * @throws DataModelException a violation in data model rule
+     */
+    YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
+            throws DataModelException;
 }

@@ -17,7 +17,6 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
@@ -31,7 +30,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClo
  * Represents base class of a node in data model tree.
  */
 public abstract class YangNode
-        implements Cloneable, Serializable, YangSchemaNode, Comparable<YangNode> {
+        implements Cloneable, Serializable, YangSchemaNode,
+        Comparable<YangNode> {
 
     private static final long serialVersionUID = 806201601L;
 
@@ -121,7 +121,8 @@ public abstract class YangNode
      * @param type              of YANG node
      * @param ysnContextInfoMap YSN context info map
      */
-    protected YangNode(YangNodeType type, Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
+    protected YangNode(YangNodeType type,
+                       Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
         setNodeType(type);
         this.ysnContextInfoMap = ysnContextInfoMap;
     }
@@ -226,7 +227,8 @@ public abstract class YangNode
     public void addChild(YangNode newChild)
             throws DataModelException {
         if (newChild.getNodeType() == null) {
-            throw new DataModelException("Abstract node cannot be inserted into a tree");
+            throw new DataModelException("Abstract node cannot be inserted " +
+                                                 "into a tree");
         }
 
         if (newChild.getParent() == null) {
@@ -236,15 +238,20 @@ public abstract class YangNode
         }
 
         if (newChild.getChild() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a child");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a child");
         }
 
         if (newChild.getNextSibling() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a next sibling");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a next " +
+                                                 "sibling");
         }
 
         if (newChild.getPreviousSibling() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a previous sibling");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a previous " +
+                                                 "sibling");
         }
 
         /* First child to be added */
@@ -274,8 +281,9 @@ public abstract class YangNode
      * @param name      name of the node
      * @param namespace namespace of the node
      */
-    protected void processAdditionOfSchemaNodeToParentMap(String name, String namespace) {
-        processAdditionOfSchemaNodeToMap(getName(), getNameSpace(), this, getParent());
+    protected void processAdditionOfSchemaNodeToParentMap(String name,
+                                                          String namespace) {
+        processAdditionOfSchemaNodeToMap(name, namespace, this, getParent());
     }
 
     /**
@@ -285,8 +293,9 @@ public abstract class YangNode
      * @param namespace      namespace of the node
      * @param yangSchemaNode YANG schema node
      */
-    public void processAdditionOfSchemaNodeToCurNodeMap(String name, String namespace, YangSchemaNode
-            yangSchemaNode) {
+    public void processAdditionOfSchemaNodeToCurNodeMap(String name,
+                                                        String namespace,
+                                                        YangSchemaNode yangSchemaNode) {
         processAdditionOfSchemaNodeToMap(name, namespace, yangSchemaNode, this);
     }
 
@@ -298,7 +307,9 @@ public abstract class YangNode
      * @param yangSchemaNode       YANG schema node
      * @param childSchemaMapHolder child schema map holder
      */
-    private void processAdditionOfSchemaNodeToMap(String name, String namespace, YangSchemaNode yangSchemaNode,
+    private void processAdditionOfSchemaNodeToMap(String name,
+                                                  String namespace,
+                                                  YangSchemaNode yangSchemaNode,
                                                   YangNode childSchemaMapHolder) {
         // Addition of node to schema node map.
         // Create YANG schema node identifier with child node name.
@@ -310,7 +321,8 @@ public abstract class YangNode
         yangSchemaNodeContextInfo.setSchemaNode(yangSchemaNode);
         // Invoke parent method to add the created entry.
         try {
-            childSchemaMapHolder.addToChildSchemaMap(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
+            childSchemaMapHolder.addToChildSchemaMap(yangSchemaNodeIdentifier,
+                                                     yangSchemaNodeContextInfo);
         } catch (DataModelException e) {
             //TODO
         }
@@ -360,7 +372,8 @@ public abstract class YangNode
      * @param yangUses    YANG uses
      * @throws DataModelException data model error
      */
-    public static void cloneSubTree(YangNode srcRootNode, YangNode dstRootNode, YangUses yangUses)
+    public static void cloneSubTree(YangNode srcRootNode, YangNode dstRootNode,
+                                    YangUses yangUses)
             throws DataModelException {
 
         YangNode nextNodeToClone = srcRootNode;
@@ -385,11 +398,14 @@ public abstract class YangNode
         try {
             while (nextNodeToClone != srcRootNode) {
                 if (nextNodeToClone == null) {
-                    throw new DataModelException("Internal error: Cloning failed, source tree null pointer reached");
+                    throw new DataModelException("Internal error: Cloning " +
+                                                         "failed, source tree " +
+                                                         "null pointer reached");
                 }
                 if (curTraversal != PARENT) {
                     newNode = nextNodeToClone.clone(yangUses);
-                    detectCollisionWhileCloning(clonedTreeCurNode, newNode, curTraversal);
+                    detectCollisionWhileCloning(clonedTreeCurNode, newNode,
+                                                curTraversal);
                 }
 
                 if (curTraversal == CHILD) {
@@ -447,24 +463,31 @@ public abstract class YangNode
      * @param addAs       traversal type of the node
      * @throws DataModelException data model error
      */
-    private static void detectCollisionWhileCloning(YangNode currentNode, YangNode newNode, TraversalType addAs)
+    private static void detectCollisionWhileCloning(YangNode currentNode,
+                                                    YangNode newNode,
+                                                    TraversalType addAs)
             throws DataModelException {
         if (!(currentNode instanceof CollisionDetector)
                 || !(newNode instanceof Parsable)) {
-            throw new DataModelException("Node in data model tree does not support collision detection");
+            throw new DataModelException("Node in data model tree does not " +
+                                                 "support collision detection");
         }
 
         CollisionDetector collisionDetector = (CollisionDetector) currentNode;
         Parsable parsable = (Parsable) newNode;
         if (addAs == TraversalType.CHILD) {
-            collisionDetector.detectCollidingChild(newNode.getName(), parsable.getYangConstructType());
+            collisionDetector.detectCollidingChild(newNode.getName(),
+                                                   parsable.getYangConstructType());
         } else if (addAs == TraversalType.SIBILING) {
             currentNode = currentNode.getParent();
             if (!(currentNode instanceof CollisionDetector)) {
-                throw new DataModelException("Node in data model tree does not support collision detection");
+                throw new DataModelException("Node in data model tree does " +
+                                                     "not support collision " +
+                                                     "detection");
             }
             collisionDetector = (CollisionDetector) currentNode;
-            collisionDetector.detectCollidingChild(newNode.getName(), parsable.getYangConstructType());
+            collisionDetector.detectCollidingChild(newNode.getName(),
+                                                   parsable.getYangConstructType());
         } else {
             throw new DataModelException("Errored tree cloning");
         }
@@ -499,7 +522,8 @@ public abstract class YangNode
             throws DataModelException {
 
         if (newSibling.getNodeType() == null) {
-            throw new DataModelException("Cloned abstract node cannot be inserted into a tree");
+            throw new DataModelException("Cloned abstract node cannot be " +
+                                                 "inserted into a tree");
         }
 
         if (newSibling.getParent() == null) {
@@ -510,31 +534,40 @@ public abstract class YangNode
             newSibling.setParent(getParent());
 
         } else {
-            throw new DataModelException("Node is already part of a tree, and cannot be added as a sibling");
+            throw new DataModelException("Node is already part of a tree, " +
+                                                 "and cannot be added as a " +
+                                                 "sibling");
         }
 
         if (newSibling.getPreviousSibling() == null) {
             newSibling.setPreviousSibling(this);
             setNextSibling(newSibling);
         } else {
-            throw new DataModelException("New sibling to be added is not atomic, it already has a previous sibling");
+            throw new DataModelException("New sibling to be added is not " +
+                                                 "atomic, it already has a " +
+                                                 "previous sibling");
         }
 
         if (newSibling.getChild() != null) {
-            throw new DataModelException("Sibling to be added is not atomic, it already has a child");
+            throw new DataModelException("Sibling to be added is not atomic, " +
+                                                 "it already has a child");
         }
 
         if (newSibling.getNextSibling() != null) {
-            throw new DataModelException("Sibling to be added is not atomic, it already has a next sibling");
+            throw new DataModelException("Sibling to be added is not atomic, " +
+                                                 "it already has a next sibling");
         }
     }
 
     @Override
     public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
             throws DataModelException {
-        YangSchemaNodeContextInfo childSchemaContext = ysnContextInfoMap.get(dataNodeIdentifier);
+        YangSchemaNodeContextInfo childSchemaContext =
+                ysnContextInfoMap.get(dataNodeIdentifier);
         if (childSchemaContext == null) {
-            throw new DataModelException("Requested " + dataNodeIdentifier.getName() + "is not child in "
+            throw new DataModelException("Requested " +
+                                                 dataNodeIdentifier.getName() +
+                                                 "is not child in "
                     + getName());
         }
         return childSchemaContext;
@@ -549,6 +582,11 @@ public abstract class YangNode
     @Override
     public Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier) {
         return defaultChildMap;
+    }
+
+    @Override
+    public boolean isNotificationPresent() throws DataModelException {
+        throw new DataModelException("Method is called for node other than module/sub-module.");
     }
 
     /**
@@ -600,7 +638,8 @@ public abstract class YangNode
      *
      * @return YANG schema node context info map
      */
-    public Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> getYsnContextInfoMap() {
+    public Map<YangSchemaNodeIdentifier,
+            YangSchemaNodeContextInfo> getYsnContextInfoMap() {
         return ysnContextInfoMap;
     }
 
@@ -632,7 +671,8 @@ public abstract class YangNode
      *
      * @param ysnContextInfoMap YSN context info map
      */
-    public void setYsnContextInfoMap(Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
+    public void setYsnContextInfoMap(Map<YangSchemaNodeIdentifier,
+            YangSchemaNodeContextInfo> ysnContextInfoMap) {
         this.ysnContextInfoMap = ysnContextInfoMap;
     }
 
@@ -642,7 +682,8 @@ public abstract class YangNode
      * @param yangSchemaNodeIdentifier  YANG schema node identifier
      * @param yangSchemaNodeContextInfo YANG schema node context info
      */
-    public void addToYsnContextInfoMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNodeContextInfo
+    public void addToYsnContextInfoMap(YangSchemaNodeIdentifier
+                                               yangSchemaNodeIdentifier, YangSchemaNodeContextInfo
             yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
@@ -702,5 +743,12 @@ public abstract class YangNode
             yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }
         yangSchemaNodeIdentifier.setNameSpace(namespace);
+    }
+
+    @Override
+    public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
+            throws DataModelException {
+        throw new DataModelException("Method called for schema node other " +
+                                             "then module/sub-module");
     }
 }

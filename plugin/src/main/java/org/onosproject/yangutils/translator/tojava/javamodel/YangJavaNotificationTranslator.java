@@ -17,23 +17,25 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.io.IOException;
-
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
+import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaNotification;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfAugmentableNode;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
@@ -71,7 +73,8 @@ public class YangJavaNotificationTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node");
+            throw new TranslatorException("Missing java info in java " +
+                                                  "datamodel node");
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -114,11 +117,14 @@ public class YangJavaNotificationTranslator
      * @throws TranslatorException translator operation fail
      */
     @Override
-    public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
+    public void generateCodeEntry(YangPluginConfig yangPlugin)
+            throws TranslatorException {
 
         /*
-         * As part of the notification support the following files needs to be generated.
-         * 1) Subject of the notification(event), this is simple interface with builder class.
+         * As part of the notification support the following files needs to
+         * be generated.
+         * 1) Subject of the notification(event), this is simple interface with
+         * builder class.
          * 2) Event class extending "AbstractEvent" and defining event type enum.
          * 3) Event listener interface extending "EventListener".
          *
@@ -132,7 +138,8 @@ public class YangJavaNotificationTranslator
             addNotificationToExtendsList();
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to prepare generate code entry for notification node " + getName());
+                    "Failed to prepare generate code entry for notification " +
+                            "node " + getName());
         }
     }
 
@@ -167,8 +174,34 @@ public class YangJavaNotificationTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for notification node " + getName());
+            throw new TranslatorException("Failed to generate code for " +
+                                                  "notification node " +
+                                                  getName());
         }
 
+    }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        if (this.getParent() != null) {
+            String nameSpace = this.getParent().getNameSpace();
+            // Set namespace for self node.
+            setNameSpace(nameSpace);
+            // Process addition of leaf to the child schema map of parent.
+            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
+            // Obtain the notification name as per enum in notification.
+            String enumName = getEnumJavaAttribute(getJavaFileInfo().getJavaName()).toUpperCase();
+
+            ((RpcNotificationContainer) this.getParent()).addToNotificationEnumMap(enumName, this);
+
+        }
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        if (this instanceof YangLeavesHolder) {
+            ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
+        }
     }
 }

@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -82,8 +82,9 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLi
  */
 public abstract class YangSubModule
         extends YangNode
-        implements YangLeavesHolder, YangDesc, YangReference, Parsable, CollisionDetector, YangReferenceResolver,
-        RpcNotificationContainer, YangFeatureHolder, YangIsFilterContentNodes {
+        implements YangLeavesHolder, YangDesc, YangReference, Parsable,
+        CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
+        YangFeatureHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201614L;
 
@@ -235,6 +236,16 @@ public abstract class YangSubModule
     private List<YangResolutionInfo> augmentResolutionList;
 
     /**
+     * Flag to indicate the presence of notification.
+     */
+    private boolean isNotificationPresent;
+
+    /**
+     * Map of notification enum.
+     */
+    private Map<String, YangSchemaNode> notificationEnumMap;
+
+    /**
      * Creates a sub module node.
      */
     public YangSubModule() {
@@ -254,6 +265,7 @@ public abstract class YangSubModule
         extensionList = new LinkedList<>();
         compilerAnnotationList = new LinkedList<>();
         listOfFeature = new LinkedList<>();
+        notificationEnumMap = new HashMap<>();
     }
 
     @Override
@@ -268,7 +280,8 @@ public abstract class YangSubModule
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                     YangSchemaNode yangSchemaNode) {
         // TODO
     }
 
@@ -568,14 +581,16 @@ public abstract class YangSubModule
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Asks helper to detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         // Not required as module doesn't have any parent.
     }
@@ -742,4 +757,37 @@ public abstract class YangSubModule
         }
     }
 
+
+    @Override
+    public boolean isNotificationPresent() {
+        return isNotificationPresent;
+    }
+
+    @Override
+    public void setNotificationPresenceFlag(boolean notificationPresent) {
+        this.isNotificationPresent = notificationPresent;
+    }
+
+    @Override
+    public void addToNotificationEnumMap(String nameOfNotificationInEnum,
+                                         YangSchemaNode notficationSchemaNode) {
+        getNotificationEnumMap().put(nameOfNotificationInEnum,
+                                     notficationSchemaNode);
+    }
+
+    /**
+     * Returns notification enumeration map with key as the name of
+     * notification as per the enum in generated code and value as the
+     * notification schema node.
+     *
+     * @return notification enumeration map
+     */
+    private Map<String, YangSchemaNode> getNotificationEnumMap() {
+        return notificationEnumMap;
+    }
+
+    @Override
+    public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum) {
+        return getNotificationEnumMap().get(notificationNameInEnum);
+    }
 }

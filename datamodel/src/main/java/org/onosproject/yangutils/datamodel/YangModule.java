@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -74,8 +74,9 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLi
  */
 public abstract class YangModule
         extends YangNode
-        implements YangLeavesHolder, YangDesc, YangReference, Parsable, CollisionDetector, YangReferenceResolver,
-        RpcNotificationContainer, YangFeatureHolder, YangIsFilterContentNodes {
+        implements YangLeavesHolder, YangDesc, YangReference, Parsable,
+        CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
+        YangFeatureHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201610L;
 
@@ -232,6 +233,16 @@ public abstract class YangModule
     private List<YangExtension> extensionList;
 
     /**
+     * Flag to indicate the presence of notification.
+     */
+    private boolean isNotificationPresent;
+
+    /**
+     * Map of notification enum.
+     */
+    private Map<String, YangSchemaNode> notificationEnumMap;
+
+    /**
      * Creates a YANG node of module type.
      */
     public YangModule() {
@@ -251,6 +262,7 @@ public abstract class YangModule
         listOfLeafList = new LinkedList<>();
         extensionList = new LinkedList<>();
         listOfFeature = new LinkedList<>();
+        notificationEnumMap = new HashMap<>();
     }
 
     @Override
@@ -265,7 +277,8 @@ public abstract class YangModule
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                     YangSchemaNode yangSchemaNode) {
         // TODO
     }
 
@@ -621,14 +634,16 @@ public abstract class YangModule
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Asks helper to detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         // Not required as module doesn't have any parent.
     }
@@ -737,5 +752,38 @@ public abstract class YangModule
         for (YangLeafList yangLeafList : getListOfLeafList()) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    @Override
+    public boolean isNotificationPresent() {
+        return isNotificationPresent;
+    }
+
+    @Override
+    public void setNotificationPresenceFlag(boolean notificationPresent) {
+        isNotificationPresent = notificationPresent;
+    }
+
+    @Override
+    public void addToNotificationEnumMap(String nameOfNotificationInEnum,
+                                         YangSchemaNode notficationSchemaNode) {
+        getNotificationEnumMap().put(nameOfNotificationInEnum,
+                                     notficationSchemaNode);
+    }
+
+    /**
+     * Returns notification enumeration map with key as the name of
+     * notification as per the enum in generated code and value as the
+     * notification schema node.
+     *
+     * @return notification enumeration map
+     */
+    private Map<String, YangSchemaNode> getNotificationEnumMap() {
+        return notificationEnumMap;
+    }
+
+    @Override
+    public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum) {
+        return getNotificationEnumMap().get(notificationNameInEnum);
     }
 }

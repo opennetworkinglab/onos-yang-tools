@@ -14,4 +14,12 @@ module Testmodule {
              }
         }
     }
+    notification testnotification1 {
+        leaf type {
+            type string;
+        }
+        leaf severity {
+            type string;
+        }
+    }
 }

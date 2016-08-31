@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
@@ -32,6 +33,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
@@ -46,10 +48,14 @@ public class SchemaNodeTest {
     /**
      * Checks method to get schema node from map.
      *
-     * @throws MojoExecutionException
+     * @throws IOException a violation in IO rule
+     * @throws ParserException a violation in parser rule
+     * @throws MojoExecutionException a violation in mojo rule
+     * @throws DataModelException a violation in data model rule
      */
     @Test
-    public void processSchemaNodeMap() throws IOException, ParserException, MojoExecutionException {
+    public void processSchemaNodeMap() throws IOException, ParserException,
+            MojoExecutionException, DataModelException {
 
         String searchDir = "src/test/resources/schemaMap";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
@@ -63,13 +69,23 @@ public class SchemaNodeTest {
         Iterator<YangNode> yangNodeIterator = utilManager.getYangNodeSet().iterator();
         YangNode rootNode = yangNodeIterator.next();
 
+        // Validate the notification enum map
+        assertThat(rootNode.getChild().getNextSibling(),
+                   is(rootNode.getNotificationSchemaNode("TESTNOTIFICATION1")));
+
+        // Validate the notification enum map shouldn't have container
+        assertThat(rootNode.getNotificationSchemaNode("TESTCONTAINER"),
+                   is(nullValue()));
+
         assertThat(rootNode.getYsnContextInfoMap(), is(notNullValue()));
-        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap = rootNode.getYsnContextInfoMap();
+        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap =
+                rootNode.getYsnContextInfoMap();
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         yangSchemaNodeIdentifier.setName("testcontainer");
         yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap.get(yangSchemaNodeIdentifier), is(notNullValue()));
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo = schemaMap.get(yangSchemaNodeIdentifier);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo =
+                schemaMap.get(yangSchemaNodeIdentifier);
         assertThat(yangSchemaNodeContextInfo.getSchemaNode(), is(rootNode.getChild()));
 
         assertThat(rootNode.getChild().getYsnContextInfoMap(), is(notNullValue()));
@@ -84,21 +100,26 @@ public class SchemaNodeTest {
         assertThat(schemaMap2.get(yangSchemaNodeIdentifier), is(notNullValue()));
 
         assertThat(rootNode.getChild().getChild().getYsnContextInfoMap(), is(notNullValue()));
-        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap3 = rootNode.getChild().getChild()
+        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap3 =
+                rootNode.getChild().getChild()
                 .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
         yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap3.get(yangSchemaNodeIdentifier), is(notNullValue()));
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo3 = schemaMap3.get(yangSchemaNodeIdentifier);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo3 =
+                schemaMap3.get(yangSchemaNodeIdentifier);
 
-        assertThat(rootNode.getChild().getChild().getChild().getYsnContextInfoMap(), is(notNullValue()));
-        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap4 = rootNode.getChild().getChild().getChild()
+        assertThat(rootNode.getChild().getChild().getChild().getYsnContextInfoMap(),
+                   is(notNullValue()));
+        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> schemaMap4 =
+                rootNode.getChild().getChild().getChild()
                 .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
         yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
         assertThat(schemaMap4.get(yangSchemaNodeIdentifier), is(notNullValue()));
 
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo2 = schemaMap4.get(yangSchemaNodeIdentifier);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo2 =
+                schemaMap4.get(yangSchemaNodeIdentifier);
         List<YangLeaf> yangListOfLeaf = ((YangLeavesHolder) rootNode.getChild().getChild().getChild()).getListOfLeaf();
         YangLeaf yangLeaf = yangListOfLeaf.get(0);
         assertThat(yangSchemaNodeContextInfo2.getSchemaNode(), is(yangLeaf));
@@ -109,4 +130,33 @@ public class SchemaNodeTest {
         deleteDirectory("target/schemaMap/");
     }
 
+    /**
+     * Checks that notification map shouldn't be present in other YANG node.
+     *
+     * @throws IOException a violation in IO rule
+     * @throws ParserException a violation in parser rule
+     * @throws MojoExecutionException a violation in mojo rule
+     * @throws DataModelException a violation in data model rule
+     */
+    @Test(expected = DataModelException.class)
+    public void processNotificationEnumMapInvalidScenario() throws IOException,
+            ParserException, MojoExecutionException,
+            DataModelException {
+
+        String searchDir = "src/test/resources/schemaMap";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir("target/schemaMap/");
+        utilManager.translateToJava(yangPluginConfig);
+
+        Iterator<YangNode> yangNodeIterator = utilManager.getYangNodeSet().iterator();
+        YangNode rootNode = yangNodeIterator.next();
+
+        deleteDirectory("target/schemaMap/");
+
+        rootNode.getChild().getNotificationSchemaNode("TESTNOTIFICATION1");
+    }
 }

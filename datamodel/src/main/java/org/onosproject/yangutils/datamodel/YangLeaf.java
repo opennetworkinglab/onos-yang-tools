@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
@@ -64,7 +63,8 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public abstract class YangLeaf
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
-        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode, YangConfig {
+        YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode,
+        YangConfig {
 
     private static final long serialVersionUID = 806201635L;
 
@@ -368,7 +368,8 @@ public abstract class YangLeaf
     @Override
     public void validateDataOnExit()
             throws DataModelException {
-        if (defaultValueInString != null && !defaultValueInString.isEmpty() && dataType != null) {
+        if (defaultValueInString != null && !defaultValueInString.isEmpty()
+                && dataType != null) {
             dataType.isValidValue(defaultValueInString);
         }
     }
@@ -434,6 +435,11 @@ public abstract class YangLeaf
     }
 
     @Override
+    public boolean isNotificationPresent() throws DataModelException {
+        throw new DataModelException("Method is called for node other than module/sub-module.");
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_SINGLE_INSTANCE_LEAF_NODE;
     }
@@ -459,14 +465,19 @@ public abstract class YangLeaf
      *
      * @param yangSchemaNodeIdentifier YANG schema node identifier
      */
-    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier yangSchemaNodeIdentifier) {
+    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier
+                                                    yangSchemaNodeIdentifier) {
         if (this.yangSchemaNodeIdentifier == null) {
             this.yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }
         this.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier;
     }
 
-    @Override
+    /**
+     * Retrieve the name of leaf.
+     *
+     * @return leaf name
+     */
     public String getName() {
         return yangSchemaNodeIdentifier.getName();
     }
@@ -498,5 +509,12 @@ public abstract class YangLeaf
             yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }
         yangSchemaNodeIdentifier.setNameSpace(namespace);
+    }
+
+    @Override
+    public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
+            throws DataModelException {
+        throw new DataModelException("Method called for schema node other " +
+                                             "then module/sub-module");
     }
 }

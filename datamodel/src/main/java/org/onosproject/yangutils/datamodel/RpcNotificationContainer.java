@@ -20,4 +20,20 @@ package org.onosproject.yangutils.datamodel;
  * Represents class having rpc and notification.
  */
 public interface RpcNotificationContainer {
+
+    /**
+     * Sets notification presence flag.
+     *
+     * @param notificationPresent notification presence flag
+     */
+    void setNotificationPresenceFlag(boolean notificationPresent);
+
+    /**
+     * Adds to notification enumeration map.
+     *
+     * @param nameOfNotificationInEnum name of notification in enum
+     * @param notficationSchemaNode    schema node of notification
+     */
+    void addToNotificationEnumMap(String nameOfNotificationInEnum,
+                                  YangSchemaNode notficationSchemaNode);
 }
