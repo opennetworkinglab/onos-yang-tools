@@ -159,8 +159,6 @@ public abstract class YangChoice
      */
     private YangAppErrorInfo yangAppErrorInfo;
 
-    private boolean isAugmented;
-
     /**
      * Create a choice node.
      */
@@ -463,16 +461,6 @@ public abstract class YangChoice
     @Override
     public List<YangAugment> getAugmentedInfoList() {
         return yangAugmentedInfo;
-    }
-
-    @Override
-    public void setIsAugmented(boolean isAugmented) {
-        this.isAugmented = isAugmented;
-    }
-
-    @Override
-    public boolean isAugmented() {
-        return isAugmented;
     }
 
     @Override

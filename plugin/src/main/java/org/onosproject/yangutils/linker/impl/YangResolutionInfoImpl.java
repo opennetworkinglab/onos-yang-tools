@@ -1249,8 +1249,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 if (targetNode instanceof YangAugmentableNode) {
                     detectCollisionForAugmentedNode(targetNode, augment);
                     ((YangAugmentableNode) targetNode).addAugmentation(augment);
-                    ((YangAugmentableNode) targetNode).setIsAugmented(true);
                     augment.setAugmentedNode(targetNode);
+                    setAugmentedFlagInAncestors(targetNode);
                     Resolvable resolvable = (Resolvable) entityToResolve;
                     resolvable.setResolvableStatus(RESOLVED);
                 } else {
@@ -1842,4 +1842,16 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         return null;
     }
 
+    /**
+     * Sets descendant node augmented flag in ancestors.
+     *
+     * @param targetNode augmented YANG node
+     */
+    private void setAugmentedFlagInAncestors(YangNode targetNode) {
+        targetNode = targetNode.getParent();
+        while (targetNode != null) {
+            targetNode.setDescendantNodeAugmented(true);
+            targetNode = targetNode.getParent();
+        }
+    }
 }

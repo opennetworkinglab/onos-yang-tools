@@ -96,6 +96,11 @@ public abstract class YangNode extends DefaultLocationInfo
     private Map<YangSchemaNodeIdentifier, YangSchemaNode> defaultChildMap;
 
     /**
+     * Flag to check whether any descendant node is augmented.
+     */
+    private boolean isDescendantNodeAugmented;
+
+    /**
      * Returns the priority of the node.
      *
      * @return priority of the node
@@ -130,6 +135,24 @@ public abstract class YangNode extends DefaultLocationInfo
                        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
         setNodeType(type);
         this.ysnContextInfoMap = ysnContextInfoMap;
+    }
+
+    /**
+     * Returns true if descendant node is augmented.
+     *
+     * @return true if descendant node is augmented
+     */
+    public boolean isDescendantNodeAugmented() {
+        return isDescendantNodeAugmented;
+    }
+
+    /**
+     * Sets true if descendant node is augmented.
+     *
+     * @param descendantNodeAugmented true if descendant node is augmented.
+     */
+    public void setDescendantNodeAugmented(boolean descendantNodeAugmented) {
+        isDescendantNodeAugmented = descendantNodeAugmented;
     }
 
     /**
