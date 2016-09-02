@@ -1,0 +1,15 @@
+module moduletest {
+  yang-version 1;
+  namespace "onos-yang-20:level1:newlevel";
+  prefix test;
+  organization "huawei";
+  contact "adarsh.m@huawei.com";
+  description "leaf scenario";
+  revision 2015-02-05;
+  leaf eleven {
+    type union { 
+      type binary;
+      type int8;
+    }
+  }
+}

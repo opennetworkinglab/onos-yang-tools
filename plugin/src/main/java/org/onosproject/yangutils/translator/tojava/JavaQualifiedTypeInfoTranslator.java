@@ -28,8 +28,11 @@ import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import com.google.common.base.MoreObjects;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportClass;
 import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportPackage;
+import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
+import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
 
 /**
  * Represents the information about individual imports in the generated file.
@@ -177,10 +180,15 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
          */
         JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = new JavaQualifiedTypeInfoTranslator();
 
-        qualifiedInfoOfFromString.setClassInfo(
-                getJavaImportClass(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
-        qualifiedInfoOfFromString.setPkgInfo(
-                getJavaImportPackage(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
+        if (referredTypesAttrInfo.getAttributeType().getDataType() == BINARY) {
+            qualifiedInfoOfFromString.setClassInfo(BASE64);
+            qualifiedInfoOfFromString.setPkgInfo(COLLECTION_IMPORTS);
+        } else {
+            qualifiedInfoOfFromString.setClassInfo(
+                    getJavaImportClass(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
+            qualifiedInfoOfFromString.setPkgInfo(
+                    getJavaImportPackage(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
+        }
         return qualifiedInfoOfFromString;
     }
 

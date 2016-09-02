@@ -209,5 +209,28 @@ public final class UnionTranslatorTest {
         deleteDirectory("target/unionTranslator/");
     }
 
+    /**
+     * Unit test case to test Union with binary type.
+     *
+     * @throws IOException when fails to do IO operations
+     * @throws MojoExecutionException when fails to do mojo operations
+     */
+    @Test
+    public void processUnionWithBinaryTypes() throws IOException,
+            MojoExecutionException {
+        String searchDir = "src/test/resources/unionTranslator/unionwithbinary";
+        YangUtilManager utilManager = new YangUtilManager();
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir("target/unionTranslator/");
+
+        utilManager.translateToJava(yangPluginConfig);
+        deleteDirectory("target/unionTranslator/");
+    }
+
     // TODO enhance the test cases, after having a framework of translator test.
 }
