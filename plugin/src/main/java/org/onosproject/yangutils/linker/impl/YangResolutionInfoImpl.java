@@ -1256,13 +1256,13 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 } else {
                     throw new LinkerException("Invalid target node type " + targetNode.getNodeType() + " for "
                             + augment.getName() + " for " + targetNode.getName() +
-                            "in " + targetNode.getLineNumber()
+                            " in " + targetNode.getLineNumber()
                             + " at " + targetNode.getCharPosition() +
                             " in " + targetNode.getFileName());
                 }
             } else {
                 throw new LinkerException("Failed to link " + augment.getName() +
-                        "in " + augment.getLineNumber()
+                        " in " + augment.getLineNumber()
                         + " at " + augment.getCharPosition() +
                         " in " + augment.getFileName());
             }

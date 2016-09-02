@@ -115,7 +115,7 @@ public final class AugmentListener {
         detectCollidingChildUtil(listener, line, charPositionInLine, "", AUGMENT_DATA);
 
         Parsable curData = listener.getParsedDataStack().peek();
-        if (curData instanceof YangModule || curData instanceof YangSubModule || curData instanceof YangUses) {
+        if (curData instanceof YangModule || curData instanceof YangSubModule) {
             YangNode curNode = (YangNode) curData;
             YangAugment yangAugment = getYangAugmentNode(JAVA_GENERATION);
             yangAugment.setLineNumber(line);
@@ -141,7 +141,11 @@ public final class AugmentListener {
                     charPositionInLine);
             addToResolutionList(resolutionInfo, ctx);
 
-        } else {
+        } else if (curData instanceof YangUses) {
+            throw new ParserException(constructListenerErrorMessage(UNHANDLED_PARSED_DATA, AUGMENT_DATA,
+                    ctx.augment().getText(), ENTRY));
+        }
+        else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, AUGMENT_DATA,
                     ctx.augment().getText(), ENTRY));
         }
