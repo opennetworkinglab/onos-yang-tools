@@ -255,45 +255,48 @@ public abstract class YangNode extends DefaultLocationInfo
     public void addChild(YangNode newChild)
             throws DataModelException {
         if (newChild.getNodeType() == null) {
-            throw new DataModelException("Abstract node cannot be inserted into a tree " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+            throw new DataModelException("Abstract node cannot be inserted " +
+                                                 "into a tree " + getName() +
+                                                 " in " + getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
 
         if (newChild.getParent() == null) {
             newChild.setParent(this);
         } else if (newChild.getParent() != this) {
             throw new DataModelException("Node is already part of a tree " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
         }
 
         if (newChild.getChild() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a child "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a child " +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
         }
 
         if (newChild.getNextSibling() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a next sibling "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a next " +
+                                                 "sibling " + getName() +
+                                                 " in " + getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
 
         if (newChild.getPreviousSibling() != null) {
-            throw new DataModelException("Child to be added is not atomic, it already has a previous sibling "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Child to be added is not atomic, " +
+                                                 "it already has a previous " +
+                                                 "sibling " + getName() +
+                                                 " in " +    getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
 
         /* First child to be added */
@@ -440,11 +443,14 @@ public abstract class YangNode extends DefaultLocationInfo
         try {
             while (nextNodeToClone != srcRootNode) {
                 if (nextNodeToClone == null) {
-                    throw new DataModelException("Internal error: Cloning failed, source tree null pointer reached "
-                            + nextNodeToClone.getName() + " in " +
-                            nextNodeToClone.getLineNumber() + " at " +
-                            nextNodeToClone.getCharPosition()
-                            + " in " + nextNodeToClone.getFileName() + "\"");
+                    throw new DataModelException("Internal error: Cloning " +
+                                                         "failed, source " +
+                                                         "tree null pointer " +
+                                                         "reached " +
+                                                         nextNodeToClone.getName() +
+                                                         " in " + nextNodeToClone.getLineNumber() +
+                                                         " at " + nextNodeToClone.getCharPosition() +
+                                                         " in " + nextNodeToClone.getFileName() + "\"");
                 }
                 if (curTraversal != PARENT) {
                     newNode = nextNodeToClone.clone(yangUses);
@@ -494,10 +500,11 @@ public abstract class YangNode extends DefaultLocationInfo
                 }
             }
         } catch (CloneNotSupportedException e) {
-            throw new DataModelException("Failed to clone the tree " + nextNodeToClone.getName() + " in " +
-                    nextNodeToClone.getLineNumber() + " at " +
-                    nextNodeToClone.getCharPosition()
-                    + " in " + nextNodeToClone.getFileName() + "\"");
+            throw new DataModelException("Failed to clone the tree " +
+                                                 nextNodeToClone.getName() +
+                                                 " in " + nextNodeToClone.getLineNumber() +
+                                                 " at " + nextNodeToClone.getCharPosition() +
+                                                 " in " + nextNodeToClone.getFileName() + "\"");
         }
 
     }
@@ -516,11 +523,12 @@ public abstract class YangNode extends DefaultLocationInfo
             throws DataModelException {
         if (!(currentNode instanceof CollisionDetector)
                 || !(newNode instanceof Parsable)) {
-            throw new DataModelException("Node in data model tree does not support collision detection " +
-                    newNode.getName() + " in " +
-                    newNode.getLineNumber() + " at " +
-                    newNode.getCharPosition()
-                    + " in " + newNode.getFileName() + "\"");
+            throw new DataModelException("Node in data model tree does not " +
+                                                 "support collision detection " +
+                                                 newNode.getName() + " in " +
+                                                 newNode.getLineNumber() + " at " +
+                                                 newNode.getCharPosition() +
+                                                 " in " + newNode.getFileName() + "\"");
         }
 
         CollisionDetector collisionDetector = (CollisionDetector) currentNode;
@@ -531,20 +539,22 @@ public abstract class YangNode extends DefaultLocationInfo
         } else if (addAs == TraversalType.SIBILING) {
             currentNode = currentNode.getParent();
             if (!(currentNode instanceof CollisionDetector)) {
-                throw new DataModelException("Node in data model tree does not support collision detection"
-                        + currentNode.getName() + " in " +
-                        currentNode.getLineNumber() + " at " +
-                        currentNode.getCharPosition()
-                        + " in " + currentNode.getFileName() + "\"");
+                throw new DataModelException("Node in data model tree does " +
+                                                     "not support collision " +
+                                                     "detection" + currentNode.getName() +
+                                                     " in " + currentNode.getLineNumber() +
+                                                     " at " + currentNode.getCharPosition() +
+                                                     " in " + currentNode.getFileName() + "\"");
             }
             collisionDetector = (CollisionDetector) currentNode;
             collisionDetector.detectCollidingChild(newNode.getName(),
                                                    parsable.getYangConstructType());
         } else {
-            throw new DataModelException("Error tree cloning " + currentNode.getName() + " in " +
-                    currentNode.getLineNumber() + " at " +
-                    currentNode.getCharPosition()
-                    + " in " + currentNode.getFileName() + "\"");
+            throw new DataModelException("Error tree cloning " +
+                                                 currentNode.getName() + " in" +
+                                                 " " + currentNode.getLineNumber() +
+                                                 " at " + currentNode.getCharPosition() +
+                                                 " in " + currentNode.getFileName() + "\"");
         }
 
     }
@@ -577,7 +587,8 @@ public abstract class YangNode extends DefaultLocationInfo
             throws DataModelException {
 
         if (newSibling.getNodeType() == null) {
-            throw new DataModelException("Cloned abstract node cannot be inserted into a tree "
+            throw new DataModelException("Cloned abstract node cannot be " +
+                                                 "inserted into a tree "
                     + getName() + " in " +
                     getLineNumber() + " at " +
                     getCharPosition()
@@ -592,38 +603,43 @@ public abstract class YangNode extends DefaultLocationInfo
             newSibling.setParent(getParent());
 
         } else {
-            throw new DataModelException("Node is already part of a tree, and cannot be added as a sibling "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Node is already part of a tree, " +
+                                                 "and cannot be added as a " +
+                                                 "sibling " + getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
         }
 
         if (newSibling.getPreviousSibling() == null) {
             newSibling.setPreviousSibling(this);
             setNextSibling(newSibling);
         } else {
-            throw new DataModelException("New sibling to be added is not atomic, it already has a previous sibling "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("New sibling to be added is not " +
+                                                 "atomic, it already has a " +
+                                                 "previous sibling " +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
         }
 
         if (newSibling.getChild() != null) {
-            throw new DataModelException("Sibling to be added is not atomic, it already has a child "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Sibling to be added is not atomic, " +
+                                                 "it already has a child " +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
         }
 
         if (newSibling.getNextSibling() != null) {
-            throw new DataModelException("Sibling to be added is not atomic, it already has a next sibling "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Sibling to be added is not atomic, " +
+                                                 "it already has a next " +
+                                                 "sibling " + getName() +
+                                                 " in " + getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
     }
 
@@ -633,11 +649,10 @@ public abstract class YangNode extends DefaultLocationInfo
         YangSchemaNodeContextInfo childSchemaContext =
                 ysnContextInfoMap.get(dataNodeIdentifier);
         if (childSchemaContext == null) {
-            throw new DataModelException("Requested " + dataNodeIdentifier.getName() + "is not child in "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("Requested " +
+                                                 dataNodeIdentifier.getName() +
+                                                 " is not child in " +
+                                                 getName());
         }
         return childSchemaContext;
     }

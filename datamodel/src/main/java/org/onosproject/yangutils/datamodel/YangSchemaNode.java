@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.datamodel;
 
 import java.util.Map;
+
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
@@ -64,18 +65,21 @@ public interface YangSchemaNode {
             throws DataModelException;
 
     /**
-     * Returns map of default child nodes, this is used by YMS to identify whether
+     * Returns map of default child nodes, this is used by YMS to identify
+     * whether
      * in request all default child nodes are available.
      *
      * @param dataNodeIdentifier YANG data node identifier
      * @return map of default child nodes
      */
-    Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(YangSchemaNodeIdentifier dataNodeIdentifier);
+    Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(
+            YangSchemaNodeIdentifier dataNodeIdentifier);
 
     /**
      * Get Java class's package corresponding to the schema node.
      *
-     * @return java package, it is null, if the Java type is a built in data type
+     * @return java package, it is null, if the Java type is a built in data
+     * type
      */
     String getJavaPackage();
 
@@ -121,11 +125,14 @@ public interface YangSchemaNode {
      * @return true if notification is present, false otherwise
      * @throws DataModelException a violation in data model rule
      */
-    boolean isNotificationPresent() throws DataModelException;
+    boolean isNotificationPresent()
+            throws DataModelException;
 
     /**
-     * Returns notification shcema node corresponding to the name of notification
-     * as per the generated code enumeration. This is to be used for notification
+     * Returns notification shcema node corresponding to the name of
+     * notification
+     * as per the generated code enumeration. This is to be used for
+     * notification
      * processing in YMS.
      *
      * @param notificationNameInEnum notification name as per the generated

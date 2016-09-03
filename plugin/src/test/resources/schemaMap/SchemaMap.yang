@@ -22,4 +22,36 @@ module Testmodule {
             type string;
         }
     }
+
+    rpc activate-software-image {
+        description "description";
+        input {
+            leaf image-name {
+                type string;
+            }
+            list ospf {
+                key "invalid-interval";
+                config true;
+                max-elements 10;
+                min-elements 3;
+                leaf invalid-interval {
+                    type uint16;
+                }
+            }
+            container isis {
+               config true;
+               leaf invalid-interval {
+                   type uint16;
+               }
+           }
+        }
+        output {
+            leaf image-name {
+                type string;
+            }
+            leaf image-value {
+                type string;
+            }
+        }
+    }
 }

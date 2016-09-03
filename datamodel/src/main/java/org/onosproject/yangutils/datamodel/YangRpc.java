@@ -63,7 +63,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 public abstract class YangRpc
         extends YangNode
         implements YangCommonInfo, Parsable,
-        CollisionDetector, YangIfFeatureHolder {
+                   CollisionDetector, YangIfFeatureHolder {
 
     private static final long serialVersionUID = 806201613L;
 
@@ -96,28 +96,27 @@ public abstract class YangRpc
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(
+            YangSchemaNodeIdentifier schemaNodeIdentifier,
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
-        /*
-         * This will maintain all child schema which are there inside input and
-         * output as input/output is non data node.
-         */
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
     @Override
     public void incrementMandatoryChildCount() {
         /*
-         * This will maintain all mandatory child which are there inside input and
+         * This will maintain all mandatory child which are there inside
+         * input and
          * output as input/output is non data node.
          */
         // TODO
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                     YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(
+            YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+            YangSchemaNode yangSchemaNode) {
         /*
          * This will maintain all default child which are there inside input and
          * output as input/output is non data node.
@@ -131,21 +130,24 @@ public abstract class YangRpc
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as rpc \""
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("YANG file error: Duplicate input " +
+                                                 "identifier detected, same " +
+                                                 "as rpc \"" + getName() + " " +
+                                                 "in " + getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
     }
 

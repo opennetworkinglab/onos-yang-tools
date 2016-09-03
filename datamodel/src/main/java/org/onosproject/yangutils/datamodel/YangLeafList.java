@@ -428,7 +428,8 @@ public abstract class YangLeafList extends DefaultLocationInfo
     }
 
     @Override
-    public YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
+    public YangSchemaNodeContextInfo getChildSchema(
+            YangSchemaNodeIdentifier dataNodeIdentifier)
             throws DataModelException {
         throw new DataModelException("leaf cannot have any child schema nodes" +
                 getName() + " in " +

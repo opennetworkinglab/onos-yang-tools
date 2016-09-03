@@ -72,7 +72,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
  */
 public abstract class YangInput
         extends YangNode
-        implements YangLeavesHolder, Parsable, CollisionDetector, YangAugmentableNode, YangIsFilterContentNodes {
+        implements YangLeavesHolder, Parsable, CollisionDetector,
+                   YangAugmentableNode, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201608L;
 
@@ -102,23 +103,6 @@ public abstract class YangInput
                                     YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
-        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
-    }
-
-    @Override
-    public void setNameSpaceAndAddToParentSchemaMap() {
-        // Get parent namespace.
-        String nameSpace = this.getParent().getNameSpace();
-        // Set namespace for self node.
-        setNameSpace(nameSpace);
-        /*
-         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
-         * and leaf list.
-         */
-        setLeafNameSpaceAndAddToParentSchemaMap();
     }
 
     @Override
@@ -128,32 +112,36 @@ public abstract class YangInput
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+                                     YangSchemaNode yangSchemaNode) {
         //For non data nodes, default child to be added to parent node.
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as input \"" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+            throw new DataModelException("YANG file error: Duplicate input " +
+                                                 "identifier detected, same " +
+                                                 "as input \"" + getName() +
+                                                 " in " + getLineNumber() +
+                                                 " at " + getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
     }
 
@@ -230,4 +218,27 @@ public abstract class YangInput
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
+
+    @Override
+    public void setNameSpaceAndAddToParentSchemaMap() {
+        // Get parent namespace.
+        if (this.getParent() != null) {
+            String nameSpace = this.getParent().getNameSpace();
+            // Set namespace for self node.
+            setNameSpace(nameSpace);
+            // Process addition of leaf to the child schema map of parent.
+            processAdditionOfSchemaNodeToParentMap("input", getNameSpace());
+        }
+        /*
+         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
+         * and leaf list.
+         */
+        if (this instanceof YangLeavesHolder) {
+            ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
+        }
+    }
+    /*
+     * TODO analyze the reason to have RPC name prepended in input name in
+     * input Listener.
+     */
 }
