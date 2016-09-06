@@ -17,10 +17,11 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import java.util.List;
-import java.util.Map;
 
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
+import org.onosproject.yangutils.datamodel.YangEnum;
+import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
@@ -45,9 +46,11 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
-import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils
+        .getAugmentedClassNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getParentNodeNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getSetOfNodeIdentifiers;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.INT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.SHORT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD;
@@ -143,6 +146,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.REPLACE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_INPUT_VAR_NAME;
+import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static org.onosproject.yangutils.utils.UtilConstants.SET_METHOD_PREFIX;
@@ -158,6 +162,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SPLIT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.SQUARE_BRACKETS;
 import static org.onosproject.yangutils.utils.UtilConstants.STATIC;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
+import static org.onosproject.yangutils.utils.UtilConstants.STR_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
@@ -244,12 +249,12 @@ public final class MethodsGenerator {
         if (generatedJavaFiles == GENERATE_SERVICE_AND_MANAGER) {
             return generateForGetMethodWithAttribute(returnType)
                     + getGetterForInterface(attributeName, returnType, attr.isListAttr(), generatedJavaFiles,
-                    attr.getCompilerAnnotation());
+                                            attr.getCompilerAnnotation());
         }
 
         return getJavaDoc(GETTER_METHOD, attributeName, attr.isListAttr(), pluginConfig, appDataStructure)
                 + getGetterForInterface(attributeName, returnType, attr.isListAttr(), generatedJavaFiles,
-                attr.getCompilerAnnotation());
+                                        attr.getCompilerAnnotation());
     }
 
     /**
@@ -279,7 +284,7 @@ public final class MethodsGenerator {
         }
         return getJavaDoc(type, attributeName, attr.isListAttr(), pluginConfig, appDataStructure)
                 + getSetterForInterface(attributeName, attrType, className, attr.isListAttr(), generatedJavaFiles,
-                attr.getCompilerAnnotation());
+                                        attr.getCompilerAnnotation());
     }
 
     /**
@@ -926,7 +931,7 @@ public final class MethodsGenerator {
                     + FROM_STRING_PARAM_NAME + CLOSE_PARENTHESIS + SEMI_COLAN;
         } else {
             String parseFromStringMethod = getParseFromStringMethod(targetDataType,
-                    fromStringAttributeInfo.getAttributeType());
+                                                                    fromStringAttributeInfo.getAttributeType());
             return targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE + parseFromStringMethod
                     + OPEN_PARENTHESIS + FROM_STRING_PARAM_NAME + CLOSE_PARENTHESIS + SEMI_COLAN;
         }
@@ -1130,8 +1135,9 @@ public final class MethodsGenerator {
             appDataStructure = attr1.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
         }
         return getJavaDoc(TYPE_CONSTRUCTOR, generatedJavaClassName + " for type " + attrName1, false, pluginConfig,
-                appDataStructure) + getTypeConstructorString(attrType, attrName1,
-                attrName2, generatedJavaClassName, type, addFirst);
+                          appDataStructure) + getTypeConstructorString(attrType, attrName1,
+                                                                       attrName2, generatedJavaClassName, type,
+                                                                       addFirst);
     }
 
     /**
@@ -1273,36 +1279,34 @@ public final class MethodsGenerator {
      * @return enum's constructor
      */
     static String getEnumsConstructor(String className) {
-        return FOUR_SPACE_INDENTATION + className + OPEN_PARENTHESIS + INT + SPACE + VALUE + CLOSE_PARENTHESIS + SPACE
+        return FOUR_SPACE_INDENTATION + className + OPEN_PARENTHESIS + INT + SPACE + VALUE +
+                COMMA + SPACE + STRING_DATA_TYPE + SPACE + STR_VAL + CLOSE_PARENTHESIS + SPACE
                 + OPEN_CURLY_BRACKET + NEW_LINE + EIGHT_SPACE_INDENTATION + getSmallCase(className) + SPACE + EQUAL
-                + SPACE + VALUE + SEMI_COLAN + NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
+                + SPACE + VALUE + SEMI_COLAN + NEW_LINE
+                + EIGHT_SPACE_INDENTATION + SCHEMA_NAME + SPACE + EQUAL
+                + SPACE + STR_VAL + SEMI_COLAN + NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
     }
 
     /**
      * Returns of method for enum class.
      *
      * @param className    class name
-     * @param attr         java attribute
-     * @param enumMap      enum's sets map
-     * @param enumList     enum's sets list
      * @param pluginConfig plugin configurations
      * @return of method
      */
-    static String getEnumsOfMethod(String className, JavaAttributeInfo attr,
-                                   Map<String, Integer> enumMap, List<String> enumList,
-                                   YangPluginConfig pluginConfig) {
-        String attrType = getReturnType(attr);
-        String attrName = attr.getAttributeName();
+    static String getEnumsOfValueMethod(String className, YangEnumeration enumeration,
+                                        YangPluginConfig pluginConfig) {
 
         String method = FOUR_SPACE_INDENTATION + PUBLIC + SPACE + STATIC + SPACE + getCapitalCase(className) + SPACE
                 + OF + OPEN_PARENTHESIS
-                + attrType + SPACE + VALUE + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE
+                + INT + SPACE + VALUE + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE
                 + EIGHT_SPACE_INDENTATION + SWITCH + SPACE + OPEN_PARENTHESIS + VALUE
                 + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
         int value;
-        for (String str : enumList) {
-
-            value = enumMap.get(str);
+        String str;
+        for (YangEnum yangEnum : enumeration.getEnumSet()) {
+            value = yangEnum.getValue();
+            str = getEnumJavaAttribute(yangEnum.getNamedValue()).toUpperCase();
             method = method + TWELVE_SPACE_INDENTATION + CASE + SPACE + value + COLON + NEW_LINE
                     + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + getCapitalCase(className) + PERIOD
                     + str + SEMI_COLAN + NEW_LINE;
@@ -1311,7 +1315,39 @@ public final class MethodsGenerator {
                 + RETURN + SPACE + NULL + SEMI_COLAN + NEW_LINE + EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET
                 + NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
 
-        return getJavaDoc(OF_METHOD, getCapitalCase(className) + " for type " + attrName, false, pluginConfig, null)
+        return getJavaDoc(OF_METHOD, getCapitalCase(className) + " for value", false, pluginConfig, null)
+                + method;
+    }
+
+    /**
+     * Returns of method with string value for enum class.
+     *
+     * @param enumName enum class name
+     * @return of method with string value for enum class
+     */
+    static String getEnumValueOfSchemaNameMethod(String enumName,
+                                                 YangPluginConfig pluginConfig,
+                                                 YangEnumeration enumeration) {
+
+        String method = FOUR_SPACE_INDENTATION + PUBLIC + SPACE + STATIC + SPACE + getCapitalCase(enumName) + SPACE
+                + OF + OPEN_PARENTHESIS
+                + STRING_DATA_TYPE + SPACE + VALUE + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE
+                + EIGHT_SPACE_INDENTATION + SWITCH + SPACE + OPEN_PARENTHESIS + VALUE
+                + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+        String value;
+        for (YangEnum yangEnum : enumeration.getEnumSet()) {
+
+            value = getEnumJavaAttribute(yangEnum.getNamedValue()).toUpperCase();
+            method = method + TWELVE_SPACE_INDENTATION + CASE + SPACE + QUOTES +
+                    yangEnum.getNamedValue() + QUOTES + COLON + NEW_LINE
+                    + SIXTEEN_SPACE_INDENTATION + RETURN + SPACE + getCapitalCase(enumName) + PERIOD
+                    + value + SEMI_COLAN + NEW_LINE;
+        }
+        method = method + TWELVE_SPACE_INDENTATION + DEFAULT + SPACE + COLON + NEW_LINE + SIXTEEN_SPACE_INDENTATION
+                + RETURN + SPACE + NULL + SEMI_COLAN + NEW_LINE + EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET
+                + NEW_LINE + FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
+
+        return getJavaDoc(OF_METHOD, getCapitalCase(enumName) + " for " + SCHEMA_NAME, false, pluginConfig, null)
                 + method;
     }
 
@@ -1357,10 +1393,10 @@ public final class MethodsGenerator {
                 return targetDataType + PERIOD + FROM_STRING_METHOD_NAME;
             default:
                 throw new TranslatorException("given data type is not supported. " +
-                        yangType.getDataTypeName() + " in " +
-                        yangType.getLineNumber() + " at " +
-                        yangType.getCharPosition()
-                        + " in " + yangType.getFileName());
+                                                      yangType.getDataTypeName() + " in " +
+                                                      yangType.getLineNumber() + " at " +
+                                                      yangType.getCharPosition()
+                                                      + " in " + yangType.getFileName());
         }
     }
 
@@ -1399,8 +1435,8 @@ public final class MethodsGenerator {
             method = getJavaDoc(MANAGER_SETTER_METHOD, AUGMENTED +
                     getCapitalCase(parentName) + getCapitalCase(curNodeName), false, pluginConfig, null) +
                     getSetterForInterface(getSmallCase(AUGMENTED) + parentName +
-                                    getCapitalCase(curNodeName), returnType, parentName, false,
-                            GENERATE_SERVICE_AND_MANAGER, null) + NEW_LINE;
+                                                  getCapitalCase(curNodeName), returnType, parentName, false,
+                                          GENERATE_SERVICE_AND_MANAGER, null) + NEW_LINE;
             methods.append(method);
         }
         return methods.toString();

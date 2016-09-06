@@ -188,6 +188,17 @@ public final class JavaDocGen {
      * @return javaDocs
      */
     private static String generateForEnumAttr(String name) {
+        return FOUR_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + FOUR_SPACE_INDENTATION + ENUM_ATTRIBUTE_JAVADOC
+                + name + PERIOD + NEW_LINE + FOUR_SPACE_INDENTATION + JAVA_DOC_END_LINE;
+    }
+
+    /**
+     * Generates javaDocs for inner class enum's attributes.
+     *
+     * @param name attribute name
+     * @return javaDocs
+     */
+    public static String enumJavaDocForInnerClass(String name) {
         return EIGHT_SPACE_INDENTATION + JAVA_DOC_FIRST_LINE + EIGHT_SPACE_INDENTATION + ENUM_ATTRIBUTE_JAVADOC
                 + name + PERIOD + NEW_LINE + EIGHT_SPACE_INDENTATION + JAVA_DOC_END_LINE;
     }

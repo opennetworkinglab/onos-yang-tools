@@ -25,6 +25,7 @@ import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
+import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
@@ -37,203 +38,116 @@ import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yangutils.translator.tojava
-        .JavaQualifiedTypeInfoTranslator;
-import org.onosproject.yangutils.translator.tojava
-        .TempJavaCodeFragmentFilesContainer;
-import org.onosproject.yangutils.translator.tojava
-        .TempJavaEnumerationFragmentFiles;
+import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
+import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.translator.tojava.TempJavaEventFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaTypeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype
-        .YangDataTypes.BINARY;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype
-        .YangDataTypes.BITS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.BUILDER_CLASS_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.DEFAULT_CLASS_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_ENUM_CLASS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_EVENT_CLASS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_EVENT_LISTENER_INTERFACE;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.GENERATE_UNION_CLASS;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedJavaFileType.INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.ATTRIBUTES_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.CONSTRUCTOR_FOR_TYPE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.CONSTRUCTOR_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.ENUM_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EQUALS_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EVENT_ENUM_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EVENT_METHOD_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EVENT_SUBJECT_ATTRIBUTE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EVENT_SUBJECT_GETTER_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.EVENT_SUBJECT_SETTER_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.FROM_STRING_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.HASH_CODE_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.OF_STRING_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.RPC_INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.SETTER_FOR_CLASS_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
-import static org.onosproject.yangutils.translator.tojava
-        .GeneratedTempFileType.TO_STRING_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo
-        .getAttributeInfoForTheData;
-import static org.onosproject.yangutils.translator.tojava
-        .JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
-import static org.onosproject.yangutils.translator.tojava
-        .TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
-import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils
-        .getQualifierInfoForCasesParent;
-import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils
-        .isGetSetOfRootNodeRequired;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.addAugmentationAttribute;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getEnumsValueAttribute;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getEventEnumTypeStart;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getOperationAttributeForConstructor;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getOperationAttributes;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getOperationTypeAttr;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getOperationTypeEnum;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaCodeSnippetGen.getOperationTypeForConstructor;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaFileGeneratorUtils.getDataFromTempFileHandle;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .JavaFileGeneratorUtils.initiateJavaFileGeneration;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.builderMethod;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getAddAugmentInfoMethodImpl;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getAddAugmentInfoMethodInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getAugmentsDataMethodForService;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getConstructorStart;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getEnumsConstructor;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getEnumsOfMethod;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getEqualsMethodClose;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getEqualsMethodOpen;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getFromStringMethodClose;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getFromStringMethodSignature;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getGetter;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getGetterForOperationType;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getGetterString;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getGettersForValueAndSelectLeaf;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getHashCodeMethodClose;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getHashCodeMethodOpen;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getInterfaceLeafIdEnumMethods;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getInterfaceLeafIdEnumSignature;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getOmitNullValueString;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getOperationAttributesGetters;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getOverRideString;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getRangeValidatorMethodForUnion;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getSetterForOperationType;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getSetterForSelectLeaf;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getSetterString;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getToStringMethodClose;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getToStringMethodOpen;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getYangAugmentInfoImpl;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getYangAugmentInfoInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getYangAugmentInfoMapImpl;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.getYangAugmentInfoMapInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.isLeafValueSetInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.isSelectLeafSetInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.processSubtreeFilteringInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .MethodsGenerator.setSelectLeafSetInterface;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getAugmentableSubTreeFiltering;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessChildNodeSubtreeFiltering;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessLeafListSubtreeFiltering;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessLeafSubtreeFiltering;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessSubTreeFilteringEnd;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessSubtreeFilteringStart;
-import static org.onosproject.yangutils.translator.tojava.utils
-        .SubtreeFilteringMethodsGenerator.getProcessSubtreeFunctionBody;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_LISTENER_INTERFACE;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ATTRIBUTES_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_FOR_TYPE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ENUM_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EQUALS_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_ENUM_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_METHOD_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_ATTRIBUTE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_GETTER_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_SETTER_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FROM_STRING_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.HASH_CODE_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.OF_STRING_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.RPC_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.SETTER_FOR_CLASS_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.TO_STRING_IMPL_MASK;
+import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
+import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
+import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getQualifierInfoForCasesParent;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.isGetSetOfRootNodeRequired;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.addAugmentationAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEnumsValueAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEventEnumTypeStart;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationAttributeForConstructor;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationAttributes;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationTypeAttr;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationTypeEnum;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getOperationTypeForConstructor;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen
+        .getYangAugmentedMapObjectForConstruct;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getDataFromTempFileHandle;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.builderMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodImpl;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAugmentsDataMethodForService;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getConstructorStart;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEnumValueOfSchemaNameMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEnumsConstructor;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEnumsOfValueMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEqualsMethodClose;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEqualsMethodOpen;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getFromStringMethodClose;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getFromStringMethodSignature;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetter;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterForOperationType;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterString;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGettersForValueAndSelectLeaf;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethodClose;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethodOpen;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumMethods;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumSignature;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOmitNullValueString;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOperationAttributesGetters;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getOverRideString;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getRangeValidatorMethodForUnion;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForOperationType;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForSelectLeaf;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterString;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethodClose;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethodOpen;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoImpl;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoMapImpl;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoMapInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.isLeafValueSetInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.isSelectLeafSetInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.processSubtreeFilteringInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.setSelectLeafSetInterface;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getAugmentableSubTreeFiltering;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessChildNodeSubtreeFiltering;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessLeafListSubtreeFiltering;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessLeafSubtreeFiltering;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessSubTreeFilteringEnd;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessSubtreeFilteringStart;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator
+        .getProcessSubtreeFunctionBody;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
@@ -241,24 +155,15 @@ import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .EIGHT_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENCODE_TO_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .EVENT_LISTENER_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .EVENT_SUBJECT_NAME_SUFFIX;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .FOUR_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.EVENT_SUBJECT_NAME_SUFFIX;
+import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_ENCODER;
-import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .JAVA_UTIL_IMPORT_BASE64_CLASS;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .JAVA_UTIL_OBJECTS_IMPORT_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
@@ -268,27 +173,21 @@ import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
+import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
-import static org.onosproject.yangutils.utils.UtilConstants
-        .SERVICE_METHOD_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.SERVICE_METHOD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.TO;
-import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType
-        .GETTER_METHOD;
-import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType
-        .TYPE_CONSTRUCTOR;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.TYPE_CONSTRUCTOR;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils
-        .getCapitalCase;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils
-        .insertDataIntoJavaFile;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.replaceLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils
-        .validateLineLength;
-import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen
-        .getYangAugmentedMapObjectForConstruct;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
+
 import static java.util.Collections.sort;
 
 /**
@@ -908,10 +807,6 @@ public final class JavaFileGenerator {
         List<YangType<?>> types = typeDef.getTypeList();
         YangType type = types.get(0);
         YangDataTypes yangDataTypes = type.getDataType();
-        if (type.getDataType().equals(BINARY)) {
-            imports.add(IMPORT + JAVA_UTIL_OBJECTS_IMPORT_PKG + PERIOD +
-                                JAVA_UTIL_IMPORT_BASE64_CLASS);
-        }
 
         initiateJavaFileGeneration(file, className, GENERATE_TYPEDEF_CLASS,
                                    imports, path, pluginConfig);
@@ -1343,27 +1238,21 @@ public final class JavaFileGenerator {
         insertDataIntoJavaFile(file,
                                getJavaDoc(TYPE_CONSTRUCTOR, className, false,
                                           pluginConfig, null)
-                                       + getEnumsConstructor(
-                                       getCapitalCase(className)) + NEW_LINE);
+                                       + getEnumsConstructor(getCapitalCase(className)) + NEW_LINE);
 
-        TempJavaEnumerationFragmentFiles enumFragFiles =
-                ((TempJavaCodeFragmentFilesContainer) curNode)
-                        .getTempJavaCodeFragmentFiles()
-                        .getEnumerationTempFiles();
         insertDataIntoJavaFile(file,
-                               getEnumsOfMethod(className, enumFragFiles
-                                                        .getJavaAttributeForEnum(
-                                                                pluginConfig),
-                                                enumFragFiles
-                                                        .getEnumSetJavaMap(),
-                                                enumFragFiles
-                                                        .getEnumStringList(),
-                                                pluginConfig) + NEW_LINE);
+                               getEnumsOfValueMethod(className, (YangEnumeration) curNode, pluginConfig) + NEW_LINE);
+        insertDataIntoJavaFile(file,
+                               getEnumValueOfSchemaNameMethod(className, pluginConfig, (YangEnumeration) curNode));
 
         // Add a getter method for enum.
         insertDataIntoJavaFile(file, getJavaDoc(GETTER_METHOD, className, false,
                                                 pluginConfig, null) +
                 getGetter(INT, className, GENERATE_ENUM_CLASS) + NEW_LINE);
+        insertDataIntoJavaFile(file, getJavaDoc(GETTER_METHOD, SCHEMA_NAME, false,
+                                                pluginConfig, null) +
+                getGetter(STRING_DATA_TYPE, SCHEMA_NAME,
+                          GENERATE_ENUM_CLASS) + NEW_LINE);
 
         try {
             insertDataIntoJavaFile(file, getFromStringMethodSignature(

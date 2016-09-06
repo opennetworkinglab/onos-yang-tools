@@ -58,11 +58,14 @@ import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
+import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
+import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
+import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT8_MIN_RANGE_ATTR;
@@ -72,6 +75,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MAX_RANGE_ATTR
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ENUM_ATTRIBUTE;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.enumJavaDocForInnerClass;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
 
@@ -190,15 +194,31 @@ public final class JavaCodeSnippetGen {
     /**
      * Returns string for enum's attribute.
      *
+     * @param name  name of attribute
+     * @param value value of the enum
+     * @return string for enum's attribute
+     */
+    public static String generateEnumAttributeString(String name, int value) {
+        String enumName = getEnumJavaAttribute(name);
+        return NEW_LINE + enumJavaDocForInnerClass(name)
+                + EIGHT_SPACE_INDENTATION + enumName.toUpperCase() + OPEN_PARENTHESIS
+                + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+    }
+
+    /**
+     * Returns string for enum's attribute for enum class.
+     *
      * @param name         name of attribute
      * @param value        value of the enum
      * @param pluginConfig plugin configurations
      * @return string for enum's attribute
      */
-    public static String generateEnumAttributeString(String name, int value, YangPluginConfig pluginConfig) {
+    public static String generateEnumAttributeStringWithSchemaName(String name, int value, YangPluginConfig
+            pluginConfig) {
+        String enumName = getEnumJavaAttribute(name);
         return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, pluginConfig, null)
-                + EIGHT_SPACE_INDENTATION + getEnumJavaAttribute(name).toUpperCase() + OPEN_PARENTHESIS
-                + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+                + FOUR_SPACE_INDENTATION + enumName.toUpperCase() + OPEN_PARENTHESIS
+                + value + COMMA + SPACE + QUOTES + name + QUOTES + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
     }
 
     /**
@@ -271,7 +291,8 @@ public final class JavaCodeSnippetGen {
      */
     static String getEnumsValueAttribute(String className) {
         return NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + INT + SPACE + getSmallCase(className)
-                + SEMI_COLAN + NEW_LINE;
+                + SEMI_COLAN + NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + STRING_DATA_TYPE + SPACE +
+                SCHEMA_NAME + SEMI_COLAN + NEW_LINE;
     }
 
     /**

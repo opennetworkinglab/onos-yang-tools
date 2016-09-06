@@ -302,6 +302,21 @@ public final class UtilConstants {
     public static final String SPACE = " ";
 
     /**
+     * Static attribute for schema name.
+     */
+    public static final String SCHEMA_NAME = "schemaName";
+
+    /**
+     * Static attribute for schema name value.
+     */
+    public static final String STR_VAL = "stringValue";
+
+    /**
+     * Static attribute for value of method.
+     */
+    public static final String VALUE_OF = "valueOf";
+
+    /**
      * Static attribute for validateRange.
      */
     public static final String VALIDATE_RANGE = "validateRange";

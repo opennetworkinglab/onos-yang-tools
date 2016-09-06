@@ -17,8 +17,8 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import java.io.IOException;
+
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
-import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaNotification;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -74,10 +74,10 @@ public class YangJavaNotificationTranslator
 
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -120,7 +120,8 @@ public class YangJavaNotificationTranslator
      * @throws TranslatorException translator operation fail
      */
     @Override
-    public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
+    public void generateCodeEntry(YangPluginConfig yangPlugin)
+            throws TranslatorException {
 
         /*
          * As part of the notification support the following files needs to be generated.
@@ -156,7 +157,7 @@ public class YangJavaNotificationTranslator
         JavaQualifiedTypeInfoTranslator event = new JavaQualifiedTypeInfoTranslator();
 
         String parentInfo = getCapitalCase(((JavaFileInfoContainer) parent)
-                .getJavaFileInfo().getJavaName());
+                                                   .getJavaFileInfo().getJavaName());
         event.setClassInfo(parentInfo + EVENT_STRING);
         event.setPkgInfo(getJavaFileInfo().getPackage());
         holder.addToExtendsList(event, parent, tempJavaServiceFragmentFiles);
@@ -173,15 +174,16 @@ public class YangJavaNotificationTranslator
      * Creates a java file using the YANG notification info.
      */
     @Override
-    public void generateCodeExit() throws TranslatorException {
+    public void generateCodeExit()
+            throws TranslatorException {
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for notification node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + " " + e.getLocalizedMessage());
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 
@@ -204,8 +206,7 @@ public class YangJavaNotificationTranslator
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
          * and leaf list.
          */
-        if (this instanceof YangLeavesHolder) {
-            ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
-        }
+        this.setLeafNameSpaceAndAddToParentSchemaMap();
+
     }
 }

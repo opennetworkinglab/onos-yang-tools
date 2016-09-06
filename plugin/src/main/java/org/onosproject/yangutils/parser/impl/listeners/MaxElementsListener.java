@@ -27,7 +27,8 @@ import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.MAX_ELEMENT_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
@@ -68,10 +69,10 @@ public final class MaxElementsListener {
      * (max-elements), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processMaxElementsEntry(TreeWalkListener listener,
-            GeneratedYangParser.MaxElementsStatementContext ctx) {
+                                               GeneratedYangParser.MaxElementsStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, MAX_ELEMENT_DATA, "", ENTRY);
@@ -117,16 +118,20 @@ public final class MaxElementsListener {
                 maxElementsValue = Integer.parseInt(value);
             } catch (NumberFormatException e) {
                 ParserException parserException = new ParserException("YANG file error : " +
-                        YangConstructType.getYangConstructType(MAX_ELEMENT_DATA) + " value " + value + " is not " +
-                        "valid.");
+                                                                              YangConstructType.getYangConstructType(
+                                                                                      MAX_ELEMENT_DATA) + " value " +
+                                                                              value + " is not " +
+                                                                              "valid.");
                 parserException.setLine(ctx.getStart().getLine());
                 parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                 throw parserException;
             }
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    YangConstructType.getYangConstructType(MAX_ELEMENT_DATA) + " value " + value + " is not " +
-                    "valid.");
+                                                                          YangConstructType.getYangConstructType(
+                                                                                  MAX_ELEMENT_DATA) + " value " +
+                                                                          value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -134,4 +139,5 @@ public final class MaxElementsListener {
 
         return maxElementsValue;
     }
+
 }

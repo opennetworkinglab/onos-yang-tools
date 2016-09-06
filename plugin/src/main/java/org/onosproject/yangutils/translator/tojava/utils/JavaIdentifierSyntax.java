@@ -95,6 +95,7 @@ public final class JavaIdentifierSyntax {
         return pkg.toLowerCase();
     }
 
+
     /**
      * Returns version.
      *

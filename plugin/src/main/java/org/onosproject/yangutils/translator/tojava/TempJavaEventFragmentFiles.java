@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_ENUM_MASK;
@@ -41,14 +41,15 @@ import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSy
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
+import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
-import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ENUM_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.MANAGER_SETTER_METHOD;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.enumJavaDocForInnerClass;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -154,7 +155,7 @@ public class TempJavaEventFragmentFiles
         setJavaImportData(new JavaImportData());
         setJavaFileInfo(javaFileInfo);
         setAbsoluteDirPath(getAbsolutePackagePath(getJavaFileInfo().getBaseCodeGenPath(),
-                getJavaFileInfo().getPackageFilePath()));
+                                                  getJavaFileInfo().getPackageFilePath()));
 
         addGeneratedTempFile(EVENT_ENUM_MASK);
         addGeneratedTempFile(EVENT_METHOD_MASK);
@@ -250,7 +251,8 @@ public class TempJavaEventFragmentFiles
         this.eventSubjectJavaFileHandle = eventSubjectJavaFileHandle;
     }
 
-    public void generateJavaFile(int fileType, YangNode curNode) throws IOException {
+    public void generateJavaFile(int fileType, YangNode curNode)
+            throws IOException {
         generateEventJavaFile(curNode);
         generateEventListenerJavaFile(curNode);
         generateEventSubjectJavaFile(curNode);
@@ -295,7 +297,7 @@ public class TempJavaEventFragmentFiles
 
         imports.add(getJavaImportData().getEventListenerImport());
         String curNodeInfo = getCapitalCase(((JavaFileInfoContainer) curNode)
-                .getJavaFileInfo().getJavaName());
+                                                    .getJavaFileInfo().getJavaName());
 
         // Creates event listener interface file.
         setEventListenerJavaFileHandle(
@@ -314,7 +316,7 @@ public class TempJavaEventFragmentFiles
             throws IOException {
 
         String curNodeInfo = getCapitalCase(((JavaFileInfoContainer) curNode)
-                .getJavaFileInfo().getJavaName());
+                                                    .getJavaFileInfo().getJavaName());
 
         //Creates event interface file.
         setEventSubjectJavaFileHandle(getJavaFileHandle(curNode, curNodeInfo +
@@ -424,28 +426,28 @@ public class TempJavaEventFragmentFiles
             throws IOException {
 
         String currentInfo = getCapitalCase(getCamelCase(curNode.getName(),
-                pluginConfig.getConflictResolver()));
+                                                         pluginConfig.getConflictResolver()));
         String notificationName = curNode.getName();
 
         JavaQualifiedTypeInfoTranslator qualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(curNode,
-                getCapitalCase(currentInfo));
+                                                                                          getCapitalCase(currentInfo));
 
         JavaAttributeInfo javaAttributeInfo = getAttributeInfoForTheData(qualifiedTypeInfo, getSmallCase(currentInfo),
-                null, false, false);
+                                                                         null, false, false);
 
         /*Adds java info for event in respective temp files.*/
-        addEventEnum(notificationName, pluginConfig);
+        addEventEnum(notificationName);
         addEventSubjectAttribute(javaAttributeInfo, pluginConfig);
         addEventSubjectGetter(javaAttributeInfo, pluginConfig);
         addEventSubjectSetter(javaAttributeInfo, pluginConfig, currentInfo);
     }
 
     /*Adds event to enum temp file.*/
-    private void addEventEnum(String notificationName, YangPluginConfig pluginConfig)
+    private void addEventEnum(String notificationName)
             throws IOException {
         appendToFile(getEventEnumTempFileHandle(),
-                getJavaDoc(ENUM_ATTRIBUTE, notificationName, false, pluginConfig, null) + FOUR_SPACE_INDENTATION
-                        + getEnumJavaAttribute(notificationName).toUpperCase() + COMMA + NEW_LINE);
+                     enumJavaDocForInnerClass(notificationName) + EIGHT_SPACE_INDENTATION
+                             + getEnumJavaAttribute(notificationName).toUpperCase() + COMMA + NEW_LINE);
     }
 
     /*Adds event method in event class*/
@@ -458,7 +460,7 @@ public class TempJavaEventFragmentFiles
     private void addEventSubjectAttribute(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
         appendToFile(getEventSubjectAttributeTempFileHandle(),
-                FOUR_SPACE_INDENTATION + parseAttribute(attr, pluginConfig));
+                     FOUR_SPACE_INDENTATION + parseAttribute(attr, pluginConfig));
     }
 
     /*Adds getter method for event in event subject class.*/
@@ -469,8 +471,8 @@ public class TempJavaEventFragmentFiles
             appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
         }
         appendToFile(getEventSubjectGetterTempFileHandle(),
-                getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
-                        appDataStructure) + getGetterForClass(attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
+                     getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                                appDataStructure) + getGetterForClass(attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
     }
 
     /*Adds setter method for event in event subject class.*/
@@ -481,9 +483,9 @@ public class TempJavaEventFragmentFiles
             appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
         }
         appendToFile(getEventSubjectSetterTempFileHandle(),
-                getJavaDoc(MANAGER_SETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
-                        appDataStructure) + getSetterForClass(attr, className, GENERATE_EVENT_SUBJECT_CLASS)
-                        + NEW_LINE);
+                     getJavaDoc(MANAGER_SETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                                appDataStructure) + getSetterForClass(attr, className, GENERATE_EVENT_SUBJECT_CLASS)
+                             + NEW_LINE);
     }
 
     /**
@@ -498,7 +500,7 @@ public class TempJavaEventFragmentFiles
 
         JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
         return getFileObject(getDirPath(parentInfo), name, JAVA_FILE_EXTENSION,
-                parentInfo);
+                             parentInfo);
     }
 
     /**

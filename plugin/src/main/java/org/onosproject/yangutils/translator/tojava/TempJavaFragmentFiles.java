@@ -1151,8 +1151,8 @@ public class TempJavaFragmentFiles {
         if ((getGeneratedJavaFiles() & BUILDER_CLASS_MASK) != 0
                 || (getGeneratedJavaFiles() & GENERATE_SERVICE_AND_MANAGER) != 0) {
             if (!isRooNode()) {
-                appendToFile(getGetterImplTempFileHandle(), getOverRideString() + getGetterForClass(attr,
-                                                                                                    getGeneratedJavaFiles()) +
+                appendToFile(getGetterImplTempFileHandle(), getOverRideString() +
+                        getGetterForClass(attr, getGeneratedJavaFiles()) +
                         NEW_LINE);
             } else {
                 appendToFile(getGetterImplTempFileHandle(), getGetterForClass(attr,
@@ -1207,7 +1207,7 @@ public class TempJavaFragmentFiles {
             throws IOException {
         appendToFile(getLeafIdAttributeTempFileHandle(),
                      FOUR_SPACE_INDENTATION + generateEnumAttributeString(attr.getAttributeName(),
-                                                                          value, yangPluginConfig));
+                                                                          value));
     }
 
     /**
@@ -1615,19 +1615,19 @@ public class TempJavaFragmentFiles {
             }
 
             if ((getGeneratedTempFiles() & FROM_STRING_IMPL_MASK) != 0) {
-                JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = getQualifiedInfoOfFromString(newAttrInfo,
-                                                                                                         pluginConfig
-                                                                                                                 .getConflictResolver());
+                JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString =
+                        getQualifiedInfoOfFromString(newAttrInfo, pluginConfig
+                                .getConflictResolver());
             /*
              * Create a new java attribute info with qualified information of
              * wrapper classes.
              */
-                JavaAttributeInfo fromStringAttributeInfo = getAttributeInfoForTheData(qualifiedInfoOfFromString,
-                                                                                       newAttrInfo.getAttributeName(),
-                                                                                       newAttrInfo.getAttributeType(),
-                                                                                       getIsQualifiedAccessOrAddToImportList(
-                                                                                               qualifiedInfoOfFromString),
-                                                                                       false);
+                JavaAttributeInfo fromStringAttributeInfo =
+                        getAttributeInfoForTheData(qualifiedInfoOfFromString, newAttrInfo.getAttributeName(),
+                                                   newAttrInfo.getAttributeType(),
+                                                   getIsQualifiedAccessOrAddToImportList(
+                                                           qualifiedInfoOfFromString),
+                                                   false);
 
                 addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
             }

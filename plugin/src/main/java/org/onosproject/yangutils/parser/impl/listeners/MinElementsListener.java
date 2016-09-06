@@ -26,7 +26,8 @@ import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.MIN_ELEMENT_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
+        .constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.getValidNonNegativeIntegerValue;
@@ -93,7 +94,8 @@ public final class MinElementsListener {
                 break;
             default:
                 throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, MIN_ELEMENT_DATA,
-                        ctx.minValue().getText(), ENTRY));
+                                                                        ctx.minValue().getText(), ENTRY));
         }
     }
+
 }
