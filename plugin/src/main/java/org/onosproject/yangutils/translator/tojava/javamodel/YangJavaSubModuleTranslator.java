@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.onosproject.yangutils.datamodel.YangBelongsTo;
-import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaSubModule;
@@ -38,6 +36,7 @@ import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.gen
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.isRootNodesCodeGenRequired;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
 import static org.onosproject.yangutils.utils.UtilConstants.SBI;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.removeEmptyDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
 
 /**
@@ -81,10 +80,10 @@ public class YangJavaSubModuleTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -122,11 +121,10 @@ public class YangJavaSubModuleTranslator
     /**
      * Returns the name space of the module to which the sub module belongs to.
      *
-     * @param belongsToInfo Information of the module to which the sub module belongs
      * @return the name space string of the module.
      */
-    public String getNameSpaceFromModule(YangBelongsTo belongsToInfo) {
-        return ((YangModule) belongsToInfo.getModuleNode()).getNameSpace();
+    public String getNameSpaceFromModule() {
+        return (getBelongsTo().getModuleNode()).getNameSpace();
     }
 
     /**
@@ -136,13 +134,14 @@ public class YangJavaSubModuleTranslator
      * @throws TranslatorException when fails to translate
      */
     @Override
-    public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
-        String subModulePkg = getRootPackage(getVersion(), getNameSpaceFromModule(getBelongsTo()),
-                getRevision().getRevDate(), yangPlugin.getConflictResolver());
+    public void generateCodeEntry(YangPluginConfig yangPlugin)
+            throws TranslatorException {
+        String subModulePkg = getRootPackage(getVersion(), getNameSpaceFromModule(),
+                                             getRevision(), yangPlugin.getConflictResolver());
 
         if (isNotificationChildNodePresent(this)) {
             getJavaFileInfo().setGeneratedFileTypes(getJavaFileInfo().getGeneratedFileTypes()
-                    | GENERATE_ALL_EVENT_CLASS_MASK);
+                                                            | GENERATE_ALL_EVENT_CLASS_MASK);
         }
         try {
             generateCodeOfRootNode(this, yangPlugin, subModulePkg);
@@ -161,7 +160,8 @@ public class YangJavaSubModuleTranslator
      * Creates a java file using the YANG submodule info.
      */
     @Override
-    public void generateCodeExit() throws TranslatorException {
+    public void generateCodeExit()
+            throws TranslatorException {
         /**
          * As part of the notification support the following files needs to be generated.
          * 1) Subject of the notification(event), this is simple interface with builder class.
@@ -185,15 +185,15 @@ public class YangJavaSubModuleTranslator
             }
 
             searchAndDeleteTempDir(getJavaFileInfo().getBaseCodeGenPath() +
-                    getJavaFileInfo().getPackageFilePath());
-            searchAndDeleteTempDir(getJavaFileInfo().getPluginConfig().getCodeGenDir() +
-                    getJavaFileInfo().getPackageFilePath());
+                                           getJavaFileInfo().getPackageFilePath());
+            removeEmptyDirectory(getJavaFileInfo().getBaseCodeGenPath() +
+                                         getJavaFileInfo().getPackageFilePath());
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for submodule node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + " " + e.getLocalizedMessage());
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
         }
     }
 

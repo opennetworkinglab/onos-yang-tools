@@ -1,0 +1,9 @@
+module test5 {
+    namespace "test5:test";
+    prefix test ;
+
+    leaf a-leaf {
+       type int32;
+    }
+    
+}

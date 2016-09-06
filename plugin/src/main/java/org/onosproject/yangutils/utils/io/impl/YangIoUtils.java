@@ -95,7 +95,8 @@ public final class YangIoUtils {
      * @return directory structure
      * @throws IOException when fails to do IO operations
      */
-    public static File createDirectories(String path) throws IOException {
+    public static File createDirectories(String path)
+            throws IOException {
         File generatedDir = new File(path);
         if (!generatedDir.exists()) {
             boolean isGenerated = generatedDir.mkdirs();
@@ -259,7 +260,7 @@ public final class YangIoUtils {
             stringBuilder.replace(index, index + 1, replacingString);
         } else {
             stringBuilder.append(NEW_LINE + EIGHT_SPACE_INDENTATION + UNUSED + OPEN_PARENTHESIS + ONE +
-                    CLOSE_PARENTHESIS + SEMI_COLAN);
+                                         CLOSE_PARENTHESIS + SEMI_COLAN);
         }
         return stringBuilder.toString();
 
@@ -684,15 +685,16 @@ public final class YangIoUtils {
             String replacementForUnderscore = conflictResolver.getReplacementForUnderscore();
             if (replacementForPeriod != null) {
                 yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_PERIOD,
-                        PERIOD + replacementForPeriod.toLowerCase() + PERIOD);
+                                                           PERIOD + replacementForPeriod.toLowerCase() + PERIOD);
             }
             if (replacementForUnderscore != null) {
                 yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_UNDERSCORE,
-                        UNDER_SCORE + replacementForUnderscore.toLowerCase() + UNDER_SCORE);
+                                                           UNDER_SCORE + replacementForUnderscore.toLowerCase() +
+                                                                   UNDER_SCORE);
             }
             if (replacementForHyphen != null) {
                 yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_HYPHEN,
-                        HYPHEN + replacementForHyphen.toLowerCase() + HYPHEN);
+                                                           HYPHEN + replacementForHyphen.toLowerCase() + HYPHEN);
             }
         }
         yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_IDENTIFIER_SPECIAL_CHAR, COLAN);
@@ -739,4 +741,39 @@ public final class YangIoUtils {
         }
         return prefixForIdentifier;
     }
+
+    /**
+     * Removes empty directory.
+     *
+     * @param path path to be checked
+     */
+    public static void removeEmptyDirectory(String path) {
+        int index;
+        while (path != null && !path.equals("")) {
+            if (!removeDirectory(path)) {
+                break;
+            } else {
+                index = path.lastIndexOf(SLASH);
+                path = path.substring(0, index);
+            }
+        }
+    }
+
+    private static boolean removeDirectory(String path) {
+        File dir = new File(path);
+        boolean isDeleted = false;
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && files.length == 0) {
+                isDeleted = dir.delete();
+            } else if (files != null && files.length == 1) {
+                if (files[0].getName().equals("package-info.java")
+                        || files[0].getName().endsWith("-temp")) {
+                    isDeleted = dir.delete();
+                }
+            }
+        }
+        return isDeleted;
+    }
+
 }

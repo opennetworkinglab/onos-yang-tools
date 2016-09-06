@@ -26,10 +26,8 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
-import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
-import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
@@ -77,9 +75,9 @@ public final class YangJavaModelUtils {
         } else {
             javaCodeGeneratorInfo.getJavaFileInfo()
                     .setJavaName(getCamelCase(((YangNode) javaCodeGeneratorInfo).getName(),
-                            yangPluginConfig.getConflictResolver()));
+                                              yangPluginConfig.getConflictResolver()));
             javaCodeGeneratorInfo.getJavaFileInfo().setJavaAttributeName(javaCodeGeneratorInfo
-                    .getJavaFileInfo().getJavaName());
+                                                                                 .getJavaFileInfo().getJavaName());
             javaCodeGeneratorInfo.getJavaFileInfo().setPackage(getCurNodePackage((YangNode) javaCodeGeneratorInfo));
         }
         javaCodeGeneratorInfo.getJavaFileInfo().setPackageFilePath(
@@ -102,7 +100,7 @@ public final class YangJavaModelUtils {
             throws IOException {
         javaCodeGeneratorInfo.getJavaFileInfo()
                 .setJavaName(getAugmentClassName((YangJavaAugmentTranslator) javaCodeGeneratorInfo,
-                        yangPluginConfig));
+                                                 yangPluginConfig));
         javaCodeGeneratorInfo.getJavaFileInfo().setPackage(
                 getAugmentsNodePackage((YangNode) javaCodeGeneratorInfo, yangPluginConfig));
         javaCodeGeneratorInfo.getJavaFileInfo().setPackageFilePath(
@@ -141,10 +139,11 @@ public final class YangJavaModelUtils {
      * @throws IOException IO operations fails
      */
     private static void updatePackageInfo(JavaCodeGeneratorInfo javaCodeGeneratorInfo, YangPluginConfig yangPlugin,
-                                          String pkg) throws IOException {
+                                          String pkg)
+            throws IOException {
         javaCodeGeneratorInfo.getJavaFileInfo()
                 .setJavaName(getCamelCase(((YangNode) javaCodeGeneratorInfo).getName(),
-                        yangPlugin.getConflictResolver()));
+                                          yangPlugin.getConflictResolver()));
         javaCodeGeneratorInfo.getJavaFileInfo().setPackage(pkg);
         javaCodeGeneratorInfo.getJavaFileInfo().setPackageFilePath(
                 getPackageDirPathFromJavaJPackage(javaCodeGeneratorInfo.getJavaFileInfo().getPackage()));
@@ -174,12 +173,8 @@ public final class YangJavaModelUtils {
                                                 YangPluginConfig yangPluginConfig)
             throws IOException {
 
-        if (javaCodeGeneratorInfo instanceof YangModule
-                || javaCodeGeneratorInfo instanceof YangSubModule) {
-            javaCodeGeneratorInfo.getTempJavaCodeFragmentFiles().getBeanTempFiles().setRooNode(true);
-        }
-
         if (javaCodeGeneratorInfo instanceof RpcNotificationContainer) {
+            javaCodeGeneratorInfo.getTempJavaCodeFragmentFiles().getBeanTempFiles().setRooNode(true);
             /*
              * Module / sub module node code generation.
              */
@@ -228,9 +223,9 @@ public final class YangJavaModelUtils {
             /*Do nothing, only the interface needs to be generated*/
         } else {
             throw new TranslatorException("Unsupported Node Translation "
-                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
     }
 
@@ -246,9 +241,9 @@ public final class YangJavaModelUtils {
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
             throw new TranslatorException("translation is not supported for the node "
-                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
         createTempFragmentFile(javaCodeGeneratorInfo);
         updateTempFragmentFiles(javaCodeGeneratorInfo, yangPluginConfig);
@@ -295,9 +290,9 @@ public final class YangJavaModelUtils {
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
             throw new TranslatorException("Invalid node for translation " +
-                    javaCodeGeneratorInfo.getLineNumber() + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  javaCodeGeneratorInfo.getLineNumber() + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
 
         /*
@@ -323,9 +318,9 @@ public final class YangJavaModelUtils {
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
             throw new TranslatorException("invalid node for translation " +
-                    javaCodeGeneratorInfo.getLineNumber() + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  javaCodeGeneratorInfo.getLineNumber() + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
 
         generateCodeOfNode(javaCodeGeneratorInfo, yangPlugin);
@@ -336,7 +331,7 @@ public final class YangJavaModelUtils {
             JavaQualifiedTypeInfoTranslator parentsInfo = getQualifierInfoForCasesParent(parent, yangPlugin);
             javaCodeGeneratorInfo.getTempJavaCodeFragmentFiles().getBeanTempFiles().getJavaExtendsListHolder()
                     .addToExtendsList(parentsInfo, (YangNode) javaCodeGeneratorInfo,
-                            tempJavaCodeFragmentFiles.getBeanTempFiles());
+                                      tempJavaCodeFragmentFiles.getBeanTempFiles());
 
             javaCodeGeneratorInfo.getTempJavaCodeFragmentFiles().getBeanTempFiles()
                     .addParentInfoInCurNodeTempFile((YangNode) javaCodeGeneratorInfo, yangPlugin);
@@ -388,9 +383,9 @@ public final class YangJavaModelUtils {
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
             throw new TranslatorException("invalid node for translation "
-                    + javaCodeGeneratorInfo.getLineNumber() + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  + javaCodeGeneratorInfo.getLineNumber() + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
         updatePackageInfo(javaCodeGeneratorInfo, yangPluginConfig);
         generateTempFiles(javaCodeGeneratorInfo, yangPluginConfig);
@@ -409,9 +404,9 @@ public final class YangJavaModelUtils {
             throws IOException {
         if (!(javaCodeGeneratorInfo instanceof YangNode)) {
             throw new TranslatorException("invalid node for translation " + javaCodeGeneratorInfo.getLineNumber()
-                    + " at " +
-                    javaCodeGeneratorInfo.getCharPosition()
-                    + " in " + javaCodeGeneratorInfo.getFileName());
+                                                  + " at " +
+                                                  javaCodeGeneratorInfo.getCharPosition()
+                                                  + " in " + javaCodeGeneratorInfo.getFileName());
         }
         updatePackageInfo(javaCodeGeneratorInfo, yangPluginConfig, rootPkg);
 
@@ -434,19 +429,19 @@ public final class YangJavaModelUtils {
         if (!(curNode instanceof JavaFileInfoContainer)
                 || curNode.getParent() == null) {
             throw new TranslatorException("missing parent node to get current node's package " +
-                    curNode.getName() + " in " +
-                    curNode.getLineNumber() + " at " +
-                    curNode.getCharPosition()
-                    + " in " + curNode.getFileName());
+                                                  curNode.getName() + " in " +
+                                                  curNode.getLineNumber() + " at " +
+                                                  curNode.getCharPosition()
+                                                  + " in " + curNode.getFileName());
         }
 
         YangNode parentNode = DataModelUtils.getParentNodeInGenCode(curNode);
         if (!(parentNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("missing parent java node to get current node's package " +
-                    curNode.getName() + " in " +
-                    curNode.getLineNumber() + " at " +
-                    curNode.getCharPosition()
-                    + " in " + curNode.getFileName());
+                                                  curNode.getName() + " in " +
+                                                  curNode.getLineNumber() + " at " +
+                                                  curNode.getCharPosition()
+                                                  + " in " + curNode.getFileName());
         }
         JavaFileInfoTranslator parentJavaFileHandle = ((JavaFileInfoContainer) parentNode).getJavaFileInfo();
         pkg = parentJavaFileHandle.getPackage() + PERIOD + parentJavaFileHandle.getJavaName();
@@ -460,49 +455,57 @@ public final class YangJavaModelUtils {
      * @return true if root node contains any data node
      */
     public static boolean isRootNodesCodeGenRequired(YangNode node) {
+        YangLeavesHolder holder = (YangLeavesHolder) node;
 
-        List<YangNode> childNodes = new ArrayList<>();
-        YangNode tempNode = node.getChild();
-        while (tempNode != null) {
-            childNodes.add(tempNode);
-            tempNode = tempNode.getNextSibling();
-        }
-
-        if (childNodes.size() == 0) {
-            YangLeavesHolder leavesHolder = (YangLeavesHolder) node;
-            return !leavesHolder.getListOfLeaf().isEmpty() || !leavesHolder.getListOfLeafList().isEmpty();
-        } else if (childNodes.size() == 1) {
-            return !(childNodes.get(0) instanceof YangTranslatorOperatorNode);
-        }
-        List<Boolean> booleanData = new ArrayList<>();
-        for (YangNode child : childNodes) {
-            if (child instanceof YangTranslatorOperatorNode) {
-                booleanData.add(false);
+        if (holder.getListOfLeaf().isEmpty()) {
+            if (holder.getListOfLeafList().isEmpty()) {
+                YangNode tempNode = node.getChild();
+                if (tempNode == null) {
+                    return false;
+                }
+                while (tempNode != null) {
+                    if (!(tempNode instanceof YangTranslatorOperatorNode)) {
+                        return true;
+                    }
+                    tempNode = tempNode.getNextSibling();
+                }
+                return false;
             } else {
-                booleanData.add(true);
+                return true;
             }
+        } else {
+            return true;
         }
-        return booleanData.contains(true);
     }
 
     /**
-     * Returns true if only augment nodes present in module.
+     * Returns true if get/set method of root node are required.
      *
      * @param curNode root node
-     * @return true if only augment nodes present in module
+     * @return true if get/set method of root node are required
      */
-    public static boolean isOnlyAugmentNodeInRoot(YangNode curNode) {
-        List<Boolean> booleanData = new ArrayList<>();
-        curNode = curNode.getChild();
-        while (curNode != null) {
-            if (curNode instanceof YangAugment) {
-                booleanData.add(true);
+    public static boolean isGetSetOfRootNodeRequired(YangNode curNode) {
+        YangLeavesHolder holder = (YangLeavesHolder) curNode;
+
+        if (holder.getListOfLeaf().isEmpty()) {
+            if (holder.getListOfLeafList().isEmpty()) {
+                curNode = curNode.getChild();
+                if (curNode == null) {
+                    return false;
+                }
+                while (curNode != null) {
+                    if (!(curNode instanceof YangAugment)) {
+                        return true;
+                    }
+                    curNode = curNode.getNextSibling();
+                }
+                return false;
             } else {
-                booleanData.add(false);
+                return true;
             }
-            curNode = curNode.getNextSibling();
+        } else {
+            return true;
         }
-        return !booleanData.contains(false);
     }
 
     /**
@@ -528,12 +531,12 @@ public final class YangJavaModelUtils {
         if (node instanceof YangJavaModuleTranslator) {
             YangJavaModuleTranslator module = (YangJavaModuleTranslator) node;
             pkg.append(getRootPackage(module.getVersion(), module.getNameSpace(), module
-                    .getRevision().getRevDate(), yangPluginConfig.getConflictResolver()));
+                    .getRevision(), yangPluginConfig.getConflictResolver()));
         } else if (node instanceof YangJavaSubModuleTranslator) {
             YangJavaSubModuleTranslator subModule = (YangJavaSubModuleTranslator) node;
             pkg.append(getRootPackage(subModule.getVersion(),
-                    subModule.getNameSpaceFromModule(subModule.getBelongsTo()),
-                    subModule.getRevision().getRevDate(), yangPluginConfig.getConflictResolver()));
+                                      subModule.getNameSpaceFromModule(),
+                                      subModule.getRevision(), yangPluginConfig.getConflictResolver()));
         }
         String concat = "";
         for (int i = 1; i <= clsInfo.size(); i++) {
@@ -551,7 +554,7 @@ public final class YangJavaModelUtils {
      * @param yangPluginConfig plugin configurations
      * @return augment class name
      */
-    static String getAugmentClassName(YangAugment augment, YangPluginConfig yangPluginConfig) {
+    private static String getAugmentClassName(YangAugment augment, YangPluginConfig yangPluginConfig) {
         YangNodeIdentifier yangNodeIdentifier = augment.getTargetNode().get(augment.getTargetNode().size() - 1)
                 .getNodeIdentifier();
         String name = getCapitalCase(getCamelCase(yangNodeIdentifier.getName(), yangPluginConfig

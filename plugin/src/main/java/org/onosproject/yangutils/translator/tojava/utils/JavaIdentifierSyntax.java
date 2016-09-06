@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangRevision;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
@@ -78,7 +79,7 @@ public final class JavaIdentifierSyntax {
      * @param conflictResolver object of YANG to java naming conflict util
      * @return the root package string
      */
-    public static String getRootPackage(byte version, String nameSpace, Date revision,
+    public static String getRootPackage(byte version, String nameSpace, YangRevision revision,
                                         YangToJavaNamingConflictUtil conflictResolver) {
 
         String pkg;
@@ -87,9 +88,10 @@ public final class JavaIdentifierSyntax {
         pkg = pkg + getYangVersion(version);
         pkg = pkg + PERIOD;
         pkg = pkg + getPkgFromNameSpace(nameSpace, conflictResolver);
-        pkg = pkg + PERIOD;
-        pkg = pkg + getYangRevisionStr(revision);
-
+        if (revision != null) {
+            pkg = pkg + PERIOD;
+            pkg = pkg + getYangRevisionStr(revision.getRevDate());
+        }
         return pkg.toLowerCase();
     }
 
@@ -203,13 +205,14 @@ public final class JavaIdentifierSyntax {
      * @param yangNode YANG node for which code is being generated
      * @throws IOException any IO exception
      */
-    public static void createPackage(YangNode yangNode) throws IOException {
+    public static void createPackage(YangNode yangNode)
+            throws IOException {
         if (!(yangNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("current node must have java file info " +
-                    yangNode.getName() + " in " +
-                    yangNode.getLineNumber() + " at " +
-                    yangNode.getCharPosition()
-                    + " in " + yangNode.getFileName());
+                                                  yangNode.getName() + " in " +
+                                                  yangNode.getLineNumber() + " at " +
+                                                  yangNode.getCharPosition()
+                                                  + " in " + yangNode.getFileName());
         }
         String pkgInfo;
         JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo();
@@ -221,11 +224,11 @@ public final class JavaIdentifierSyntax {
                 if (parent != null) {
                     pkgInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo().getJavaName();
                     addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg), true,
-                            ((JavaFileInfoContainer) parent).getJavaFileInfo().getPluginConfig());
+                                   ((JavaFileInfoContainer) parent).getJavaFileInfo().getPluginConfig());
                 } else {
                     pkgInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo().getJavaName();
                     addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg), false,
-                            ((JavaFileInfoContainer) yangNode).getJavaFileInfo().getPluginConfig());
+                                   ((JavaFileInfoContainer) yangNode).getJavaFileInfo().getPluginConfig());
                 }
             } catch (IOException e) {
                 throw new IOException("failed to create package-info file");

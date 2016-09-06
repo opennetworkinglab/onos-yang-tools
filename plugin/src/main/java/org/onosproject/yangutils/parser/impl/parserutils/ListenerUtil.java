@@ -16,16 +16,6 @@
 
 package org.onosproject.yangutils.parser.impl.parserutils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +35,16 @@ import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.onosproject.yangutils.datamodel.YangPathArgType.ABSOLUTE_PATH;
 import static org.onosproject.yangutils.datamodel.YangPathArgType.RELATIVE_PATH;
@@ -123,16 +123,16 @@ public final class ListenerUtil {
 
         if (identifierString.length() > IDENTIFIER_LENGTH) {
             parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " name " + identifierString + " is " +
-                    "greater than 64 characters.");
+                                                          getYangConstructType(yangConstruct) + " name " + identifierString + " is " +
+                                                          "greater than 64 characters.");
         } else if (!IDENTIFIER_PATTERN.matcher(identifierString).matches()) {
             parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " name " + identifierString + " is not " +
-                    "valid.");
+                                                          getYangConstructType(yangConstruct) + " name " + identifierString + " is not " +
+                                                          "valid.");
         } else if (identifierString.toLowerCase().startsWith(XML)) {
             parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " identifier " + identifierString +
-                    " must not start with (('X'|'x') ('M'|'m') ('L'|'l')).");
+                                                          getYangConstructType(yangConstruct) + " identifier " + identifierString +
+                                                          " must not start with (('X'|'x') ('M'|'m') ('L'|'l')).");
         } else {
             return identifierString;
         }
@@ -159,16 +159,16 @@ public final class ListenerUtil {
 
         if (identifierString.length() > IDENTIFIER_LENGTH) {
             parserException = new ParserException("YANG file error : " + " identifier " + identifierString + " in " +
-                    getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() + " is " +
-                    "greater than 64 characters.");
+                                                          getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() + " is " +
+                                                          "greater than 64 characters.");
         } else if (!IDENTIFIER_PATTERN.matcher(identifierString).matches()) {
             parserException = new ParserException("YANG file error : " + " identifier " + identifierString + " in " +
-                    getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() + " is not " +
-                    "valid.");
+                                                          getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() + " is not " +
+                                                          "valid.");
         } else if (identifierString.toLowerCase().startsWith(XML)) {
             parserException = new ParserException("YANG file error : " + " identifier " + identifierString + " in " +
-                    getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
-                    " must not start with (('X'|'x') ('M'|'m') ('L'|'l')).");
+                                                          getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
+                                                          " must not start with (('X'|'x') ('M'|'m') ('L'|'l')).");
         } else {
             return identifierString;
         }
@@ -235,8 +235,8 @@ public final class ListenerUtil {
         String value = removeQuotesAndHandleConcat(integerValue);
         if (!value.matches(NON_NEGATIVE_INTEGER_PATTERN)) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " value " + value + " is not " +
-                    "valid.");
+                                                                          getYangConstructType(yangConstruct) + " value " + value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -247,8 +247,8 @@ public final class ListenerUtil {
             valueInInteger = Integer.parseInt(value);
         } catch (NumberFormatException e) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " value " + value + " is not " +
-                    "valid.");
+                                                                          getYangConstructType(yangConstruct) + " value " + value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -270,8 +270,8 @@ public final class ListenerUtil {
         String value = removeQuotesAndHandleConcat(integerValue);
         if (!INTEGER_PATTERN.matcher(value).matches()) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " value " + value + " is not " +
-                    "valid.");
+                                                                          getYangConstructType(yangConstruct) + " value " + value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -282,8 +282,8 @@ public final class ListenerUtil {
             valueInInteger = Integer.parseInt(value);
         } catch (NumberFormatException e) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " value " + value + " is not " +
-                    "valid.");
+                                                                          getYangConstructType(yangConstruct) + " value " + value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -309,8 +309,8 @@ public final class ListenerUtil {
             return false;
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " value " + value + " is not " +
-                    "valid.");
+                                                                          getYangConstructType(yangConstruct) + " value " + value + " is not " +
+                                                                          "valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -361,8 +361,8 @@ public final class ListenerUtil {
             return nodeIdentifier;
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " name " + nodeIdentifierString +
-                    " is not valid.");
+                                                                          getYangConstructType(yangConstruct) + " name " + nodeIdentifierString +
+                                                                          " is not valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -395,8 +395,8 @@ public final class ListenerUtil {
             return nodeIdentifier;
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
-                    " is not valid.");
+                                                                          getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
+                                                                          " is not valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -419,7 +419,7 @@ public final class ListenerUtil {
         if (completePathString.startsWith(SLASH)) {
             yangLeafRef.setPathType(ABSOLUTE_PATH);
             List<YangAtomicPath> yangAtomicPathListList = validateAbsolutePath(completePathString, yangConstruct, ctx,
-                    yangLeafRef);
+                                                                               yangLeafRef);
             validatePrefixAndYangNode(yangAtomicPathListList, yangLeafRef);
             yangLeafRef.setAtomicPath(yangAtomicPathListList);
         } else if (completePathString.startsWith(ANCESTOR_ACCESSOR)) {
@@ -427,8 +427,8 @@ public final class ListenerUtil {
             validateRelativePath(completePathString, yangConstruct, ctx, yangLeafRef);
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
-                    " does not follow valid path syntax");
+                                                                          getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
+                                                                          " does not follow valid path syntax");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -522,7 +522,7 @@ public final class ListenerUtil {
             atomicPath.add(yangAtomicPathPath);
             if (nodeIdentifier.getPrefix() != null && nodeIdentifier.getPrefix() != prefixOfFile) {
                 ParserException parserException = new ParserException("YANG file error : A leaf reference, in unique," +
-                        " must refer to a leaf in the list");
+                                                                              " must refer to a leaf in the list");
                 parserException.setLine(ctx.getStart().getLine());
                 parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                 throw parserException;
@@ -557,8 +557,8 @@ public final class ListenerUtil {
                 }
                 if (leaf == null) {
                     ParserException parserException = new ParserException("YANG file error : A leaf reference, in " +
-                            "unique," +
-                            " must refer to a leaf under the list");
+                                                                                  "unique," +
+                                                                                  " must refer to a leaf under the list");
                     parserException.setLine(ctx.getStart().getLine());
                     parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                     throw parserException;
@@ -582,10 +582,10 @@ public final class ListenerUtil {
         while (nodesInReference.hasNext()) {
             YangAtomicPath nodeInUnique = nodesInReference.next();
             YangNode referredNode = getReferredNodeFromTheUniqueNodes(nodeInUnique.getNodeIdentifier(),
-                    potentialReferredNode);
+                                                                      potentialReferredNode);
             if (referredNode == null) {
                 ParserException parserException = new ParserException("YANG file error : The target node in unique " +
-                        "reference path is invalid");
+                                                                              "reference path is invalid");
                 parserException.setLine(ctx.getStart().getLine());
                 parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                 throw parserException;
@@ -678,16 +678,16 @@ public final class ListenerUtil {
         }
         if (completePathString == null || completePathString.length() == 0) {
             ParserException parserException = new ParserException("YANG file error : "
-                    + getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
-                    " does not follow valid path syntax");
+                                                                          + getYangConstructType(yangConstruct) + yangLeafRef.getPath() +
+                                                                          " does not follow valid path syntax");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
         }
         relativePath.setAncestorNodeCount(numberOfAncestors);
         List<YangAtomicPath> atomicPath = validateAbsolutePath(SLASH_FOR_STRING + completePathString,
-                yangConstruct,
-                ctx, yangLeafRef);
+                                                               yangConstruct,
+                                                               ctx, yangLeafRef);
         validatePrefixAndYangNode(atomicPath, yangLeafRef);
         relativePath.setAtomicPathList(atomicPath);
         yangLeafRef.setRelativePath(relativePath);
@@ -714,8 +714,8 @@ public final class ListenerUtil {
             String path = completePathString.replaceFirst(SLASH_FOR_STRING, EMPTY_STRING);
             if (path == null || path.length() == 0) {
                 ParserException parserException = new ParserException("YANG file error : "
-                        + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
-                        " does not follow valid path syntax");
+                                                                              + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
+                                                                              " does not follow valid path syntax");
                 parserException.setLine(ctx.getStart().getLine());
                 parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                 throw parserException;
@@ -733,8 +733,8 @@ public final class ListenerUtil {
 
                 if (matchedPathPredicate == null || matchedPathPredicate.length() == 0) {
                     ParserException parserException = new ParserException("YANG file error : "
-                            + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
-                            " does not follow valid path syntax");
+                                                                                  + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
+                                                                                  " does not follow valid path syntax");
                     parserException.setLine(ctx.getStart().getLine());
                     parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                     throw parserException;
@@ -763,7 +763,7 @@ public final class ListenerUtil {
                 }
 
                 List<YangPathPredicate> pathPredicateList = validatePathPredicate(pathPredicate, yangConstruct, ctx,
-                        yangPathPredicate, yangLeafRef);
+                                                                                  yangPathPredicate, yangLeafRef);
                 YangAtomicPath atomicPath = new YangAtomicPath();
                 yangNodeIdentifier = getValidNodeIdentifierForLeafref(nodeIdentifier, yangConstruct, ctx, yangLeafRef);
                 atomicPath.setNodeIdentifier(yangNodeIdentifier);
@@ -815,11 +815,11 @@ public final class ListenerUtil {
             String pathPredicateForNode = pathPredicateString.next();
             pathPredicateForNode = (pathPredicateForNode.substring(1)).trim();
             pathPredicateForNode = pathPredicateForNode.substring(0,
-                    pathPredicateForNode.indexOf(CHAR_OF_CLOSE_SQUARE_BRACKET));
+                                                                  pathPredicateForNode.indexOf(CHAR_OF_CLOSE_SQUARE_BRACKET));
             pathEqualityExpression.add(pathPredicateForNode);
         }
         List<YangPathPredicate> validatedPathPredicateList = validatePathEqualityExpression(pathEqualityExpression,
-                yangConstruct, ctx, yangPathPredicate, yangLeafRef);
+                                                                                            yangConstruct, ctx, yangPathPredicate, yangLeafRef);
         return validatedPathPredicateList;
     }
 
@@ -849,9 +849,9 @@ public final class ListenerUtil {
             YangNodeIdentifier yangNodeIdentifierForPredicate;
             YangRelativePath yangRelativePath;
             yangNodeIdentifierForPredicate = getValidNodeIdentifierForLeafref(pathEqualityExpressionArray[0].trim(),
-                    yangConstruct, ctx, yangLeafRef);
+                                                                              yangConstruct, ctx, yangLeafRef);
             yangRelativePath = validatePathKeyExpression(pathEqualityExpressionArray[1].trim(), yangConstruct, ctx,
-                    yangLeafRef);
+                                                         yangLeafRef);
             yangPathPredicate.setNodeIdentifier(yangNodeIdentifierForPredicate);
             yangPathPredicate.setPathOperator(EQUALTO);
             yangPathPredicate.setRightRelativePath(yangRelativePath);
@@ -885,7 +885,7 @@ public final class ListenerUtil {
             }
         }
         List<YangAtomicPath> atomicPathInRelativePath = validateRelativePathKeyExpression(rightAbsolutePath,
-                yangConstruct, ctx, yangLeafRef);
+                                                                                          yangConstruct, ctx, yangLeafRef);
         yangRelativePath.setAtomicPathList(atomicPathInRelativePath);
         yangRelativePath.setAncestorNodeCount(accessAncestor);
         return yangRelativePath;
@@ -915,8 +915,8 @@ public final class ListenerUtil {
 
         if (!(currentFunction[0].trim().equals(CURRENT)) || !(currentFunction[1].trim().equals(CLOSE_PARENTHESIS))) {
             ParserException parserException = new ParserException("YANG file error : "
-                    + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
-                    " does not follow valid path syntax");
+                                                                          + getYangConstructType(yangConstruct) + " " + yangLeafRef.getPath() +
+                                                                          " does not follow valid path syntax");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -967,8 +967,8 @@ public final class ListenerUtil {
         // absolute-schema-nodeid = 1*("/" node-identifier)
         if (!tmpSchemaNodeId.startsWith(SLASH)) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstructType) + " name " + argumentString +
-                    "is not valid");
+                                                                          getYangConstructType(yangConstructType) + " name " + argumentString +
+                                                                          "is not valid");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -999,7 +999,7 @@ public final class ListenerUtil {
         parserException.setLine(ctx.getStart().getLine());
         parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
         log.info(parserException.getMessage() + " at position " + parserException.getCharPositionInLine() +
-                " in line " + parserException.getLineNumber() + " of yang file " + fileName);
+                         " in line " + parserException.getLineNumber() + " of yang file " + fileName);
     }
 
     /**
@@ -1011,7 +1011,7 @@ public final class ListenerUtil {
      */
     public static Date getValidDateFromString(String dateInString, ParserRuleContext ctx) {
         String dateArgument = removeQuotesAndHandleConcat(dateInString);
-        if (dateArgument == null || !dateArgument.matches(DATE_PATTERN)) {
+        if (!dateArgument.matches(DATE_PATTERN)) {
             ParserException parserException = new ParserException("YANG file error: Input date is not correct");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
@@ -1023,8 +1023,7 @@ public final class ListenerUtil {
 
         try {
             //if not valid, it will throw ParseException
-            Date date = sdf.parse(dateArgument);
-            return date;
+            return sdf.parse(dateArgument);
         } catch (ParseException e) {
             ParserException parserException = new ParserException("YANG file error: Input date is not correct");
             parserException.setLine(ctx.getStart().getLine());
@@ -1049,8 +1048,8 @@ public final class ListenerUtil {
             return tmpData[0];
         } else {
             ParserException parserException = new ParserException("YANG file error : " +
-                    getYangConstructType(yangConstruct) + " name " + inputString +
-                    " is not valid.");
+                                                                          getYangConstructType(yangConstruct) + " name " + inputString +
+                                                                          " is not valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;

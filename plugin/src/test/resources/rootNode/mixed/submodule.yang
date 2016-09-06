@@ -1,0 +1,25 @@
+submodule test6 {
+      
+     belongs-to "test5" {
+         prefix "test";
+    }    
+
+    revision "2016-07-04" {
+             description "Initial revision.";
+    }
+
+    typedef typedef {
+        type int32;
+    }
+    container cont1 {
+        leaf leaf1 {
+           type int32;
+        }
+    }
+    container cont2 {
+        leaf leaf1 {
+           type int32;
+        }
+    }
+
+}

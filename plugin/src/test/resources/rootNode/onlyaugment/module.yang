@@ -1,0 +1,21 @@
+module test5 {
+    namespace "test5:test";
+    prefix test ;
+
+    include test6;
+    revision "2016-07-04" {
+             description "Initial revision.";
+    }
+    
+    augment /cont1 {
+       leaf cont1 {
+          type string;
+        }
+    }
+    augment /cont2 {
+       leaf cont2 {
+          type string;
+        }
+    }	
+
+}

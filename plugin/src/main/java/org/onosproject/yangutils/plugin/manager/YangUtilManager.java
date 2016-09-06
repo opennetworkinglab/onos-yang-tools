@@ -254,7 +254,7 @@ public class YangUtilManager
             throws IOException {
         try {
             List<YangNode> interJarResolvedNodes = resolveInterJarDependencies(project, localRepository,
-                    remoteRepository, getDirectory(baseDir, outputDirectory));
+                                                                               remoteRepository, getDirectory(baseDir, outputDirectory));
             for (YangNode node : interJarResolvedNodes) {
                 YangFileInfo dependentFileInfo = new YangFileInfo();
                 node.setToTranslate(false);

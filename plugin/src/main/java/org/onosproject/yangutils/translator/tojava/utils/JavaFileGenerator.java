@@ -126,6 +126,8 @@ import static org.onosproject.yangutils.translator.tojava
         .TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils
         .getQualifierInfoForCasesParent;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils
+        .isGetSetOfRootNodeRequired;
 import static org.onosproject.yangutils.translator.tojava.utils
         .JavaCodeSnippetGen.addAugmentationAttribute;
 import static org.onosproject.yangutils.translator.tojava.utils
@@ -173,6 +175,8 @@ import static org.onosproject.yangutils.translator.tojava.utils
 import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getGetterForOperationType;
 import static org.onosproject.yangutils.translator.tojava.utils
+        .MethodsGenerator.getGetterString;
+import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getGettersForValueAndSelectLeaf;
 import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getHashCodeMethodClose;
@@ -194,6 +198,8 @@ import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getSetterForOperationType;
 import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getSetterForSelectLeaf;
+import static org.onosproject.yangutils.translator.tojava.utils
+        .MethodsGenerator.getSetterString;
 import static org.onosproject.yangutils.translator.tojava.utils
         .MethodsGenerator.getToStringMethodClose;
 import static org.onosproject.yangutils.translator.tojava.utils
@@ -1412,6 +1418,19 @@ public final class JavaFileGenerator {
                                               tempJavaServiceFragmentFiles);
 
         try {
+
+            if (isGetSetOfRootNodeRequired(curNode)) {
+                //Getter methods.
+                methods.add(getGetterString(rootAttribute,
+                                            GENERATE_SERVICE_AND_MANAGER,
+                                            javaFileInfo.getPluginConfig()) +
+                                    NEW_LINE);
+                // Setter methods.
+                methods.add(getSetterString(rootAttribute, className,
+                                            GENERATE_SERVICE_AND_MANAGER,
+                                            javaFileInfo.getPluginConfig()) +
+                                    NEW_LINE);
+            }
 
             methods.add(getAugmentsDataMethodForService(curNode) + NEW_LINE);
 

@@ -23,9 +23,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yangutils.datamodel.YangRevision;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
@@ -128,8 +130,9 @@ public final class JavaIdentifierSyntaxTest {
      *                                   or constructor.
      */
     @Test
-    public void callPrivateConstructors() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException {
+    public void callPrivateConstructors()
+            throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+                   InstantiationException, IllegalAccessException, InvocationTargetException {
 
         Class<?>[] classesToConstruct = {JavaIdentifierSyntax.class};
         for (Class<?> clazz : classesToConstruct) {
@@ -143,48 +146,48 @@ public final class JavaIdentifierSyntaxTest {
      * Unit test for root package generation with revision complexity.
      */
     @Test
-    public void getRootPackageTest() throws ParseException {
+    public void getRootPackageTest()
+            throws ParseException {
         conflictResolver.setPrefixForIdentifier(null);
-        Date date = simpleDateFormat.parse(DATE1);
-        String rootPackage = getRootPackage((byte) 1, CHILD_PACKAGE, date, conflictResolver);
+        String rootPackage = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage.equals(DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER
-                + PERIOD + CHILD_WITH_PERIOD + PERIOD + DATE_WITH_REV1), is(true));
+                                              + PERIOD + CHILD_WITH_PERIOD + PERIOD + DATE_WITH_REV1), is(true));
     }
 
     /**
      * Unit test for root package generation with invalid prefix.
      */
     @Test
-    public void getRootPackageWithInvalidPrefix() throws TranslatorException, ParseException {
+    public void getRootPackageWithInvalidPrefix()
+            throws TranslatorException, ParseException {
         thrown.expect(TranslatorException.class);
         thrown.expectMessage("The given prefix in pom.xml is invalid.");
         conflictResolver.setPrefixForIdentifier(INVALID_PREFIX);
-        Date date = simpleDateFormat.parse(DATE1);
-        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE_FOR_INVALID_PREFIX, date,
-                conflictResolver);
+        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE_FOR_INVALID_PREFIX, getYangRevision(DATE1),
+                                             conflictResolver);
     }
 
     /**
      * Unit test for root package generation with special characters presence.
      */
     @Test
-    public void getRootPackageWithSpecialCharactersTest() throws ParseException {
+    public void getRootPackageWithSpecialCharactersTest()
+            throws ParseException {
         conflictResolver.setPrefixForIdentifier(VALID_PREFIX);
-        Date date = simpleDateFormat.parse(DATE1);
-        String rootPackage = getRootPackage((byte) 1, INVALID_NAME_SPACE1, date, conflictResolver);
+        String rootPackage = getRootPackage((byte) 1, INVALID_NAME_SPACE1, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage.equals(DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER
-                + PERIOD + VALID_NAME_SPACE1 + PERIOD + DATE_WITH_REV1), is(true));
+                                              + PERIOD + VALID_NAME_SPACE1 + PERIOD + DATE_WITH_REV1), is(true));
         conflictResolver.setPrefixForIdentifier(null);
-        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, date, conflictResolver);
+        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage1.equals(DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER
-                + PERIOD + VALID_NAME_SPACE2 + PERIOD + DATE_WITH_REV1), is(true));
-        String rootPackage2 = getRootPackage((byte) 1, INVALID_NAME_SPACE3, date, conflictResolver);
+                                               + PERIOD + VALID_NAME_SPACE2 + PERIOD + DATE_WITH_REV1), is(true));
+        String rootPackage2 = getRootPackage((byte) 1, INVALID_NAME_SPACE3, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage2.equals(DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER
-                + PERIOD + VALID_NAME_SPACE4 + PERIOD + DATE_WITH_REV1), is(true));
+                                               + PERIOD + VALID_NAME_SPACE4 + PERIOD + DATE_WITH_REV1), is(true));
         conflictResolver.setPrefixForIdentifier(INVALID_PREFIX1);
-        String rootPackage3 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, date, conflictResolver);
+        String rootPackage3 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage3.equals(DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER
-                + PERIOD + VALID_NAME_SPACE3 + PERIOD + DATE_WITH_REV1), is(true));
+                                               + PERIOD + VALID_NAME_SPACE3 + PERIOD + DATE_WITH_REV1), is(true));
 
     }
 
@@ -192,12 +195,13 @@ public final class JavaIdentifierSyntaxTest {
      * Unit test for root package generation without complexity in revision.
      */
     @Test
-    public void getRootPackageWithRevTest() throws ParseException {
+    public void getRootPackageWithRevTest()
+            throws ParseException {
         Date date = simpleDateFormat.parse(DATE2);
-        String rootPkgWithRev = getRootPackage((byte) 1, CHILD_PACKAGE, date, null);
+        String rootPkgWithRev = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE2), null);
         assertThat(rootPkgWithRev.equals(
                 DEFAULT_BASE_PKG + PERIOD + VERSION_NUMBER + PERIOD + CHILD_WITH_PERIOD + PERIOD + DATE_WITH_REV2),
-                is(true));
+                   is(true));
     }
 
     /**
@@ -265,7 +269,8 @@ public final class JavaIdentifierSyntaxTest {
      * Unit test for getting the camel case along with the invalid prefix provided.
      */
     @Test
-    public void getCamelCaseWithInvalidPrefixTest() throws TranslatorException {
+    public void getCamelCaseWithInvalidPrefixTest()
+            throws TranslatorException {
 
         thrown.expect(TranslatorException.class);
         thrown.expectMessage("The given prefix in pom.xml is invalid.");
@@ -307,7 +312,8 @@ public final class JavaIdentifierSyntaxTest {
      * @throws IOException when failed to create a test file
      */
     @Test
-    public void packageExistTest() throws IOException {
+    public void packageExistTest()
+            throws IOException {
 
         String strPath = BASE_DIR_PKG + DIR_PATH;
         File createDir = new File(strPath.replace(PERIOD, SLASH));
@@ -318,5 +324,15 @@ public final class JavaIdentifierSyntaxTest {
         createDir.delete();
         deleteDirectory(createDir);
         deleteDirectory(new File(BASE_DIR_PKG.replace(PERIOD, SLASH)));
+    }
+
+    private YangRevision getYangRevision(String date) {
+        YangRevision revision = new YangRevision();
+        try {
+            revision.setRevDate(simpleDateFormat.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return revision;
     }
 }

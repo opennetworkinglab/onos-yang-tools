@@ -112,10 +112,10 @@ public final class AttributesJavaDataType {
                 return getJavaDataType(getReferredTypeFromLeafref(yangType));
             default:
                 throw new TranslatorException("given data type is not supported. " +
-                        yangType.getDataTypeName() + " in " +
-                        yangType.getLineNumber() + " at " +
-                        yangType.getCharPosition()
-                        + " in " + yangType.getFileName());
+                                                      yangType.getDataTypeName() + " in " +
+                                                      yangType.getLineNumber() + " at " +
+                                                      yangType.getCharPosition()
+                                                      + " in " + yangType.getFileName());
         }
     }
 
@@ -159,7 +159,7 @@ public final class AttributesJavaDataType {
                 case ENUMERATION:
                     return getCapitalCase(
                             getCamelCase(((YangJavaEnumerationTranslator) yangType.getDataTypeExtendedInfo()).getName(),
-                                    pluginConfig));
+                                         pluginConfig));
                 case BITS:
                     return BIT_SET;
                 case BINARY:
@@ -184,10 +184,10 @@ public final class AttributesJavaDataType {
                             getCamelCase(yangType.getDataTypeName(), pluginConfig));
                 default:
                     throw new TranslatorException("given data type is not supported ." +
-                            yangType.getDataTypeName() + " in " +
-                            yangType.getLineNumber() + " at " +
-                            yangType.getCharPosition()
-                            + " in " + yangType.getFileName());
+                                                          yangType.getDataTypeName() + " in " +
+                                                          yangType.getLineNumber() + " at " +
+                                                          yangType.getCharPosition()
+                                                          + " in " + yangType.getFileName());
             }
         } else {
             switch (type) {
@@ -198,7 +198,7 @@ public final class AttributesJavaDataType {
                 case ENUMERATION:
                     return getCapitalCase(
                             getCamelCase(((YangJavaEnumerationTranslator) yangType.getDataTypeExtendedInfo()).getName(),
-                                    pluginConfig));
+                                         pluginConfig));
                 case BITS:
                     return BIT_SET;
                 case DECIMAL64:
@@ -273,10 +273,10 @@ public final class AttributesJavaDataType {
                     return getTypeDefsPackage(yangType, conflictResolver);
                 default:
                     throw new TranslatorException("given data type is not supported. " +
-                            yangType.getDataTypeName() + " in " +
-                            yangType.getLineNumber() + " at " +
-                            yangType.getCharPosition()
-                            + " in " + yangType.getFileName());
+                                                          yangType.getDataTypeName() + " in " +
+                                                          yangType.getLineNumber() + " at " +
+                                                          yangType.getCharPosition()
+                                                          + " in " + yangType.getFileName());
             }
         } else {
             switch (type) {
@@ -318,18 +318,18 @@ public final class AttributesJavaDataType {
         Object var = type.getDataTypeExtendedInfo();
         if (!(var instanceof YangDerivedInfo)) {
             throw new TranslatorException("type should have been derived. " +
-                    type.getDataTypeName() + " in " +
-                    type.getLineNumber() + " at " +
-                    type.getCharPosition()
-                    + " in " + type.getFileName());
+                                                  type.getDataTypeName() + " in " +
+                                                  type.getLineNumber() + " at " +
+                                                  type.getCharPosition()
+                                                  + " in " + type.getFileName());
         }
 
         if (!(((YangDerivedInfo<?>) var).getReferredTypeDef() != null)) {
             throw new TranslatorException("derived info is not an instance of typedef. " +
-                    type.getDataTypeName() + " in " +
-                    type.getLineNumber() + " at " +
-                    type.getCharPosition()
-                    + " in " + type.getFileName());
+                                                  type.getDataTypeName() + " in " +
+                                                  type.getLineNumber() + " at " +
+                                                  type.getCharPosition()
+                                                  + " in " + type.getFileName());
         }
 
         YangJavaTypeDefTranslator typedef = (YangJavaTypeDefTranslator) ((YangDerivedInfo<?>) var).getReferredTypeDef();
@@ -350,10 +350,10 @@ public final class AttributesJavaDataType {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangUnion)) {
             throw new TranslatorException("type should have been union. " +
-                    type.getDataTypeName() + " in " +
-                    type.getLineNumber() + " at " +
-                    type.getCharPosition()
-                    + " in " + type.getFileName());
+                                                  type.getDataTypeName() + " in " +
+                                                  type.getLineNumber() + " at " +
+                                                  type.getCharPosition()
+                                                  + " in " + type.getFileName());
         }
 
         YangJavaUnionTranslator union = (YangJavaUnionTranslator) type.getDataTypeExtendedInfo();
@@ -374,10 +374,10 @@ public final class AttributesJavaDataType {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangEnumeration)) {
             throw new TranslatorException("type should have been enumeration. " +
-                    type.getDataTypeName() + " in " +
-                    type.getLineNumber() + " at " +
-                    type.getCharPosition()
-                    + " in " + type.getFileName());
+                                                  type.getDataTypeName() + " in " +
+                                                  type.getLineNumber() + " at " +
+                                                  type.getCharPosition()
+                                                  + " in " + type.getFileName());
         }
         YangJavaEnumerationTranslator enumeration = (YangJavaEnumerationTranslator) type.getDataTypeExtendedInfo();
         if (enumeration.getJavaFileInfo().getPackage() == null) {
@@ -397,10 +397,10 @@ public final class AttributesJavaDataType {
 
         if (!(type.getDataTypeExtendedInfo() instanceof YangIdentityRef)) {
             throw new TranslatorException("type should have been identityref. " +
-                    type.getDataTypeName() + " in " +
-                    type.getLineNumber() + " at " +
-                    type.getCharPosition()
-                    + " in " + type.getFileName());
+                                                  type.getDataTypeName() + " in " +
+                                                  type.getLineNumber() + " at " +
+                                                  type.getCharPosition()
+                                                  + " in " + type.getFileName());
         }
         YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
         YangJavaIdentityTranslator identity = (YangJavaIdentityTranslator) (identityRef.getReferredIdentity());
@@ -421,10 +421,10 @@ public final class AttributesJavaDataType {
                                                YangToJavaNamingConflictUtil conflictResolver) {
         if (!(parent instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("invalid child node is being processed. " +
-                    parent.getName() + " in " +
-                    parent.getLineNumber() + " at " +
-                    parent.getCharPosition()
-                    + " in " + parent.getFileName());
+                                                  parent.getName() + " in " +
+                                                  parent.getLineNumber() + " at " +
+                                                  parent.getCharPosition()
+                                                  + " in " + parent.getFileName());
         }
         JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
         if (parentInfo.getPackage() == null) {
@@ -464,18 +464,18 @@ public final class AttributesJavaDataType {
             if (yangNode instanceof YangJavaModuleTranslator) {
                 YangJavaModuleTranslator module = (YangJavaModuleTranslator) yangNode;
                 pkg = getRootPackage(module.getVersion(), module.getNameSpace(), module
-                        .getRevision().getRevDate(), conflictResolver);
+                        .getRevision(), conflictResolver);
             } else if (yangNode instanceof YangJavaSubModuleTranslator) {
                 YangJavaSubModuleTranslator submodule = (YangJavaSubModuleTranslator) yangNode;
                 pkg = getRootPackage(submodule.getVersion(),
-                        submodule.getNameSpaceFromModule(submodule.getBelongsTo()),
-                        submodule.getRevision().getRevDate(), conflictResolver);
+                                     submodule.getNameSpaceFromModule(),
+                                     submodule.getRevision(), conflictResolver);
             } else {
                 throw new TranslatorException("Invalid root node of data model tree " +
-                        yangNode.getName() + " in " +
-                        yangNode.getLineNumber() + " at " +
-                        yangNode.getCharPosition()
-                        + " in " + yangNode.getFileName());
+                                                      yangNode.getName() + " in " +
+                                                      yangNode.getLineNumber() + " at " +
+                                                      yangNode.getCharPosition()
+                                                      + " in " + yangNode.getFileName());
 
             }
 

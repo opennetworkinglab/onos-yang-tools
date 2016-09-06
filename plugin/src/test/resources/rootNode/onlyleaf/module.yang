@@ -1,0 +1,15 @@
+module test5 {
+    namespace "test5:test";
+    prefix test ;
+
+    revision "2016-07-04" {
+             description "Initial revision.";
+    }
+    leaf a-leaf {
+       type int32;
+     }
+    leaf b-leaf {
+       type int32;
+     }
+    
+}

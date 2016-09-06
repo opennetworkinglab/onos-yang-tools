@@ -49,7 +49,7 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
  */
 public abstract class YangIdentity
         extends YangNode
-        implements YangCommonInfo, Parsable, Serializable {
+        implements YangCommonInfo, Parsable, Serializable, YangTranslatorOperatorNode {
 
     private static final long serialVersionUID = 806201691L;
 

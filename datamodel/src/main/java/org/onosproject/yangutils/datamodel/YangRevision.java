@@ -46,8 +46,9 @@ import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 /**
  * Represents the information about the revision.
  */
-public class YangRevision extends DefaultLocationInfo
-        implements YangDesc, YangReference, Parsable, Serializable {
+public class YangRevision
+        extends DefaultLocationInfo
+        implements YangDesc, YangReference, Parsable, Serializable, Comparable<YangRevision> {
 
     private static final long serialVersionUID = 8062016052L;
 
@@ -146,7 +147,8 @@ public class YangRevision extends DefaultLocationInfo
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnEntry() throws DataModelException {
+    public void validateDataOnEntry()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
 
     }
@@ -157,8 +159,17 @@ public class YangRevision extends DefaultLocationInfo
      * @throws DataModelException a violation of data model rules
      */
     @Override
-    public void validateDataOnExit() throws DataModelException {
+    public void validateDataOnExit()
+            throws DataModelException {
         // TODO auto-generated method stub, to be implemented by parser
 
+    }
+
+    @Override
+    public int compareTo(YangRevision obj) {
+        if (this == obj) {
+            return 0;
+        }
+        return getRevDate().compareTo(obj.getRevDate());
     }
 }

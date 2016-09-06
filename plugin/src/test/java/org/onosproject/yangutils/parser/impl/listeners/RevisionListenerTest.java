@@ -16,17 +16,17 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -75,7 +75,7 @@ public class RevisionListenerTest {
     public void processWithoutRevision() throws IOException, ParserException {
 
         YangNode node = manager.getDataModel("src/test/resources/RevisionAbsence.yang");
-        assertThat(((YangModule) node).getRevision().getRevDate(), notNullValue());
+        assertThat(true, is((node).getRevision() == null));
     }
 
     /**
@@ -85,6 +85,6 @@ public class RevisionListenerTest {
     public void processWithMultipleRevision() throws IOException, ParserException, ParseException {
 
         YangNode node = manager.getDataModel("src/test/resources/MultipleRevision.yang");
-        assertThat(((YangModule) node).getRevision().getRevDate(), is(simpleDateFormat.parse("2013-07-15")));
+        assertThat((node).getRevision().getRevDate(), is(simpleDateFormat.parse("2013-07-15")));
     }
 }

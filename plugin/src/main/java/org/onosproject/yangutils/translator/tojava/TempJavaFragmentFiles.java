@@ -395,7 +395,7 @@ public class TempJavaFragmentFiles {
         setJavaImportData(new JavaImportData());
         setJavaFileInfo(javaFileInfo);
         setAbsoluteDirPath(getAbsolutePackagePath(getJavaFileInfo().getBaseCodeGenPath(),
-                getJavaFileInfo().getPackageFilePath()));
+                                                  getJavaFileInfo().getPackageFilePath()));
 
         /*
          * Initialize getter when generation file type matches to interface
@@ -526,8 +526,9 @@ public class TempJavaFragmentFiles {
         YangNode parent = getParentNodeInGenCode(curNode);
         if (!(parent instanceof JavaCodeGenerator)) {
             throw new TranslatorException("missing parent node to contain current node info in generated file "
-                    + parent.getName() + " in " + parent.getLineNumber() + " at " + parent.getCharPosition()
-                    + " in " + parent.getFileName());
+                                                  + parent.getName() + " in " + parent.getLineNumber() + " at " +
+                                                  parent.getCharPosition()
+                                                  + " in " + parent.getFileName());
         }
 
         if (parent instanceof YangJavaGroupingTranslator) {
@@ -542,7 +543,7 @@ public class TempJavaFragmentFiles {
                 .getTempJavaCodeFragmentFiles().getBeanTempFiles();
 
         JavaAttributeInfo javaAttributeInfo = getCurNodeAsAttributeInTarget(curNode,
-                parent, isList, tempJavaBeanFragmentFiles);
+                                                                            parent, isList, tempJavaBeanFragmentFiles);
         tempJavaBeanFragmentFiles.addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfo, pluginConfig);
     }
 
@@ -569,11 +570,12 @@ public class TempJavaFragmentFiles {
          * generated java files or qualified access
          */
         JavaQualifiedTypeInfoTranslator qualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(curNode,
-                getCapitalCase(curNodeName));
+                                                                                          getCapitalCase(curNodeName));
         if (!(targetNode instanceof TempJavaCodeFragmentFilesContainer)) {
             throw new TranslatorException("Parent node does not have file info "
-                    + targetNode.getName() + " in " + targetNode.getLineNumber() + " at " + targetNode.getCharPosition()
-                    + " in " + targetNode.getFileName());
+                                                  + targetNode.getName() + " in " + targetNode.getLineNumber() +
+                                                  " at " + targetNode.getCharPosition()
+                                                  + " in " + targetNode.getFileName());
         }
         JavaImportData parentImportData = tempJavaFragmentFiles.getJavaImportData();
         JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) targetNode).getJavaFileInfo();
@@ -593,7 +595,7 @@ public class TempJavaFragmentFiles {
             }
 
             isQualified = parentImportData.addImportInfo(qualifiedTypeInfo,
-                    className, fileInfo.getPackage());
+                                                         className, fileInfo.getPackage());
         }
         boolean collectionSetFlag = false;
         if (curNode instanceof YangList) {
@@ -622,7 +624,7 @@ public class TempJavaFragmentFiles {
         }
         if (curNode instanceof YangList) {
             return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode,
-                    ((YangList) curNode).getCompilerAnnotation());
+                                              ((YangList) curNode).getCompilerAnnotation());
         }
         return getAttributeInfoForTheData(qualifiedTypeInfo, curNodeName, null, isQualified, isListNode);
     }
@@ -1050,7 +1052,7 @@ public class TempJavaFragmentFiles {
     private void addSubTreeFilteringForLeaf(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getSubtreeFilteringForLeafTempFileHandle(),
-                getSubtreeFilteringForLeaf(attr, attr.getAttributeType()) + NEW_LINE);
+                     getSubtreeFilteringForLeaf(attr, attr.getAttributeType()) + NEW_LINE);
     }
 
     /**
@@ -1062,7 +1064,7 @@ public class TempJavaFragmentFiles {
     private void addSubtreeFilteringForLeafList(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getGetSubtreeFilteringForListTempFileHandle(),
-                getSubtreeFilteringForLeafList(attr) + NEW_LINE);
+                     getSubtreeFilteringForLeafList(attr) + NEW_LINE);
     }
 
     /**
@@ -1074,7 +1076,7 @@ public class TempJavaFragmentFiles {
     private void addSubtreeFilteringForChildNode(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getGetSubtreeFilteringForChildNodeTempFileHandle(),
-                getSubtreeFilteringForNode(attr) + NEW_LINE);
+                     getSubtreeFilteringForNode(attr) + NEW_LINE);
     }
 
     /**
@@ -1100,7 +1102,7 @@ public class TempJavaFragmentFiles {
     private void addGetterForInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
         appendToFile(getGetterInterfaceTempFileHandle(),
-                getGetterString(attr, getGeneratedJavaFiles(), pluginConfig) + NEW_LINE);
+                     getGetterString(attr, getGeneratedJavaFiles(), pluginConfig) + NEW_LINE);
     }
 
     /**
@@ -1113,8 +1115,8 @@ public class TempJavaFragmentFiles {
     private void addSetterForInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
         appendToFile(getSetterInterfaceTempFileHandle(),
-                getSetterString(attr, getGeneratedJavaClassName(), getGeneratedJavaFiles(), pluginConfig)
-                        + NEW_LINE);
+                     getSetterString(attr, getGeneratedJavaClassName(), getGeneratedJavaFiles(), pluginConfig)
+                             + NEW_LINE);
     }
 
     /**
@@ -1127,7 +1129,7 @@ public class TempJavaFragmentFiles {
             throws IOException {
         if (isRooNode()) {
             appendToFile(getSetterImplTempFileHandle(), getJavaDoc(SETTER_METHOD, attr.getAttributeName(),
-                    attr.isListAttr(), pluginConfig, null) +
+                                                                   attr.isListAttr(), pluginConfig, null) +
                     getSetterForClass(attr, getGeneratedJavaClassName(), getGeneratedJavaFiles())
                     + NEW_LINE);
         } else {
@@ -1150,10 +1152,11 @@ public class TempJavaFragmentFiles {
                 || (getGeneratedJavaFiles() & GENERATE_SERVICE_AND_MANAGER) != 0) {
             if (!isRooNode()) {
                 appendToFile(getGetterImplTempFileHandle(), getOverRideString() + getGetterForClass(attr,
-                        getGeneratedJavaFiles()) + NEW_LINE);
+                                                                                                    getGeneratedJavaFiles()) +
+                        NEW_LINE);
             } else {
                 appendToFile(getGetterImplTempFileHandle(), getGetterForClass(attr,
-                        getGeneratedJavaFiles()) + NEW_LINE);
+                                                                              getGeneratedJavaFiles()) + NEW_LINE);
             }
         } else {
             String appDataStructure = null;
@@ -1161,8 +1164,8 @@ public class TempJavaFragmentFiles {
                 appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
             }
             appendToFile(getGetterImplTempFileHandle(),
-                    getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
-                            appDataStructure) + getGetterForClass(attr, getGeneratedJavaFiles()) + NEW_LINE);
+                         getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
+                                    appDataStructure) + getGetterForClass(attr, getGeneratedJavaFiles()) + NEW_LINE);
         }
     }
 
@@ -1176,8 +1179,8 @@ public class TempJavaFragmentFiles {
     private void addAddToListInterface(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
             throws IOException {
         appendToFile(getAddToListInterfaceTempFileHandle(),
-                getJavaDoc(ADD_TO_LIST, getCapitalCase(attr.getAttributeName()), false, pluginConfig, null)
-                        + getAddToListMethodInterface(attr, getGeneratedJavaClassName()) + NEW_LINE);
+                     getJavaDoc(ADD_TO_LIST, getCapitalCase(attr.getAttributeName()), false, pluginConfig, null)
+                             + getAddToListMethodInterface(attr, getGeneratedJavaClassName()) + NEW_LINE);
     }
 
     /**
@@ -1189,7 +1192,7 @@ public class TempJavaFragmentFiles {
     private void addAddToListImpl(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getAddToListImplTempFileHandle(),
-                getAddToListMethodImpl(attr, getGeneratedJavaClassName(), isRooNode()) + NEW_LINE);
+                     getAddToListMethodImpl(attr, getGeneratedJavaClassName(), isRooNode()) + NEW_LINE);
     }
 
     /**
@@ -1203,8 +1206,8 @@ public class TempJavaFragmentFiles {
     private void addLeafIdAttributes(JavaAttributeInfo attr, int value, YangPluginConfig yangPluginConfig)
             throws IOException {
         appendToFile(getLeafIdAttributeTempFileHandle(),
-                FOUR_SPACE_INDENTATION + generateEnumAttributeString(attr.getAttributeName(),
-                        value, yangPluginConfig));
+                     FOUR_SPACE_INDENTATION + generateEnumAttributeString(attr.getAttributeName(),
+                                                                          value, yangPluginConfig));
     }
 
     /**
@@ -1247,7 +1250,7 @@ public class TempJavaFragmentFiles {
             name = name + OP_PARAM;
             return NEW_LINE
                     + getDefaultConstructorString(name, modifier,
-                    pluginConfig);
+                                                  pluginConfig);
         }
         if (isSuffix) {
             return NEW_LINE +
@@ -1261,7 +1264,7 @@ public class TempJavaFragmentFiles {
         }
         return NEW_LINE
                 + getDefaultConstructorString(appended + name, modifier,
-                pluginConfig);
+                                              pluginConfig);
     }
 
     /**
@@ -1308,7 +1311,7 @@ public class TempJavaFragmentFiles {
                              JavaAttributeInfo fromStringAttributeInfo)
             throws IOException {
         appendToFile(getFromStringImplTempFileHandle(), getFromStringMethod(javaAttributeInfo,
-                fromStringAttributeInfo) + NEW_LINE);
+                                                                            fromStringAttributeInfo) + NEW_LINE);
     }
 
     /**
@@ -1337,7 +1340,7 @@ public class TempJavaFragmentFiles {
             }
         } else {
             throw new IOException(fileName + " is reused due to YANG naming. probably your previous build would have " +
-                    "failed");
+                                          "failed");
         }
         return file;
     }
@@ -1369,7 +1372,7 @@ public class TempJavaFragmentFiles {
             return readAppendFile(path + file.getName(), EMPTY_STRING);
         } else {
             throw new IOException("Unable to get data from the given "
-                    + file.getName() + " file for " + getGeneratedJavaClassName() + PERIOD);
+                                          + file.getName() + " file for " + getGeneratedJavaClassName() + PERIOD);
         }
     }
 
@@ -1402,11 +1405,12 @@ public class TempJavaFragmentFiles {
         }
         if (attr.isQualifiedName()) {
             return getJavaAttributeDefinition(attr.getImportInfo().getPkgInfo(),
-                    attr.getImportInfo().getClassInfo(),
-                    attributeName, attr.isListAttr(), attributeAccessType, attr.getCompilerAnnotation());
+                                              attr.getImportInfo().getClassInfo(),
+                                              attributeName, attr.isListAttr(), attributeAccessType,
+                                              attr.getCompilerAnnotation());
         } else {
             return getJavaAttributeDefinition(null, attr.getImportInfo().getClassInfo(), attributeName,
-                    attr.isListAttr(), attributeAccessType, attr.getCompilerAnnotation());
+                                              attr.isListAttr(), attributeAccessType, attr.getCompilerAnnotation());
         }
     }
 
@@ -1443,19 +1447,21 @@ public class TempJavaFragmentFiles {
         }
         if (!(curNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException("missing java file information to get the package details "
-                    + "of attribute corresponding to child node " +
-                    curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
-                    + " in " + curNode.getFileName());
+                                                  + "of attribute corresponding to child node " +
+                                                  curNode.getName() + " in " + curNode.getLineNumber() + " at " +
+                                                  curNode.getCharPosition()
+                                                  + " in " + curNode.getFileName());
         }
         caseImportInfo.setClassInfo(getCapitalCase(getCamelCase(parent.getName(),
-                pluginConfig.getConflictResolver())));
+                                                                pluginConfig.getConflictResolver())));
         caseImportInfo.setPkgInfo(((JavaFileInfoContainer) parent).getJavaFileInfo().getPackage());
 
         JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
 
         ((TempJavaCodeFragmentFilesContainer) curNode).getTempJavaCodeFragmentFiles()
                 .getBeanTempFiles().getJavaImportData().addImportInfo(caseImportInfo,
-                getCapitalCase(fileInfo.getJavaName()), fileInfo.getPackage());
+                                                                      getCapitalCase(fileInfo.getJavaName()),
+                                                                      fileInfo.getPackage());
     }
 
     /**
@@ -1473,18 +1479,18 @@ public class TempJavaFragmentFiles {
             for (YangLeaf leaf : listOfLeaves) {
                 if (!(leaf instanceof JavaLeafInfoContainer)) {
                     throw new TranslatorException("Leaf does not have java information " +
-                            leaf.getName() + " in " + leaf.getLineNumber() + " at " +
-                            leaf.getCharPosition()
-                            + " in " + leaf.getFileName());
+                                                          leaf.getName() + " in " + leaf.getLineNumber() + " at " +
+                                                          leaf.getCharPosition()
+                                                          + " in " + leaf.getFileName());
                 }
                 if (curNode instanceof YangModule || curNode instanceof YangSubModule) {
                     TempJavaBeanFragmentFiles tempJavaBeanFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
                             .getTempJavaCodeFragmentFiles().getBeanTempFiles();
                     addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeOfLeaf(tempJavaBeanFragmentFiles, leaf,
-                            yangPluginConfig), yangPluginConfig);
+                                                                                   yangPluginConfig), yangPluginConfig);
                 } else {
                     addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeOfLeaf(this, leaf, yangPluginConfig),
-                            yangPluginConfig);
+                                                            yangPluginConfig);
                 }
             }
         }
@@ -1505,17 +1511,20 @@ public class TempJavaFragmentFiles {
             for (YangLeafList leafList : listOfLeafList) {
                 if (!(leafList instanceof JavaLeafInfoContainer)) {
                     throw new TranslatorException("Leaf-list does not have java information " +
-                            curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
-                            + " in " + curNode.getFileName());
+                                                          curNode.getName() + " in " + curNode.getLineNumber() +
+                                                          " at " + curNode.getCharPosition()
+                                                          + " in " + curNode.getFileName());
                 }
                 if (curNode instanceof YangModule || curNode instanceof YangSubModule) {
                     TempJavaBeanFragmentFiles tempJavaBeanFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
                             .getTempJavaCodeFragmentFiles().getBeanTempFiles();
                     addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeOfLeafList(tempJavaBeanFragmentFiles,
-                            leafList, yangPluginConfig), yangPluginConfig);
+                                                                                       leafList, yangPluginConfig),
+                                                            yangPluginConfig);
                 } else {
                     addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeOfLeafList(this,
-                            leafList, yangPluginConfig), yangPluginConfig);
+                                                                                       leafList, yangPluginConfig),
+                                                            yangPluginConfig);
                 }
             }
         }
@@ -1533,8 +1542,9 @@ public class TempJavaFragmentFiles {
             throws IOException {
         if (!(curNode instanceof YangLeavesHolder)) {
             throw new TranslatorException("Data model node does not have any leaves " +
-                    curNode.getName() + " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition()
-                    + " in " + curNode.getFileName());
+                                                  curNode.getName() + " in " + curNode.getLineNumber() + " at " +
+                                                  curNode.getCharPosition()
+                                                  + " in " + curNode.getFileName());
         }
         YangLeavesHolder leavesHolder = (YangLeavesHolder) curNode;
         addLeavesInfoToTempFiles(leavesHolder.getListOfLeaf(), yangPluginConfig, curNode);
@@ -1606,15 +1616,18 @@ public class TempJavaFragmentFiles {
 
             if ((getGeneratedTempFiles() & FROM_STRING_IMPL_MASK) != 0) {
                 JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = getQualifiedInfoOfFromString(newAttrInfo,
-                        pluginConfig.getConflictResolver());
+                                                                                                         pluginConfig
+                                                                                                                 .getConflictResolver());
             /*
              * Create a new java attribute info with qualified information of
              * wrapper classes.
              */
                 JavaAttributeInfo fromStringAttributeInfo = getAttributeInfoForTheData(qualifiedInfoOfFromString,
-                        newAttrInfo.getAttributeName(),
-                        newAttrInfo.getAttributeType(),
-                        getIsQualifiedAccessOrAddToImportList(qualifiedInfoOfFromString), false);
+                                                                                       newAttrInfo.getAttributeName(),
+                                                                                       newAttrInfo.getAttributeType(),
+                                                                                       getIsQualifiedAccessOrAddToImportList(
+                                                                                               qualifiedInfoOfFromString),
+                                                                                       false);
 
                 addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
             }
@@ -1685,7 +1698,7 @@ public class TempJavaFragmentFiles {
                             getJavaFileHandle(getJavaClassName(BUILDER_INTERFACE_FILE_NAME_SUFFIX)));
                     setBuilderInterfaceJavaFileHandle(
                             generateBuilderInterfaceFile(getBuilderInterfaceJavaFileHandle(), curNode,
-                                    isAttributePresent()));
+                                                         isAttributePresent()));
 
                     //Append builder interface file to interface file and close it.
                     mergeJavaFiles(getBuilderInterfaceJavaFileHandle(), getInterfaceJavaFileHandle());
@@ -1728,7 +1741,7 @@ public class TempJavaFragmentFiles {
                 setBuilderClassJavaFileHandle(getJavaFileHandle(getJavaClassName(BUILDER_CLASS_FILE_NAME_SUFFIX)));
                 setBuilderClassJavaFileHandle(
                         generateBuilderClassFile(getBuilderClassJavaFileHandle(), curNode,
-                                isAttributePresent()));
+                                                 isAttributePresent()));
 
                 //Append impl class to builder class and close it.
                 mergeJavaFiles(getBuilderClassJavaFileHandle(), getImplClassJavaFileHandle());
@@ -1880,8 +1893,8 @@ public class TempJavaFragmentFiles {
     boolean getIsQualifiedAccessOrAddToImportList(
             JavaQualifiedTypeInfo importInfo) {
         return getJavaImportData().addImportInfo((JavaQualifiedTypeInfoTranslator) importInfo,
-                getGeneratedJavaClassName(),
-                getJavaFileInfo().getPackage());
+                                                 getGeneratedJavaClassName(),
+                                                 getJavaFileInfo().getPackage());
     }
 
     /**
