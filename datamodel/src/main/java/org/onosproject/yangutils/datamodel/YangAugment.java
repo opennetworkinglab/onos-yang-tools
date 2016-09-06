@@ -24,7 +24,8 @@ import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils
+        .detectCollidingChildUtil;
 
 /*-
  * Reference RFC 6020.
@@ -79,12 +80,14 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
  */
 
 /**
- * Representation of data model node to maintain information defined in YANG augment.
+ * Representation of data model node to maintain information defined in YANG
+ * augment.
  */
 public abstract class YangAugment
         extends YangNode
-        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, Resolvable,
-        YangXPathResolver, YangWhenHolder, YangIfFeatureHolder {
+        implements YangLeavesHolder, YangCommonInfo, Parsable,
+                   CollisionDetector, Resolvable,
+                   YangXPathResolver, YangWhenHolder, YangIfFeatureHolder {
 
     private static final long serialVersionUID = 806201602L;
 
@@ -124,8 +127,10 @@ public abstract class YangAugment
     private YangNode augmentedNode;
 
     /**
-     * Status of resolution. If completely resolved enum value is "RESOLVED", if not enum value is "UNRESOLVED", in case
-     * reference of grouping/typedef is added to uses/type but it's not resolved value of enum should be
+     * Status of resolution. If completely resolved enum value is "RESOLVED",
+     * if not enum value is "UNRESOLVED", in case
+     * reference of grouping/typedef is added to uses/type but it's not
+     * resolved value of enum should be
      * "INTRA_FILE_RESOLVED".
      */
     private ResolvableStatus resolvableStatus;
@@ -153,14 +158,19 @@ public abstract class YangAugment
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(
+            YangSchemaNodeIdentifier schemaNodeIdentifier,
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        getYsnContextInfoMap()
+                .put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 =
+                new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1
+                .setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
         yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getAugmentedNode().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+        getAugmentedNode().addToChildSchemaMap(schemaNodeIdentifier,
+                                               yangSchemaNodeContextInfo1);
     }
 
     @Override
@@ -182,13 +192,18 @@ public abstract class YangAugment
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(
+            YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+            YangSchemaNode yangSchemaNode) {
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        /*
+         * Augment node to switch the name space in YMS
+         */
+        return YangSchemaNodeType.YANG_AUGMENT_NODE;
     }
 
     /**
@@ -250,21 +265,25 @@ public abstract class YangAugment
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as input \"" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    "YANG file error: Duplicate input identifier detected, " +
+                            "same as input \"" +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
         }
     }
 
@@ -336,7 +355,8 @@ public abstract class YangAugment
         }
         // Add namespace for all leaf list.
         for (YangLeafList yangLeafList : getListOfLeafList()) {
-            yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+            yangLeafList
+                    .setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
 

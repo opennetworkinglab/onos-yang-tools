@@ -22,22 +22,28 @@ import java.util.Objects;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType;
-import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
+import org.onosproject.yangutils.translator.tojava.javamodel
+        .AttributesJavaDataType;
+import org.onosproject.yangutils.translator.tojava.javamodel
+        .JavaLeafInfoContainer;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import com.google.common.base.MoreObjects;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
-import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportClass;
-import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportPackage;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype
+        .YangDataTypes.BINARY;
+import static org.onosproject.yangutils.translator.tojava.javamodel
+        .AttributesJavaDataType.getJavaImportClass;
+import static org.onosproject.yangutils.translator.tojava.javamodel
+        .AttributesJavaDataType.getJavaImportPackage;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
 
 /**
  * Represents the information about individual imports in the generated file.
  */
-public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
+public class JavaQualifiedTypeInfoTranslator
+        extends JavaQualifiedTypeInfo
         implements Comparable<JavaQualifiedTypeInfoTranslator>, Serializable {
     private static final long serialVersionUID = 806201634L;
 
@@ -89,21 +95,27 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
      *
      * @param leaf leaf whose java information is being updated
      */
-    public static void updateLeavesJavaQualifiedInfo(JavaLeafInfoContainer leaf) {
+    public static void updateLeavesJavaQualifiedInfo(
+            JavaLeafInfoContainer leaf) {
 
-        JavaQualifiedTypeInfoTranslator importInfo = (JavaQualifiedTypeInfoTranslator) leaf.getJavaQualifiedInfo();
+        JavaQualifiedTypeInfoTranslator importInfo =
+                (JavaQualifiedTypeInfoTranslator) leaf.getJavaQualifiedInfo();
 
         if (leaf.getDataType() == null) {
-            throw new TranslatorException("missing data type of leaf " + leaf.getName()
-                    + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
+            throw new TranslatorException(
+                    "missing data type of leaf " + leaf.getName()
+                            + " in " + leaf.getLineNumber() + " at" +
+                            leaf.getCharPosition() + " in " +
+                            leaf.getFileName());
         }
 
         /*
          * Current leaves holder is adding a leaf info as a attribute to the
          * current class.
          */
-        String className = getJavaImportClass(leaf.getDataType(), leaf.isLeafList(),
-                leaf.getConflictResolveConfig());
+        String className =
+                getJavaImportClass(leaf.getDataType(), leaf.isLeafList(),
+                                   leaf.getConflictResolveConfig());
         if (className != null) {
             /*
              * Corresponding to the attribute type a class needs to be imported,
@@ -111,11 +123,16 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
              */
             importInfo.setClassInfo(className);
             String classPkg = getJavaImportPackage(leaf.getDataType(),
-                    leaf.isLeafList(), leaf.getConflictResolveConfig());
+                                                   leaf.isLeafList(),
+                                                   leaf.getConflictResolveConfig());
             if (classPkg == null) {
-                throw new TranslatorException("import package cannot be null when the class is used for "
-                        + leaf.getName()
-                        + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
+                throw new TranslatorException(
+                        "import package cannot be null when the class is used" +
+                                " for "
+                                + leaf.getName()
+                                + " in " + leaf.getLineNumber() + " at" +
+                                leaf.getCharPosition() + " in " +
+                                leaf.getFileName());
             }
             importInfo.setPkgInfo(classPkg);
         } else {
@@ -123,43 +140,56 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
              * The attribute does not need a class to be imported, for example
              * built in java types.
              */
-            String dataTypeName = AttributesJavaDataType.getJavaDataType(leaf.getDataType());
+            String dataTypeName =
+                    AttributesJavaDataType.getJavaDataType(leaf.getDataType());
             if (dataTypeName == null) {
                 throw new TranslatorException("not supported data type for "
-                        + leaf.getName()
-                        + " in " + leaf.getLineNumber() + " at" + leaf.getCharPosition() + " in " + leaf.getFileName());
+                                                      + leaf.getName()
+                                                      + " in " +
+                                                      leaf.getLineNumber() +
+                                                      " at" +
+                                                      leaf.getCharPosition() +
+                                                      " in " +
+                                                      leaf.getFileName());
             }
             importInfo.setClassInfo(dataTypeName);
         }
 
-        leaf.getJavaQualifiedInfo().setJavaAttributeName(leaf.getJavaName(null));
+        leaf.getJavaQualifiedInfo().setJavaAttributeName(leaf.getJavaName(
+                leaf.getConflictResolveConfig()));
     }
 
     /**
      * Returns the import info for an attribute, which needs to be used for code
      * generation for import or for qualified access.
      *
-     * @param curNode       current data model node for which the java file is being
+     * @param curNode       current data model node for which the java file
+     *                      is being
      *                      generated
      * @param attributeName name of the attribute being added, it will used in
      *                      import info for child class
      * @return return the import info for this attribute
      */
-    public static JavaQualifiedTypeInfoTranslator getQualifiedTypeInfoOfCurNode(YangNode curNode,
-                                                                                String attributeName) {
+    public static JavaQualifiedTypeInfoTranslator getQualifiedTypeInfoOfCurNode(
+            YangNode curNode,
+            String attributeName) {
 
-        JavaQualifiedTypeInfoTranslator importInfo = new JavaQualifiedTypeInfoTranslator();
+        JavaQualifiedTypeInfoTranslator importInfo =
+                new JavaQualifiedTypeInfoTranslator();
 
         if (!(curNode instanceof JavaFileInfoContainer)) {
-            throw new TranslatorException("missing java file information to get the package details "
-                    + "of attribute corresponding to child node " + curNode.getName() +
-                    " in " + curNode.getLineNumber() + " at " + curNode.getCharPosition() + " in " +
-                    curNode.getFileName());
+            throw new TranslatorException(
+                    "missing java file information to get the package details "
+                            + "of attribute corresponding to child node " +
+                            curNode.getName() +
+                            " in " + curNode.getLineNumber() + " at " +
+                            curNode.getCharPosition() + " in " +
+                            curNode.getFileName());
         }
 
         importInfo.setClassInfo(attributeName);
         importInfo.setPkgInfo(((JavaFileInfoContainer) curNode)
-                .getJavaFileInfo().getPackage());
+                                      .getJavaFileInfo().getPackage());
 
         return importInfo;
     }
@@ -171,23 +201,28 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
      * @param conflictResolver      plugin configurations
      * @return return the import info for this attribute
      */
-    static JavaQualifiedTypeInfoTranslator getQualifiedInfoOfFromString(JavaAttributeInfo referredTypesAttrInfo,
-                                                                        YangToJavaNamingConflictUtil conflictResolver) {
+    static JavaQualifiedTypeInfoTranslator getQualifiedInfoOfFromString(
+            JavaAttributeInfo referredTypesAttrInfo,
+            YangToJavaNamingConflictUtil conflictResolver) {
 
         /*
          * Get the java qualified type information for the wrapper classes and
          * set it in new java attribute information.
          */
-        JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = new JavaQualifiedTypeInfoTranslator();
+        JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString =
+                new JavaQualifiedTypeInfoTranslator();
 
         if (referredTypesAttrInfo.getAttributeType().getDataType() == BINARY) {
             qualifiedInfoOfFromString.setClassInfo(BASE64);
             qualifiedInfoOfFromString.setPkgInfo(COLLECTION_IMPORTS);
         } else {
             qualifiedInfoOfFromString.setClassInfo(
-                    getJavaImportClass(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
+                    getJavaImportClass(referredTypesAttrInfo.getAttributeType(),
+                                       true, conflictResolver));
             qualifiedInfoOfFromString.setPkgInfo(
-                    getJavaImportPackage(referredTypesAttrInfo.getAttributeType(), true, conflictResolver));
+                    getJavaImportPackage(
+                            referredTypesAttrInfo.getAttributeType(), true,
+                            conflictResolver));
         }
         return qualifiedInfoOfFromString;
     }
@@ -204,7 +239,8 @@ public class JavaQualifiedTypeInfoTranslator extends JavaQualifiedTypeInfo
             return true;
         }
         if (obj instanceof JavaQualifiedTypeInfoTranslator) {
-            JavaQualifiedTypeInfoTranslator other = (JavaQualifiedTypeInfoTranslator) obj;
+            JavaQualifiedTypeInfoTranslator other =
+                    (JavaQualifiedTypeInfoTranslator) obj;
             return Objects.equals(pkgInfo, other.pkgInfo) &&
                     Objects.equals(classInfo, other.classInfo);
         }

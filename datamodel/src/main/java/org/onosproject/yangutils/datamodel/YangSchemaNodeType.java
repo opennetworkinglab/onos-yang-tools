@@ -51,5 +51,16 @@ public enum YangSchemaNodeType {
     /**
      * Represents node which is not a data node.
      */
-    YANG_NON_DATA_NODE
+    YANG_NON_DATA_NODE,
+
+    /**
+     * Represents node which cannot be instantiated.
+     */
+    YANG_CHOICE_NODE,
+
+    /**
+     * Represents the Augmented Node.
+     */
+    YANG_AUGMENT_NODE
+
 }

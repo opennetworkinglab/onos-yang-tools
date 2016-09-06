@@ -24,10 +24,14 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
-import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CHOICE_DATA;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.DATA_MISSING_ERROR_TAG;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.ERROR_PATH_MISSING_CHOICE;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MISSING_CHOICE_ERROR_APP_TAG;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType
+        .CHOICE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
+        .DATA_MISSING_ERROR_TAG;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
+        .ERROR_PATH_MISSING_CHOICE;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
+        .MISSING_CHOICE_ERROR_APP_TAG;
 
 /*-
  * Reference RFC 6020.
@@ -70,8 +74,10 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MISS
  */
 public abstract class YangChoice
         extends YangNode
-        implements YangCommonInfo, Parsable, CollisionDetector, YangAugmentableNode,
-        YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder, YangIsFilterContentNodes, YangConfig {
+        implements YangCommonInfo, Parsable, CollisionDetector,
+                   YangAugmentableNode,
+                   YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder,
+                   YangIsFilterContentNodes, YangConfig {
 
     private static final long serialVersionUID = 806201604L;
 
@@ -172,14 +178,19 @@ public abstract class YangChoice
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(
+            YangSchemaNodeIdentifier schemaNodeIdentifier,
+            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
+        getYsnContextInfoMap()
+                .put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 =
+                new YangSchemaNodeContextInfo();
+        yangSchemaNodeContextInfo1
+                .setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
         yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+        getParent().addToChildSchemaMap(schemaNodeIdentifier,
+                                        yangSchemaNodeContextInfo1);
     }
 
     @Override
@@ -197,14 +208,17 @@ public abstract class YangChoice
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(
+            YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+            YangSchemaNode yangSchemaNode) {
         //For non data nodes, default child to be added to parent node.
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        /*Choice node to be skipped in YANG data tree preperation*/
+        return YangSchemaNodeType.YANG_CHOICE_NODE;
     }
 
     /**
@@ -378,7 +392,8 @@ public abstract class YangChoice
             // Check whether default string matches the case
             while (node != null) {
                 if (node instanceof YangCase) {
-                    if (defaultValueInString.equals(((YangCase) node).getName())) {
+                    if (defaultValueInString
+                            .equals(((YangCase) node).getName())) {
                         matched = true;
                         break;
                     }
@@ -387,36 +402,46 @@ public abstract class YangChoice
             }
 
             if (!matched) {
-                throw new DataModelException("YANG file error: default string \"" + defaultValueInString
-                        + "\" not matching choice \"" + getName() + "\" case.");
+                throw new DataModelException(
+                        "YANG file error: default string \"" +
+                                defaultValueInString
+                                + "\" not matching choice \"" + getName() +
+                                "\" case.");
             }
         }
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
 
-        if (getParent() instanceof YangCase && dataType != YangConstructType.CASE_DATA) {
-            ((CollisionDetector) getParent()).detectCollidingChild(identifierName, dataType);
+        if (getParent() instanceof YangCase &&
+                dataType != YangConstructType.CASE_DATA) {
+            ((CollisionDetector) getParent())
+                    .detectCollidingChild(identifierName, dataType);
         }
         YangNode node = getChild();
         while (node != null) {
             if (node instanceof CollisionDetector) {
-                ((CollisionDetector) node).detectSelfCollision(identifierName, dataType);
+                ((CollisionDetector) node)
+                        .detectSelfCollision(identifierName, dataType);
             }
             node = node.getNextSibling();
         }
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
 
         if (dataType == CHOICE_DATA) {
             if (getName().equals(identifierName)) {
-                throw new DataModelException("YANG file error: Identifier collision detected in choice \"" +
-                        getName() + "\"");
+                throw new DataModelException(
+                        "YANG file error: Identifier collision detected in " +
+                                "choice \"" +
+                                getName() + "\"");
             }
             return;
         }
@@ -424,7 +449,8 @@ public abstract class YangChoice
         YangNode node = getChild();
         while (node != null) {
             if (node instanceof CollisionDetector) {
-                ((CollisionDetector) node).detectSelfCollision(identifierName, dataType);
+                ((CollisionDetector) node)
+                        .detectSelfCollision(identifierName, dataType);
             }
             node = node.getNextSibling();
         }
