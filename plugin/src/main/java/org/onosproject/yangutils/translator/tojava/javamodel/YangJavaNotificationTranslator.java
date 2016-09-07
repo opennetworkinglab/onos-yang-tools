@@ -16,8 +16,6 @@
 
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.IOException;
-
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaNotification;
@@ -33,9 +31,15 @@ import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfAugmentableNode;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_NODE;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
@@ -59,7 +63,6 @@ public class YangJavaNotificationTranslator
      * Creates an instance of java Notification.
      */
     public YangJavaNotificationTranslator() {
-        super();
         setJavaFileInfo(new JavaFileInfoTranslator());
         getJavaFileInfo().setGeneratedFileTypes(GENERATE_INTERFACE_WITH_BUILDER);
     }
@@ -73,11 +76,7 @@ public class YangJavaNotificationTranslator
     public JavaFileInfoTranslator getJavaFileInfo() {
 
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node " +
-                                                  getName() + " in " +
-                                                  getLineNumber() + " at " +
-                                                  getCharPosition()
-                                                  + " in " + getFileName());
+            throw new TranslatorException(getErrorMsg(INVALID_NODE, this));
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -124,9 +123,12 @@ public class YangJavaNotificationTranslator
             throws TranslatorException {
 
         /*
-         * As part of the notification support the following files needs to be generated.
-         * 1) Subject of the notification(event), this is simple interface with builder class.
-         * 2) Event class extending "AbstractEvent" and defining event type enum.
+         * As part of the notification support the following files needs to be
+         * generated.
+         * 1) Subject of the notification(event), this is simple interface with
+         * builder class.
+         * 2) Event class extending "AbstractEvent" and defining event type
+         * enum.
          * 3) Event listener interface extending "EventListener".
          *
          * The manager class needs to extend the ListenerRegistry.
@@ -138,36 +140,34 @@ public class YangJavaNotificationTranslator
             generateCodeOfAugmentableNode(this, yangPlugin);
             addNotificationToExtendsList();
         } catch (IOException e) {
-            throw new TranslatorException(
-                    "Failed to prepare generate code entry for notification node " +
-                            getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 
     /*Adds current notification info to the extends list so its parents service*/
     private void addNotificationToExtendsList() {
         YangNode parent = getParent();
-        TempJavaServiceFragmentFiles tempJavaServiceFragmentFiles = ((TempJavaCodeFragmentFilesContainer) parent)
-                .getTempJavaCodeFragmentFiles()
-                .getServiceTempFiles();
-        JavaExtendsListHolder holder = tempJavaServiceFragmentFiles.getJavaExtendsListHolder();
-        JavaQualifiedTypeInfoTranslator event = new JavaQualifiedTypeInfoTranslator();
+        TempJavaServiceFragmentFiles tempFiles =
+                ((TempJavaCodeFragmentFilesContainer) parent).getTempJavaCodeFragmentFiles()
+                        .getServiceTempFiles();
+        JavaExtendsListHolder holder = tempFiles.getJavaExtendsListHolder();
+        JavaQualifiedTypeInfoTranslator event =
+                new JavaQualifiedTypeInfoTranslator();
 
         String parentInfo = getCapitalCase(((JavaFileInfoContainer) parent)
-                                                   .getJavaFileInfo().getJavaName());
+                                                   .getJavaFileInfo()
+                                                   .getJavaName());
         event.setClassInfo(parentInfo + EVENT_STRING);
         event.setPkgInfo(getJavaFileInfo().getPackage());
-        holder.addToExtendsList(event, parent, tempJavaServiceFragmentFiles);
+        holder.addToExtendsList(event, parent, tempFiles);
 
-        JavaQualifiedTypeInfoTranslator eventListener = new JavaQualifiedTypeInfoTranslator();
+        JavaQualifiedTypeInfoTranslator eventListener =
+                new JavaQualifiedTypeInfoTranslator();
 
         eventListener.setClassInfo(parentInfo + EVENT_LISTENER_STRING);
         eventListener.setPkgInfo(getJavaFileInfo().getPackage());
-        holder.addToExtendsList(eventListener, parent, tempJavaServiceFragmentFiles);
-
+        holder.addToExtendsList(eventListener, parent, tempFiles);
     }
 
     /**
@@ -177,36 +177,34 @@ public class YangJavaNotificationTranslator
     public void generateCodeExit()
             throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
+            getTempJavaCodeFragmentFiles().generateJavaFile(
+                    GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for notification node " +
-                                                  getName() + " in " +
-                                                  getLineNumber() + " at " +
-                                                  getCharPosition()
-                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        if (this.getParent() != null) {
-            String nameSpace = this.getParent().getNameSpace();
+        if (getParent() != null) {
+            String nameSpace = getParent().getNameSpace();
             // Set namespace for self node.
             setNameSpace(nameSpace);
             // Process addition of leaf to the child schema map of parent.
             processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
             // Obtain the notification name as per enum in notification.
-            String enumName = getEnumJavaAttribute(getJavaFileInfo().getJavaName()).toUpperCase();
+            String enumName = getEnumJavaAttribute(getName().toUpperCase());
 
-            ((RpcNotificationContainer) this.getParent()).addToNotificationEnumMap(enumName, this);
+            ((RpcNotificationContainer) getParent())
+                    .addToNotificationEnumMap(enumName, this);
 
         }
         /*
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
          * and leaf list.
          */
-        this.setLeafNameSpaceAndAddToParentSchemaMap();
-
+        setLeafNameSpaceAndAddToParentSchemaMap();
     }
 }

@@ -147,4 +147,23 @@ public final class FileSystemUtil {
             }
         }
     }
+
+    /**
+     * Closes the file handle for temporary file with file deletion.
+     *
+     * @param file file to be closed
+     * @throws IOException when failed to close the file handle
+     */
+    public static void closeFile(File file) throws IOException {
+
+        if (file != null) {
+            updateFileHandle(file, null, true);
+            boolean deleted = file.delete();
+            if (!deleted) {
+                throw new IOException("Failed to delete temporary file " +
+                                              file.getName());
+            }
+        }
+    }
+    // TODO follow coding guidelines in remaining of this file.
 }

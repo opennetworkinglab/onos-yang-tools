@@ -16,15 +16,15 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+
+import java.util.Map;
 
 /**
  * Abstraction of YANG data node, used by YMS to abstractly refer the data
  * nodes in YANG data tree.
  */
-public interface YangSchemaNode {
+public interface YangSchemaNode extends LocationInfo {
 
     /**
      * Returns type of YANG schema node.

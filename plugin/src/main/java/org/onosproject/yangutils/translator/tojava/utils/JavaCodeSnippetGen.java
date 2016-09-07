@@ -16,15 +16,18 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
+import org.onosproject.yangutils.utils.UtilConstants.Operation;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.util.List;
+
+import static java.util.Collections.sort;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.CLASS_STRING;
@@ -79,16 +82,12 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.enumJavaDocForI
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
 
-import static java.util.Collections.sort;
-
 /**
  * Represents utility class to generate the java snippet.
  */
 public final class JavaCodeSnippetGen {
 
-    /**
-     * Creates an instance of java code snippet gen.
-     */
+    // No instantiation.
     private JavaCodeSnippetGen() {
     }
 
@@ -106,84 +105,119 @@ public final class JavaCodeSnippetGen {
     }
 
     /**
-     * Returns the textual java code information corresponding to the import list.
+     * Returns the textual java code information corresponding to the import
+     * list.
      *
      * @param importInfo import info
-     * @return the textual java code information corresponding to the import list
+     * @return the textual java code information corresponding to the import
+     * list
      */
     static String getImportText(JavaQualifiedTypeInfoTranslator importInfo) {
-        return IMPORT + importInfo.getPkgInfo() + PERIOD + importInfo.getClassInfo() + SEMI_COLAN + NEW_LINE;
+        return IMPORT + importInfo.getPkgInfo() + PERIOD +
+                importInfo.getClassInfo() + SEMI_COLAN + NEW_LINE;
     }
 
     /**
      * Returns the textual java code for attribute definition in class.
      *
-     * @param javaAttributeTypePkg Package of the attribute type
-     * @param javaAttributeType    java attribute type
-     * @param javaAttributeName    name of the attribute
-     * @param isList               is list attribute
-     * @param attributeAccessType  attribute access type
-     * @param compilerAnnotation   compiler annotation
+     * @param typePkg    Package of the attribute type
+     * @param attrType   java attribute type
+     * @param attrName   name of the attribute
+     * @param isList     is list attribute
+     * @param accessType attribute access type
+     * @param annotation compiler annotation
      * @return the textual java code for attribute definition in class
      */
-    public static String getJavaAttributeDefinition(String javaAttributeTypePkg, String javaAttributeType,
-                                                    String javaAttributeName, boolean isList,
-                                                    String attributeAccessType,
-                                                    YangCompilerAnnotation compilerAnnotation) {
-
-        String attributeDefinition = attributeAccessType + SPACE;
+    public static String getJavaAttributeDefinition(String typePkg,
+                                                    String attrType,
+                                                    String attrName,
+                                                    boolean isList,
+                                                    String accessType,
+                                                    YangCompilerAnnotation annotation) {
+        StringBuilder attrDef = new StringBuilder();
+        attrDef.append(accessType).append(SPACE);
 
         if (!isList) {
-            if (javaAttributeTypePkg != null) {
-                attributeDefinition = attributeDefinition + javaAttributeTypePkg + PERIOD;
+            if (typePkg != null) {
+                attrDef.append(typePkg).append(PERIOD);
             }
 
-            attributeDefinition = attributeDefinition + javaAttributeType + SPACE + javaAttributeName + SEMI_COLAN
-                    + NEW_LINE;
+            attrDef.append(attrType).append(SPACE)
+                    .append(attrName).append(SEMI_COLAN)
+                    .append(NEW_LINE);
         } else {
-            if (compilerAnnotation != null && compilerAnnotation.getYangAppDataStructure() != null) {
-                switch (compilerAnnotation.getYangAppDataStructure().getDataStructure()) {
-                    case QUEUE: {
-                        attributeDefinition = attributeDefinition + QUEUE + DIAMOND_OPEN_BRACKET;
-                        break;
-                    }
-                    case SET: {
-                        attributeDefinition = attributeDefinition + SET + DIAMOND_OPEN_BRACKET;
-                        break;
-                    }
-                    default: {
-                        attributeDefinition = attributeDefinition + LIST + DIAMOND_OPEN_BRACKET;
-                    }
-                }
-            } else {
-                attributeDefinition = attributeDefinition + LIST + DIAMOND_OPEN_BRACKET;
+            // Add starting definition.
+            addAttrStartDef(annotation, attrDef);
+
+            if (typePkg != null) {
+                attrDef.append(typePkg).append(PERIOD);
             }
 
-            if (javaAttributeTypePkg != null) {
-                attributeDefinition = attributeDefinition + javaAttributeTypePkg + PERIOD;
-            }
+            attrDef.append(attrType);
 
-            attributeDefinition = attributeDefinition + javaAttributeType;
-
-            if (compilerAnnotation != null && compilerAnnotation.getYangAppDataStructure() != null) {
-                switch (compilerAnnotation.getYangAppDataStructure().getDataStructure()) {
-                    default: {
-                        attributeDefinition = attributeDefinition + DIAMOND_CLOSE_BRACKET + SPACE
-                                + javaAttributeName + SEMI_COLAN + NEW_LINE;
-                    }
-                }
-            } else {
-                attributeDefinition = attributeDefinition + DIAMOND_CLOSE_BRACKET + SPACE
-                        + javaAttributeName + SPACE + EQUAL + SPACE + NEW + SPACE
-                        + ARRAY_LIST + SEMI_COLAN + NEW_LINE;
-            }
-
+            // Add ending definition.
+            addAttrEndDef(annotation, attrDef, attrName);
         }
-        return attributeDefinition;
+        return attrDef.toString();
     }
 
     /**
-     * Returns based on the file type and the YANG name of the file, generate the class / interface definition close.
+     * Adds starting attribute definition.
+     *
+     * @param annotation compiler annotation
+     * @param attrDef    JAVA attribute definition
+     */
+    private static void addAttrStartDef(YangCompilerAnnotation annotation,
+                                        StringBuilder attrDef) {
+        if (annotation != null &&
+                annotation.getYangAppDataStructure() != null) {
+            switch (annotation.getYangAppDataStructure().getDataStructure()) {
+                case QUEUE: {
+                    attrDef.append(QUEUE)
+                            .append(DIAMOND_OPEN_BRACKET);
+                    break;
+                }
+                case SET: {
+                    attrDef.append(SET)
+                            .append(DIAMOND_OPEN_BRACKET);
+                    break;
+                }
+                default: {
+                    attrDef.append(LIST)
+                            .append(DIAMOND_OPEN_BRACKET);
+                }
+            }
+        } else {
+            attrDef.append(LIST).append(DIAMOND_OPEN_BRACKET);
+        }
+    }
+
+    /**
+     * Adds ending attribute definition.
+     *
+     * @param annotation compiler annotation
+     * @param attrDef    JAVA attribute definition
+     * @param attrName   name of attribute
+     */
+    private static void addAttrEndDef(YangCompilerAnnotation annotation,
+                                      StringBuilder attrDef, String attrName) {
+        if (annotation != null &&
+                annotation.getYangAppDataStructure() != null) {
+            attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE)
+                    .append(attrName).append(SEMI_COLAN)
+                    .append(NEW_LINE);
+            // TODO refactor SEMI_COLAN, when refactoring in method generator.
+        } else {
+            attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE).append(attrName)
+                    .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
+                    .append(SPACE).append(ARRAY_LIST).append(SEMI_COLAN)
+                    .append(NEW_LINE);
+        }
+    }
+
+    /**
+     * Returns based on the file type and the YANG name of the file, generate
+     * the class / interface definition close.
      *
      * @return corresponding textual java code information
      */
@@ -200,25 +234,27 @@ public final class JavaCodeSnippetGen {
      */
     public static String generateEnumAttributeString(String name, int value) {
         String enumName = getEnumJavaAttribute(name);
-        return NEW_LINE + enumJavaDocForInnerClass(name)
-                + EIGHT_SPACE_INDENTATION + enumName.toUpperCase() + OPEN_PARENTHESIS
-                + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+        return NEW_LINE + enumJavaDocForInnerClass(name) +
+                EIGHT_SPACE_INDENTATION + enumName.toUpperCase() +
+                OPEN_PARENTHESIS + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
     }
 
     /**
      * Returns string for enum's attribute for enum class.
      *
-     * @param name         name of attribute
-     * @param value        value of the enum
-     * @param pluginConfig plugin configurations
+     * @param name   name of attribute
+     * @param value  value of the enum
+     * @param config plugin configurations
      * @return string for enum's attribute
      */
-    public static String generateEnumAttributeStringWithSchemaName(String name, int value, YangPluginConfig
-            pluginConfig) {
+    public static String generateEnumAttributeStringWithSchemaName(String name,
+                                                                   int value,
+                                                                   YangPluginConfig config) {
         String enumName = getEnumJavaAttribute(name);
-        return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, pluginConfig, null)
-                + FOUR_SPACE_INDENTATION + enumName.toUpperCase() + OPEN_PARENTHESIS
-                + value + COMMA + SPACE + QUOTES + name + QUOTES + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+        return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, config, null) +
+                FOUR_SPACE_INDENTATION + enumName.toUpperCase() +
+                OPEN_PARENTHESIS + value + COMMA + SPACE + QUOTES + name +
+                QUOTES + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
     }
 
     /**
@@ -238,8 +274,8 @@ public final class JavaCodeSnippetGen {
      * @return event enum start
      */
     static String getEventEnumTypeStart() {
-        return FOUR_SPACE_INDENTATION + PUBLIC + SPACE + ENUM + SPACE + TYPE + SPACE + OPEN_CURLY_BRACKET
-                + NEW_LINE;
+        return FOUR_SPACE_INDENTATION + PUBLIC + SPACE + ENUM + SPACE + TYPE +
+                SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
     }
 
     /**
@@ -250,16 +286,21 @@ public final class JavaCodeSnippetGen {
      * @param operation add or remove
      * @param classInfo class info to be added to import list
      */
-    public static void addListenersImport(YangNode curNode, List<String> imports, boolean operation,
+    public static void addListenersImport(YangNode curNode,
+                                          List<String> imports,
+                                          Operation operation,
                                           String classInfo) {
         String thisImport;
-        TempJavaServiceFragmentFiles tempJavaServiceFragmentFiles = ((JavaCodeGeneratorInfo) curNode)
-                .getTempJavaCodeFragmentFiles().getServiceTempFiles();
+        TempJavaServiceFragmentFiles tempFiles =
+                ((JavaCodeGeneratorInfo) curNode).getTempJavaCodeFragmentFiles()
+                        .getServiceTempFiles();
         if (classInfo.equals(LISTENER_SERVICE)) {
-            thisImport = tempJavaServiceFragmentFiles.getJavaImportData().getListenerServiceImport();
+            thisImport = tempFiles.getJavaImportData()
+                    .getListenerServiceImport();
             performOperationOnImports(imports, thisImport, operation);
         } else {
-            thisImport = tempJavaServiceFragmentFiles.getJavaImportData().getListenerRegistryImport();
+            thisImport = tempFiles.getJavaImportData()
+                    .getListenerRegistryImport();
             performOperationOnImports(imports, thisImport, operation);
         }
     }
@@ -269,15 +310,21 @@ public final class JavaCodeSnippetGen {
      *
      * @param imports   list of imports
      * @param curImport current import
-     * @param operation add or remove
+     * @param operation ADD or REMOVE
      * @return import list
      */
-    private static List<String> performOperationOnImports(List<String> imports, String curImport,
-                                                          boolean operation) {
-        if (operation) {
-            imports.add(curImport);
-        } else {
-            imports.remove(curImport);
+    private static List<String> performOperationOnImports(List<String> imports,
+                                                          String curImport,
+                                                          Operation operation) {
+        switch (operation) {
+            case ADD:
+                imports.add(curImport);
+                break;
+            case REMOVE:
+                imports.remove(curImport);
+                break;
+            default:
+                throw new TranslatorException("Invalid operation type");
         }
         sortImports(imports);
         return imports;
@@ -290,9 +337,10 @@ public final class JavaCodeSnippetGen {
      * @return enum's attribute
      */
     static String getEnumsValueAttribute(String className) {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + INT + SPACE + getSmallCase(className)
-                + SEMI_COLAN + NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + STRING_DATA_TYPE + SPACE +
-                SCHEMA_NAME + SEMI_COLAN + NEW_LINE;
+        return NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + INT +
+                SPACE + getSmallCase(className) + SEMI_COLAN + NEW_LINE +
+                FOUR_SPACE_INDENTATION + PRIVATE + SPACE + STRING_DATA_TYPE +
+                SPACE + SCHEMA_NAME + SEMI_COLAN + NEW_LINE;
     }
 
     /**
@@ -301,11 +349,14 @@ public final class JavaCodeSnippetGen {
      * @return attribute for augmentation
      */
     static String addAugmentationAttribute() {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + PROTECTED + SPACE + MAP + DIAMOND_OPEN_BRACKET + CLASS_STRING
-                + DIAMOND_OPEN_BRACKET + QUESTION_MARK + DIAMOND_CLOSE_BRACKET + COMMA + SPACE + OBJECT_STRING
-                + DIAMOND_CLOSE_BRACKET + SPACE + getSmallCase(YANG_AUGMENTED_INFO) + MAP + SPACE + EQUAL + SPACE +
-                NEW + SPACE + HASH_MAP + DIAMOND_OPEN_BRACKET + DIAMOND_CLOSE_BRACKET + OPEN_PARENTHESIS
-                + CLOSE_PARENTHESIS + SEMI_COLAN;
+        return NEW_LINE + FOUR_SPACE_INDENTATION + PROTECTED + SPACE + MAP +
+                DIAMOND_OPEN_BRACKET + CLASS_STRING + DIAMOND_OPEN_BRACKET +
+                QUESTION_MARK + DIAMOND_CLOSE_BRACKET + COMMA + SPACE +
+                OBJECT_STRING + DIAMOND_CLOSE_BRACKET + SPACE +
+                getSmallCase(YANG_AUGMENTED_INFO) + MAP + SPACE + EQUAL +
+                SPACE + NEW + SPACE + HASH_MAP + DIAMOND_OPEN_BRACKET +
+                DIAMOND_CLOSE_BRACKET + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
+                SEMI_COLAN;
     }
 
     /**
@@ -315,15 +366,16 @@ public final class JavaCodeSnippetGen {
      * @param addFirst true if int need to be added fist.
      * @return attribute for int ranges
      */
-    static String addStaticAttributeIntRange(String modifier, boolean addFirst) {
+    static String addStaticAttributeIntRange(String modifier,
+                                             boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + INT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION +
-                    modifier +
+            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                    INT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
                     SPACE + INT_MAX_RANGE_ATTR;
-        } else {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + UINT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION +
-                    modifier + SPACE + UINT_MAX_RANGE_ATTR;
         }
+        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                UINT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
+                SPACE + UINT_MAX_RANGE_ATTR;
     }
 
     /**
@@ -333,14 +385,16 @@ public final class JavaCodeSnippetGen {
      * @param addFirst if need to be added first
      * @return attribute for long ranges
      */
-    static String addStaticAttributeLongRange(String modifier, boolean addFirst) {
+    static String addStaticAttributeLongRange(String modifier,
+                                              boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + LONG_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION +
+            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                    LONG_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION +
                     modifier + SPACE + LONG_MAX_RANGE_ATTR;
-        } else {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + ULONG_MIN_RANGE_ATTR +
-                    FOUR_SPACE_INDENTATION + modifier + SPACE + ULONG_MAX_RANGE_ATTR;
         }
+        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                ULONG_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
+                SPACE + ULONG_MAX_RANGE_ATTR;
     }
 
     /**
@@ -350,15 +404,16 @@ public final class JavaCodeSnippetGen {
      * @param addFirst if need to be added first
      * @return attribute for long ranges
      */
-    static String addStaticAttributeShortRange(String modifier, boolean addFirst) {
+    static String addStaticAttributeShortRange(String modifier,
+                                               boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + SHORT_MIN_RANGE_ATTR +
-                    FOUR_SPACE_INDENTATION +
-                    modifier + SPACE + SHORT_MAX_RANGE_ATTR;
-        } else {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE + UINT8_MIN_RANGE_ATTR +
-                    FOUR_SPACE_INDENTATION + modifier + SPACE + UINT8_MAX_RANGE_ATTR;
+            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                    SHORT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
+                    SPACE + SHORT_MAX_RANGE_ATTR;
         }
+        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+                UINT8_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
+                SPACE + UINT8_MAX_RANGE_ATTR;
     }
 
     /**
@@ -383,9 +438,10 @@ public final class JavaCodeSnippetGen {
     }
 
     /**
-     * Returns operation type enum, leaf value set attribute and select leaf attribute.
+     * Returns operation type enum, leaf value set attribute and select leaf
+     * attribute.
      *
-     * @return operation type enum, leaf value set attribute and select leaf attribute.
+     * @return operation attributes for value and select leaf flags
      */
     static String getOperationAttributes() {
         return "    /**\n" +
@@ -401,23 +457,10 @@ public final class JavaCodeSnippetGen {
     }
 
     /**
-     * Returns operation type enum, leaf value set attribute and select leaf attribute.
+     * Returns operation type enum, leaf value set attribute and select leaf
+     * attribute for constructor.
      *
-     * @return operation type enum, leaf value set attribute and select leaf attribute.
-     */
-    static String getOperationTypeAttr() {
-        return "\n    /**\n" +
-                "     * Specify the node specific operation in protocols like NETCONF.\n" +
-                "     * Applicable in protocol edit operation, will be ignored in query operation\n" +
-                "     */\n" +
-                "    private OnosYangNodeOperationType onosYangNodeOperationType;\n" +
-                "\n";
-    }
-
-    /**
-     * Returns operation type enum, leaf value set attribute and select leaf attribute for constructor.
-     *
-     * @return operation type enum, leaf value set attribute and select leaf attribute for constructor
+     * @return operation attributes for constructor
      */
     static String getOperationAttributeForConstructor() {
         return "        this.valueLeafFlags = builderObject.getValueLeafFlags();\n" +
@@ -425,18 +468,9 @@ public final class JavaCodeSnippetGen {
     }
 
     /**
-     * Returns operation type enum, leaf value set attribute and select leaf attribute for constructor.
-     *
-     * @return operation type enum, leaf value set attribute and select leaf attribute for constructor
-     */
-    static String getOperationTypeForConstructor() {
-        return "        this.onosYangNodeOperationType = builderObject.onosYangNodeOperationType();\n";
-    }
-
-    /**
      * Returns attribute in constructor for yang augmented info map.
      *
-     * @return attribute in constructor for yang augmented info map
+     * @return augment info map
      */
     static String getYangAugmentedMapObjectForConstruct() {
         return "        this.yangAugmentedInfoMap = builderObject.yangAugmentedInfoMap();\n";

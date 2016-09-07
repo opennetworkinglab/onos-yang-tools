@@ -28,33 +28,39 @@ public final class UtilConstants {
     /**
      * JavaDocs for impl class.
      */
-    public static final String IMPL_CLASS_JAVA_DOC = " * Represents the implementation of ";
+    public static final String IMPL_CLASS_JAVA_DOC =
+            " * Represents the implementation of ";
 
     /**
      * JavaDocs for builder class.
      */
-    public static final String BUILDER_CLASS_JAVA_DOC = " * Represents the builder implementation of ";
+    public static final String BUILDER_CLASS_JAVA_DOC =
+            " * Represents the builder implementation of ";
 
     /**
      * JavaDocs for interface class.
      */
-    public static final String INTERFACE_JAVA_DOC = " * Abstraction of an entity which represents the"
-            + " functionality of ";
+    public static final String INTERFACE_JAVA_DOC =
+            " * Abstraction of an entity which represents the functionality " +
+                    "of ";
 
     /**
      * JavaDocs for event.
      */
-    public static final String EVENT_JAVA_DOC = " * Represents event implementation of ";
+    public static final String EVENT_JAVA_DOC =
+            " * Represents event implementation of ";
 
     /**
      * JavaDocs for op param class.
      */
-    public static final String OP_PARAM_JAVA_DOC = " * Represents operation parameter implementation of ";
+    public static final String OP_PARAM_JAVA_DOC =
+            " * Represents operation parameter implementation of ";
 
     /**
      * JavaDocs for event listener.
      */
-    public static final String EVENT_LISTENER_JAVA_DOC = " * Abstraction for event listener of ";
+    public static final String EVENT_LISTENER_JAVA_DOC =
+            " * Abstraction for event listener of ";
 
     /**
      * JavaDocs for builder interface class.
@@ -64,7 +70,8 @@ public final class UtilConstants {
     /**
      * JavaDocs for enum class.
      */
-    public static final String ENUM_CLASS_JAVADOC = " * Represents ENUM data of ";
+    public static final String ENUM_CLASS_JAVADOC =
+            " * Represents ENUM data of ";
 
     /**
      * JavaDocs for enum attribute.
@@ -74,12 +81,14 @@ public final class UtilConstants {
     /**
      * JavaDocs for package info class.
      */
-    public static final String PACKAGE_INFO_JAVADOC = " * Implementation of YANG node ";
+    public static final String PACKAGE_INFO_JAVADOC =
+            " * Implementation of YANG node ";
 
     /**
      * JavaDocs for package info class.
      */
-    public static final String PACKAGE_INFO_JAVADOC_OF_CHILD = "'s children nodes";
+    public static final String PACKAGE_INFO_JAVADOC_OF_CHILD =
+            "'s children nodes";
 
     /**
      * JavaDocs's first line.
@@ -104,7 +113,8 @@ public final class UtilConstants {
     /**
      * JavaDocs's description for setter method.
      */
-    public static final String JAVA_DOC_SETTERS = " * Returns the builder object of ";
+    public static final String JAVA_DOC_SETTERS =
+            " * Returns the builder object of ";
 
     /**
      * JavaDocs's description for add to list method.
@@ -114,7 +124,8 @@ public final class UtilConstants {
     /**
      * JavaDocs's description for setter method.
      */
-    public static final String JAVA_DOC_MANAGER_SETTERS = " * Sets the value to attribute ";
+    public static final String JAVA_DOC_MANAGER_SETTERS =
+            " * Sets the value to attribute ";
 
     /**
      * JavaDocs's description for OF method.
@@ -124,7 +135,8 @@ public final class UtilConstants {
     /**
      * JavaDocs's description for typedef' setter method.
      */
-    public static final String JAVA_DOC_SETTERS_COMMON = " * Sets the value of ";
+    public static final String JAVA_DOC_SETTERS_COMMON =
+            " * Sets the value of ";
 
     /**
      * JavaDocs's description for getter method.
@@ -134,17 +146,20 @@ public final class UtilConstants {
     /**
      * JavaDocs's description for getter method.
      */
-    public static final String JAVA_DOC_FOR_VALIDATOR = " * Validates if value is in given range.";
+    public static final String JAVA_DOC_FOR_VALIDATOR =
+            " * Validates if value is in given range.";
 
     /**
      * JavaDocs's description for getter method.
      */
-    public static final String JAVA_DOC_FOR_VALIDATOR_RETURN = " * @return true if value is in range";
+    public static final String JAVA_DOC_FOR_VALIDATOR_RETURN =
+            " * @return true if value is in range";
 
     /**
      * JavaDocs's description for constructor.
      */
-    public static final String JAVA_DOC_CONSTRUCTOR = " * Creates an instance of ";
+    public static final String JAVA_DOC_CONSTRUCTOR =
+            " * Creates an instance of ";
 
     /**
      * JavaDocs's description for build method.
@@ -174,7 +189,8 @@ public final class UtilConstants {
     /**
      * JavaDocs's statement for rpc's output string.
      */
-    public static final String RPC_OUTPUT_STRING = "output of service interface ";
+    public static final String RPC_OUTPUT_STRING =
+            "output of service interface ";
 
     /**
      * Static attribute for new line.
@@ -185,11 +201,6 @@ public final class UtilConstants {
      * Static attribute for default.
      */
     public static final String DEFAULT = "default";
-
-    /**
-     * Static attribute for op param class.
-     */
-    public static final String OPERATION = "OpParam";
 
     /**
      * Static attribute for java code generation for sbi.
@@ -312,11 +323,6 @@ public final class UtilConstants {
     public static final String STR_VAL = "stringValue";
 
     /**
-     * Static attribute for value of method.
-     */
-    public static final String VALUE_OF = "valueOf";
-
-    /**
      * Static attribute for validateRange.
      */
     public static final String VALIDATE_RANGE = "validateRange";
@@ -334,7 +340,8 @@ public final class UtilConstants {
     /**
      * Static attribute for minRange.
      */
-    public static final String SHORT_MIN_RANGE_ATTR = "static final int INT16_MIN_RANGE = -32768;\n";
+    public static final String SHORT_MIN_RANGE_ATTR =
+            "static final int INT16_MIN_RANGE = -32768;\n";
 
     /**
      * Static attribute for minRange.
@@ -349,18 +356,21 @@ public final class UtilConstants {
     /**
      * Static attribute for maxRange.
      */
-    public static final String SHORT_MAX_RANGE_ATTR = "static final int INT16_MAX_RANGE = 32767;";
+    public static final String SHORT_MAX_RANGE_ATTR =
+            "static final int INT16_MAX_RANGE = 32767;";
 
 
     /**
      * Static attribute for minRange.
      */
-    public static final String UINT8_MIN_RANGE_ATTR = "static final int UINT8_MIN_RANGE = 0;\n";
+    public static final String UINT8_MIN_RANGE_ATTR =
+            "static final int UINT8_MIN_RANGE = 0;\n";
 
     /**
      * Static attribute for maxRange.
      */
-    public static final String UINT8_MAX_RANGE_ATTR = "static final int UINT8_MAX_RANGE = 32767;";
+    public static final String UINT8_MAX_RANGE_ATTR =
+            "static final int UINT8_MAX_RANGE = 32767;";
 
 
     /**
@@ -376,7 +386,8 @@ public final class UtilConstants {
     /**
      * Static attribute for minRange.
      */
-    public static final String INT_MIN_RANGE_ATTR = "static final int INT32_MIN_RANGE = -2147483648;\n";
+    public static final String INT_MIN_RANGE_ATTR =
+            "static final int INT32_MIN_RANGE = -2147483648;\n";
 
     /**
      * Static attribute for minRange.
@@ -391,18 +402,21 @@ public final class UtilConstants {
     /**
      * Static attribute for maxRange.
      */
-    public static final String INT_MAX_RANGE_ATTR = "static final int INT32_MAX_RANGE = 2147483647;";
+    public static final String INT_MAX_RANGE_ATTR =
+            "static final int INT32_MAX_RANGE = 2147483647;";
 
 
     /**
      * Static attribute for minRange.
      */
-    public static final String UINT_MIN_RANGE_ATTR = "static final int UINT16_MIN_RANGE = 0;\n";
+    public static final String UINT_MIN_RANGE_ATTR =
+            "static final int UINT16_MIN_RANGE = 0;\n";
 
     /**
      * Static attribute for maxRange.
      */
-    public static final String UINT_MAX_RANGE_ATTR = "static final int UINT16_MAX_RANGE = 2147483647;";
+    public static final String UINT_MAX_RANGE_ATTR =
+            "static final int UINT16_MAX_RANGE = 2147483647;";
 
 
     /**
@@ -418,14 +432,16 @@ public final class UtilConstants {
     /**
      * Static attribute for minRange.
      */
-    public static final String LONG_MIN_RANGE_ATTR = "static final BigInteger INT64_MIN_RANGE =" +
-            " new BigInteger(\"-9223372036854775808\");\n";
+    public static final String LONG_MIN_RANGE_ATTR =
+            "static final BigInteger INT64_MIN_RANGE =" +
+                    " new BigInteger(\"-9223372036854775808\");\n";
 
     /**
      * Static attribute for maxRange.
      */
-    public static final String LONG_MAX_RANGE_ATTR = "static final BigInteger INT64_MAX_RANGE =" +
-            " new BigInteger(\"9223372036854775807\");";
+    public static final String LONG_MAX_RANGE_ATTR =
+            "static final BigInteger INT64_MAX_RANGE =" +
+                    " new BigInteger(\"9223372036854775807\");";
 
     /**
      * Static attribute for minRange.
@@ -440,14 +456,16 @@ public final class UtilConstants {
     /**
      * Static attribute for minRange.
      */
-    public static final String ULONG_MIN_RANGE_ATTR = "static final BigInteger UINT32_MIN_RANGE =" +
-            " new BigInteger(\"0\");\n";
+    public static final String ULONG_MIN_RANGE_ATTR =
+            "static final BigInteger UINT32_MIN_RANGE =" +
+                    " new BigInteger(\"0\");\n";
 
     /**
      * Static attribute for maxRange.
      */
-    public static final String ULONG_MAX_RANGE_ATTR = "static final BigInteger UINT32_MAX_RANGE =" +
-            " new BigInteger(\"9223372036854775807\");";
+    public static final String ULONG_MAX_RANGE_ATTR =
+            "static final BigInteger UINT32_MAX_RANGE =" +
+                    " new BigInteger(\"9223372036854775807\");";
 
 
     /**
@@ -845,27 +863,26 @@ public final class UtilConstants {
     /**
      * Static attribute for is filter content match method prefix.
      */
-    public static final String PROCESS_SUBTREE_FILTERING = "processSubtreeFiltering";
+    public static final String PROCESS_SUBTREE_FILTERING =
+            "processSubtreeFiltering";
 
     /**
      * variable name of the subtree  filtering result builder.
      */
-    public static final String SUBTREE_FILTERING_RESULT_BUILDER = "subTreeFilteringResultBuilder";
+    public static final String SUBTREE_FILTERING_RESULT_BUILDER =
+            "subTreeFilteringResultBuilder";
 
     /**
      * variable name of the subtree  filtering result flag.
      */
-    public static final String IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG = "isAnySelectOrContainmentNode";
+    public static final String IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG =
+            "isAnySelectOrContainmentNode";
 
     /**
      * variable name of the subtree  filtering to select all child.
      */
-    public static final String IS_SELECT_ALL_SCHEMA_CHILD_FLAG = "isSelectAllSchemaChild";
-
-    /**
-     * Static attribute for flag prefix.
-     */
-    public static final String FLAG = "flag";
+    public static final String IS_SELECT_ALL_SCHEMA_CHILD_FLAG =
+            "isSelectAllSchemaChild";
 
     /**
      * Static attribute for break prefix.
@@ -920,37 +937,44 @@ public final class UtilConstants {
     /**
      * Static attribute for eight space indentation.
      */
-    public static final String EIGHT_SPACE_INDENTATION = FOUR_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String EIGHT_SPACE_INDENTATION =
+            FOUR_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twelve space indentation.
      */
-    public static final String TWELVE_SPACE_INDENTATION = EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String TWELVE_SPACE_INDENTATION =
+            EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for sixteen space indentation.
      */
-    public static final String SIXTEEN_SPACE_INDENTATION = TWELVE_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String SIXTEEN_SPACE_INDENTATION =
+            TWELVE_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twenty space indentation.
      */
-    public static final String TWENTY_SPACE_INDENTATION = SIXTEEN_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String TWENTY_SPACE_INDENTATION =
+            SIXTEEN_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twenty four space indentation.
      */
-    public static final String TWENTY_FOUR_SPACE_INDENTATION = TWENTY_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String TWENTY_FOUR_SPACE_INDENTATION =
+            TWENTY_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for twenty eight space indentation.
      */
-    public static final String TWENTY_EIGHT_SPACE_INDENTATION = TWENTY_FOUR_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String TWENTY_EIGHT_SPACE_INDENTATION =
+            TWENTY_FOUR_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * Static attribute for thirty two space indentation.
      */
-    public static final String THIRTY_TWO_SPACE_INDENTATION = TWENTY_EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
+    public static final String THIRTY_TWO_SPACE_INDENTATION =
+            TWENTY_EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
 
     /**
      * continue.
@@ -973,7 +997,8 @@ public final class UtilConstants {
     public static final String REVISION_PREFIX = "rev";
 
     /**
-     * Static attribute for YANG automatic prefix for identifiers with keywords and beginning with digits.
+     * Static attribute for YANG automatic prefix for identifiers with keywords
+     * and beginning with digits.
      */
     public static final String YANG_AUTO_PREFIX = "yangAutoPrefix";
 
@@ -1098,14 +1123,20 @@ public final class UtilConstants {
     public static final String QUESTION_MARK = "?";
 
     /**
-     * List of keywords in java, this is used for checking if the input does not contain these keywords.
+     * List of keywords in java, this is used for checking if the input does not
+     * contain these keywords.
      */
-    public static final List<String> JAVA_KEY_WORDS = Arrays.asList(
-            "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
-            "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", "goto", "if",
-            "implements", "import", "instanceof", "enum", "int", "interface", "long", "native", "new", "null",
-            "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch",
-            "synchronized", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while");
+    public static final List<String> JAVA_KEY_WORDS =
+            Arrays.asList("abstract", "assert", "boolean", "break", "byte",
+                          "case", "catch", "char", "class", "const", "continue",
+                          "default", "do", "double", "else", "extends", "false",
+                          "final", "finally", "float", "for", "goto", "if",
+                          "implements", "import", "instanceof", "enum", "int",
+                          "interface", "long", "native", "new", "null",
+                          "package", "private", "protected", "public", "return",
+                          "short", "static", "strictfp", "super", "switch",
+                          "synchronized", "this", "throw", "throws", "transient",
+                          "true", "try", "void", "volatile", "while");
 
     /**
      * Static attribute for regex for all the special characters.
@@ -1113,7 +1144,8 @@ public final class UtilConstants {
     public static final String REGEX_WITH_ALL_SPECIAL_CHAR = "\\p{Punct}+";
 
     /**
-     * Static attribute for regex for three special characters used in identifier.
+     * Static attribute for regex for three special characters used in
+     * identifier.
      */
     public static final String REGEX_FOR_IDENTIFIER_SPECIAL_CHAR = "[. _ -]+";
 
@@ -1150,7 +1182,8 @@ public final class UtilConstants {
     /**
      * Static attribute for regex for digits with single letter.
      */
-    public static final String REGEX_FOR_DIGITS_WITH_SINGLE_LETTER = "[0-9]+[a-zA-Z]";
+    public static final String REGEX_FOR_DIGITS_WITH_SINGLE_LETTER =
+            "[0-9]+[a-zA-Z]";
 
     /**
      * Static attribute for regex with uppercase.
@@ -1163,14 +1196,18 @@ public final class UtilConstants {
     public static final String REGEX_WITH_SINGLE_CAPITAL_CASE = "[A-Z]";
 
     /**
-     * Static attribute for regex for capital case letter with any number of digits and small case letters.
+     * Static attribute for regex for capital case letter with any number of
+     * digits and small case letters.
      */
-    public static final String REGEX_WITH_SINGLE_CAPITAL_CASE_AND_DIGITS_SMALL_CASES = "[A-Z][0-9a-z]+";
+    public static final String
+            REGEX_WITH_SINGLE_CAPITAL_CASE_AND_DIGITS_SMALL_CASES =
+            "[A-Z][0-9a-z]+";
 
     /**
      * Static attribute for regex for any string ending with service.
      */
-    public static final String REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE = ".+Service";
+    public static final String REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE =
+            ".+Service";
 
     /**
      * Static attribute for class syntax.
@@ -1321,17 +1358,20 @@ public final class UtilConstants {
     /**
      * Static attribute for more object import package.
      */
-    public static final String GOOGLE_MORE_OBJECT_IMPORT_PKG = "com.google.common.base";
+    public static final String GOOGLE_MORE_OBJECT_IMPORT_PKG =
+            "com.google.common.base";
 
     /**
      * Static attribute for more object import class.
      */
-    public static final String GOOGLE_MORE_OBJECT_IMPORT_CLASS = "MoreObjects;\n";
+    public static final String GOOGLE_MORE_OBJECT_IMPORT_CLASS =
+            "MoreObjects;\n";
 
     /**
      * Static attribute for to string method.
      */
-    public static final String GOOGLE_MORE_OBJECT_METHOD_STRING = " MoreObjects.toStringHelper(getClass())";
+    public static final String GOOGLE_MORE_OBJECT_METHOD_STRING =
+            " MoreObjects.toStringHelper(getClass())";
 
     /**
      * Static attribute for java utilities import package.
@@ -1347,11 +1387,6 @@ public final class UtilConstants {
      * Static attribute for java utilities objects import class.
      */
     public static final String JAVA_UTIL_OBJECTS_IMPORT_CLASS = "Objects;\n";
-
-    /**
-     * Static attribute for java utilities import base64 class.
-     */
-    public static final String JAVA_UTIL_IMPORT_BASE64_CLASS = "Base64;\n";
 
     /**
      * Static attribute for AugmentedInfo class.
@@ -1381,7 +1416,8 @@ public final class UtilConstants {
     /**
      * Comment to be added for autogenerated impl methods.
      */
-    public static final String YANG_UTILS_TODO = "//TODO: YANG utils generated code";
+    public static final String YANG_UTILS_TODO =
+            "//TODO: YANG utils generated code";
 
     /**
      * Static attribute for AbstractEvent.
@@ -1411,49 +1447,52 @@ public final class UtilConstants {
     /**
      * Static attribute for unsupported error information.
      */
-    public static final String UNSUPPORTED_YANG_CONSTRUCT = " is not supported.";
+    public static final String UNSUPPORTED_YANG_CONSTRUCT =
+            " is not supported.";
 
     /**
      * Static attribute for currently unsupported error information.
      */
-    public static final String CURRENTLY_UNSUPPORTED = " is not supported in current version, please check wiki" +
-            " for YANG utils road map.";
+    public static final String CURRENTLY_UNSUPPORTED =
+            " is not supported in current version, please check wiki" +
+                    " for YANG utils road map.";
 
     /**
      * Static attribute for typedef linker error information.
      */
-    public static final String TYPEDEF_LINKER_ERROR = "YANG file error: Unable to find base "
-            + "typedef for given type";
+    public static final String TYPEDEF_LINKER_ERROR =
+            "YANG file error: Unable to find base typedef for given type";
 
     /**
      * Static attribute for grouping linker error information.
      */
-    public static final String GROUPING_LINKER_ERROR = "YANG file error: Unable to find base "
-            + "grouping for given uses";
+    public static final String GROUPING_LINKER_ERROR =
+            "YANG file error: Unable to find base grouping for given uses";
 
     /**
      * Static attribute for if-feature linker error information.
      */
-    public static final String FEATURE_LINKER_ERROR = "YANG file error: Unable to find feature "
-            + "for given if-feature";
+    public static final String FEATURE_LINKER_ERROR =
+            "YANG file error: Unable to find feature for given if-feature";
 
     /**
      * Static attribute for leafref linker error information.
      */
-    public static final String LEAFREF_LINKER_ERROR = "YANG file error: Unable to find base "
-            + "leaf/leaf-list for given leafref";
+    public static final String LEAFREF_LINKER_ERROR =
+            "YANG file error: Unable to find base leaf/leaf-list for given " +
+                    "leafref";
 
     /**
      * Static attribute for base linker error information.
      */
-    public static final String BASE_LINKER_ERROR = "YANG file error: Unable to find base "
-            + "identity for given base";
+    public static final String BASE_LINKER_ERROR =
+            "YANG file error: Unable to find base identity for given base";
 
     /**
      * Static attribute for identityref linker error information.
      */
-    public static final String IDENTITYREF_LINKER_ERROR = "YANG file error: Unable to find base "
-            + "identity for given base";
+    public static final String IDENTITYREF_LINKER_ERROR =
+            "YANG file error: Unable to find base identity for given base";
 
     /**
      * Static attribute for jar.
@@ -1468,17 +1507,20 @@ public final class UtilConstants {
     /**
      * Static attribute for YangAugmentedOpParamInfo.
      */
-    public static final String YANG_AUGMENTED_OP_PARAM_INFO = "YangAugmentedOpParamInfo";
+    public static final String YANG_AUGMENTED_OP_PARAM_INFO =
+            "YangAugmentedOpParamInfo";
 
     /**
      * Static attribute for NoSuchMethodException.
      */
-    public static final String NO_SUCH_METHOD_EXCEPTION = "NoSuchMethodException";
+    public static final String NO_SUCH_METHOD_EXCEPTION =
+            "NoSuchMethodException";
 
     /**
      * Static attribute for InvocationTargetException.
      */
-    public static final String INVOCATION_TARGET_EXCEPTION = "InvocationTargetException";
+    public static final String INVOCATION_TARGET_EXCEPTION =
+            "InvocationTargetException";
 
     /**
      * Static attribute for InvocationTargetException.
@@ -1488,7 +1530,8 @@ public final class UtilConstants {
     /**
      * Static attribute for IllegalAccessException.
      */
-    public static final String ILLEGAL_ACCESS_EXCEPTION = "IllegalAccessException";
+    public static final String ILLEGAL_ACCESS_EXCEPTION =
+            "IllegalAccessException";
 
     /**
      * Static attribute for arrayList.
@@ -1498,12 +1541,8 @@ public final class UtilConstants {
     /**
      * Static attribute for arrayList import.
      */
-    public static final String ARRAY_LIST_IMPORT = IMPORT + COLLECTION_IMPORTS + ".ArrayList;\n";
-
-    /**
-     * Static attribute for temp keyword.
-     */
-    public static final String TMP_VAR = "tmp";
+    public static final String ARRAY_LIST_IMPORT =
+            IMPORT + COLLECTION_IMPORTS + ".ArrayList;\n";
 
     /**
      * Static attribute for unused keyword.
@@ -1516,8 +1555,88 @@ public final class UtilConstants {
     public static final String ONE = "1";
 
     /**
-     * Creates an instance of util constants.
+     * Static attribute for YANG node operation type class.
      */
+    public static final String OPERATION_TYPE_CLASS =
+            "OnosYangNodeOperationType";
+
+    /**
+     * Static attribute for YANG node operation type attribute.
+     */
+    public static final String OPERATION_TYPE_ATTRIBUTE =
+            "NodeOperationType";
+
+    /**
+     * Static attribute for event class.
+     */
+    public static final String EVENT_CLASS = "event class";
+
+    /**
+     * Static attribute for typedef class.
+     */
+    public static final String TYPEDEF_CLASS = "typedef class";
+
+    /**
+     * Static attribute for impl class.
+     */
+    public static final String IMPL_CLASS = "impl class";
+
+    /**
+     * Static attribute for union class.
+     */
+    public static final String UNION_CLASS = "union class";
+
+    /**
+     * Static attribute for enum class.
+     */
+    public static final String ENUM_CLASS = "enum class";
+
+    /**
+     * Static attribute for rpc class.
+     */
+    public static final String RPC_CLASS = "rpc class";
+
+    /**
+     * Static attribute for builder class.
+     */
+    public static final String BUILDER_CLASS = "builder class";
+
+    /**
+     * Static attribute for builder interface.
+     */
+    public static final String BUILDER_INTERFACE = "builder interface";
+
+    /**
+     * Static attribute for binary.
+     */
+    public static final String BINARY = "binary";
+
+    /**
+     * Static attribute for bits.
+     */
+    public static final String BITS = "bits";
+
+    /**
+     * Static attribute for YANG.
+     */
+    public static final String YANG = "yang";
+
+    // No instantiation.
     private UtilConstants() {
+    }
+
+    /**
+     * Represents operation type.
+     */
+    public enum Operation {
+        /**
+         * Represents add operation.
+         */
+        ADD,
+
+        /**
+         * Represents remove operation.
+         */
+        REMOVE
     }
 }
