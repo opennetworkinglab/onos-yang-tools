@@ -23,17 +23,16 @@ import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.TempJavaBeanFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.translator.tojava.TempJavaTypeFragmentFiles;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.IOException;
+
+import static org.onosproject.yangutils.utils.UtilConstants.AT;
+import static org.onosproject.yangutils.utils.UtilConstants.IN;
 
 /**
  * Represents common translator utilities.
  */
 public final class TranslatorUtils {
-
-    private static final String IN = " in ";
-    private static final String AT = " at ";
 
     // No instantiation
     private TranslatorUtils() {
@@ -119,7 +118,7 @@ public final class TranslatorUtils {
      * @param curNode current YANG node
      * @return type files
      */
-    public static TempJavaTypeFragmentFiles getTypeFiles(YangNode curNode) {
+    static TempJavaTypeFragmentFiles getTypeFiles(YangNode curNode) {
         return ((TempJavaCodeFragmentFilesContainer) curNode)
                 .getTempJavaCodeFragmentFiles().getTypeTempFiles();
     }
@@ -130,19 +129,15 @@ public final class TranslatorUtils {
      * @param node     YANG node
      * @param modifier modifier for constructor.
      * @param toAppend string which need to be appended with the class name
-     * @param config   plugin configurations
-     * @param curNode  YANG node
      * @return default constructor for class
      * @throws IOException when fails to append to file
      */
-    public static String addDefaultConstructor(YangNode node, String modifier,
-                                               String toAppend,
-                                               YangPluginConfig config,
-                                               YangNode curNode)
+    static String addDefaultConstructor(YangNode node, String modifier,
+                                        String toAppend)
             throws IOException {
         return ((TempJavaCodeFragmentFilesContainer) node)
                 .getTempJavaCodeFragmentFiles()
-                .addDefaultConstructor(modifier, toAppend, config, curNode);
+                .addDefaultConstructor(modifier, toAppend);
         /*
          * TODO update addDefaultConstructor, it doesn't need YANG node as an
          * input.

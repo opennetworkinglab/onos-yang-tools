@@ -23,38 +23,39 @@ import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.utils.UtilConstants.Operation;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.util.List;
 
 import static java.util.Collections.sort;
+import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
+import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
+import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_DIAMOND;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.brackets;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultDefinition;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.signatureClose;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.CLASS_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
-import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH_MAP;
-import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
-import static org.onosproject.yangutils.utils.UtilConstants.LISTENER_SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
-import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
@@ -63,7 +64,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE_ATTR;
@@ -76,11 +77,11 @@ import static org.onosproject.yangutils.utils.UtilConstants.UINT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.UINT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.ULONG_MIN_RANGE_ATTR;
-import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ENUM_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.enumJavaDocForInnerClass;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 
 /**
  * Represents utility class to generate the java snippet.
@@ -113,8 +114,8 @@ public final class JavaCodeSnippetGen {
      * list
      */
     static String getImportText(JavaQualifiedTypeInfoTranslator importInfo) {
-        return IMPORT + importInfo.getPkgInfo() + PERIOD +
-                importInfo.getClassInfo() + SEMI_COLAN + NEW_LINE;
+        return getImportString(importInfo.getPkgInfo(), importInfo
+                .getClassInfo());
     }
 
     /**
@@ -134,7 +135,7 @@ public final class JavaCodeSnippetGen {
                                                     boolean isList,
                                                     String accessType,
                                                     YangCompilerAnnotation annotation) {
-        StringBuilder attrDef = new StringBuilder();
+        StringBuilder attrDef = new StringBuilder(FOUR_SPACE_INDENTATION);
         attrDef.append(accessType).append(SPACE);
 
         if (!isList) {
@@ -143,7 +144,7 @@ public final class JavaCodeSnippetGen {
             }
 
             attrDef.append(attrType).append(SPACE)
-                    .append(attrName).append(SEMI_COLAN)
+                    .append(attrName).append(SEMI_COLON)
                     .append(NEW_LINE);
         } else {
             // Add starting definition.
@@ -204,25 +205,14 @@ public final class JavaCodeSnippetGen {
         if (annotation != null &&
                 annotation.getYangAppDataStructure() != null) {
             attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE)
-                    .append(attrName).append(SEMI_COLAN)
+                    .append(attrName).append(SEMI_COLON)
                     .append(NEW_LINE);
-            // TODO refactor SEMI_COLAN, when refactoring in method generator.
         } else {
             attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE).append(attrName)
                     .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
-                    .append(SPACE).append(ARRAY_LIST).append(SEMI_COLAN)
+                    .append(SPACE).append(ARRAY_LIST).append(SEMI_COLON)
                     .append(NEW_LINE);
         }
-    }
-
-    /**
-     * Returns based on the file type and the YANG name of the file, generate
-     * the class / interface definition close.
-     *
-     * @return corresponding textual java code information
-     */
-    public static String getJavaClassDefClose() {
-        return CLOSE_CURLY_BRACKET;
     }
 
     /**
@@ -234,9 +224,10 @@ public final class JavaCodeSnippetGen {
      */
     public static String generateEnumAttributeString(String name, int value) {
         String enumName = getEnumJavaAttribute(name);
-        return NEW_LINE + enumJavaDocForInnerClass(name) +
-                EIGHT_SPACE_INDENTATION + enumName.toUpperCase() +
-                OPEN_PARENTHESIS + value + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+        return enumJavaDocForInnerClass(name) + EIGHT_SPACE_INDENTATION +
+                enumName.toUpperCase() + brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
+                                                  value + EMPTY_STRING, null) +
+                COMMA + NEW_LINE;
     }
 
     /**
@@ -244,17 +235,15 @@ public final class JavaCodeSnippetGen {
      *
      * @param name   name of attribute
      * @param value  value of the enum
-     * @param config plugin configurations
      * @return string for enum's attribute
      */
-    public static String generateEnumAttributeStringWithSchemaName(String name,
-                                                                   int value,
-                                                                   YangPluginConfig config) {
+    public static String generateEnumAttributeStringWithSchemaName(
+            String name, int value) {
         String enumName = getEnumJavaAttribute(name);
-        return NEW_LINE + getJavaDoc(ENUM_ATTRIBUTE, name, false, config, null) +
-                FOUR_SPACE_INDENTATION + enumName.toUpperCase() +
-                OPEN_PARENTHESIS + value + COMMA + SPACE + QUOTES + name +
-                QUOTES + CLOSE_PARENTHESIS + COMMA + NEW_LINE;
+        String str = value + COMMA + SPACE + QUOTES + name + QUOTES;
+        return getJavaDoc(ENUM_ATTRIBUTE, name, false, null) +
+                FOUR_SPACE_INDENTATION + enumName.toUpperCase() + brackets(
+                OPEN_CLOSE_BRACKET_WITH_VALUE, str, null) + COMMA + NEW_LINE;
     }
 
     /**
@@ -274,8 +263,8 @@ public final class JavaCodeSnippetGen {
      * @return event enum start
      */
     static String getEventEnumTypeStart() {
-        return FOUR_SPACE_INDENTATION + PUBLIC + SPACE + ENUM + SPACE + TYPE +
-                SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+        return NEW_LINE + FOUR_SPACE_INDENTATION +
+                getDefaultDefinition(ENUM, TYPE, PUBLIC);
     }
 
     /**
@@ -284,25 +273,16 @@ public final class JavaCodeSnippetGen {
      * @param curNode   currentYangNode.
      * @param imports   import list
      * @param operation add or remove
-     * @param classInfo class info to be added to import list
      */
     public static void addListenersImport(YangNode curNode,
                                           List<String> imports,
-                                          Operation operation,
-                                          String classInfo) {
+                                          Operation operation) {
         String thisImport;
         TempJavaServiceFragmentFiles tempFiles =
                 ((JavaCodeGeneratorInfo) curNode).getTempJavaCodeFragmentFiles()
                         .getServiceTempFiles();
-        if (classInfo.equals(LISTENER_SERVICE)) {
-            thisImport = tempFiles.getJavaImportData()
-                    .getListenerServiceImport();
-            performOperationOnImports(imports, thisImport, operation);
-        } else {
-            thisImport = tempFiles.getJavaImportData()
-                    .getListenerRegistryImport();
-            performOperationOnImports(imports, thisImport, operation);
-        }
+        thisImport = tempFiles.getJavaImportData().getListenerServiceImport();
+        performOperationOnImports(imports, thisImport, operation);
     }
 
     /**
@@ -337,10 +317,10 @@ public final class JavaCodeSnippetGen {
      * @return enum's attribute
      */
     static String getEnumsValueAttribute(String className) {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + PRIVATE + SPACE + INT +
-                SPACE + getSmallCase(className) + SEMI_COLAN + NEW_LINE +
-                FOUR_SPACE_INDENTATION + PRIVATE + SPACE + STRING_DATA_TYPE +
-                SPACE + SCHEMA_NAME + SEMI_COLAN + NEW_LINE;
+        return getJavaAttributeDefinition(null, INT, className,
+                                          false, PRIVATE, null) +
+                getJavaAttributeDefinition(null, STRING_DATA_TYPE, SCHEMA_NAME,
+                                           false, PRIVATE, null);
     }
 
     /**
@@ -349,14 +329,24 @@ public final class JavaCodeSnippetGen {
      * @return attribute for augmentation
      */
     static String addAugmentationAttribute() {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + PROTECTED + SPACE + MAP +
-                DIAMOND_OPEN_BRACKET + CLASS_STRING + DIAMOND_OPEN_BRACKET +
+        String[] array = {NEW_LINE, SEMI_COLON};
+        return trimAtLast(getJavaAttributeDefinition(
+                null, getAugmentMapTypeString(),
+                YANG_AUGMENTED_INFO_LOWER_CASE + MAP, false, PROTECTED,
+                null), array) + SPACE + EQUAL + SPACE + NEW + SPACE +
+                HASH_MAP + brackets(OPEN_CLOSE_DIAMOND, null, null) + brackets(
+                OPEN_CLOSE_BRACKET, null, null) + signatureClose();
+    }
+
+    /**
+     * Returns augment map return type.
+     *
+     * @return augment map return type
+     */
+    static String getAugmentMapTypeString() {
+        return MAP + DIAMOND_OPEN_BRACKET + CLASS_STRING + DIAMOND_OPEN_BRACKET +
                 QUESTION_MARK + DIAMOND_CLOSE_BRACKET + COMMA + SPACE +
-                OBJECT_STRING + DIAMOND_CLOSE_BRACKET + SPACE +
-                getSmallCase(YANG_AUGMENTED_INFO) + MAP + SPACE + EQUAL +
-                SPACE + NEW + SPACE + HASH_MAP + DIAMOND_OPEN_BRACKET +
-                DIAMOND_CLOSE_BRACKET + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                SEMI_COLAN;
+                OBJECT_STRING + DIAMOND_CLOSE_BRACKET;
     }
 
     /**
@@ -369,13 +359,13 @@ public final class JavaCodeSnippetGen {
     static String addStaticAttributeIntRange(String modifier,
                                              boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                    INT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
-                    SPACE + INT_MAX_RANGE_ATTR;
+            return getTypeConflictAttributeStrings(modifier,
+                                                   INT_MIN_RANGE_ATTR,
+                                                   INT_MAX_RANGE_ATTR);
         }
-        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                UINT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
-                SPACE + UINT_MAX_RANGE_ATTR;
+        return getTypeConflictAttributeStrings(modifier,
+                                               UINT_MIN_RANGE_ATTR,
+                                               UINT_MAX_RANGE_ATTR);
     }
 
     /**
@@ -388,13 +378,13 @@ public final class JavaCodeSnippetGen {
     static String addStaticAttributeLongRange(String modifier,
                                               boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                    LONG_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION +
-                    modifier + SPACE + LONG_MAX_RANGE_ATTR;
+            return getTypeConflictAttributeStrings(modifier,
+                                                   LONG_MIN_RANGE_ATTR,
+                                                   LONG_MAX_RANGE_ATTR);
         }
-        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                ULONG_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
-                SPACE + ULONG_MAX_RANGE_ATTR;
+        return getTypeConflictAttributeStrings(modifier,
+                                               ULONG_MIN_RANGE_ATTR,
+                                               ULONG_MAX_RANGE_ATTR);
     }
 
     /**
@@ -407,13 +397,29 @@ public final class JavaCodeSnippetGen {
     static String addStaticAttributeShortRange(String modifier,
                                                boolean addFirst) {
         if (addFirst) {
-            return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                    SHORT_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
-                    SPACE + SHORT_MAX_RANGE_ATTR;
+            return getTypeConflictAttributeStrings(modifier,
+                                                   SHORT_MIN_RANGE_ATTR,
+                                                   SHORT_MAX_RANGE_ATTR);
         }
+        return getTypeConflictAttributeStrings(modifier,
+                                               UINT8_MIN_RANGE_ATTR,
+                                               UINT8_MAX_RANGE_ATTR);
+    }
+
+    /**
+     * Returns attribute for conflicting type in union.
+     *
+     * @param modifier modifier
+     * @param attr1    attribute one
+     * @param att2     attribute two
+     * @return attribute for conflicting type in union
+     */
+    private static String getTypeConflictAttributeStrings(String modifier,
+                                                          String attr1,
+                                                          String att2) {
         return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
-                UINT8_MIN_RANGE_ATTR + FOUR_SPACE_INDENTATION + modifier +
-                SPACE + UINT8_MAX_RANGE_ATTR;
+                attr1 + FOUR_SPACE_INDENTATION + modifier +
+                SPACE + att2;
     }
 
     /**
@@ -422,10 +428,11 @@ public final class JavaCodeSnippetGen {
      * @return operation type enum
      */
     static String getOperationTypeEnum() {
-        return "\n" +
-                "    /**\n" +
-                "     * Specify the node specific operation in protocols like NETCONF.\n" +
-                "     * Applicable in protocol edit operation, not applicable in query operation\n" +
+        return "    /**\n" +
+                "     * Specify the node specific operation in protocols " +
+                "like NETCONF.\n" +
+                "     * Applicable in protocol edit operation, not applicable" +
+                " in query operation\n" +
                 "     */\n" +
                 "    public enum OnosYangNodeOperationType {\n" +
                 "        MERGE,\n" +
@@ -473,6 +480,7 @@ public final class JavaCodeSnippetGen {
      * @return augment info map
      */
     static String getYangAugmentedMapObjectForConstruct() {
-        return "        this.yangAugmentedInfoMap = builderObject.yangAugmentedInfoMap();\n";
+        return "        this.yangAugmentedInfoMap = builderObject" +
+                ".yangAugmentedInfoMap();\n";
     }
 }

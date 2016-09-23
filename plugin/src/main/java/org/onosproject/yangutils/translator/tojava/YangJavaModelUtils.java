@@ -70,11 +70,9 @@ public final class YangJavaModelUtils {
      *
      * @param info   YANG java file info node
      * @param config YANG plugin config
-     * @throws IOException IO operations fails
      */
     public static void updatePackageInfo(JavaCodeGeneratorInfo info,
-                                         YangPluginConfig config)
-            throws IOException {
+                                         YangPluginConfig config) {
 
         JavaFileInfoTranslator translator = info.getJavaFileInfo();
 
@@ -95,11 +93,9 @@ public final class YangJavaModelUtils {
      *
      * @param info   YANG java file info node
      * @param config YANG plugin config
-     * @throws IOException IO operations fails
      */
     private static void updatePackageForAugmentInfo(JavaCodeGeneratorInfo info,
-                                                    YangPluginConfig config)
-            throws IOException {
+                                                    YangPluginConfig config) {
 
         JavaFileInfoTranslator translator = info.getJavaFileInfo();
 
@@ -236,11 +232,10 @@ public final class YangJavaModelUtils {
             /*
              * Enumeration
              */
-            translator.getEnumerationTempFiles()
+            translator.getEnumTempFiles()
                     .addEnumAttributeToTempFiles((YangNode) info, config);
-        } else if (info instanceof YangChoice) {
-            /*Do nothing, only the interface needs to be generated*/
-        } else {
+        } else if (!(info instanceof YangChoice)) {
+            /*Do nothing, only the interface needs to be generated for choice*/
             throw new TranslatorException(
                     getErrorMsgForCodeGenerator(INVALID_TRANSLATION_NODE,
                                                 info));
@@ -494,8 +489,8 @@ public final class YangJavaModelUtils {
      * @param rootNodeGen flag indicating check type
      * @return true if check pass, false otherwise
      */
-    public static boolean isNodeCodeGenRequired(YangNode node,
-                                                boolean rootNodeGen) {
+    private static boolean isNodeCodeGenRequired(YangNode node,
+                                                 boolean rootNodeGen) {
         YangLeavesHolder holder = (YangLeavesHolder) node;
 
         if (!holder.getListOfLeaf().isEmpty()) {

@@ -16,8 +16,6 @@
 
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.IOException;
-
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangNode;
@@ -27,20 +25,20 @@ import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
-import org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles;
+import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
-import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.updatePackageInfo;
-import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_CHILD_NODE;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_PARENT_NODE;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 
 /**
  * Represents rpc information extended to support java code generation.
@@ -60,7 +58,6 @@ public class YangJavaRpcTranslator
      * Creates an instance of YANG java rpc.
      */
     public YangJavaRpcTranslator() {
-        super();
         setJavaFileInfo(new JavaFileInfoTranslator());
     }
 
@@ -74,10 +71,7 @@ public class YangJavaRpcTranslator
 
         if (javaFileInfo == null) {
             throw new TranslatorException("missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+                                                  getName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -114,15 +108,7 @@ public class YangJavaRpcTranslator
             throws TranslatorException {
 
         // Add package information for rpc and create corresponding folder.
-        try {
-            updatePackageInfo(this, yangPlugin);
-        } catch (IOException e) {
-            throw new TranslatorException("Failed to prepare generate code entry for RPC node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + " " + e.getLocalizedMessage());
-        }
+        updatePackageInfo(this, yangPlugin);
     }
 
     /**
@@ -138,18 +124,18 @@ public class YangJavaRpcTranslator
 
         // Parent should be holder of rpc or notification.
         if (!(parent instanceof RpcNotificationContainer)) {
-            throw new TranslatorException("parent node of rpc can only be module or sub-module " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+            throw new TranslatorException(getErrorMsg(INVALID_PARENT_NODE,
+                                                      this));
         }
 
         /*
          * Create attribute info for input and output of rpc and add it to the
          * parent import list.
          */
-
+        TempJavaServiceFragmentFiles tempJavaFragmentFiles =
+                ((TempJavaCodeFragmentFilesContainer) getParent())
+                        .getTempJavaCodeFragmentFiles()
+                        .getServiceTempFiles();
         JavaAttributeInfo javaAttributeInfoOfInput = null;
         JavaAttributeInfo javaAttributeInfoOfOutput = null;
 
@@ -158,27 +144,18 @@ public class YangJavaRpcTranslator
         YangNode yangNode = getChild();
         while (yangNode != null) {
             if (yangNode instanceof YangInput) {
-                javaAttributeInfoOfInput = getChildNodeAsAttributeInParentService(yangNode, this);
-
+                javaAttributeInfoOfInput = tempJavaFragmentFiles
+                        .getChildNodeAsAttributeInParentService(yangNode,
+                                                                getParent());
             } else if (yangNode instanceof YangOutput) {
-                javaAttributeInfoOfOutput = getChildNodeAsAttributeInParentService(yangNode, this);
+                javaAttributeInfoOfOutput = tempJavaFragmentFiles
+                        .getChildNodeAsAttributeInParentService(yangNode,
+                                                                getParent());
             } else {
-                throw new TranslatorException("RPC should contain only input/output child nodes. " +
-                        yangNode.getName() + " in " +
-                        yangNode.getLineNumber() + " at " +
-                        yangNode.getCharPosition()
-                        + " in " + yangNode.getFileName());
-
+                throw new TranslatorException(getErrorMsg(INVALID_CHILD_NODE,
+                                                          this));
             }
             yangNode = yangNode.getNextSibling();
-        }
-
-        if (!(parent instanceof TempJavaCodeFragmentFilesContainer)) {
-            throw new TranslatorException("missing parent temp file handle " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
         }
 
         /*
@@ -186,78 +163,15 @@ public class YangJavaRpcTranslator
          */
         try {
 
-            ((TempJavaCodeFragmentFilesContainer) parent).getTempJavaCodeFragmentFiles().getServiceTempFiles()
-                    .addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfoOfInput, javaAttributeInfoOfOutput,
-                            ((JavaFileInfoContainer) parent).getJavaFileInfo().getPluginConfig(), getName());
-
+            ((TempJavaCodeFragmentFilesContainer) parent)
+                    .getTempJavaCodeFragmentFiles().getServiceTempFiles()
+                    .addJavaSnippetInfoToApplicableTempFiles(
+                            javaAttributeInfoOfInput, javaAttributeInfoOfOutput,
+                            getJavaClassNameOrBuiltInType());
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for RPC node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
+                                                      e.getLocalizedMessage()));
         }
         // No file will be generated during RPC exit.
     }
-
-    /**
-     * Creates an attribute info object corresponding to a data model node and
-     * return it.
-     *
-     * @param childNode   child data model node(input / output) for which the java code generation
-     *                    is being handled
-     * @param currentNode parent node (module / sub-module) in which the child node is an attribute
-     * @return AttributeInfo attribute details required to add in temporary
-     * files
-     */
-    private JavaAttributeInfo getChildNodeAsAttributeInParentService(
-            YangNode childNode, YangNode currentNode) {
-
-        YangNode parentNode = getParentNodeInGenCode(currentNode);
-
-        String childNodeName = ((JavaFileInfoContainer) childNode).getJavaFileInfo().getJavaName();
-        /*
-         * Get the import info corresponding to the attribute for import in
-         * generated java files or qualified access
-         */
-        JavaQualifiedTypeInfoTranslator qualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(childNode,
-                getCapitalCase(childNodeName));
-        if (!(parentNode instanceof TempJavaCodeFragmentFilesContainer)) {
-            throw new TranslatorException("Parent node does not have file info");
-        }
-
-        TempJavaFragmentFiles tempJavaFragmentFiles;
-        tempJavaFragmentFiles = ((TempJavaCodeFragmentFilesContainer) parentNode)
-                .getTempJavaCodeFragmentFiles()
-                .getServiceTempFiles();
-
-        if (tempJavaFragmentFiles == null) {
-            throw new TranslatorException("Parent node does not have service file info");
-        }
-        boolean isQualified = addImportToService(qualifiedTypeInfo);
-        return getAttributeInfoForTheData(qualifiedTypeInfo, childNodeName, null, isQualified, false);
-    }
-
-    /**
-     * Adds to service class import list.
-     *
-     * @param importInfo import info
-     * @return true or false
-     */
-    private boolean addImportToService(JavaQualifiedTypeInfoTranslator importInfo) {
-        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) getParent()).getJavaFileInfo();
-
-        if (importInfo.getClassInfo().contentEquals(SERVICE)
-                || importInfo.getClassInfo().contentEquals(getCapitalCase(fileInfo.getJavaName() + SERVICE))) {
-            return true;
-        }
-
-        String className;
-        className = getCapitalCase(fileInfo.getJavaName()) + "Service";
-
-        return ((TempJavaCodeFragmentFilesContainer) getParent()).getTempJavaCodeFragmentFiles()
-                .getServiceTempFiles().getJavaImportData().addImportInfo(importInfo,
-                        className, fileInfo.getPackage());
-    }
-
 }

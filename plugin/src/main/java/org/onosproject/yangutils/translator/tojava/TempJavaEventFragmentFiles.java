@@ -16,14 +16,14 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
+import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.EVENT_ENUM_MASK;
@@ -42,8 +42,8 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
@@ -54,7 +54,6 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
 
 /**
  * Represent temporary java fragments for event files.
@@ -79,27 +78,20 @@ public class TempJavaEventFragmentFiles
     /**
      * File name for event subject attribute temp file.
      */
-    private static final String EVENT_SUBJECT_ATTRIBUTE_FILE_NAME = "EventSubjectAttribute";
+    private static final String EVENT_SUBJECT_ATTRIBUTE_FILE_NAME
+            = "EventSubjectAttribute";
 
     /**
      * File name for event subject getter temp file.
      */
-    private static final String EVENT_SUBJECT_GETTER_FILE_NAME = "EventSubjectGetter";
+    private static final String EVENT_SUBJECT_GETTER_FILE_NAME
+            = "EventSubjectGetter";
 
     /**
      * File name for event subject setter temp file.
      */
-    private static final String EVENT_SUBJECT_SETTER_FILE_NAME = "EventSubjectSetter";
-
-    /**
-     * File name for generated class file for special type like union, typedef suffix.
-     */
-    private static final String EVENT_FILE_NAME_SUFFIX = "Event";
-
-    /**
-     * File name for generated class file for special type like union, typedef suffix.
-     */
-    private static final String EVENT_LISTENER_FILE_NAME_SUFFIX = "EventListener";
+    private static final String EVENT_SUBJECT_SETTER_FILE_NAME
+            = "EventSubjectSetter";
 
     private static final String JAVA_FILE_EXTENSION = ".java";
 
@@ -121,27 +113,27 @@ public class TempJavaEventFragmentFiles
     /**
      * Java file handle for event enum impl file.
      */
-    private File eventEnumTempFileHandle;
+    private final File eventEnumTempFileHandle;
 
     /**
      * Java file handle for event method impl file.
      */
-    private File eventMethodTempFileHandle;
+    private final File eventMethodTempFileHandle;
 
     /**
      * Java file handle for event subject attribute file.
      */
-    private File eventSubjectAttributeTempFileHandle;
+    private final File eventSubjectAttributeTempFileHandle;
 
     /**
      * Java file handle for event subject getter impl file.
      */
-    private File eventSubjectGetterTempFileHandle;
+    private final File eventSubjectGetterTempFileHandle;
 
     /**
      * Java file handle for event subject setter impl file.
      */
-    private File eventSubjectSetterTempFileHandle;
+    private final File eventSubjectSetterTempFileHandle;
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -154,8 +146,9 @@ public class TempJavaEventFragmentFiles
         setJavaExtendsListHolder(new JavaExtendsListHolder());
         setJavaImportData(new JavaImportData());
         setJavaFileInfo(javaFileInfo);
-        setAbsoluteDirPath(getAbsolutePackagePath(getJavaFileInfo().getBaseCodeGenPath(),
-                                                  getJavaFileInfo().getPackageFilePath()));
+        setAbsoluteDirPath(getAbsolutePackagePath(
+                getJavaFileInfo().getBaseCodeGenPath(),
+                getJavaFileInfo().getPackageFilePath()));
 
         addGeneratedTempFile(EVENT_ENUM_MASK);
         addGeneratedTempFile(EVENT_METHOD_MASK);
@@ -163,11 +156,60 @@ public class TempJavaEventFragmentFiles
         addGeneratedTempFile(EVENT_SUBJECT_GETTER_MASK);
         addGeneratedTempFile(EVENT_SUBJECT_SETTER_MASK);
 
-        setEventEnumTempFileHandle(getTemporaryFileHandle(EVENT_ENUM_FILE_NAME));
-        setEventMethodTempFileHandle(getTemporaryFileHandle(EVENT_METHOD_FILE_NAME));
-        setEventSubjectAttributeTempFileHandle(getTemporaryFileHandle(EVENT_SUBJECT_ATTRIBUTE_FILE_NAME));
-        setEventSubjectGetterTempFileHandle(getTemporaryFileHandle(EVENT_SUBJECT_GETTER_FILE_NAME));
-        setEventSubjectSetterTempFileHandle(getTemporaryFileHandle(EVENT_SUBJECT_SETTER_FILE_NAME));
+        eventEnumTempFileHandle = getTemporaryFileHandle(EVENT_ENUM_FILE_NAME);
+        eventMethodTempFileHandle = getTemporaryFileHandle(
+                EVENT_METHOD_FILE_NAME);
+        eventSubjectAttributeTempFileHandle = getTemporaryFileHandle
+                (EVENT_SUBJECT_ATTRIBUTE_FILE_NAME);
+        eventSubjectGetterTempFileHandle = getTemporaryFileHandle(
+                EVENT_SUBJECT_GETTER_FILE_NAME);
+        eventSubjectSetterTempFileHandle = getTemporaryFileHandle(
+                EVENT_SUBJECT_SETTER_FILE_NAME);
+    }
+
+    /**
+     * Returns event enum temp file.
+     *
+     * @return event enum temp file
+     */
+    public File getEventEnumTempFileHandle() {
+        return eventEnumTempFileHandle;
+    }
+
+    /**
+     * Returns event method temp file.
+     *
+     * @return event method temp file
+     */
+    public File getEventMethodTempFileHandle() {
+        return eventMethodTempFileHandle;
+    }
+
+    /**
+     * Returns event subject attribute temp file.
+     *
+     * @return event subject attribute temp file
+     */
+    public File getEventSubjectAttributeTempFileHandle() {
+        return eventSubjectAttributeTempFileHandle;
+    }
+
+    /**
+     * Returns event subject getter temp file.
+     *
+     * @return event subject getter temp file
+     */
+    public File getEventSubjectGetterTempFileHandle() {
+        return eventSubjectGetterTempFileHandle;
+    }
+
+    /**
+     * Returns event subject setter temp file.
+     *
+     * @return event subject setter temp file
+     */
+    public File getEventSubjectSetterTempFileHandle() {
+        return eventSubjectSetterTempFileHandle;
     }
 
     /*Adds event method contents to event file.*/
@@ -179,7 +221,8 @@ public class TempJavaEventFragmentFiles
                 "     * @param type event type\n" +
                 "     * @param subject subject " + classname + "\n" +
                 "     */\n" +
-                "    public " + eventClassname + "(Type type, " + getCapitalCase(classname) + " subject) {\n" +
+                "    public " + eventClassname + "(Type type, " +
+                getCapitalCase(classname) + " subject) {\n" +
                 "        super(type, subject);\n" +
                 "    }\n" +
                 "\n" +
@@ -195,60 +238,6 @@ public class TempJavaEventFragmentFiles
                 "        super(type, subject, time);\n" +
                 "    }\n" +
                 "\n";
-    }
-
-    /**
-     * Returns event's java file handle.
-     *
-     * @return java file handle
-     */
-    private File getEventJavaFileHandle() {
-        return eventJavaFileHandle;
-    }
-
-    /**
-     * Sets event's java file handle.
-     *
-     * @param eventJavaFileHandle file handle for event
-     */
-    private void setEventJavaFileHandle(File eventJavaFileHandle) {
-        this.eventJavaFileHandle = eventJavaFileHandle;
-    }
-
-    /**
-     * Returns event listeners's java file handle.
-     *
-     * @return java file handle
-     */
-    private File getEventListenerJavaFileHandle() {
-        return eventListenerJavaFileHandle;
-    }
-
-    /**
-     * Sets event's java file handle.
-     *
-     * @param eventListenerJavaFileHandle file handle for event
-     */
-    private void setEventListenerJavaFileHandle(File eventListenerJavaFileHandle) {
-        this.eventListenerJavaFileHandle = eventListenerJavaFileHandle;
-    }
-
-    /**
-     * Returns event subject's java file handle.
-     *
-     * @return java file handle
-     */
-    private File getEventSubjectJavaFileHandle() {
-        return eventSubjectJavaFileHandle;
-    }
-
-    /**
-     * Sets event's subject java file handle.
-     *
-     * @param eventSubjectJavaFileHandle file handle for event's subject
-     */
-    private void setEventSubjectJavaFileHandle(File eventSubjectJavaFileHandle) {
-        this.eventSubjectJavaFileHandle = eventSubjectJavaFileHandle;
     }
 
     public void generateJavaFile(int fileType, YangNode curNode)
@@ -273,15 +262,16 @@ public class TempJavaEventFragmentFiles
         List<String> imports = new ArrayList<>();
 
         imports.add(getJavaImportData().getAbstractEventsImport());
-        String curNodeInfo = getCapitalCase(((JavaFileInfoContainer) curNode).getJavaFileInfo().getJavaName());
+        String curNodeInfo = getCapitalCase(((JavaFileInfoContainer) curNode)
+                                                    .getJavaFileInfo().getJavaName());
         String nodeName = curNodeInfo + EVENT_STRING;
 
         addEnumMethod(nodeName, curNodeInfo + EVENT_SUBJECT_NAME_SUFFIX);
 
         //Creates event interface file.
-        setEventJavaFileHandle(getJavaFileHandle(curNode, curNodeInfo + EVENT_FILE_NAME_SUFFIX));
-        generateEventFile(getEventJavaFileHandle(), curNode, imports);
-
+        eventJavaFileHandle = getJavaFileHandle(curNode, curNodeInfo +
+                EVENT_STRING);
+        generateEventFile(eventJavaFileHandle, curNode, imports);
     }
 
     /**
@@ -300,10 +290,9 @@ public class TempJavaEventFragmentFiles
                                                     .getJavaFileInfo().getJavaName());
 
         // Creates event listener interface file.
-        setEventListenerJavaFileHandle(
-                getJavaFileHandle(curNode, curNodeInfo + EVENT_LISTENER_FILE_NAME_SUFFIX));
-        generateEventListenerFile(getEventListenerJavaFileHandle(), curNode, imports);
-
+        eventListenerJavaFileHandle =
+                getJavaFileHandle(curNode, curNodeInfo + EVENT_LISTENER);
+        generateEventListenerFile(eventListenerJavaFileHandle, curNode, imports);
     }
 
     /**
@@ -319,100 +308,9 @@ public class TempJavaEventFragmentFiles
                                                     .getJavaFileInfo().getJavaName());
 
         //Creates event interface file.
-        setEventSubjectJavaFileHandle(getJavaFileHandle(curNode, curNodeInfo +
-                EVENT_SUBJECT_NAME_SUFFIX));
-        generateEventSubjectFile(getEventSubjectJavaFileHandle(), curNode);
-
-    }
-
-    /**
-     * Returns event enum temp file.
-     *
-     * @return event enum temp file
-     */
-    public File getEventEnumTempFileHandle() {
-        return eventEnumTempFileHandle;
-    }
-
-    /**
-     * Sets event enum temp file.
-     *
-     * @param eventEnumTempFileHandle event enum temp file
-     */
-    private void setEventEnumTempFileHandle(File eventEnumTempFileHandle) {
-        this.eventEnumTempFileHandle = eventEnumTempFileHandle;
-    }
-
-    /**
-     * Returns event method temp file.
-     *
-     * @return event method temp file
-     */
-    public File getEventMethodTempFileHandle() {
-        return eventMethodTempFileHandle;
-    }
-
-    /**
-     * Sets event method temp file.
-     *
-     * @param eventMethodTempFileHandle event method temp file
-     */
-    private void setEventMethodTempFileHandle(File eventMethodTempFileHandle) {
-        this.eventMethodTempFileHandle = eventMethodTempFileHandle;
-    }
-
-    /**
-     * Returns event subject attribute temp file.
-     *
-     * @return event subject attribute temp file
-     */
-    public File getEventSubjectAttributeTempFileHandle() {
-        return eventSubjectAttributeTempFileHandle;
-    }
-
-    /**
-     * Sets event subject attribute temp file.
-     *
-     * @param eventSubjectAttributeTempFileHandle event subject attribute temp file
-     */
-    private void setEventSubjectAttributeTempFileHandle(File eventSubjectAttributeTempFileHandle) {
-        this.eventSubjectAttributeTempFileHandle = eventSubjectAttributeTempFileHandle;
-    }
-
-    /**
-     * Returns event subject getter temp file.
-     *
-     * @return event subject getter temp file
-     */
-    public File getEventSubjectGetterTempFileHandle() {
-        return eventSubjectGetterTempFileHandle;
-    }
-
-    /**
-     * Sets event subject getter temp file.
-     *
-     * @param eventSubjectGetterTempFileHandle event subject getter temp file
-     */
-    private void setEventSubjectGetterTempFileHandle(File eventSubjectGetterTempFileHandle) {
-        this.eventSubjectGetterTempFileHandle = eventSubjectGetterTempFileHandle;
-    }
-
-    /**
-     * Returns event subject setter temp file.
-     *
-     * @return event subject setter temp file
-     */
-    public File getEventSubjectSetterTempFileHandle() {
-        return eventSubjectSetterTempFileHandle;
-    }
-
-    /**
-     * Sets event subject setter temp file.
-     *
-     * @param eventSubjectSetterTempFileHandle event subject setter temp file
-     */
-    private void setEventSubjectSetterTempFileHandle(File eventSubjectSetterTempFileHandle) {
-        this.eventSubjectSetterTempFileHandle = eventSubjectSetterTempFileHandle;
+        eventSubjectJavaFileHandle = getJavaFileHandle(curNode, curNodeInfo +
+                EVENT_SUBJECT_NAME_SUFFIX);
+        generateEventSubjectFile(eventSubjectJavaFileHandle, curNode);
     }
 
     /**
@@ -425,67 +323,74 @@ public class TempJavaEventFragmentFiles
     void addJavaSnippetOfEvent(YangNode curNode, YangPluginConfig pluginConfig)
             throws IOException {
 
-        String currentInfo = getCapitalCase(getCamelCase(curNode.getName(),
-                                                         pluginConfig.getConflictResolver()));
+        String currentInfo = getCamelCase(curNode.getName(), pluginConfig
+                .getConflictResolver());
         String notificationName = curNode.getName();
 
-        JavaQualifiedTypeInfoTranslator qualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(curNode,
-                                                                                          getCapitalCase(currentInfo));
+        JavaQualifiedTypeInfoTranslator qualifiedTypeInfo
+                = getQualifiedTypeInfoOfCurNode(curNode, getCapitalCase(currentInfo));
 
-        JavaAttributeInfo javaAttributeInfo = getAttributeInfoForTheData(qualifiedTypeInfo, getSmallCase(currentInfo),
-                                                                         null, false, false);
+        JavaAttributeInfo javaAttributeInfo
+                = getAttributeInfoForTheData(qualifiedTypeInfo, currentInfo,
+                                             null, false, false);
 
         /*Adds java info for event in respective temp files.*/
         addEventEnum(notificationName);
-        addEventSubjectAttribute(javaAttributeInfo, pluginConfig);
-        addEventSubjectGetter(javaAttributeInfo, pluginConfig);
-        addEventSubjectSetter(javaAttributeInfo, pluginConfig, currentInfo);
+        addEventSubjectAttribute(javaAttributeInfo);
+        addEventSubjectGetter(javaAttributeInfo);
+        addEventSubjectSetter(javaAttributeInfo, currentInfo);
     }
 
     /*Adds event to enum temp file.*/
     private void addEventEnum(String notificationName)
             throws IOException {
-        appendToFile(getEventEnumTempFileHandle(),
-                     enumJavaDocForInnerClass(notificationName) + EIGHT_SPACE_INDENTATION
-                             + getEnumJavaAttribute(notificationName).toUpperCase() + COMMA + NEW_LINE);
+        appendToFile(getEventEnumTempFileHandle(), enumJavaDocForInnerClass(
+                notificationName) + EIGHT_SPACE_INDENTATION
+                + getEnumJavaAttribute(notificationName).toUpperCase() +
+                COMMA + NEW_LINE);
     }
 
     /*Adds event method in event class*/
     private void addEnumMethod(String eventClassname, String className)
             throws IOException {
-        appendToFile(getEventMethodTempFileHandle(), getEventFileContents(eventClassname, className));
+        appendToFile(getEventMethodTempFileHandle(),
+                     getEventFileContents(eventClassname, className));
     }
 
     /*Adds events to event subject file.*/
-    private void addEventSubjectAttribute(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
+    private void addEventSubjectAttribute(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getEventSubjectAttributeTempFileHandle(),
-                     FOUR_SPACE_INDENTATION + parseAttribute(attr, pluginConfig));
+                     parseAttribute(attr));
     }
 
     /*Adds getter method for event in event subject class.*/
-    private void addEventSubjectGetter(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
+    private void addEventSubjectGetter(JavaAttributeInfo attr)
             throws IOException {
         String appDataStructure = null;
         if (attr.getCompilerAnnotation() != null) {
-            appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
+            appDataStructure = attr.getCompilerAnnotation()
+                    .getYangAppDataStructure().getDataStructure().name();
         }
-        appendToFile(getEventSubjectGetterTempFileHandle(),
-                     getJavaDoc(GETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
-                                appDataStructure) + getGetterForClass(attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
+        appendToFile(getEventSubjectGetterTempFileHandle(), getJavaDoc(
+                GETTER_METHOD, attr.getAttributeName(), false,
+                appDataStructure) + getGetterForClass(
+                attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
     }
 
     /*Adds setter method for event in event subject class.*/
-    private void addEventSubjectSetter(JavaAttributeInfo attr, YangPluginConfig pluginConfig, String className)
+    private void addEventSubjectSetter(JavaAttributeInfo attr,
+                                       String className)
             throws IOException {
         String appDataStructure = null;
         if (attr.getCompilerAnnotation() != null) {
-            appDataStructure = attr.getCompilerAnnotation().getYangAppDataStructure().getDataStructure().name();
+            appDataStructure = attr.getCompilerAnnotation()
+                    .getYangAppDataStructure().getDataStructure().name();
         }
-        appendToFile(getEventSubjectSetterTempFileHandle(),
-                     getJavaDoc(MANAGER_SETTER_METHOD, getCapitalCase(attr.getAttributeName()), false, pluginConfig,
-                                appDataStructure) + getSetterForClass(attr, className, GENERATE_EVENT_SUBJECT_CLASS)
-                             + NEW_LINE);
+        appendToFile(getEventSubjectSetterTempFileHandle(), getJavaDoc(
+                MANAGER_SETTER_METHOD, attr.getAttributeName(),
+                false, appDataStructure) + getSetterForClass(
+                attr, className, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
     }
 
     /**
@@ -493,12 +398,11 @@ public class TempJavaEventFragmentFiles
      *
      * @param name file name
      * @return temporary file handle
-     * @throws IOException when fails to create new file handle
      */
-    private File getJavaFileHandle(YangNode curNode, String name)
-            throws IOException {
+    private File getJavaFileHandle(YangNode curNode, String name) {
 
-        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) curNode)
+                .getJavaFileInfo();
         return getFileObject(getDirPath(parentInfo), name, JAVA_FILE_EXTENSION,
                              parentInfo);
     }
@@ -509,7 +413,8 @@ public class TempJavaEventFragmentFiles
      * @return directory path
      */
     private String getDirPath(JavaFileInfoTranslator parentInfo) {
-        return (parentInfo.getPackageFilePath() + SLASH + parentInfo.getJavaName()).toLowerCase();
+        return (parentInfo.getPackageFilePath() + SLASH +
+                parentInfo.getJavaName()).toLowerCase();
     }
 
     /**
@@ -522,17 +427,16 @@ public class TempJavaEventFragmentFiles
     public void freeTemporaryResources(boolean isErrorOccurred)
             throws IOException {
 
-        closeFile(getEventJavaFileHandle(), isErrorOccurred);
-        closeFile(getEventListenerJavaFileHandle(), isErrorOccurred);
-        closeFile(getEventSubjectJavaFileHandle(), isErrorOccurred);
+        closeFile(eventJavaFileHandle, isErrorOccurred);
+        closeFile(eventListenerJavaFileHandle, isErrorOccurred);
+        closeFile(eventSubjectJavaFileHandle, isErrorOccurred);
 
-        closeFile(getEventEnumTempFileHandle(), true);
-        closeFile(getEventSubjectAttributeTempFileHandle(), true);
-        closeFile(getEventMethodTempFileHandle(), true);
-        closeFile(getEventSubjectGetterTempFileHandle(), true);
-        closeFile(getEventSubjectSetterTempFileHandle(), true);
+        closeFile(eventEnumTempFileHandle, true);
+        closeFile(eventSubjectAttributeTempFileHandle, true);
+        closeFile(eventMethodTempFileHandle, true);
+        closeFile(eventSubjectGetterTempFileHandle, true);
+        closeFile(eventSubjectSetterTempFileHandle, true);
 
         super.freeTemporaryResources(isErrorOccurred);
-
     }
 }

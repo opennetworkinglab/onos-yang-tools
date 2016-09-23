@@ -16,17 +16,16 @@
 
 package org.onosproject.yangutils.utils.io.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.onosproject.yangutils.utils.UtilConstants;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -66,7 +65,7 @@ public final class YangIoUtilsTest {
 
         File dirPath = new File(CREATE_PATH);
         dirPath.mkdirs();
-        addPackageInfo(dirPath, CHECK1, CREATE_PATH, false, getStubPluginConfig());
+        addPackageInfo(dirPath, CHECK1, CREATE_PATH, false);
         File filePath = new File(dirPath + File.separator + PKG_INFO);
         assertThat(filePath.isFile(), is(true));
         FileUtils.deleteDirectory(new File(BASE_DIR));
@@ -82,7 +81,7 @@ public final class YangIoUtilsTest {
 
         File dirPath = new File(CREATE_PATH);
         dirPath.mkdirs();
-        addPackageInfo(dirPath, CHECK1, PATH + CREATE_PATH, false, getStubPluginConfig());
+        addPackageInfo(dirPath, CHECK1, PATH + CREATE_PATH, false);
         File filePath = new File(dirPath + File.separator + PKG_INFO);
         assertThat(filePath.isFile(), is(true));
         FileUtils.deleteDirectory(new File(BASE_DIR));
@@ -98,7 +97,7 @@ public final class YangIoUtilsTest {
 
         File dirPath = new File(CREATE_PATH);
         dirPath.mkdirs();
-        addPackageInfo(dirPath, CHECK1, PATH + CREATE_PATH, true, getStubPluginConfig());
+        addPackageInfo(dirPath, CHECK1, PATH + CREATE_PATH, true);
         File filePath = new File(dirPath + File.separator + PKG_INFO);
         assertThat(filePath.isFile(), is(true));
         FileUtils.deleteDirectory(new File(BASE_DIR));
@@ -115,7 +114,7 @@ public final class YangIoUtilsTest {
         File dirPath = new File("invalid/check");
         thrown.expect(IOException.class);
         thrown.expectMessage(MSG);
-        addPackageInfo(dirPath, CHECK1, CREATE_PATH, false, getStubPluginConfig());
+        addPackageInfo(dirPath, CHECK1, CREATE_PATH, false);
         File filePath1 = new File(dirPath + File.separator + PKG_INFO);
         assertThat(filePath1.isFile(), is(false));
         FileUtils.deleteDirectory(dirPath);
@@ -194,17 +193,6 @@ public final class YangIoUtilsTest {
 
         String test = trimAtLast(CHECK_STRING, "six");
         assertThat(test.contains(TRIM_STRING), is(true));
-    }
-
-    /**
-     * Returns stub pluginConfig.
-     *
-     * @return stub pluginConfig
-     */
-    private YangPluginConfig getStubPluginConfig() {
-        YangPluginConfig pluginConfig = new YangPluginConfig();
-        pluginConfig.setConflictResolver(null);
-        return pluginConfig;
     }
 
 }

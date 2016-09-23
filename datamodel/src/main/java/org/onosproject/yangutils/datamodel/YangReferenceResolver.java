@@ -16,9 +16,10 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+
 import java.util.List;
 import java.util.Set;
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 
 /**
  * Abstraction of YANG dependency resolution information. Abstracted to obtain the
@@ -40,7 +41,8 @@ public interface YangReferenceResolver {
      * @param resolutionInfo resolution information
      * @param type           resolvable type
      */
-    void addToResolutionList(YangResolutionInfo resolutionInfo, ResolvableType type);
+    void addToResolutionList(YangResolutionInfo resolutionInfo,
+                             ResolvableType type);
 
     /**
      * Creates resolution list.
@@ -48,7 +50,8 @@ public interface YangReferenceResolver {
      * @param resolutionList resolution list
      * @param type           resolvable type
      */
-    void setResolutionList(List<YangResolutionInfo> resolutionList, ResolvableType type);
+    void setResolutionList(List<YangResolutionInfo> resolutionList,
+                           ResolvableType type);
 
     /**
      * Returns unresolved imported list.

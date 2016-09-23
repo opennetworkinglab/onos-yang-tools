@@ -16,14 +16,13 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
@@ -42,6 +41,7 @@ public class IncludeReferenceWithPrefix {
     @Test
     public void processRefToIncludeWithPrefix() throws IOException, ParserException, MojoExecutionException {
 
+        deleteDirectory("target/refincludecontentwithprefix/");
         String searchDir = "src/test/resources/refincludecontentwithprefix";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -51,9 +51,6 @@ public class IncludeReferenceWithPrefix {
         yangPluginConfig.setCodeGenDir("target/refincludecontentwithprefix/");
         utilManager.translateToJava(yangPluginConfig);
 
-        Iterator<YangNode> yangNodeIterator = utilManager.getYangNodeSet().iterator();
-        YangNode rootNode = yangNodeIterator.next();
-
-        deleteDirectory("target/schemaMap/");
+        deleteDirectory("target/refincludecontentwithprefix/");
     }
 }

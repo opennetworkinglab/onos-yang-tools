@@ -15,14 +15,21 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.GROUPING_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.GROUPING;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.GROUPING_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -79,7 +86,8 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
  */
 public abstract class YangGrouping
         extends YangNode
-        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, YangTranslatorOperatorNode {
+        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
+        YangTranslatorOperatorNode {
 
     private static final long serialVersionUID = 806201607L;
 
@@ -117,14 +125,14 @@ public abstract class YangGrouping
      * Creates the grouping node.
      */
     public YangGrouping() {
-        super(YangNodeType.GROUPING_NODE, null);
+        super(GROUPING_NODE, null);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
         // Do nothing, to be handled during linking.
     }
@@ -135,13 +143,14 @@ public abstract class YangGrouping
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode node) {
         // Do nothing, to be handled during linking.
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        return YANG_NON_DATA_NODE;
     }
 
     /**
@@ -171,7 +180,7 @@ public abstract class YangGrouping
      */
     @Override
     public List<YangLeaf> getListOfLeaf() {
-        return listOfLeaf;
+        return unmodifiableList(listOfLeaf);
     }
 
     /**
@@ -191,7 +200,7 @@ public abstract class YangGrouping
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
     }
 
     /**
@@ -201,7 +210,7 @@ public abstract class YangGrouping
      */
     @Override
     public List<YangLeafList> getListOfLeafList() {
-        return listOfLeafList;
+        return unmodifiableList(listOfLeafList);
     }
 
     /**
@@ -221,7 +230,7 @@ public abstract class YangGrouping
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
     }
 
     /**
@@ -271,7 +280,7 @@ public abstract class YangGrouping
      */
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.GROUPING_DATA;
+        return GROUPING_DATA;
     }
 
     /**
@@ -318,22 +327,21 @@ public abstract class YangGrouping
     public void detectSelfCollision(String identifierName, YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as grouping \"" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    getErrorMsgCollision(COLLISION_DETECTION, getName(),
+                                         getLineNumber(), getCharPosition(),
+                                         GROUPING, getFileName()));
         }
     }
 
     @Override
     public void setLeafNameSpaceAndAddToParentSchemaMap() {
         // Add namespace for all leafs.
-        for (YangLeaf yangLeaf : getListOfLeaf()) {
+        for (YangLeaf yangLeaf : listOfLeaf) {
             yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
         // Add namespace for all leaf list.
-        for (YangLeafList yangLeafList : getListOfLeafList()) {
+        for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }

@@ -16,10 +16,10 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
 import java.io.File;
 import java.io.IOException;
-
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getConstructor;
@@ -40,7 +40,7 @@ public class TempJavaBeanFragmentFiles
     /**
      * Temporary file handle for constructor of class.
      */
-    private File constructorImplTempFileHandle;
+    private final File constructorImplTempFileHandle;
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -58,8 +58,7 @@ public class TempJavaBeanFragmentFiles
          * to strings when generation file type matches to impl class mask.
          */
         addGeneratedTempFile(CONSTRUCTOR_IMPL_MASK);
-
-        setConstructorImplTempFileHandle(getTemporaryFileHandle(CONSTRUCTOR_FILE_NAME));
+        constructorImplTempFileHandle = getTemporaryFileHandle(CONSTRUCTOR_FILE_NAME);
     }
 
     /**
@@ -72,44 +71,37 @@ public class TempJavaBeanFragmentFiles
     }
 
     /**
-     * Sets to constructor's temporary file handle.
-     *
-     * @param constructor file handle for to constructor
-     */
-    private void setConstructorImplTempFileHandle(File constructor) {
-        constructorImplTempFileHandle = constructor;
-    }
-
-    /**
      * Adds constructor for class.
      *
      * @param attr attribute info
      * @throws IOException when fails to append to temporary file
      */
-    private void addConstructor(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
+    private void addConstructor(JavaAttributeInfo attr)
             throws IOException {
-        appendToFile(getConstructorImplTempFileHandle(), getConstructor(attr,
-                getGeneratedJavaFiles(), pluginConfig));
+        appendToFile(constructorImplTempFileHandle,
+                     getConstructor(attr, getGeneratedJavaFiles()));
     }
 
     /**
      * Adds the new attribute info to the target generated temporary files.
      *
      * @param newAttrInfo the attribute info that needs to be added to temporary
-     * files
+     *                    files
      * @throws IOException IO operation fail
      */
     @Override
-    void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo newAttrInfo, YangPluginConfig pluginConfig)
+    void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo newAttrInfo,
+                                                 YangPluginConfig pluginConfig)
             throws IOException {
         super.addJavaSnippetInfoToApplicableTempFiles(newAttrInfo, pluginConfig);
-        addConstructor(newAttrInfo, pluginConfig);
+        addConstructor(newAttrInfo);
     }
 
     /**
      * Removes all temporary file handles.
      *
-     * @param isErrorOccurred flag to tell translator that error has occurred while code generation
+     * @param isErrorOccurred flag to tell translator that error has occurred
+     *                        while code generation
      * @throws IOException when failed to delete the temporary files
      */
     @Override
@@ -119,9 +111,7 @@ public class TempJavaBeanFragmentFiles
         /*
          * Close constructor temporary file handle and delete the file.
          */
-        closeFile(getConstructorImplTempFileHandle(), true);
-
+        closeFile(constructorImplTempFileHandle, true);
         super.freeTemporaryResources(isErrorOccurred);
     }
-
 }

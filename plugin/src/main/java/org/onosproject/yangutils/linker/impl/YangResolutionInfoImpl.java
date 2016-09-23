@@ -16,15 +16,10 @@
 
 package org.onosproject.yangutils.linker.impl;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-
 import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
 import org.onosproject.yangutils.datamodel.Resolvable;
 import org.onosproject.yangutils.datamodel.ResolvableType;
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
@@ -32,7 +27,6 @@ import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangBase;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
-import org.onosproject.yangutils.datamodel.YangEntityToResolveInfo;
 import org.onosproject.yangutils.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yangutils.datamodel.YangFeature;
 import org.onosproject.yangutils.datamodel.YangFeatureHolder;
@@ -47,31 +41,35 @@ import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangList;
-import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
-import org.onosproject.yangutils.datamodel.YangOutput;
-import org.onosproject.yangutils.datamodel.YangPathArgType;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
 import org.onosproject.yangutils.datamodel.YangRelativePath;
 import org.onosproject.yangutils.datamodel.YangResolutionInfo;
-import org.onosproject.yangutils.datamodel.YangRpc;
-import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangUses;
 import org.onosproject.yangutils.datamodel.YangXPathResolver;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
-import org.onosproject.yangutils.linker.YangLinkingPhase;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yangutils.datamodel.YangPathArgType.ABSOLUTE_PATH;
+import static org.onosproject.yangutils.datamodel.YangPathArgType.RELATIVE_PATH;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTER_FILE_LINKED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
@@ -79,24 +77,27 @@ import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.LINKED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNDEFINED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOLVED;
-import static org.onosproject.yangutils.linker.YangLinkingPhase.INTER_FILE;
-import static org.onosproject.yangutils.linker.YangLinkingPhase.INTRA_FILE;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATH_DATA;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.detectCollisionForAugmentedNode;
+import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getErrorInfoForLinker;
+import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getLeafRefErrorInfo;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getPathWithAugment;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getValidNodeIdentifier;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.skipInvalidDataNodes;
-import static org.onosproject.yangutils.utils.UtilConstants.BASE_LINKER_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.FEATURE_LINKER_ERROR;
-import static org.onosproject.yangutils.utils.UtilConstants.GROUPING_LINKER_ERROR;
+import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_FIND_ANNOTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_FIND_LEAD_INFO_HOLDER;
+import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_LINK;
 import static org.onosproject.yangutils.utils.UtilConstants.IDENTITYREF;
-import static org.onosproject.yangutils.utils.UtilConstants.IDENTITYREF_LINKER_ERROR;
-import static org.onosproject.yangutils.utils.UtilConstants.INPUT;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_ENTITY;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_LINKER_STATE;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_RESOLVED_ENTITY;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_TARGET;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_TREE;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF;
-import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF_LINKER_ERROR;
-import static org.onosproject.yangutils.utils.UtilConstants.OUTPUT;
+import static org.onosproject.yangutils.utils.UtilConstants.LINKER_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH_FOR_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.TYPEDEF_LINKER_ERROR;
+import static org.onosproject.yangutils.utils.UtilConstants.UNRESOLVABLE;
 
 /**
  * Represents implementation of resolution object which will be resolved by
@@ -118,7 +119,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * Current module/sub-module reference, will be used in inter-file/
      * inter-jar scenario to get the import/include list.
      */
-    private YangReferenceResolver curReferenceResolver;
+    private YangReferenceResolver curRefResolver;
 
     /**
      * Stack for type/uses is maintained for hierarchical references, this is
@@ -142,25 +143,26 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @param lineNumber         error line number
      * @param charPositionInLine error character position in line
      */
-    public YangResolutionInfoImpl(T dataNode, YangNode holderNode, int lineNumber, int charPositionInLine) {
-        setEntityToResolveInfo(new YangEntityToResolveInfoImpl<>());
-        getEntityToResolveInfo().setEntityToResolve(dataNode);
-        getEntityToResolveInfo().setHolderOfEntityToResolve(holderNode);
-        this.setLineNumber(lineNumber);
-        this.setCharPosition(charPositionInLine);
-        setPartialResolvedStack(new Stack<>());
+    public YangResolutionInfoImpl(T dataNode, YangNode holderNode, int lineNumber,
+                                  int charPositionInLine) {
+        entityToResolveInfo = new YangEntityToResolveInfoImpl<>();
+        entityToResolveInfo.setEntityToResolve(dataNode);
+        entityToResolveInfo.setHolderOfEntityToResolve(holderNode);
+        setLineNumber(lineNumber);
+        setCharPosition(charPositionInLine);
+        partialResolvedStack = new Stack<>();
     }
 
     @Override
     public void resolveLinkingForResolutionInfo(YangReferenceResolver dataModelRootNode)
             throws DataModelException {
 
-        setCurReferenceResolver(dataModelRootNode);
-        /*
+        curRefResolver = dataModelRootNode;
+    /*
          * Current node to resolve, it can be a YANG type, YANG uses or YANG if-feature or
          * YANG leafref or YANG base or YANG identityref.
          */
-        T entityToResolve = getEntityToResolveInfo().getEntityToResolve();
+        T entityToResolve = entityToResolveInfo.getEntityToResolve();
 
         // Check if linking is already done
         if (entityToResolve instanceof Resolvable) {
@@ -172,14 +174,11 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 return;
             }
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than " +
-                    "type/uses/if-feature/leafref/base/identityref");
+            throw new DataModelException(LINKER_ERROR);
         }
         // Push the initial entity to resolve in stack.
-        addInPartialResolvedStack(getEntityToResolveInfo());
-
+        addInPartialResolvedStack(entityToResolveInfo);
         linkAndResolvePartialResolvedStack();
-
         addDerivedRefTypeToRefTypeResolutionList();
     }
 
@@ -191,87 +190,63 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void linkAndResolvePartialResolvedStack()
             throws DataModelException {
 
-        while (getPartialResolvedStack().size() != 0) {
+        while (!partialResolvedStack.isEmpty()) {
             /*
              * Current node to resolve, it can be a YANG type or YANG uses or
              * YANG if-feature or YANG leafref or YANG base or YANG identityref.
              */
-            T entityToResolve = getCurrentEntityToResolveFromStack();
+            T entityToResolve = getCurEntityToResolveFromStack();
+            if (!(entityToResolve instanceof Resolvable)) {
+                throw new DataModelException(LINKER_ERROR);
+            }
             // Check if linking is already done
-            if (entityToResolve instanceof Resolvable) {
-
-                Resolvable resolvable = (Resolvable) entityToResolve;
-                switch (resolvable.getResolvableStatus()) {
-                    case RESOLVED: {
+            Resolvable resolvable = (Resolvable) entityToResolve;
+            switch (resolvable.getResolvableStatus()) {
+                case RESOLVED:
                         /*
                          * If the entity is already resolved in the stack, then pop
                          * it and continue with the remaining stack elements to
                          * resolve
                          */
-                        getPartialResolvedStack().pop();
-                        break;
-                    }
+                    partialResolvedStack.pop();
+                    break;
 
-                    case LINKED: {
+                case LINKED:
                         /*
                          * If the top of the stack is already linked then resolve
                          * the references and pop the entity and continue with
                          * remaining stack elements to resolve.
                          */
-                        resolveTopOfStack(INTRA_FILE);
-                        getPartialResolvedStack().pop();
-                        break;
-                    }
+                    resolveTopOfStack();
+                    partialResolvedStack.pop();
+                    break;
 
-                    case INTRA_FILE_RESOLVED: {
+                case INTRA_FILE_RESOLVED:
                         /*
                          * Pop the top of the stack.
                          */
-                        getPartialResolvedStack().pop();
-                        break;
+                    partialResolvedStack.pop();
+                    break;
+
+                case UNRESOLVED:
+                    linkTopOfStackReferenceUpdateStack();
+
+                    if (resolvable.getResolvableStatus() == UNRESOLVED) {
+                        // If current entity is still not resolved, then
+                        // linking/resolution has failed.
+                        DataModelException ex =
+                                new DataModelException
+                                        (getErrorInfoForLinker(resolvable));
+                        ex.setLine(getLineNumber());
+                        ex.setCharPosition(getCharPosition());
+                        throw ex;
                     }
+                    break;
 
-                    case UNRESOLVED: {
-                        linkTopOfStackReferenceUpdateStack();
-
-                        if (resolvable.getResolvableStatus() == UNRESOLVED) {
-                            // If current entity is still not resolved, then
-                            // linking/resolution has failed.
-                            String errorInfo;
-                            if (resolvable instanceof YangType) {
-                                errorInfo = TYPEDEF_LINKER_ERROR;
-                            } else if (resolvable instanceof YangUses) {
-                                errorInfo = GROUPING_LINKER_ERROR;
-                            } else if (resolvable instanceof YangIfFeature) {
-                                errorInfo = FEATURE_LINKER_ERROR;
-                            } else if (resolvable instanceof YangBase) {
-                                errorInfo = BASE_LINKER_ERROR;
-                            } else if (resolvable instanceof YangIdentityRef) {
-                                errorInfo = IDENTITYREF_LINKER_ERROR;
-                            } else {
-                                errorInfo = LEAFREF_LINKER_ERROR;
-                            }
-                            DataModelException dataModelException =
-                                    new DataModelException(errorInfo);
-                            dataModelException.setLine(getLineNumber());
-                            dataModelException.setCharPosition(getCharPosition());
-                            throw dataModelException;
-                        }
-                        break;
-                    }
-                    default: {
-                        throw new DataModelException("Data Model Exception: Unsupported, linker state");
-                    }
-
-                }
-
-            } else {
-                throw new DataModelException(
-                        "Data Model Exception: Entity to resolved is other than type/uses/if-feature" +
-                                "/leafref/base/identityref");
+                default:
+                    throw new DataModelException(INVALID_LINKER_STATE);
             }
         }
-
     }
 
     /**
@@ -281,39 +256,30 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void addDerivedRefTypeToRefTypeResolutionList()
             throws DataModelException {
 
-        YangNode potentialAncestorWithReferredNode = getEntityToResolveInfo().getHolderOfEntityToResolve();
+        YangNode refNode = entityToResolveInfo.getHolderOfEntityToResolve();
+        YangType yangType = getValidateResolvableType();
 
-        // If holder is typedef return.
-        if (potentialAncestorWithReferredNode instanceof YangTypeDef) {
+        if (yangType == null) {
             return;
         }
 
-        // If entity is not type return.
-        if (!(getEntityToResolveInfo().getEntityToResolve() instanceof YangType)) {
-            return;
-        }
+        YangDerivedInfo derivedInfo = (YangDerivedInfo) yangType
+                .getDataTypeExtendedInfo();
 
-        YangType yangType = (YangType) getEntityToResolveInfo().getEntityToResolve();
-
-        // If type is not resolved return.
-        if (yangType.getResolvableStatus() != RESOLVED) {
-            return;
-        }
-
-        YangDerivedInfo derivedInfo = (YangDerivedInfo) yangType.getDataTypeExtendedInfo();
-
+        YangDataTypes dataType = derivedInfo.getEffectiveBuiltInType();
         // If the derived types referred type is not leafref/identityref return
-        if ((derivedInfo.getEffectiveBuiltInType() != YangDataTypes.LEAFREF) &&
-                (derivedInfo.getEffectiveBuiltInType() != YangDataTypes.IDENTITYREF)) {
+        if (dataType != YangDataTypes.LEAFREF &&
+                dataType != YangDataTypes.IDENTITYREF) {
             return;
         }
 
-        T extendedInfo = (T) derivedInfo.getReferredTypeDef().getTypeDefBaseType().getDataTypeExtendedInfo();
+        T extendedInfo = (T) derivedInfo.getReferredTypeDef()
+                .getTypeDefBaseType().getDataTypeExtendedInfo();
 
         while (extendedInfo instanceof YangDerivedInfo) {
             YangDerivedInfo derivedInfoFromTypedef = (YangDerivedInfo) extendedInfo;
-            extendedInfo = (T) derivedInfoFromTypedef.getReferredTypeDef().getTypeDefBaseType()
-                    .getDataTypeExtendedInfo();
+            extendedInfo = (T) derivedInfoFromTypedef.getReferredTypeDef()
+                    .getTypeDefBaseType().getDataTypeExtendedInfo();
         }
 
         /*
@@ -322,61 +288,76 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * create a leafref/identityref resolution info using the current resolution info and
          * add to leafref/identityref resolution list.
          */
-        if (derivedInfo.getEffectiveBuiltInType() == YangDataTypes.LEAFREF) {
+        if (dataType == YangDataTypes.LEAFREF) {
             YangLeafRef leafRefInTypeDef = (YangLeafRef) extendedInfo;
-            yangType.resetYangType();
-
-            yangType.setResolvableStatus(RESOLVED);
-            yangType.setDataType(YangDataTypes.LEAFREF);
-            yangType.setDataTypeName(LEAFREF);
-            yangType.setDataTypeExtendedInfo(leafRefInTypeDef);
-            leafRefInTypeDef.setResolvableStatus(UNRESOLVED);
-            leafRefInTypeDef.setParentNodeOfLeafref(potentialAncestorWithReferredNode);
-
-            // Add resolution information to the list.
-            YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<>(leafRefInTypeDef,
-                    potentialAncestorWithReferredNode,
-                    getLineNumber(), getCharPosition());
-            getCurReferenceResolver().addToResolutionList(resolutionInfoImpl,
-                    ResolvableType.YANG_LEAFREF);
-            getCurReferenceResolver().resolveSelfFileLinking(ResolvableType.YANG_LEAFREF);
-
-        } else if (derivedInfo.getEffectiveBuiltInType() == YangDataTypes.IDENTITYREF) {
-
-            YangIdentityRef identityRefInTypeDef = (YangIdentityRef) extendedInfo;
-            yangType.resetYangType();
-
-            yangType.setResolvableStatus(RESOLVED);
-            yangType.setDataType(YangDataTypes.IDENTITYREF);
-            yangType.setDataTypeName(IDENTITYREF);
-            yangType.setDataTypeExtendedInfo(identityRefInTypeDef);
-            identityRefInTypeDef.setResolvableStatus(UNRESOLVED);
-
-            // Add resolution information to the list.
-            YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<>(identityRefInTypeDef,
-                    potentialAncestorWithReferredNode, getLineNumber(), getCharPosition());
-            getCurReferenceResolver().addToResolutionList(resolutionInfoImpl,
-                    ResolvableType.YANG_IDENTITYREF);
-            getCurReferenceResolver().resolveSelfFileLinking(ResolvableType.YANG_IDENTITYREF);
+            addRefTypeInfo(YangDataTypes.LEAFREF, LEAFREF, extendedInfo,
+                           yangType, refNode, YANG_LEAFREF);
+            leafRefInTypeDef.setParentNodeOfLeafref(refNode);
+        } else {
+            addRefTypeInfo(YangDataTypes.IDENTITYREF, IDENTITYREF, extendedInfo,
+                           yangType, refNode, YANG_IDENTITYREF);
         }
+    }
+
+    //Validates entity to resolve for YANG type and returns type
+    private YangType getValidateResolvableType() {
+        YangNode refNode = entityToResolveInfo.getHolderOfEntityToResolve();
+        T entity = entityToResolveInfo.getEntityToResolve();
+        // If holder is typedef return.
+        if (!(refNode instanceof YangTypeDef) && entity instanceof YangType) {
+            YangType yangType = (YangType) entity;
+
+            // If type is not resolved return.
+            if (yangType.getResolvableStatus() == RESOLVED) {
+                return (YangType) entity;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Adds referred type(leafref/identityref) info to resolution list.
+     *
+     * @param type     data type
+     * @param typeName type name
+     * @param info     extended info
+     * @param yangType YANG type
+     * @param refNode  referred node
+     * @param resType  resolution type
+     * @throws DataModelException when fails to do data model operations
+     */
+    private void addRefTypeInfo(YangDataTypes type, String typeName, T info,
+                                YangType yangType, YangNode refNode,
+                                ResolvableType resType) throws DataModelException {
+        yangType.resetYangType();
+        yangType.setResolvableStatus(RESOLVED);
+        yangType.setDataType(type);
+        yangType.setDataTypeName(typeName);
+        yangType.setDataTypeExtendedInfo(info);
+        ((Resolvable) info).setResolvableStatus(UNRESOLVED);
+        YangResolutionInfoImpl resolutionInfoImpl
+                = new YangResolutionInfoImpl<>(info, refNode,
+                                               getLineNumber(), getCharPosition());
+        curRefResolver.addToResolutionList(resolutionInfoImpl, resType);
+        curRefResolver.resolveSelfFileLinking(resType);
     }
 
     /**
      * Resolves the current entity in the stack.
      */
-    private void resolveTopOfStack(YangLinkingPhase linkingPhase)
+    private void resolveTopOfStack()
             throws DataModelException {
-        List<T> entityToResolve = (List<T>) ((Resolvable) getCurrentEntityToResolveFromStack()).resolve();
+        T entity = getCurEntityToResolveFromStack();
+        List<T> entityToResolve = (List<T>) ((Resolvable) entity).resolve();
         if (entityToResolve != null && !entityToResolve.isEmpty()) {
-            Iterator<T> entityToResolveIterator = entityToResolve.listIterator();
-            while (entityToResolveIterator.hasNext()) {
-                addUnresolvedEntitiesToResolutionList(entityToResolveIterator.next());
+            for (T anEntityToResolve : entityToResolve) {
+                addUnresolvedEntitiesToResolutionList(anEntityToResolve);
             }
         }
-        if (((Resolvable) getCurrentEntityToResolveFromStack()).getResolvableStatus() != INTRA_FILE_RESOLVED
-                && ((Resolvable) getCurrentEntityToResolveFromStack()).getResolvableStatus() != UNDEFINED) {
+        if (((Resolvable) entity).getResolvableStatus() != INTRA_FILE_RESOLVED &&
+                ((Resolvable) entity).getResolvableStatus() != UNDEFINED) {
             // Sets the resolution status in inside the type/uses/if-feature/leafref.
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(RESOLVED);
+            ((Resolvable) entity).setResolvableStatus(RESOLVED);
         }
     }
 
@@ -389,10 +370,13 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void addUnresolvedEntitiesToResolutionList(T entityToResolve)
             throws DataModelException {
         if (entityToResolve instanceof YangEntityToResolveInfoImpl) {
-            YangEntityToResolveInfoImpl entityToResolveInfo = (YangEntityToResolveInfoImpl) entityToResolve;
+            YangEntityToResolveInfoImpl entityToResolveInfo
+                    = (YangEntityToResolveInfoImpl) entityToResolve;
             if (entityToResolveInfo.getEntityToResolve() instanceof YangLeafRef) {
-                YangLeafRef leafref = (YangLeafRef) entityToResolveInfo.getEntityToResolve();
-                YangNode parentNodeOfLeafref = entityToResolveInfo.getHolderOfEntityToResolve();
+                YangLeafRef leafref = (YangLeafRef) entityToResolveInfo
+                        .getEntityToResolve();
+                YangNode parentNodeOfLeafref = entityToResolveInfo
+                        .getHolderOfEntityToResolve();
                 leafref.setParentNodeOfLeafref(parentNodeOfLeafref);
                 if (leafref.getResolvableStatus() == UNRESOLVED) {
                     leafref.setResolvableStatus(INTRA_FILE_RESOLVED);
@@ -401,8 +385,10 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
 
             // Add resolution information to the list.
             YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<>(
-                    entityToResolveInfo.getEntityToResolve(), entityToResolveInfo.getHolderOfEntityToResolve(),
-                    entityToResolveInfo.getLineNumber(), entityToResolveInfo.getCharPosition());
+                    entityToResolveInfo.getEntityToResolve(),
+                    entityToResolveInfo.getHolderOfEntityToResolve(),
+                    entityToResolveInfo.getLineNumber(),
+                    entityToResolveInfo.getCharPosition());
             addResolutionInfo(resolutionInfoImpl);
         }
     }
@@ -414,9 +400,9 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      */
     private void linkTopOfStackReferenceUpdateStack()
             throws DataModelException {
-
-        if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangLeafRef) {
+            ((Resolvable) entity).setResolvableStatus(INTRA_FILE_RESOLVED);
             return;
         }
         /*
@@ -425,51 +411,45 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * sub-module from include list.
          */
         if (!isCandidateForSelfFileReference()) {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
+            ((Resolvable) entity).setResolvableStatus(INTRA_FILE_RESOLVED);
             return;
         }
 
-        /**
+        /*
          * Try to resolve the top of the stack and update partial resolved stack
          * if there is recursive references
          */
-        YangNode potentialAncestorWithReferredNode = getPartialResolvedStack().peek()
+        YangNode ancestorRefNode = partialResolvedStack.peek()
                 .getHolderOfEntityToResolve();
 
-        if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            resolveSelfFileLinkingForIfFeature(potentialAncestorWithReferredNode);
+        if (entity instanceof YangIfFeature) {
+            resolveSelfFileLinkingForIfFeature(ancestorRefNode);
             return;
-        } else if ((getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) ||
-                (getCurrentEntityToResolveFromStack() instanceof YangBase)) {
+        }
+        if (entity instanceof YangIdentityRef || entity instanceof YangBase) {
             resolveSelfFileLinkingForBaseAndIdentityref();
             return;
-        } else {
-
-            YangType type = null;
-            if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-                type = (YangType) getCurrentEntityToResolveFromStack();
-            }
-
-            /**
+        }
+        YangType type = null;
+        if (entity instanceof YangType) {
+            type = (YangType) entity;
+        }
+            /*
              * Traverse up in the ancestor tree to check if the referred node is
              * defined
              */
-            while (potentialAncestorWithReferredNode != null) {
-
-                /**
+        while (ancestorRefNode != null) {
+                /*
                  * Check for the referred node defined in a ancestor scope
                  */
-                YangNode potentialReferredNode = potentialAncestorWithReferredNode.getChild();
-                if (isReferredNodeInSiblingListProcessed(potentialReferredNode)) {
-                    return;
-                }
-
-                potentialAncestorWithReferredNode = potentialAncestorWithReferredNode.getParent();
-
-                if (type != null && potentialAncestorWithReferredNode != null) {
-                    if (potentialAncestorWithReferredNode.getParent() == null) {
-                        type.setTypeNotResolvedTillRootNode(true);
-                    }
+            YangNode curRefNode = ancestorRefNode.getChild();
+            if (isReferredNodeInSiblingListProcessed(curRefNode)) {
+                return;
+            }
+            ancestorRefNode = ancestorRefNode.getParent();
+            if (type != null && ancestorRefNode != null) {
+                if (ancestorRefNode.getParent() == null) {
+                    type.setTypeNotResolvedTillRootNode(true);
                 }
             }
         }
@@ -478,8 +458,9 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * In case prefix is not present or it's self prefix it's a candidate for inter-file
          * resolution via include list.
          */
-        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
+        if (getRefPrefix() == null ||
+                getRefPrefix().contentEquals(curRefResolver.getPrefix())) {
+            ((Resolvable) entity).setResolvableStatus(INTRA_FILE_RESOLVED);
         }
     }
 
@@ -491,28 +472,19 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void resolveSelfFileLinkingForBaseAndIdentityref()
             throws DataModelException {
 
-        boolean referredIdentityFound = false;
+        boolean refIdentity = false;
         String nodeName = null;
-
-        if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-            nodeName = ((YangIdentityRef) getCurrentEntityToResolveFromStack()).getName();
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangIdentityRef) {
+            nodeName = ((YangIdentityRef) entity).getName();
+        } else if (entity instanceof YangBase) {
+            nodeName = ((YangBase) entity).getBaseIdentifier().getName();
         }
-
-        if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-            nodeName = ((YangBase) getCurrentEntityToResolveFromStack()).getBaseIdentifier().getName();
-        }
-
-        if (getCurReferenceResolver() instanceof YangModule) {
-            YangModule rootNode = (YangModule) getCurReferenceResolver();
+        if (curRefResolver instanceof RpcNotificationContainer) {
             // Sends list of nodes for finding the target identity.
-            referredIdentityFound = isIdentityReferenceFound(nodeName, rootNode);
-        } else if (getCurReferenceResolver() instanceof YangSubModule) {
-            YangSubModule rootNode = (YangSubModule) getCurReferenceResolver();
-            // Sends list of nodes for finding the target identity.
-            referredIdentityFound = isIdentityReferenceFound(nodeName, rootNode);
+            refIdentity = isIdentityReferenceFound(nodeName, (YangNode) curRefResolver);
         }
-
-        if (referredIdentityFound) {
+        if (refIdentity) {
             return;
         }
 
@@ -520,59 +492,34 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * In case prefix is not present or it's self prefix it's a candidate for inter-file
          * resolution via include list.
          */
-        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
+        if (getRefPrefix() == null || getRefPrefix()
+                .contentEquals(curRefResolver.getPrefix())) {
+            ((Resolvable) entity).setResolvableStatus(INTRA_FILE_RESOLVED);
         }
-    }
-
-    /**
-     * Returns the root parent with respect to the ancestor count from leafref.
-     *
-     * @param ancestorCount count of node where parent node can be reached
-     * @param currentParent current parent node
-     * @return root node
-     * @throws DataModelException a violation of data model rules
-     */
-    private YangNode getRootNodeWithAncestorCount(int ancestorCount, YangNode currentParent)
-            throws DataModelException {
-
-        int currentParentCount = 1;
-        while (currentParentCount < ancestorCount) {
-            if (currentParent.getParent() == null) {
-                throw new DataModelException("YANG file error: The target node of leafref is invalid."
-                        + currentParent.getName() + " in " +
-                        currentParent.getLineNumber() + " at " +
-                        currentParent.getCharPosition()
-                        + " in " + currentParent.getFileName() + "\"");
-            }
-            currentParent = currentParent.getParent();
-            currentParentCount = currentParentCount + 1;
-        }
-        return currentParent;
     }
 
     /**
      * Resolves self file linking for if-feature.
      *
-     * @param potentialAncestorWithReferredNode if-feature holder node
+     * @param ancestorRefNode if-feature holder node
      * @throws DataModelException DataModelException a violation of data model
      *                            rules
      */
-    private void resolveSelfFileLinkingForIfFeature(YangNode potentialAncestorWithReferredNode)
+    private void resolveSelfFileLinkingForIfFeature(YangNode ancestorRefNode)
             throws DataModelException {
 
-        YangFeatureHolder featureHolder = getFeatureHolder(potentialAncestorWithReferredNode);
-        YangNode potentialReferredNode = (YangNode) featureHolder;
-        if (isReferredNode(potentialReferredNode)) {
+        YangFeatureHolder featureHolder = getFeatureHolder(ancestorRefNode);
+        YangNode curRefNode = (YangNode) featureHolder;
+        if (isReferredNode(curRefNode)) {
 
             // Adds reference link of entity to the node under resolution.
-            addReferredEntityLink(potentialReferredNode, LINKED);
+            addReferredEntityLink(curRefNode, LINKED);
 
-            /**
+            /*
              * resolve the reference and update the partial resolution stack
              * with any further recursive references
              */
-            addUnresolvedRecursiveReferenceToStack(potentialReferredNode);
+            addUnresolvedRecursiveReferenceToStack(curRefNode);
             return;
         }
 
@@ -580,37 +527,41 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * In case prefix is not present or it's self prefix it's a candidate for inter-file
          * resolution via include list.
          */
-        if (getRefPrefix() == null || getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTRA_FILE_RESOLVED);
+        if (getRefPrefix() == null || getRefPrefix()
+                .contentEquals(curRefResolver.getPrefix())) {
+            ((Resolvable) getCurEntityToResolveFromStack())
+                    .setResolvableStatus(INTRA_FILE_RESOLVED);
         }
     }
 
     /**
      * Returns the status of the referred identity found for base/identityref.
      *
-     * @param nodeName                    the name of the base nodeidentifier/identityref nodeidentifier
-     * @param ancestorWithTheReferredNode the parent node of base/identityref
+     * @param nodeName        the name of the base node
+     *                        identifier/identityref node identifier
+     * @param ancestorRefNode the parent node of base/identityref
      * @return status of referred base/identityref
      * @throws DataModelException a violation of data model rules
      */
-    private boolean isIdentityReferenceFound(String nodeName, YangNode ancestorWithTheReferredNode)
+    private boolean isIdentityReferenceFound(String nodeName, YangNode ancestorRefNode)
             throws DataModelException {
 
         // When child is not present return.
-        if (ancestorWithTheReferredNode.getChild() == null) {
+        if (ancestorRefNode.getChild() == null) {
             return false;
         }
 
-        ancestorWithTheReferredNode = ancestorWithTheReferredNode.getChild();
+        ancestorRefNode = ancestorRefNode.getChild();
 
         // Checks all the siblings under the node and returns the matched node.
-        YangNode nodeFound = isReferredNodeInSiblingProcessedForIdentity(ancestorWithTheReferredNode, nodeName);
+        YangNode nodeFound = isReferredNodeInSiblingProcessedForIdentity(ancestorRefNode,
+                                                                         nodeName);
 
         if (nodeFound != null) {
             // Adds reference link of entity to the node under resolution.
             addReferredEntityLink(nodeFound, LINKED);
 
-            /**
+            /*
              * resolve the reference and update the partial resolution stack with any further recursive references
              */
             addUnresolvedRecursiveReferenceToStack(nodeFound);
@@ -623,55 +574,53 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     /**
      * Adds the unresolved constructs to stack which has to be resolved for leafref.
      *
-     * @param yangleafOrLeafList          YANG leaf or leaf list which holds the type
-     * @param ancestorWithTheReferredNode holder of the YANG leaf or leaf list
+     * @param leavesInfo      YANG leaf or leaf list which holds the type
+     * @param ancestorRefNode holder of the YANG leaf or leaf list
      */
-    private void addUnResolvedLeafRefTypeToStack(T yangleafOrLeafList, YangNode ancestorWithTheReferredNode) {
+    private void addUnResolvedLeafRefTypeToStack(T leavesInfo, YangNode ancestorRefNode) {
 
-        YangType referredTypeInLeafOrLeafList;
-        if (yangleafOrLeafList instanceof YangLeaf) {
-            YangLeaf leaf = (YangLeaf) yangleafOrLeafList;
-            referredTypeInLeafOrLeafList = leaf.getDataType();
-            if (referredTypeInLeafOrLeafList.getDataType() == YangDataTypes.LEAFREF) {
-                YangEntityToResolveInfoImpl<YangLeafRef<?>> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve((YangLeafRef<?>) leaf.getDataType().getDataTypeExtendedInfo());
-                unResolvedEntityInfo.setHolderOfEntityToResolve(ancestorWithTheReferredNode);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
-            } else if (referredTypeInLeafOrLeafList.getDataType() == YangDataTypes.DERIVED) {
-                YangEntityToResolveInfoImpl<YangType<?>> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve(referredTypeInLeafOrLeafList);
-                unResolvedEntityInfo.setHolderOfEntityToResolve(ancestorWithTheReferredNode);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
-            }
+        YangType refType;
+        T extendedInfo;
+        if (leavesInfo instanceof YangLeaf) {
+            YangLeaf leaf = (YangLeaf) leavesInfo;
+            refType = leaf.getDataType();
         } else {
-            YangLeafList leafList = (YangLeafList) yangleafOrLeafList;
-            referredTypeInLeafOrLeafList = leafList.getDataType();
-            if (referredTypeInLeafOrLeafList.getDataType() == YangDataTypes.LEAFREF) {
-                YangEntityToResolveInfoImpl<YangLeafRef<?>> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo
-                        .setEntityToResolve((YangLeafRef<?>) leafList.getDataType().getDataTypeExtendedInfo());
-                unResolvedEntityInfo.setHolderOfEntityToResolve(ancestorWithTheReferredNode);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
-            } else if (referredTypeInLeafOrLeafList.getDataType() == YangDataTypes.DERIVED) {
-                YangEntityToResolveInfoImpl<YangType<?>> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve(referredTypeInLeafOrLeafList);
-                unResolvedEntityInfo.setHolderOfEntityToResolve(ancestorWithTheReferredNode);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
-            }
+            YangLeafList leafList = (YangLeafList) leavesInfo;
+            refType = leafList.getDataType();
+        }
+        extendedInfo = (T) refType.getDataTypeExtendedInfo();
+        addUnResolvedTypeDataToStack(refType, ancestorRefNode, extendedInfo);
+    }
+
+    //Adds unresolved type info to stack.
+    private void addUnResolvedTypeDataToStack(YangType refType, YangNode
+            ancestorRefNode, T extendedInfo) {
+        YangEntityToResolveInfoImpl<YangLeafRef<?>> unResolvedLeafRef =
+                new YangEntityToResolveInfoImpl<>();
+        YangEntityToResolveInfoImpl<YangType<?>> unResolvedTypeDef =
+                new YangEntityToResolveInfoImpl<>();
+        if (refType.getDataType() == YangDataTypes.LEAFREF) {
+            unResolvedLeafRef.setEntityToResolve((YangLeafRef<?>) extendedInfo);
+            unResolvedLeafRef.setHolderOfEntityToResolve(ancestorRefNode);
+            addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedLeafRef);
+        } else if (refType.getDataType() == YangDataTypes.DERIVED) {
+            unResolvedTypeDef.setEntityToResolve(refType);
+            unResolvedTypeDef.setHolderOfEntityToResolve(ancestorRefNode);
+            addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedTypeDef);
         }
     }
 
     /**
      * Returns feature holder(module/sub-module node) .
      *
-     * @param potentialAncestorWithReferredNode if-feature holder node
+     * @param ancestorRefNode if-feature holder node
      */
-    private YangFeatureHolder getFeatureHolder(YangNode potentialAncestorWithReferredNode) {
-        while (potentialAncestorWithReferredNode != null) {
-            if (potentialAncestorWithReferredNode instanceof YangFeatureHolder) {
-                return (YangFeatureHolder) potentialAncestorWithReferredNode;
+    private YangFeatureHolder getFeatureHolder(YangNode ancestorRefNode) {
+        while (ancestorRefNode != null) {
+            if (ancestorRefNode instanceof YangFeatureHolder) {
+                return (YangFeatureHolder) ancestorRefNode;
             }
-            potentialAncestorWithReferredNode = potentialAncestorWithReferredNode.getParent();
+            ancestorRefNode = ancestorRefNode.getParent();
         }
         return null;
     }
@@ -685,146 +634,77 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private boolean isCandidateForSelfFileReference()
             throws DataModelException {
         String prefix = getRefPrefix();
-        return prefix == null || prefix.contentEquals(getCurReferenceResolver().getPrefix());
-    }
-
-    /**
-     * Checks for the referred parent node for the leafref path.
-     *
-     * @param potentialReferredNode potential referred node
-     * @return the reffered parent node of leaf/leaf-list
-     * @throws DataModelException data model errors
-     */
-    private YangNode isReferredNodeInSiblingProcessedForLeafref(YangNode potentialReferredNode, String referredNodeName)
-            throws DataModelException {
-
-        while (potentialReferredNode != null) {
-            if (potentialReferredNode instanceof YangInput) {
-                if (referredNodeName.equalsIgnoreCase(INPUT)) {
-                    return potentialReferredNode;
-                }
-            } else if (potentialReferredNode instanceof YangOutput) {
-                if (referredNodeName.equalsIgnoreCase(OUTPUT)) {
-                    return potentialReferredNode;
-                }
-            }
-            // Check if the potential referred node is the actual referred node
-            if (isReferredNodeForLeafref(potentialReferredNode, referredNodeName)) {
-                if (potentialReferredNode instanceof YangGrouping || potentialReferredNode instanceof YangTypeDef) {
-                    if (potentialReferredNode.getParent() instanceof YangRpc) {
-                        potentialReferredNode = potentialReferredNode.getNextSibling();
-                    } else {
-                        throw new DataModelException("YANG file error: The target node of leafref is invalid. "
-                                + potentialReferredNode.getName() + " in " +
-                                potentialReferredNode.getLineNumber() + " at " +
-                                potentialReferredNode.getCharPosition()
-                                + " in " + potentialReferredNode.getFileName() + "\"");
-                    }
-                }
-                return potentialReferredNode;
-            }
-            potentialReferredNode = potentialReferredNode.getNextSibling();
-        }
-        return null;
+        return prefix == null || prefix.contentEquals(curRefResolver.getPrefix());
     }
 
     /**
      * Checks for the referred parent node for the base/identity.
      *
-     * @param potentialReferredNode potential referred node
-     * @return the reffered parent node of base/identity.
+     * @param refNode potential referred node
+     * @return the referred parent node of base/identity.
      * @throws DataModelException data model errors
      */
-    private YangNode isReferredNodeInSiblingProcessedForIdentity(YangNode potentialReferredNode,
-                                                                 String referredNodeName)
+    private YangNode isReferredNodeInSiblingProcessedForIdentity(YangNode refNode,
+                                                                 String refName)
             throws DataModelException {
 
-        while (potentialReferredNode != null) {
-            if (potentialReferredNode instanceof YangIdentity) {
+        while (refNode != null) {
+            if (refNode instanceof YangIdentity) {
                 // Check if the potential referred node is the actual referred node
-                if (isReferredNodeForIdentity(potentialReferredNode, referredNodeName)) {
-                    return potentialReferredNode;
+                if (isReferredNodeForIdentity(refNode, refName)) {
+                    return refNode;
                 }
             }
-            potentialReferredNode = potentialReferredNode.getNextSibling();
+            refNode = refNode.getNextSibling();
         }
         return null;
     }
 
     /**
-     * Checks if the current reference node name and the name in the path are equal.
-     *
-     * @param currentReferredNode the node where the reference is pointed
-     * @param nameOfNodeinPath    name of the node in the path
-     * @return status of the match between the name
-     * @throws DataModelException a violation of data model rules
-     */
-    private boolean isReferredNodeForLeafref(YangNode currentReferredNode, String nameOfNodeinPath)
-            throws DataModelException {
-
-        if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
-            /*
-             * Check if name of node name matches with the current reference
-             * node.
-             */
-            return currentReferredNode.getName().contentEquals(nameOfNodeinPath);
-        } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than leafref "
-                    + currentReferredNode.getName() + " in " +
-                    currentReferredNode.getLineNumber() + " at " +
-                    currentReferredNode.getCharPosition()
-                    + " in " + currentReferredNode.getFileName() + "\"");
-        }
-    }
-
-    /**
      * Checks if the current reference node name and the name in the base/identityref base are equal.
      *
-     * @param currentReferredNode   the node where the reference is pointed
-     * @param nameOfIdentityRefBase name of the base in the base/identityref base
+     * @param curRefNode the node where the reference is pointed
+     * @param name       name of the base in the base/identityref base
      * @return status of the match between the name
      * @throws DataModelException a violation of data model rules
      */
-    private boolean isReferredNodeForIdentity(YangNode currentReferredNode, String nameOfIdentityRefBase)
+    private boolean isReferredNodeForIdentity(YangNode curRefNode, String name)
             throws DataModelException {
-
-        if ((getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) ||
-                (getCurrentEntityToResolveFromStack() instanceof YangBase)) {
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangIdentityRef || entity instanceof YangBase) {
 
             //Check if name of node name matches with the current reference node.
-            return currentReferredNode.getName().contentEquals(nameOfIdentityRefBase);
+            return curRefNode.getName().contentEquals(name);
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than identityref"
-                    + currentReferredNode.getName() + " in " +
-                    currentReferredNode.getLineNumber() + " at " +
-                    currentReferredNode.getCharPosition()
-                    + " in " + currentReferredNode.getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    INVALID_ENTITY, curRefNode.getName(), curRefNode.getLineNumber(),
+                    curRefNode.getCharPosition(), curRefNode.getFileName()));
         }
     }
 
     /**
      * Checks for the referred node defined in a ancestor scope.
      *
-     * @param potentialReferredNode potential referred node
+     * @param refNode potential referred node
      * @return status of resolution and updating the partial resolved stack with
      * the any recursive references
      * @throws DataModelException a violation of data model rules
      */
-    private boolean isReferredNodeInSiblingListProcessed(YangNode potentialReferredNode)
+    private boolean isReferredNodeInSiblingListProcessed(YangNode refNode)
             throws DataModelException {
-        while (potentialReferredNode != null) {
+        while (refNode != null) {
 
             // Check if the potential referred node is the actual referred node
-            if (isReferredNode(potentialReferredNode)) {
+            if (isReferredNode(refNode)) {
 
                 // Adds reference link of entity to the node under resolution.
-                addReferredEntityLink(potentialReferredNode, LINKED);
+                addReferredEntityLink(refNode, LINKED);
 
-                /**
+                /*
                  * resolve the reference and update the partial resolution stack
                  * with any further recursive references
                  */
-                addUnresolvedRecursiveReferenceToStack(potentialReferredNode);
+                addUnresolvedRecursiveReferenceToStack(refNode);
 
                 /*
                  * return true, since the reference is linked and any recursive
@@ -833,7 +713,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 return true;
             }
 
-            potentialReferredNode = potentialReferredNode.getNextSibling();
+            refNode = refNode.getNextSibling();
         }
         return false;
     }
@@ -841,52 +721,33 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     /**
      * Checks if the potential referred node is the actual referred node.
      *
-     * @param potentialReferredNode typedef/grouping node
+     * @param refNode typedef/grouping node
      * @return true if node is of resolve type otherwise false
      * @throws DataModelException a violation of data model rules
      */
-    private boolean isReferredNode(YangNode potentialReferredNode)
+    private boolean isReferredNode(YangNode refNode)
             throws DataModelException {
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-            if (potentialReferredNode instanceof YangTypeDef) {
-                /*
-                 * Check if name of node name matches with the entity being
-                 * resolved
-                 */
-                return isNodeNameSameAsResolutionInfoName(potentialReferredNode);
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            if (refNode instanceof YangTypeDef) {
+                return isNodeNameSameAsResolutionInfoName(refNode);
             }
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-            if (potentialReferredNode instanceof YangGrouping) {
-                /*
-                 * Check if name of node name matches with the entity being
-                 * resolved
-                 */
-                return isNodeNameSameAsResolutionInfoName(potentialReferredNode);
+        } else if (entity instanceof YangUses) {
+            if (refNode instanceof YangGrouping) {
+                return isNodeNameSameAsResolutionInfoName(refNode);
             }
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            if (potentialReferredNode instanceof YangFeatureHolder) {
-                /*
-                 * Check if name of node name matches with the entity being
-                 * resolved
-                 */
-                return isNodeNameSameAsResolutionInfoName(potentialReferredNode);
+        } else if (entity instanceof YangIfFeature) {
+            if (refNode instanceof YangFeatureHolder) {
+                return isNodeNameSameAsResolutionInfoName(refNode);
             }
-        } else if ((getCurrentEntityToResolveFromStack() instanceof YangBase) ||
-                (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef)) {
-            if (potentialReferredNode instanceof YangIdentity) {
-                /*
-                 * Check if name of node name matches with the entity being
-                 * resolved
-                 */
-                return isNodeNameSameAsResolutionInfoName(potentialReferredNode);
+        } else if (entity instanceof YangBase || entity instanceof YangIdentityRef) {
+            if (refNode instanceof YangIdentity) {
+                return isNodeNameSameAsResolutionInfoName(refNode);
             }
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/" +
-                    "uses/base/identityref"
-                    + potentialReferredNode.getName() + " in " +
-                    potentialReferredNode.getLineNumber() + " at " +
-                    potentialReferredNode.getCharPosition()
-                    + " in " + potentialReferredNode.getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    LINKER_ERROR, refNode.getName(), refNode.getLineNumber(),
+                    refNode.getCharPosition(), refNode.getFileName()));
         }
         return false;
     }
@@ -903,50 +764,40 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
 
     private boolean isNodeNameSameAsResolutionInfoName(YangNode node)
             throws DataModelException {
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-            if (node.getName().contentEquals(
-                    ((YangType<?>) getCurrentEntityToResolveFromStack())
-                            .getDataTypeName())) {
-                return true;
-            }
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-            if (node.getName().contentEquals(
-                    ((YangUses) getCurrentEntityToResolveFromStack()).getName())) {
-                return true;
-            }
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            return isFeatureDefinedInNode(node);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-            if (node.getName().contentEquals(
-                    ((YangBase) getCurrentEntityToResolveFromStack()).getBaseIdentifier().getName())) {
-                return true;
-            }
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-            if (node.getName().contentEquals(
-                    ((YangIdentityRef) getCurrentEntityToResolveFromStack()).getName())) {
-                return true;
-            }
-        } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses "
-                    + node.getName() + " in " +
-                    node.getLineNumber() + " at " +
-                    node.getCharPosition()
-                    + " in " + node.getFileName() + "\"");
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            return node.getName().contentEquals(((YangType<?>) entity)
+                                                        .getDataTypeName());
         }
-        return false;
+        if (entity instanceof YangUses) {
+            return node.getName().contentEquals(((YangUses) entity).getName());
+        }
+        if (entity instanceof YangIfFeature) {
+            return isFeatureDefinedInNode(node);
+        }
+        if (entity instanceof YangBase) {
+            return node.getName().contentEquals(((
+                    YangBase) entity).getBaseIdentifier().getName());
+        }
+        if (entity instanceof YangIdentityRef) {
+            return node.getName().contentEquals(((YangIdentityRef) entity).getName());
+        }
+        throw new DataModelException(getErrorMsg(
+                INVALID_RESOLVED_ENTITY, node.getName(), node.getLineNumber(),
+                node.getCharPosition(), node.getFileName()));
     }
 
-    private boolean isFeatureDefinedInNode(YangNode node)
-            throws DataModelException {
-        YangNodeIdentifier ifFeature = ((YangIfFeature) getCurrentEntityToResolveFromStack()).getName();
+    private boolean isFeatureDefinedInNode(YangNode node) {
+        T entity = getCurEntityToResolveFromStack();
+        YangNodeIdentifier ifFeature = ((YangIfFeature) entity).getName();
         List<YangFeature> featureList = ((YangFeatureHolder) node).getFeatureList();
         if (featureList != null && !featureList.isEmpty()) {
             Iterator<YangFeature> iterator = featureList.iterator();
             while (iterator.hasNext()) {
                 YangFeature feature = iterator.next();
                 if (ifFeature.getName().equals(feature.getName())) {
-                    ((YangIfFeature) getCurrentEntityToResolveFromStack()).setReferredFeature(feature);
-                    ((YangIfFeature) getCurrentEntityToResolveFromStack()).setReferredFeatureHolder(node);
+                    ((YangIfFeature) entity).setReferredFeature(feature);
+                    ((YangIfFeature) entity).setReferredFeatureHolder(node);
                     return true;
                 }
             }
@@ -957,38 +808,31 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     /**
      * Adds reference of grouping/typedef in uses/type.
      *
-     * @param referredNode grouping/typedef node being referred
+     * @param refNode      grouping/typedef node being referred
      * @param linkedStatus linked status if success.
      * @throws DataModelException a violation of data model rules
      */
-    private void addReferredEntityLink(YangNode referredNode, ResolvableStatus linkedStatus)
+    private void addReferredEntityLink(YangNode refNode, ResolvableStatus linkedStatus)
             throws DataModelException {
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) ((YangType<?>) getCurrentEntityToResolveFromStack())
-                    .getDataTypeExtendedInfo();
-            derivedInfo.setReferredTypeDef((YangTypeDef) referredNode);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-            ((YangUses) getCurrentEntityToResolveFromStack())
-                    .setRefGroup((YangGrouping) referredNode);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            // do nothing , referred node is already set
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
-            // do nothing , referred node is already set
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-            ((YangBase) getCurrentEntityToResolveFromStack()).setReferredIdentity((YangIdentity) referredNode);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-            ((YangIdentityRef) getCurrentEntityToResolveFromStack()).setReferredIdentity((YangIdentity) referredNode);
-        } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type" +
-                    "/uses/base/identityref"
-                    + referredNode.getName() + " in " +
-                    referredNode.getLineNumber() + " at " +
-                    referredNode.getCharPosition()
-                    + " in " + referredNode.getFileName() + "\"");
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) ((
+                    YangType<?>) entity).getDataTypeExtendedInfo();
+            derivedInfo.setReferredTypeDef((YangTypeDef) refNode);
+        } else if (entity instanceof YangUses) {
+            ((YangUses) entity).setRefGroup((YangGrouping) refNode);
+        } else if (entity instanceof YangBase) {
+            ((YangBase) entity).setReferredIdentity((YangIdentity) refNode);
+        } else if (entity instanceof YangIdentityRef) {
+            ((YangIdentityRef) entity).setReferredIdentity((YangIdentity) refNode);
+        } else if (!(entity instanceof YangIfFeature) &&
+                !(entity instanceof YangLeafRef)) {
+            throw new DataModelException(getErrorMsg(
+                    LINKER_ERROR, refNode.getName(), refNode.getLineNumber(),
+                    refNode.getCharPosition(), refNode.getFileName()));
         }
-
         // Sets the resolution status in inside the type/uses.
-        ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(linkedStatus);
+        ((Resolvable) entity).setResolvableStatus(linkedStatus);
     }
 
     /**
@@ -996,49 +840,41 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * uses. Add it to the partial resolve stack and return the status of
      * addition to stack.
      *
-     * @param referredNode grouping/typedef node
+     * @param refNode grouping/typedef node
      * @throws DataModelException a violation of data model rules
      */
-    private void addUnresolvedRecursiveReferenceToStack(YangNode referredNode)
+    private void addUnresolvedRecursiveReferenceToStack(YangNode refNode)
             throws DataModelException {
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
 
             //Checks if typedef type is derived
-            if (((YangTypeDef) referredNode).getTypeDefBaseType().getDataType() == YangDataTypes.DERIVED) {
-
-                YangEntityToResolveInfoImpl<YangType<?>> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve(((YangTypeDef) referredNode)
-                        .getTypeDefBaseType());
-                unResolvedEntityInfo.setHolderOfEntityToResolve(referredNode);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
+            if (((YangTypeDef) refNode).getTypeDefBaseType()
+                    .getDataType() == YangDataTypes.DERIVED) {
+                addEntityToStack((T) ((YangTypeDef) refNode).getTypeDefBaseType(),
+                                 refNode);
             }
-
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
+        } else if (entity instanceof YangUses) {
             /*
              * Search if the grouping has any un resolved uses child, if so
              * return true, else return false.
              */
-            addUnResolvedUsesToStack(referredNode);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            addUnResolvedIfFeatureToStack(referredNode);
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
+            addUnResolvedUsesToStack(refNode);
+        } else if (entity instanceof YangIfFeature) {
+            addUnResolvedIfFeatureToStack(refNode);
+        } else if (entity instanceof YangLeafRef) {
             // do nothing , referred node is already set
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses "
-                    + referredNode.getName() + " in " +
-                    referredNode.getLineNumber() + " at " +
-                    referredNode.getCharPosition()
-                    + " in " + referredNode.getFileName() + "\"");
-        } else if ((getCurrentEntityToResolveFromStack() instanceof YangBase) ||
-                (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef)) {
+            throw new DataModelException(getErrorMsg(
+                    INVALID_RESOLVED_ENTITY, refNode.getName(), refNode.getLineNumber(),
+                    refNode.getCharPosition(), refNode.getFileName()));
+        } else if (entity instanceof YangBase || entity instanceof YangIdentityRef) {
 
             //Search if the identity has any un resolved base, if so return true, else return false.
-            addUnResolvedBaseToStack(referredNode);
+            addUnResolvedBaseToStack(refNode);
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses/" +
-                    "base/identityref " + referredNode.getName() + " in " +
-                    referredNode.getLineNumber() + " at " +
-                    referredNode.getCharPosition()
-                    + " in " + referredNode.getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    LINKER_ERROR, refNode.getName(), refNode.getLineNumber(),
+                    refNode.getCharPosition(), refNode.getFileName()));
 
         }
     }
@@ -1061,10 +897,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
 
             // if child nodes has uses, then add it to resolution stack
             if (curNode instanceof YangUses) {
-                YangEntityToResolveInfoImpl<YangUses> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve((YangUses) curNode);
-                unResolvedEntityInfo.setHolderOfEntityToResolve(node);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
+                addEntityToStack((T) curNode, node);
             }
 
             // Traversing all the child nodes of grouping
@@ -1087,16 +920,13 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @param node module/submodule node
      */
     private void addUnResolvedIfFeatureToStack(YangNode node) {
-        YangFeature refFeature = ((YangIfFeature) getCurrentEntityToResolveFromStack()).getReferredFeature();
+        YangFeature refFeature = ((YangIfFeature) getCurEntityToResolveFromStack())
+                .getReferredFeature();
         List<YangIfFeature> ifFeatureList = refFeature.getIfFeatureList();
         if (ifFeatureList != null && !ifFeatureList.isEmpty()) {
             Iterator<YangIfFeature> ifFeatureIterator = ifFeatureList.iterator();
             while (ifFeatureIterator.hasNext()) {
-                YangIfFeature ifFeature = ifFeatureIterator.next();
-                YangEntityToResolveInfo<YangIfFeature> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve(ifFeature);
-                unResolvedEntityInfo.setHolderOfEntityToResolve(node);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
+                addEntityToStack((T) ifFeatureIterator.next(), node);
             }
         }
     }
@@ -1111,33 +941,17 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         YangIdentity curNode = (YangIdentity) node;
         if (curNode.getBaseNode() != null) {
             if (curNode.getBaseNode().getResolvableStatus() != RESOLVED) {
-                YangEntityToResolveInfoImpl<YangBase> unResolvedEntityInfo = new YangEntityToResolveInfoImpl<>();
-                unResolvedEntityInfo.setEntityToResolve(curNode.getBaseNode());
-                unResolvedEntityInfo.setHolderOfEntityToResolve(node);
-                addInPartialResolvedStack((YangEntityToResolveInfoImpl<T>) unResolvedEntityInfo);
-
+                addEntityToStack((T) curNode.getBaseNode(), node);
             }
         }
     }
 
-
-    /**
-     * Returns stack of YANG type with partially resolved YANG construct
-     * hierarchy.
-     *
-     * @return partial resolved YANG construct stack
-     */
-    private Stack<YangEntityToResolveInfoImpl<T>> getPartialResolvedStack() {
-        return partialResolvedStack;
-    }
-
-    /**
-     * Sets stack of YANG type with partially resolved YANG construct hierarchy.
-     *
-     * @param partialResolvedStack partial resolved YANG construct stack
-     */
-    private void setPartialResolvedStack(Stack<YangEntityToResolveInfoImpl<T>> partialResolvedStack) {
-        this.partialResolvedStack = partialResolvedStack;
+    private void addEntityToStack(T entity, YangNode holder) {
+        YangEntityToResolveInfoImpl<T> unResolvedEntityInfo =
+                new YangEntityToResolveInfoImpl<>();
+        unResolvedEntityInfo.setEntityToResolve(entity);
+        unResolvedEntityInfo.setHolderOfEntityToResolve(holder);
+        addInPartialResolvedStack(unResolvedEntityInfo);
     }
 
     /**
@@ -1146,7 +960,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @param partialResolvedInfo partial resolved YANG construct stack
      */
     private void addInPartialResolvedStack(YangEntityToResolveInfoImpl<T> partialResolvedInfo) {
-        getPartialResolvedStack().push(partialResolvedInfo);
+        partialResolvedStack.push(partialResolvedInfo);
     }
 
     /**
@@ -1155,8 +969,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      *
      * @return next entity in the stack that needs to be resolved
      */
-    private T getCurrentEntityToResolveFromStack() {
-        return getPartialResolvedStack().peek().getEntityToResolve();
+    private T getCurEntityToResolveFromStack() {
+        return partialResolvedStack.peek().getEntityToResolve();
     }
 
     @Override
@@ -1164,44 +978,14 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         return entityToResolveInfo;
     }
 
-    /**
-     * Sets information about the entity that needs to be resolved.
-     *
-     * @param entityToResolveInfo information about the entity that needs to be
-     *                            resolved
-     */
-    private void setEntityToResolveInfo(YangEntityToResolveInfoImpl<T> entityToResolveInfo) {
-        this.entityToResolveInfo = entityToResolveInfo;
-    }
-
-    /**
-     * Returns current module/sub-module reference, will be used in inter-file/
-     * inter-jar scenario to get the import/include list.
-     *
-     * @return current module/sub-module reference
-     */
-    private YangReferenceResolver getCurReferenceResolver() {
-        return curReferenceResolver;
-    }
-
-    /**
-     * Sets current module/sub-module reference, will be used in inter-file/
-     * inter-jar scenario to get the import/include list.
-     *
-     * @param curReferenceResolver current module/sub-module reference
-     */
-    private void setCurReferenceResolver(YangReferenceResolver curReferenceResolver) {
-        this.curReferenceResolver = curReferenceResolver;
-    }
-
     @Override
     public void linkInterFile(YangReferenceResolver dataModelRootNode)
             throws DataModelException {
 
-        setCurReferenceResolver(dataModelRootNode);
+        curRefResolver = dataModelRootNode;
 
         // Current node to resolve, it can be a YANG type or YANG uses.
-        T entityToResolve = getEntityToResolveInfo().getEntityToResolve();
+        T entityToResolve = entityToResolveInfo.getEntityToResolve();
 
         // Check if linking is already done
         if (entityToResolve instanceof Resolvable) {
@@ -1210,21 +994,19 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 return;
             }
         } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is not Resolvable");
+            throw new DataModelException(UNRESOLVABLE);
         }
 
-        if (entityToResolve instanceof YangXPathResolver && !(entityToResolve instanceof YangLeafRef)) {
+        if (entityToResolve instanceof YangXPathResolver &&
+                !(entityToResolve instanceof YangLeafRef)) {
             //Process x-path linking.
             processXPathLinking(entityToResolve, dataModelRootNode);
 
         } else {
-
             // Push the initial entity to resolve in stack.
-            addInPartialResolvedStack(getEntityToResolveInfo());
-
+            addInPartialResolvedStack(entityToResolveInfo);
             // Inter file linking and resolution.
             linkInterFileAndResolve();
-
             addDerivedRefTypeToRefTypeResolutionList();
         }
     }
@@ -1241,10 +1023,10 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         YangXpathLinker<T> xPathLinker = new YangXpathLinker<T>();
 
         if (entityToResolve instanceof YangAugment) {
-            YangNode targetNode = null;
+            YangNode targetNode;
             YangAugment augment = (YangAugment) entityToResolve;
-            targetNode = xPathLinker.processAugmentXpathLinking(augment.getTargetNode(),
-                    (YangNode) root);
+            targetNode = xPathLinker
+                    .processAugmentXpathLinking(augment.getTargetNode(), (YangNode) root);
             if (targetNode != null) {
                 if (targetNode instanceof YangAugmentableNode) {
                     detectCollisionForAugmentedNode(targetNode, augment);
@@ -1253,25 +1035,26 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                     setAugmentedFlagInAncestors(targetNode);
                     Resolvable resolvable = (Resolvable) entityToResolve;
                     resolvable.setResolvableStatus(RESOLVED);
+                    if (targetNode instanceof YangInput) {
+                        xPathLinker.addInModuleIfInput(augment, (YangNode) root);
+                    }
                 } else {
-                    throw new LinkerException("Invalid target node type " + targetNode.getNodeType() + " for "
-                            + augment.getName() + " for " + targetNode.getName() +
-                            " in " + targetNode.getLineNumber()
-                            + " at " + targetNode.getCharPosition() +
-                            " in " + targetNode.getFileName());
+                    throw new LinkerException(getErrorMsg(
+                            INVALID_TARGET + targetNode.getNodeType(),
+                            augment.getName(), augment.getLineNumber(),
+                            augment.getCharPosition(), augment.getFileName()));
                 }
             } else {
-                throw new LinkerException("Failed to link " + augment.getName() +
-                        " in " + augment.getLineNumber()
-                        + " at " + augment.getCharPosition() +
-                        " in " + augment.getFileName());
+                throw new LinkerException(getErrorMsg(
+                        FAILED_TO_LINK, augment.getName(), augment
+                                .getLineNumber(), augment.getCharPosition(),
+                        augment.getFileName()));
             }
         } else if (entityToResolve instanceof YangCompilerAnnotation) {
             YangNode targetNode;
             YangCompilerAnnotation ca = (YangCompilerAnnotation) entityToResolve;
-
             targetNode = xPathLinker.processAugmentXpathLinking(ca.getAtomicPathList(),
-                    (YangNode) root);
+                                                                (YangNode) root);
             if (targetNode != null) {
                 if (targetNode instanceof YangList) {
                     ((YangList) targetNode).setCompilerAnnotation(
@@ -1279,19 +1062,19 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                     Resolvable resolvable = (Resolvable) entityToResolve;
                     resolvable.setResolvableStatus(RESOLVED);
                 } else {
-                    throw new LinkerException("Invalid target node type " + targetNode.getNodeType() + " for compiler" +
-                            " annotation " + ca.getPath() + " in " + ca.getLineNumber() + " at "
-                            + ca.getCharPosition() + " in " + ca.getFileName());
+                    throw new LinkerException(getErrorMsg(
+                            INVALID_TARGET + targetNode.getNodeType(), ca.getPath(),
+                            ca.getLineNumber(), ca.getCharPosition(), ca.getFileName()));
                 }
             } else {
-                throw new LinkerException("Failed to link compiler annotation " + ca.getPath()
-                        + " in " + ca.getLineNumber() + " at "
-                        + ca.getCharPosition() + " in " + ca.getFileName());
+                throw new LinkerException(getErrorMsg(
+                        FAILED_TO_FIND_ANNOTATION, ca.getPath(), ca.getLineNumber(),
+                        ca.getCharPosition(), ca.getFileName()));
             }
         } else if (entityToResolve instanceof YangLeafRef) {
             YangLeafRef leafRef = (YangLeafRef) entityToResolve;
-            Object target = xPathLinker.processLeafRefXpathLinking(leafRef.getAtomicPath(),
-                    (YangNode) root, leafRef);
+            Object target = xPathLinker.processLeafRefXpathLinking(
+                    leafRef.getAtomicPath(), (YangNode) root, leafRef);
             if (target != null) {
                 YangLeaf leaf;
                 YangLeafList leafList;
@@ -1299,22 +1082,22 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 if (target instanceof YangLeaf) {
                     leaf = (YangLeaf) target;
                     leafRef.setResolvableStatus(INTER_FILE_LINKED);
-                    addUnResolvedLeafRefTypeToStack((T) leaf, getEntityToResolveInfo().getHolderOfEntityToResolve());
+                    addUnResolvedLeafRefTypeToStack((T) leaf, entityToResolveInfo
+                            .getHolderOfEntityToResolve());
                 } else {
                     leafList = (YangLeafList) target;
                     leafRef.setResolvableStatus(INTER_FILE_LINKED);
-                    addUnResolvedLeafRefTypeToStack((T) leafList,
-                            getEntityToResolveInfo().getHolderOfEntityToResolve());
+                    addUnResolvedLeafRefTypeToStack(
+                            (T) leafList, entityToResolveInfo.getHolderOfEntityToResolve());
                 }
                 //TODO: add logic for leaf-ref for path predicates.
             } else {
-                LinkerException linkerException = new LinkerException("YANG file error: Unable to find base " +
-                        "leaf/leaf-list for given leafref path "
-                        + leafRef.getPath());
-                linkerException.setCharPosition(leafRef.getCharPosition());
-                linkerException.setLine(leafRef.getLineNumber());
-                linkerException.setFileName(leafRef.getFileName());
-                throw linkerException;
+                LinkerException ex = new LinkerException(
+                        FAILED_TO_FIND_LEAD_INFO_HOLDER + leafRef.getPath());
+                ex.setCharPosition(leafRef.getCharPosition());
+                ex.setLine(leafRef.getLineNumber());
+                ex.setFileName(leafRef.getFileName());
+                throw ex;
             }
         }
     }
@@ -1327,22 +1110,24 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      */
     private String getRefPrefix()
             throws DataModelException {
-        String refPrefix;
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-            refPrefix = ((YangType<?>) getCurrentEntityToResolveFromStack()).getPrefix();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-            refPrefix = ((YangUses) getCurrentEntityToResolveFromStack()).getPrefix();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            refPrefix = ((YangIfFeature) getCurrentEntityToResolveFromStack()).getPrefix();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-            refPrefix = ((YangBase) getCurrentEntityToResolveFromStack()).getBaseIdentifier().getPrefix();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-            refPrefix = ((YangIdentityRef) getCurrentEntityToResolveFromStack()).getPrefix();
-        } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than " +
-                    "type/uses/base/identityref");
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            return ((YangType<?>) entity).getPrefix();
         }
-        return refPrefix;
+        if (entity instanceof YangUses) {
+            return ((YangUses) entity).getPrefix();
+        }
+        if (entity instanceof YangIfFeature) {
+            return ((YangIfFeature) entity).getPrefix();
+        }
+        if (entity instanceof YangBase) {
+            return ((YangBase) entity).getBaseIdentifier()
+                    .getPrefix();
+        }
+        if (entity instanceof YangIdentityRef) {
+            return ((YangIdentityRef) entity).getPrefix();
+        }
+        throw new DataModelException(LINKER_ERROR);
     }
 
     /**
@@ -1353,37 +1138,35 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void linkInterFileAndResolve()
             throws DataModelException {
 
-        while (getPartialResolvedStack().size() != 0) {
+        while (!partialResolvedStack.isEmpty()) {
 
             // Current node to resolve, it can be a YANG type or YANG uses.
-            T entityToResolve = getCurrentEntityToResolveFromStack();
+            T entityToResolve = getCurEntityToResolveFromStack();
             // Check if linking is already done
             if (entityToResolve instanceof Resolvable) {
 
                 Resolvable resolvable = (Resolvable) entityToResolve;
                 switch (resolvable.getResolvableStatus()) {
-                    case RESOLVED: {
+                    case RESOLVED:
                         /*
                          * If the entity is already resolved in the stack, then pop
                          * it and continue with the remaining stack elements to
                          * resolve
                          */
-                        getPartialResolvedStack().pop();
+                        partialResolvedStack.pop();
                         break;
-                    }
 
-                    case INTER_FILE_LINKED: {
+                    case INTER_FILE_LINKED:
                         /*
                          * If the top of the stack is already linked then resolve
                          * the references and pop the entity and continue with
                          * remaining stack elements to resolve
                          */
-                        resolveTopOfStack(INTER_FILE);
-                        getPartialResolvedStack().pop();
+                        resolveTopOfStack();
+                        partialResolvedStack.pop();
                         break;
-                    }
 
-                    case INTRA_FILE_RESOLVED: {
+                    case INTRA_FILE_RESOLVED:
                         /*
                          * If the top of the stack is intra file resolved then check
                          * if top of stack is linked, if not link it using
@@ -1392,29 +1175,22 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                          */
                         linkInterFileTopOfStackRefUpdateStack();
                         break;
-                    }
 
-                    case UNDEFINED: {
+                    case UNDEFINED:
                         /*
                          * In case of if-feature resolution, if referred "feature" is not
                          * defined then the resolvable status will be undefined.
                          */
-                        getPartialResolvedStack().pop();
+                        partialResolvedStack.pop();
                         break;
-                    }
 
-                    default: {
-                        throw new DataModelException("Data Model Exception: Unsupported, linker state");
-                    }
-
+                    default:
+                        throw new DataModelException(INVALID_LINKER_STATE);
                 }
-
             } else {
-                throw new DataModelException("Data Model Exception: Entity to resolved is other than type/uses");
+                throw new DataModelException(INVALID_RESOLVED_ENTITY);
             }
-
         }
-
     }
 
     /**
@@ -1424,11 +1200,11 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      */
     private void linkInterFileTopOfStackRefUpdateStack()
             throws DataModelException {
-
-        if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangLeafRef) {
             // When leafref path comes with relative path, it will be converted to absolute path.
-            setAbsolutePathFromRelativePathInLeafref(getCurrentEntityToResolveFromStack());
-            processXPathLinking(getCurrentEntityToResolveFromStack(), getCurReferenceResolver());
+            setAbsolutePathFromRelativePathInLeafref(entity);
+            processXPathLinking(entity, curRefResolver);
             return;
         }
         /*
@@ -1446,7 +1222,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
              * Check if prefix is null or not, to identify whether to search in
              * import list or include list.
              */
-            if (getRefPrefix() != null && !getRefPrefix().contentEquals(getCurReferenceResolver().getPrefix())) {
+            if (getRefPrefix() != null && !getRefPrefix()
+                    .contentEquals(curRefResolver.getPrefix())) {
                 if (resolveWithImport()) {
                     return;
                 }
@@ -1456,32 +1233,20 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 }
             }
 
-            if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-                ((YangIfFeature) getCurrentEntityToResolveFromStack()).setResolvableStatus(UNDEFINED);
+            if (entity instanceof YangIfFeature) {
+                ((YangIfFeature) entity).setResolvableStatus(UNDEFINED);
                 return;
             }
             // If current entity is still not resolved, then
             // linking/resolution has failed.
-            String errorInfo;
-            if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-                errorInfo = TYPEDEF_LINKER_ERROR;
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-                errorInfo = GROUPING_LINKER_ERROR;
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-                errorInfo = FEATURE_LINKER_ERROR;
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-                errorInfo = BASE_LINKER_ERROR;
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-                errorInfo = IDENTITYREF_LINKER_ERROR;
-            } else {
-                errorInfo = LEAFREF_LINKER_ERROR;
-            }
-            DataModelException dataModelException = new DataModelException(errorInfo);
-            dataModelException.setLine(getLineNumber());
-            dataModelException.setCharPosition(getCharPosition());
-            throw dataModelException;
+
+            DataModelException ex = new DataModelException(
+                    getErrorInfoForLinker(entity));
+            ex.setLine(getLineNumber());
+            ex.setCharPosition(getCharPosition());
+            throw ex;
         } else {
-            ((Resolvable) getCurrentEntityToResolveFromStack()).setResolvableStatus(INTER_FILE_LINKED);
+            ((Resolvable) entity).setResolvableStatus(INTER_FILE_LINKED);
             addUnresolvedRecursiveReferenceToStack((YangNode) referredNode);
         }
     }
@@ -1492,42 +1257,51 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @param resolutionInfo information about the YANG construct which has to be resolved
      * @throws DataModelException a violation of data model rules
      */
-    public void setAbsolutePathFromRelativePathInLeafref(T resolutionInfo)
+    private void setAbsolutePathFromRelativePathInLeafref(T resolutionInfo)
             throws DataModelException {
         if (resolutionInfo instanceof YangLeafRef) {
 
-            YangNode parentOfLeafref = ((YangLeafRef) resolutionInfo).getParentNodeOfLeafref();
+            YangNode leafParent = ((YangLeafRef) resolutionInfo)
+                    .getParentNodeOfLeafref();
             YangLeafRef leafref = (YangLeafRef) resolutionInfo;
 
             // Checks if the leafref has relative path in it.
-            if (leafref.getPathType() == YangPathArgType.RELATIVE_PATH) {
+            if (leafref.getPathType() == RELATIVE_PATH) {
                 YangRelativePath relativePath = leafref.getRelativePath();
                 List<YangAtomicPath> absoluteInRelative = relativePath.getAtomicPathList();
-                int numberOfAncestors = relativePath.getAncestorNodeCount();
+                int ancestorCount = relativePath.getAncestorNodeCount();
 
                 // Gets the root node from the ancestor count.
-                T nodeOrAugmentList = getRootNodeWithAncestorCountForLeafref(numberOfAncestors, parentOfLeafref,
-                        leafref);
+                T nodeOrAugmentList =
+                        getRootNodeWithAncestorCountForLeafref(ancestorCount, leafParent,
+                                                               leafref);
                 if (nodeOrAugmentList instanceof YangNode) {
-                    String pathNameToBePrefixed = EMPTY_STRING;
+                    StringBuilder name = new StringBuilder();
+                    StringBuilder prefix = new StringBuilder();
                     YangNode rootNode = (YangNode) nodeOrAugmentList;
                     // Forms a new absolute path from the relative path
                     while (!(rootNode instanceof YangReferenceResolver)) {
-                        pathNameToBePrefixed = rootNode.getName() + SLASH_FOR_STRING + pathNameToBePrefixed;
+                        name.append(rootNode.getName());
+                        prefix.append(SLASH_FOR_STRING).append(name.reverse());
+                        name.delete(0, name.length());
                         rootNode = rootNode.getParent();
                         if (rootNode == null) {
-                            throw new DataModelException("Internal datamodel error: Datamodel tree is not correct");
+                            throw new DataModelException(INVALID_TREE);
                         }
                     }
-                    fillAbsolutePathValuesInLeafref(leafref, pathNameToBePrefixed, absoluteInRelative);
+                    prefix.reverse();
+                    fillAbsolutePathValuesInLeafref(leafref, prefix.toString(),
+                                                    absoluteInRelative);
                 } else {
                     List<String> listOfAugment = (List<String>) nodeOrAugmentList;
                     Iterator<String> listOfAugmentIterator = listOfAugment.listIterator();
-                    String augment = EMPTY_STRING;
+                    StringBuilder augment = new StringBuilder(EMPTY_STRING);
                     while (listOfAugmentIterator.hasNext()) {
-                        augment = augment + SLASH_FOR_STRING + listOfAugmentIterator.next();
+                        augment.append(SLASH_FOR_STRING)
+                                .append(listOfAugmentIterator.next());
                     }
-                    fillAbsolutePathValuesInLeafref(leafref, augment, absoluteInRelative);
+                    fillAbsolutePathValuesInLeafref(leafref, augment.toString(),
+                                                    absoluteInRelative);
                 }
             }
         }
@@ -1536,43 +1310,41 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     /**
      * Fills the absolute path values in the leafref from relative path.
      *
-     * @param leafref               instance of YANG leafref
-     * @param pathNameToBePrefixed  path name which has to be prefixed to relative path
-     * @param atomicPathsInRelative atomic paths in relative
+     * @param leafref  instance of YANG leafref
+     * @param path     path name which has to be prefixed to relative path
+     * @param relative atomic paths in relative
      * @throws DataModelException a violation of data model rules
      */
-    private void fillAbsolutePathValuesInLeafref(YangLeafRef leafref, String pathNameToBePrefixed,
-                                                 List<YangAtomicPath> atomicPathsInRelative)
+    private void fillAbsolutePathValuesInLeafref(YangLeafRef leafref, String path,
+                                                 List<YangAtomicPath> relative)
             throws DataModelException {
-
-        leafref.setPathType(YangPathArgType.ABSOLUTE_PATH);
+        leafref.setPathType(ABSOLUTE_PATH);
         String[] pathName = new String[0];
-        if (pathNameToBePrefixed != EMPTY_STRING && pathNameToBePrefixed != null) {
-            pathName = pathNameToBePrefixed.split(SLASH_FOR_STRING);
+        if (path != null && !path.equals(EMPTY_STRING)) {
+            pathName = path.split(SLASH_FOR_STRING);
         }
         List<YangAtomicPath> finalListForAbsolute = new LinkedList<>();
         for (String value : pathName) {
-            if (value != null && !value.isEmpty() && value != EMPTY_STRING) {
-                YangNodeIdentifier nodeIdentifier = getValidNodeIdentifier(value, YangConstructType.PATH_DATA);
+            if (value != null && !value.isEmpty() && !value.equals(EMPTY_STRING)) {
+                YangNodeIdentifier nodeId = getValidNodeIdentifier(value, PATH_DATA);
                 YangAtomicPath atomicPath = new YangAtomicPath();
-                atomicPath.setNodeIdentifier(nodeIdentifier);
+                atomicPath.setNodeIdentifier(nodeId);
                 finalListForAbsolute.add(atomicPath);
             }
         }
-        if (atomicPathsInRelative != null && !atomicPathsInRelative.isEmpty()) {
-            Iterator<YangAtomicPath> atomicPathIterator = atomicPathsInRelative.listIterator();
-            while (atomicPathIterator.hasNext()) {
-                YangAtomicPath yangAtomicPath = atomicPathIterator.next();
+        if (relative != null && !relative.isEmpty()) {
+            Iterator<YangAtomicPath> pathIt = relative.listIterator();
+            while (pathIt.hasNext()) {
+                YangAtomicPath yangAtomicPath = pathIt.next();
                 finalListForAbsolute.add(yangAtomicPath);
             }
             leafref.setAtomicPath(finalListForAbsolute);
         } else {
-            DataModelException dataModelException = new DataModelException("YANG file error: The target node, in the " +
-                    "leafref path " + leafref.getPath() + ", is invalid.");
-            dataModelException.setCharPosition(leafref.getCharPosition());
-            dataModelException.setLine(leafref.getLineNumber());
-            dataModelException.setFileName(leafref.getFileName());
-            throw dataModelException;
+            DataModelException ex = new DataModelException(getLeafRefErrorInfo(leafref));
+            ex.setCharPosition(leafref.getCharPosition());
+            ex.setLine(leafref.getLineNumber());
+            ex.setFileName(leafref.getFileName());
+            throw ex;
         }
     }
 
@@ -1580,46 +1352,44 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * Returns the root parent with respect to the ancestor count from leafref.
      *
      * @param ancestorCount count of node where parent node can be reached
-     * @param currentParent current parent node
+     * @param curParent     current parent node
      * @param leafref       instance of YANG leafref
      * @return node where the ancestor count stops or augment path name list
      * @throws DataModelException a violation of data model rules
      */
-    private T getRootNodeWithAncestorCountForLeafref(int ancestorCount, YangNode currentParent, YangLeafRef leafref)
+    private T getRootNodeWithAncestorCountForLeafref(
+            int ancestorCount, YangNode curParent, YangLeafRef leafref)
             throws DataModelException {
 
-        int currentParentCount = 1;
-        currentParent = skipInvalidDataNodes(currentParent, leafref);
-        if (currentParent instanceof YangAugment) {
-            YangAugment augment = (YangAugment) currentParent;
-            List<String> valueInAugment = getPathWithAugment(augment, ancestorCount - currentParentCount);
+        int curParentCount = 1;
+        curParent = skipInvalidDataNodes(curParent, leafref);
+        if (curParent instanceof YangAugment) {
+            YangAugment augment = (YangAugment) curParent;
+            List<String> valueInAugment = getPathWithAugment(augment,
+                                                             ancestorCount - curParentCount);
             return (T) valueInAugment;
         } else {
-            while (currentParentCount < ancestorCount) {
-                YangNode currentSkippedParent = skipInvalidDataNodes(currentParent, leafref);
-                if (currentSkippedParent == currentParent) {
-                    if (currentParent.getParent() == null) {
-                        throw new DataModelException("YANG file error: The target node, in the leafref path "
-                                + leafref.getPath() + ", is invalid."
-                                + " in " +
-                                leafref.getLineNumber() + " at " +
-                                leafref.getCharPosition()
-                                + " in " + leafref.getFileName() + "\"");
+            while (curParentCount < ancestorCount) {
+                YangNode currentSkippedParent = skipInvalidDataNodes(curParent, leafref);
+                if (currentSkippedParent == curParent) {
+                    if (curParent.getParent() == null) {
+                        throw new DataModelException(getLeafRefErrorInfo(leafref));
                     }
-                    currentParent = currentParent.getParent();
+                    curParent = curParent.getParent();
                 } else {
-                    currentParent = currentSkippedParent;
+                    curParent = currentSkippedParent;
                     continue;
                 }
-                currentParentCount = currentParentCount + 1;
-                if (currentParent instanceof YangAugment) {
-                    YangAugment augment = (YangAugment) currentParent;
-                    List<String> valueInAugment = getPathWithAugment(augment, ancestorCount - currentParentCount);
+                curParentCount = curParentCount + 1;
+                if (curParent instanceof YangAugment) {
+                    YangAugment augment = (YangAugment) curParent;
+                    List<String> valueInAugment = getPathWithAugment(
+                            augment, ancestorCount - curParentCount);
                     return (T) valueInAugment;
                 }
             }
         }
-        return (T) currentParent;
+        return (T) curParent;
     }
 
     /**
@@ -1628,33 +1398,15 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @return true if resolved, false otherwise
      * @throws DataModelException a violation in data model rule
      */
-    private boolean resolveWithInclude()
-            throws DataModelException {
+    private boolean resolveWithInclude() throws DataModelException {
         /*
          * Run through all the nodes in include list and search for referred
          * typedef/grouping at the root level.
          */
-        for (YangInclude yangInclude : getCurReferenceResolver().getIncludeList()) {
-            YangNode linkedNode = null;
-            if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-                linkedNode = findRefTypedef(yangInclude.getIncludedNode());
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-                linkedNode = findRefGrouping(yangInclude.getIncludedNode());
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-                linkedNode = findRefFeature(yangInclude.getIncludedNode());
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-                linkedNode = findRefIdentity(yangInclude.getIncludedNode());
-            } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-                linkedNode = findRefIdentityRef(yangInclude.getIncludedNode());
-            }
-
+        for (YangInclude yangInclude : curRefResolver.getIncludeList()) {
+            YangNode linkedNode = getLinkedNode(yangInclude.getIncludedNode());
             if (linkedNode != null) {
-                // Add the link to external entity.
-                addReferredEntityLink(linkedNode, INTER_FILE_LINKED);
-
-                // Add the type/uses of referred typedef/grouping to the stack.
-                addUnresolvedRecursiveReferenceToStack(linkedNode);
-                return true;
+                return addUnResolvedRefToStack(linkedNode);
             }
         }
         // If referred node can't be found return false.
@@ -1667,37 +1419,19 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @return true if resolved, false otherwise
      * @throws DataModelException a violation in data model rule
      */
-    private boolean resolveWithImport()
-            throws DataModelException {
+    private boolean resolveWithImport() throws DataModelException {
 
         // Run through import list to find the referred typedef/grouping.
-        for (YangImport yangImport : getCurReferenceResolver().getImportList()) {
+        for (YangImport yangImport : curRefResolver.getImportList()) {
             /*
              * Match the prefix attached to entity under resolution with the
              * imported/included module/sub-module's prefix. If found, search
              * for the referred typedef/grouping at the root level.
              */
             if (yangImport.getPrefixId().contentEquals(getRefPrefix())) {
-                YangNode linkedNode = null;
-                if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-                    linkedNode = findRefTypedef(yangImport.getImportedNode());
-                } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-                    linkedNode = findRefGrouping(yangImport.getImportedNode());
-                } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-                    linkedNode = findRefFeature(yangImport.getImportedNode());
-                } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-                    linkedNode = findRefIdentity(yangImport.getImportedNode());
-                } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-                    linkedNode = findRefIdentityRef(yangImport.getImportedNode());
-                }
+                YangNode linkedNode = getLinkedNode(yangImport.getImportedNode());
                 if (linkedNode != null) {
-                    // Add the link to external entity.
-                    addReferredEntityLink(linkedNode, INTER_FILE_LINKED);
-
-                    // Add the type/uses of referred typedef/grouping to the
-                    // stack.
-                    addUnresolvedRecursiveReferenceToStack(linkedNode);
-                    return true;
+                    return addUnResolvedRefToStack(linkedNode);
                 }
                 /*
                  * If referred node can't be found at root level break for loop,
@@ -1710,32 +1444,68 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         return false;
     }
 
+    //Add unresolved constructs to stack.
+    private boolean addUnResolvedRefToStack(YangNode linkedNode)
+            throws DataModelException {
+        // Add the link to external entity.
+        addReferredEntityLink(linkedNode, INTER_FILE_LINKED);
+
+        // Add the type/uses of referred typedef/grouping to the stack.
+        addUnresolvedRecursiveReferenceToStack(linkedNode);
+        return true;
+    }
+
+    //Returns linked node from entity of stack.
+    private YangNode getLinkedNode(YangNode node) {
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            return findRefTypedef(node);
+        }
+        if (entity instanceof YangUses) {
+            return findRefGrouping(node);
+        }
+        if (entity instanceof YangIfFeature) {
+            return findRefFeature(node);
+        }
+        if (entity instanceof YangBase) {
+            return findRefIdentity(node);
+        }
+        if (entity instanceof YangIdentityRef) {
+            return findRefIdentityRef(node);
+        }
+        return null;
+    }
+
     /**
      * Returns referred typedef/grouping node.
      *
      * @return referred typedef/grouping node
      * @throws DataModelException a violation in data model rule
      */
-    private T getRefNode()
-            throws DataModelException {
-        if (getCurrentEntityToResolveFromStack() instanceof YangType) {
-            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) ((YangType<?>) getCurrentEntityToResolveFromStack())
-                    .getDataTypeExtendedInfo();
+    private T getRefNode() throws DataModelException {
+        T entity = getCurEntityToResolveFromStack();
+        if (entity instanceof YangType) {
+            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>)
+                    ((YangType<?>) entity).getDataTypeExtendedInfo();
             return (T) derivedInfo.getReferredTypeDef();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangUses) {
-            return (T) ((YangUses) getCurrentEntityToResolveFromStack()).getRefGroup();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIfFeature) {
-            return (T) ((YangIfFeature) getCurrentEntityToResolveFromStack()).getReferredFeatureHolder();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangLeafRef) {
-            return (T) ((YangLeafRef) getCurrentEntityToResolveFromStack()).getReferredLeafOrLeafList();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangBase) {
-            return (T) ((YangBase) getCurrentEntityToResolveFromStack()).getReferredIdentity();
-        } else if (getCurrentEntityToResolveFromStack() instanceof YangIdentityRef) {
-            return (T) ((YangIdentityRef) getCurrentEntityToResolveFromStack()).getReferredIdentity();
-        } else {
-            throw new DataModelException("Data Model Exception: Entity to resolved is other than type" +
-                    "/uses/base/identityref");
         }
+        if (entity instanceof YangUses) {
+            return (T) ((YangUses) entity).getRefGroup();
+        }
+        if (entity instanceof YangIfFeature) {
+            return (T) ((YangIfFeature) entity).getReferredFeatureHolder();
+        }
+        if (entity instanceof YangLeafRef) {
+            return (T) ((YangLeafRef) entity).getReferredLeafOrLeafList();
+        }
+        if (entity instanceof YangBase) {
+            return (T) ((YangBase) entity).getReferredIdentity();
+        }
+        if (entity instanceof YangIdentityRef) {
+            return (T) ((YangIdentityRef) entity).getReferredIdentity();
+        }
+        throw new DataModelException(LINKER_ERROR);
+
     }
 
     /**
@@ -1749,7 +1519,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         while (tmpNode != null) {
             if (tmpNode instanceof YangGrouping) {
                 if (tmpNode.getName()
-                        .equals(((YangUses) getCurrentEntityToResolveFromStack()).getName())) {
+                        .equals(((YangUses) getCurEntityToResolveFromStack())
+                                        .getName())) {
                     return tmpNode;
                 }
             }
@@ -1765,15 +1536,14 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      * @return referred feature
      */
     private YangNode findRefFeature(YangNode refNode) {
-        YangNodeIdentifier ifFeature = ((YangIfFeature) getCurrentEntityToResolveFromStack()).getName();
-        List<YangFeature> featureList = ((YangFeatureHolder) refNode).getFeatureList();
-
+        T entity = getCurEntityToResolveFromStack();
+        YangNodeIdentifier ifFeature = ((YangIfFeature) entity).getName();
+        List<YangFeature> featureList = ((YangFeatureHolder) refNode)
+                .getFeatureList();
         if (featureList != null && !featureList.isEmpty()) {
-            Iterator<YangFeature> iterator = featureList.iterator();
-            while (iterator.hasNext()) {
-                YangFeature feature = iterator.next();
+            for (YangFeature feature : featureList) {
                 if (ifFeature.getName().equals(feature.getName())) {
-                    ((YangIfFeature) getCurrentEntityToResolveFromStack()).setReferredFeature(feature);
+                    ((YangIfFeature) entity).setReferredFeature(feature);
                     return refNode;
                 }
             }
@@ -1792,7 +1562,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         while (tmpNode != null) {
             if (tmpNode instanceof YangTypeDef) {
                 if (tmpNode.getName()
-                        .equals(((YangType) getCurrentEntityToResolveFromStack()).getDataTypeName())) {
+                        .equals(((YangType) getCurEntityToResolveFromStack())
+                                        .getDataTypeName())) {
                     return tmpNode;
                 }
             }
@@ -1812,7 +1583,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         while (tmpNode != null) {
             if (tmpNode instanceof YangIdentity) {
                 if (tmpNode.getName()
-                        .equals(((YangBase) getCurrentEntityToResolveFromStack()).getBaseIdentifier().getName())) {
+                        .equals(((YangBase) getCurEntityToResolveFromStack())
+                                        .getBaseIdentifier().getName())) {
                     return tmpNode;
                 }
             }
@@ -1832,8 +1604,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         while (tmpNode != null) {
             if (tmpNode instanceof YangIdentity) {
                 if (tmpNode.getName()
-                        .equals(((YangIdentityRef) getCurrentEntityToResolveFromStack())
-                                .getBaseIdentity().getName())) {
+                        .equals(((YangIdentityRef) getCurEntityToResolveFromStack())
+                                        .getBaseIdentity().getName())) {
                     return tmpNode;
                 }
             }

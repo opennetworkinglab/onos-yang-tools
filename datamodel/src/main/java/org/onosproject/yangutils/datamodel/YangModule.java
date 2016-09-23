@@ -15,19 +15,30 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_AUGMENT;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_BASE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_COMPILER_ANNOTATION;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IF_FEATURE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_LEAFREF;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.MODULE_DATA;
 
 /*-
  * Reference:RFC 6020.
@@ -82,7 +93,7 @@ public abstract class YangModule
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "contact" statement provides contact information for the module. The
      * argument is a string that is used to specify contact information for the
      * person or persons to whom technical queries concerning this module should
@@ -93,7 +104,7 @@ public abstract class YangModule
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "description" statement takes as an argument a string that contains a
      * human-readable textual description of this definition. The text is
      * provided in a language (or languages) chosen by the module developer; for
@@ -128,7 +139,7 @@ public abstract class YangModule
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "organization" statement defines the party responsible for this
      * module. The argument is a string that is used to specify a textual
      * description of the organization(s) under whose auspices this module was
@@ -185,7 +196,7 @@ public abstract class YangModule
      * type or grouping cannot be defined if a higher level in the schema
      * hierarchy has a definition with a matching identifier.
      *
-     * A reference to an unprefixed type or grouping, or one which uses the
+     * A reference to an un-prefixed type or grouping, or one which uses the
      * prefix of the current module, is resolved by locating the closest
      * matching "typedef" or "grouping" statement among the immediate
      * sub-statements of each ancestor statement.
@@ -240,7 +251,12 @@ public abstract class YangModule
     /**
      * Map of notification enum.
      */
-    private Map<String, YangSchemaNode> notificationEnumMap;
+    private final Map<String, YangSchemaNode> notificationEnumMap;
+
+    /**
+     * List of augments which augmenting to an input in rpc.
+     */
+    private final List<YangAugment> augments;
 
     /**
      * Creates a YANG node of module type.
@@ -263,12 +279,13 @@ public abstract class YangModule
         extensionList = new LinkedList<>();
         listOfFeature = new LinkedList<>();
         notificationEnumMap = new HashMap<>();
+        augments = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo) {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context) {
+        getYsnContextInfoMap().put(id, context);
     }
 
     @Override
@@ -277,14 +294,14 @@ public abstract class YangModule
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-                                     YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode node) {
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YANG_SINGLE_INSTANCE_NODE;
     }
 
     /**
@@ -332,7 +349,7 @@ public abstract class YangModule
      */
     @Override
     public List<YangImport> getImportList() {
-        return importList;
+        return unmodifiableList(importList);
     }
 
     /**
@@ -342,7 +359,7 @@ public abstract class YangModule
      */
     @Override
     public void addToImportList(YangImport importedModule) {
-        getImportList().add(importedModule);
+        importList.add(importedModule);
     }
 
     @Override
@@ -357,7 +374,7 @@ public abstract class YangModule
      */
     @Override
     public List<YangInclude> getIncludeList() {
-        return includeList;
+        return unmodifiableList(includeList);
     }
 
     /**
@@ -367,7 +384,7 @@ public abstract class YangModule
      */
     @Override
     public void addToIncludeList(YangInclude includeModule) {
-        getIncludeList().add(includeModule);
+        includeList.add(includeModule);
     }
 
     @Override
@@ -382,7 +399,7 @@ public abstract class YangModule
      */
     @Override
     public List<YangLeaf> getListOfLeaf() {
-        return listOfLeaf;
+        return unmodifiableList(listOfLeaf);
     }
 
     @Override
@@ -397,7 +414,7 @@ public abstract class YangModule
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
     }
 
     /**
@@ -407,7 +424,7 @@ public abstract class YangModule
      */
     @Override
     public List<YangLeafList> getListOfLeafList() {
-        return listOfLeafList;
+        return unmodifiableList(listOfLeafList);
     }
 
     @Override
@@ -423,20 +440,17 @@ public abstract class YangModule
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
     }
 
     @Override
     public List<YangFeature> getFeatureList() {
-        return listOfFeature;
+        return unmodifiableList(listOfFeature);
     }
 
     @Override
     public void addFeatureList(YangFeature feature) {
-        if (getFeatureList() == null) {
-            setListOfFeature(new LinkedList<>());
-        }
-        getFeatureList().add(feature);
+        listOfFeature.add(feature);
     }
 
     @Override
@@ -562,7 +576,7 @@ public abstract class YangModule
      * @param extension the extension to be added
      */
     public void addExtension(YangExtension extension) {
-        getExtensionList().add(extension);
+        extensionList.add(extension);
     }
 
     /**
@@ -571,7 +585,7 @@ public abstract class YangModule
      * @return the extension list
      */
     public List<YangExtension> getExtensionList() {
-        return extensionList;
+        return unmodifiableList(extensionList);
     }
 
     /**
@@ -589,10 +603,7 @@ public abstract class YangModule
      * @param extension YANG extension
      */
     public void addToExtensionList(YangExtension extension) {
-        if (getExtensionList() == null) {
-            setExtensionList(new LinkedList<>());
-        }
-        getExtensionList().add(extension);
+        extensionList.add(extension);
     }
 
     /**
@@ -602,7 +613,7 @@ public abstract class YangModule
      */
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.MODULE_DATA;
+        return MODULE_DATA;
     }
 
     /**
@@ -650,77 +661,74 @@ public abstract class YangModule
 
     @Override
     public List<YangResolutionInfo> getUnresolvedResolutionList(ResolvableType type) {
-        if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
-            return derivedTypeResolutionList;
-        } else if (type == ResolvableType.YANG_USES) {
-            return usesResolutionList;
-        } else if (type == ResolvableType.YANG_AUGMENT) {
-            return augmentResolutionList;
-        } else if (type == ResolvableType.YANG_IF_FEATURE) {
-            return ifFeatureResolutionList;
-        } else if (type == ResolvableType.YANG_LEAFREF) {
-            return leafRefResolutionList;
-        } else if (type == ResolvableType.YANG_BASE) {
-            return baseResolutionList;
-        } else if (type == ResolvableType.YANG_IDENTITYREF) {
-            return identityRefResolutionList;
+        if (type == YANG_DERIVED_DATA_TYPE) {
+            return unmodifiableList(derivedTypeResolutionList);
+        } else if (type == YANG_USES) {
+            return unmodifiableList(usesResolutionList);
+        } else if (type == YANG_AUGMENT) {
+            return unmodifiableList(augmentResolutionList);
+        } else if (type == YANG_IF_FEATURE) {
+            return unmodifiableList(ifFeatureResolutionList);
+        } else if (type == YANG_LEAFREF) {
+            return unmodifiableList(leafRefResolutionList);
+        } else if (type == YANG_BASE) {
+            return unmodifiableList(baseResolutionList);
+        } else if (type == YANG_IDENTITYREF) {
+            return unmodifiableList(identityRefResolutionList);
         } else {
-            return compilerAnnotationList;
+            return unmodifiableList(compilerAnnotationList);
         }
     }
 
     @Override
-    public void addToResolutionList(YangResolutionInfo resolutionInfo,
+    public void addToResolutionList(YangResolutionInfo info,
                                     ResolvableType type) {
-        if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
-            derivedTypeResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_USES) {
-            usesResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_IF_FEATURE) {
-            ifFeatureResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_LEAFREF) {
-            leafRefResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_BASE) {
-            baseResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_AUGMENT) {
-            augmentResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_IDENTITYREF) {
-            identityRefResolutionList.add(resolutionInfo);
-        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
-            compilerAnnotationList.add(resolutionInfo);
+        if (type == YANG_DERIVED_DATA_TYPE) {
+            derivedTypeResolutionList.add(info);
+        } else if (type == YANG_USES) {
+            usesResolutionList.add(info);
+        } else if (type == YANG_IF_FEATURE) {
+            ifFeatureResolutionList.add(info);
+        } else if (type == YANG_LEAFREF) {
+            leafRefResolutionList.add(info);
+        } else if (type == YANG_BASE) {
+            baseResolutionList.add(info);
+        } else if (type == YANG_AUGMENT) {
+            augmentResolutionList.add(info);
+        } else if (type == YANG_IDENTITYREF) {
+            identityRefResolutionList.add(info);
+        } else if (type == YANG_COMPILER_ANNOTATION) {
+            compilerAnnotationList.add(info);
         }
     }
 
     @Override
     public void setResolutionList(List<YangResolutionInfo> resolutionList,
                                   ResolvableType type) {
-        if (type == ResolvableType.YANG_DERIVED_DATA_TYPE) {
+        if (type == YANG_DERIVED_DATA_TYPE) {
             derivedTypeResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_USES) {
+        } else if (type == YANG_USES) {
             usesResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_IF_FEATURE) {
+        } else if (type == YANG_IF_FEATURE) {
             ifFeatureResolutionList.add((YangResolutionInfo) resolutionList);
-        } else if (type == ResolvableType.YANG_LEAFREF) {
+        } else if (type == YANG_LEAFREF) {
             leafRefResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_BASE) {
+        } else if (type == YANG_BASE) {
             baseResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_AUGMENT) {
+        } else if (type == YANG_AUGMENT) {
             augmentResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_IDENTITYREF) {
+        } else if (type == YANG_IDENTITYREF) {
             identityRefResolutionList = resolutionList;
-        } else if (type == ResolvableType.YANG_COMPILER_ANNOTATION) {
+        } else if (type == YANG_COMPILER_ANNOTATION) {
             compilerAnnotationList = resolutionList;
         }
-
     }
 
     @Override
     public void addReferencesToImportList(Set<YangNode> yangNodeSet)
             throws DataModelException {
-        Iterator<YangImport> importInfoIterator = getImportList().iterator();
         // Run through the imported list to add references.
-        while (importInfoIterator.hasNext()) {
-            YangImport yangImport = importInfoIterator.next();
+        for (YangImport yangImport : getImportList()) {
             yangImport.addReferenceToImport(yangNodeSet);
         }
     }
@@ -728,15 +736,13 @@ public abstract class YangModule
     @Override
     public void addReferencesToIncludeList(Set<YangNode> yangNodeSet)
             throws DataModelException {
-        Iterator<YangInclude> includeInfoIterator = getIncludeList().iterator();
         // Run through the included list to add references.
-        while (includeInfoIterator.hasNext()) {
-            YangInclude yangInclude = includeInfoIterator.next();
-            YangSubModule subModule = null;
-            subModule = yangInclude.addReferenceToInclude(yangNodeSet);
+        for (YangInclude yangInclude : getIncludeList()) {
+            YangSubModule subModule = yangInclude
+                    .addReferenceToInclude(yangNodeSet);
 
             // Check if the referred sub-modules parent is self
-            if (!(subModule.getBelongsTo().getModuleNode() == this)) {
+            if (!subModule.getBelongsTo().getModuleNode().equals(this)) {
                 yangInclude.reportIncludeError();
             }
         }
@@ -765,25 +771,31 @@ public abstract class YangModule
     }
 
     @Override
-    public void addToNotificationEnumMap(String nameOfNotificationInEnum,
-                                         YangSchemaNode notficationSchemaNode) {
-        getNotificationEnumMap().put(nameOfNotificationInEnum,
-                                     notficationSchemaNode);
-    }
-
-    /**
-     * Returns notification enumeration map with key as the name of
-     * notification as per the enum in generated code and value as the
-     * notification schema node.
-     *
-     * @return notification enumeration map
-     */
-    private Map<String, YangSchemaNode> getNotificationEnumMap() {
-        return notificationEnumMap;
+    public void addToNotificationEnumMap(String enumName,
+                                         YangSchemaNode notification) {
+        notificationEnumMap.put(enumName, notification);
     }
 
     @Override
-    public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum) {
-        return getNotificationEnumMap().get(notificationNameInEnum);
+    public YangSchemaNode getNotificationSchemaNode(String enumName) {
+        return notificationEnumMap.get(enumName);
+    }
+
+    /**
+     * Adds to augment list.
+     *
+     * @param augment augment which is augmenting input
+     */
+    public void addToAugmentList(YangAugment augment) {
+        augments.add(augment);
+    }
+
+    /**
+     * Returns augmented list.
+     *
+     * @return augmented list
+     */
+    public List<YangAugment> getAugmentList() {
+        return unmodifiableList(augments);
     }
 }

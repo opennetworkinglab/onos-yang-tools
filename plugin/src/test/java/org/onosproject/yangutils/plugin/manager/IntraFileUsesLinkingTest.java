@@ -16,8 +16,6 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.ListIterator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,6 +34,9 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
+
+import java.io.IOException;
+import java.util.ListIterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -96,7 +97,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses get resolved
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
     }
 
     /**
@@ -177,7 +178,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses get resolved.
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
     }
 
@@ -344,18 +345,18 @@ public class IntraFileUsesLinkingTest {
         assertThat((firstUses.getNextSibling().getNextSibling() instanceof YangUses), is(true));
         YangUses fourthUses = ((YangUses) firstUses.getNextSibling().getNextSibling());
         assertThat((fourthUses.getNextSibling().getNextSibling().getNextSibling() instanceof YangTypeDef),
-                is(true));
+                   is(true));
         assertThat(fourthUses.getNextSibling().getNextSibling().getNextSibling().getName(), is("my-type"));
 
         //validate fifth uses
         assertThat((firstUses.getNextSibling().getNextSibling().getNextSibling() instanceof YangUses),
-                is(true));
+                   is(true));
 
         //validate end point uses
         assertThat(grouping.getNextSibling() instanceof YangUses, is(true));
         assertThat(grouping.getNextSibling().getNextSibling().getNextSibling().getNextSibling()
-                        .getNextSibling().getNextSibling().getNextSibling().getNextSibling() instanceof YangContainer,
-                is(true));
+                           .getNextSibling().getNextSibling().getNextSibling().getNextSibling() instanceof YangContainer,
+                   is(true));
         container = (YangContainer) grouping.getNextSibling().getNextSibling().getNextSibling().getNextSibling()
                 .getNextSibling().getNextSibling().getNextSibling().getNextSibling();
         assertThat(container.getName(), is("design"));
@@ -373,8 +374,8 @@ public class IntraFileUsesLinkingTest {
 
         thrown.expect(ParserException.class);
         thrown.expectMessage(
-                "YANG file error: Duplicate input identifier detected, same as uses \"failure in 10 at 13 in" +
-                        " src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang\"");
+                "YANG File Error: Identifier collision detected in uses as " +
+                        "\"failure in 10 at 13 in src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
         YangNode node = manager
                 .getDataModel("src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
     }
@@ -437,7 +438,7 @@ public class IntraFileUsesLinkingTest {
         YangUses uses = (YangUses) typedef.getNextSibling();
         assertThat(uses.getName(), is("creative"));
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
     }
 
     /**
@@ -485,7 +486,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses is getting resolved.
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.INTRA_FILE_RESOLVED));
+                   is(ResolvableStatus.INTRA_FILE_RESOLVED));
 
         // Check whether grouping is the child of module.
         assertThat((yangNode.getChild() instanceof YangGrouping), is(true));
@@ -499,7 +500,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether this uses is getting intra-file-resolved.
         assertThat(uses1.getResolvableStatus(),
-                is(ResolvableStatus.INTRA_FILE_RESOLVED));
+                   is(ResolvableStatus.INTRA_FILE_RESOLVED));
     }
 
     /**
@@ -534,7 +535,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses is getting resolved.
         assertThat(yangUses1.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check whether grouping is the sibling of uses.
         YangGrouping yangGrouping1 = (YangGrouping) yangUses1.getNextSibling();
@@ -546,7 +547,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check the uses gets resolved.
         assertThat(yangUses2.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check whether grouping is the sibling of list.
         YangGrouping yangGrouping2 = (YangGrouping) yangList.getNextSibling();
@@ -558,7 +559,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check uses is getting resolved.
         assertThat(yangUses3.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check grouping is the child of module.
         YangGrouping yangGrouping3 = (YangGrouping) node.getChild();
@@ -609,7 +610,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses is getting resolved.
         assertThat(yangUses1.getResolvableStatus(),
-                is(ResolvableStatus.INTRA_FILE_RESOLVED));
+                   is(ResolvableStatus.INTRA_FILE_RESOLVED));
 
         // Check whether grouping is the sibling of uses.
         YangGrouping yangGrouping1 = (YangGrouping) yangUses1.getNextSibling();
@@ -621,7 +622,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check whether uses gets intra-file-resolved.
         assertThat(yangUses2.getResolvableStatus(),
-                is(ResolvableStatus.INTRA_FILE_RESOLVED));
+                   is(ResolvableStatus.INTRA_FILE_RESOLVED));
 
         // Check whether grouping is the sibling of list.
         YangGrouping yangGrouping2 = (YangGrouping) yangList.getNextSibling();
@@ -633,7 +634,7 @@ public class IntraFileUsesLinkingTest {
 
         // Check uses is getting resolved.
         assertThat(yangUses3.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check grouping is the child of module.
         YangGrouping yangGrouping3 = (YangGrouping) node.getChild();

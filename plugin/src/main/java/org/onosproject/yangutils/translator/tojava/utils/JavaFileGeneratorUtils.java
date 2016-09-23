@@ -16,18 +16,11 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
-import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
-import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -46,6 +39,11 @@ import org.onosproject.yangutils.translator.tojava.TempJavaTypeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.CopyrightHeader;
 import org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
@@ -81,7 +79,6 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.HASH_CODE_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.OF_STRING_IMPL_MASK;
-import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.RPC_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.RPC_INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.SETTER_FOR_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
@@ -90,12 +87,13 @@ import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoT
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.ClassDefinitionGenerator.generateClassDefinition;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
+import static org.onosproject.yangutils.utils.UtilConstants.ERROR_MSG_FOR_GEN_CODE;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PACKAGE;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_CLASS;
@@ -134,187 +132,217 @@ public final class JavaFileGeneratorUtils {
      * @param handler   cached file handle
      * @return file object
      */
-    public static File getFileObject(String filePath, String fileName, String extension,
+    public static File getFileObject(String filePath, String fileName,
+                                     String extension,
                                      JavaFileInfoTranslator handler) {
-        return new File(handler.getBaseCodeGenPath() + filePath + SLASH + fileName + extension);
+        return new File(handler.getBaseCodeGenPath() + filePath + SLASH +
+                                fileName + extension);
     }
 
     /**
      * Returns data stored in temporary files.
      *
-     * @param generatedTempFiles    temporary file types
-     * @param tempJavaFragmentFiles temp java fragment files
-     * @param absolutePath          absolute path
+     * @param tempFiles  temporary file types
+     * @param tempHandle temp java fragment files
+     * @param path       absolute path
      * @return data stored in temporary files
      * @throws IOException when failed to get the data from temporary file handle
      */
-    static String getDataFromTempFileHandle(int generatedTempFiles,
-                                            TempJavaFragmentFiles tempJavaFragmentFiles, String absolutePath)
+    static String getDataFromTempFileHandle(
+            int tempFiles, TempJavaFragmentFiles tempHandle, String path)
             throws IOException {
 
-        TempJavaTypeFragmentFiles typeFragmentFiles = null;
-
-        if (tempJavaFragmentFiles instanceof TempJavaTypeFragmentFiles) {
-            typeFragmentFiles = (TempJavaTypeFragmentFiles) tempJavaFragmentFiles;
+        TempJavaTypeFragmentFiles typeHandle = null;
+        if (tempHandle instanceof TempJavaTypeFragmentFiles) {
+            typeHandle = (TempJavaTypeFragmentFiles) tempHandle;
         }
 
-        TempJavaBeanFragmentFiles beanFragmentFiles = null;
-
-        if (tempJavaFragmentFiles instanceof TempJavaBeanFragmentFiles) {
-            beanFragmentFiles = (TempJavaBeanFragmentFiles) tempJavaFragmentFiles;
+        TempJavaBeanFragmentFiles beanHandle = null;
+        if (tempHandle instanceof TempJavaBeanFragmentFiles) {
+            beanHandle = (TempJavaBeanFragmentFiles) tempHandle;
         }
 
-        TempJavaServiceFragmentFiles serviceFragmentFiles = null;
-        if (tempJavaFragmentFiles instanceof TempJavaServiceFragmentFiles) {
-            serviceFragmentFiles = (TempJavaServiceFragmentFiles) tempJavaFragmentFiles;
+        TempJavaServiceFragmentFiles serviceHandle = null;
+        if (tempHandle instanceof TempJavaServiceFragmentFiles) {
+            serviceHandle = (TempJavaServiceFragmentFiles) tempHandle;
         }
 
-        TempJavaEventFragmentFiles eventFragmentFiles = null;
-        if (tempJavaFragmentFiles instanceof TempJavaEventFragmentFiles) {
-            eventFragmentFiles = (TempJavaEventFragmentFiles) tempJavaFragmentFiles;
+        TempJavaEventFragmentFiles eventHandle = null;
+        if (tempHandle instanceof TempJavaEventFragmentFiles) {
+            eventHandle = (TempJavaEventFragmentFiles) tempHandle;
         }
 
-        if ((generatedTempFiles & ATTRIBUTES_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getAttributesTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & GETTER_FOR_INTERFACE_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getGetterInterfaceTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & SETTER_FOR_INTERFACE_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getSetterInterfaceTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & GETTER_FOR_CLASS_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getGetterImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & SETTER_FOR_CLASS_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getSetterImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & ADD_TO_LIST_INTERFACE_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getAddToListInterfaceTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & ADD_TO_LIST_IMPL_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getAddToListImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getSubtreeFilteringForLeafTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getGetSubtreeFilteringForListTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles
-                            .getGetSubtreeFilteringForChildNodeTempFileHandle(), absolutePath);
-        } else if ((generatedTempFiles & EDIT_CONTENT_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getEditContentTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getLeafIdAttributeTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & CONSTRUCTOR_IMPL_MASK) != 0) {
-            if (beanFragmentFiles == null) {
-                throw new TranslatorException("Required constructor info is missing.");
+        if ((tempFiles & ATTRIBUTES_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getAttributesTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & GETTER_FOR_INTERFACE_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getGetterInterfaceTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & SETTER_FOR_INTERFACE_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getSetterInterfaceTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & GETTER_FOR_CLASS_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getGetterImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & SETTER_FOR_CLASS_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getSetterImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & ADD_TO_LIST_INTERFACE_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getAddToListInterfaceTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & ADD_TO_LIST_IMPL_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getAddToListImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getSubtreeFilteringForLeafTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getGetSubtreeFilteringForListTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getGetSubtreeFilteringForChildNodeTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EDIT_CONTENT_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getEditContentTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getLeafIdAttributeTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & CONSTRUCTOR_IMPL_MASK) != 0) {
+            if (beanHandle == null) {
+                throw new TranslatorException("Required constructor info is" +
+                                                      " missing.");
             }
-            return beanFragmentFiles
-                    .getTemporaryDataFromFileHandle(beanFragmentFiles.getConstructorImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & HASH_CODE_IMPL_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getHashCodeImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EQUALS_IMPL_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getEqualsImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & TO_STRING_IMPL_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getToStringImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & OF_STRING_IMPL_MASK) != 0) {
-            if (typeFragmentFiles == null) {
-                throw new TranslatorException("Required of string implementation info is missing.");
+            return beanHandle.getTemporaryDataFromFileHandle(
+                    beanHandle.getConstructorImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & HASH_CODE_IMPL_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getHashCodeImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EQUALS_IMPL_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getEqualsImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & TO_STRING_IMPL_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getToStringImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & OF_STRING_IMPL_MASK) != 0) {
+            if (typeHandle == null) {
+                throw new TranslatorException("Required of string implementation" +
+                                                      " info is missing.");
             }
-            return typeFragmentFiles
-                    .getTemporaryDataFromFileHandle(typeFragmentFiles.getOfStringImplTempFileHandle(), absolutePath);
-        } else if ((generatedTempFiles & CONSTRUCTOR_FOR_TYPE_MASK) != 0) {
-            if (typeFragmentFiles == null) {
-                throw new TranslatorException("Required constructor implementation info is missing.");
+            return typeHandle.getTemporaryDataFromFileHandle(
+                    typeHandle.getOfStringImplTempFileHandle(), path);
+        }
+        if ((tempFiles & CONSTRUCTOR_FOR_TYPE_MASK) != 0) {
+            if (typeHandle == null) {
+                throw new TranslatorException("Required constructor implementation" +
+                                                      " info is missing.");
             }
-            return typeFragmentFiles
-                    .getTemporaryDataFromFileHandle(typeFragmentFiles.getConstructorForTypeTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & FROM_STRING_IMPL_MASK) != 0) {
-            return tempJavaFragmentFiles
-                    .getTemporaryDataFromFileHandle(tempJavaFragmentFiles.getFromStringImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & ENUM_IMPL_MASK) != 0) {
-            if (!(tempJavaFragmentFiles instanceof TempJavaEnumerationFragmentFiles)) {
+            return typeHandle.getTemporaryDataFromFileHandle(
+                    typeHandle.getConstructorForTypeTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & FROM_STRING_IMPL_MASK) != 0) {
+            return tempHandle.getTemporaryDataFromFileHandle(
+                    tempHandle.getFromStringImplTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & ENUM_IMPL_MASK) != 0) {
+            if (!(tempHandle instanceof TempJavaEnumerationFragmentFiles)) {
                 throw new TranslatorException("Required enum info is missing.");
             }
-            TempJavaEnumerationFragmentFiles enumFragmentFiles =
-                    (TempJavaEnumerationFragmentFiles) tempJavaFragmentFiles;
-            return enumFragmentFiles
-                    .getTemporaryDataFromFileHandle(enumFragmentFiles.getEnumClassTempFileHandle(), absolutePath);
-        } else if ((generatedTempFiles & RPC_INTERFACE_MASK) != 0) {
-            if (serviceFragmentFiles == null) {
-                throw new TranslatorException("Required rpc interface info is missing.");
+            TempJavaEnumerationFragmentFiles enumHandle =
+                    (TempJavaEnumerationFragmentFiles) tempHandle;
+            return enumHandle.getTemporaryDataFromFileHandle(
+                    enumHandle.getEnumClassTempFileHandle(), path);
+        }
+        if ((tempFiles & RPC_INTERFACE_MASK) != 0) {
+            if (serviceHandle == null) {
+                throw new TranslatorException("Required rpc interface info is" +
+                                                      " missing.");
             }
-            return serviceFragmentFiles
-                    .getTemporaryDataFromFileHandle(serviceFragmentFiles.getRpcInterfaceTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & RPC_IMPL_MASK) != 0) {
-            if (serviceFragmentFiles == null) {
-                throw new TranslatorException("Required rpc implementation info is missing.");
+            return serviceHandle.getTemporaryDataFromFileHandle(
+                    serviceHandle.getRpcInterfaceTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EVENT_ENUM_MASK) != 0) {
+            if (eventHandle == null) {
+                throw new TranslatorException(
+                        "Required event enum implementation info is missing.");
             }
-            return serviceFragmentFiles
-                    .getTemporaryDataFromFileHandle(serviceFragmentFiles.getRpcImplTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EVENT_ENUM_MASK) != 0) {
-            if (eventFragmentFiles == null) {
-                throw new TranslatorException("Required event enum implementation info is missing.");
+            return eventHandle.getTemporaryDataFromFileHandle(
+                    eventHandle.getEventEnumTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EVENT_METHOD_MASK) != 0) {
+            if (eventHandle == null) {
+                throw new TranslatorException(
+                        "Required event method implementation info is missing.");
             }
-            return eventFragmentFiles
-                    .getTemporaryDataFromFileHandle(eventFragmentFiles.getEventEnumTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EVENT_METHOD_MASK) != 0) {
-            if (eventFragmentFiles == null) {
-                throw new TranslatorException("Required event method implementation info is missing.");
+            return eventHandle.getTemporaryDataFromFileHandle(
+                    eventHandle.getEventMethodTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EVENT_SUBJECT_GETTER_MASK) != 0) {
+            if (eventHandle == null) {
+                throw new TranslatorException(
+                        "Required event subject getter implementation info is" +
+                                " missing.");
             }
-            return eventFragmentFiles
-                    .getTemporaryDataFromFileHandle(eventFragmentFiles.getEventMethodTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EVENT_SUBJECT_GETTER_MASK) != 0) {
-            if (eventFragmentFiles == null) {
-                throw new TranslatorException("Required event subject getter implementation info is missing.");
+            return eventHandle.getTemporaryDataFromFileHandle(
+                    eventHandle.getEventSubjectGetterTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EVENT_SUBJECT_SETTER_MASK) != 0) {
+            if (eventHandle == null) {
+                throw new TranslatorException(
+                        "Required event subject setter implementation info is" +
+                                " missing.");
             }
-            return eventFragmentFiles
-                    .getTemporaryDataFromFileHandle(eventFragmentFiles.getEventSubjectGetterTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EVENT_SUBJECT_SETTER_MASK) != 0) {
-            if (eventFragmentFiles == null) {
-                throw new TranslatorException("Required event subject setter implementation info is missing.");
+            return eventHandle.getTemporaryDataFromFileHandle(
+                    eventHandle.getEventSubjectSetterTempFileHandle(),
+                    path);
+        }
+        if ((tempFiles & EVENT_SUBJECT_ATTRIBUTE_MASK) != 0) {
+            if (eventHandle == null) {
+                throw new TranslatorException(
+                        "Required event subject attribute implementation info is" +
+                                " missing.");
             }
-            return eventFragmentFiles
-                    .getTemporaryDataFromFileHandle(eventFragmentFiles.getEventSubjectSetterTempFileHandle(),
-                            absolutePath);
-        } else if ((generatedTempFiles & EVENT_SUBJECT_ATTRIBUTE_MASK) != 0) {
-            if (eventFragmentFiles == null) {
-                throw new TranslatorException("Required event subject attribute implementation info is missing.");
-            }
-            return eventFragmentFiles
-                    .getTemporaryDataFromFileHandle(eventFragmentFiles.getEventSubjectAttributeTempFileHandle(),
-                            absolutePath);
+            return eventHandle.getTemporaryDataFromFileHandle(
+                    eventHandle.getEventSubjectAttributeTempFileHandle(),
+                    path);
         }
         return null;
     }
@@ -322,64 +350,67 @@ public final class JavaFileGeneratorUtils {
     /**
      * Initiates generation of file based on generated file type.
      *
-     * @param file         generated file
-     * @param className    generated file class name
-     * @param genType      generated file type
-     * @param imports      imports for the file
-     * @param pkg          generated file package
-     * @param pluginConfig plugin configurations
+     * @param file      generated file
+     * @param className generated file class name
+     * @param genType   generated file type
+     * @param imports   imports for the file
+     * @param pkg       generated file package
      * @throws IOException when fails to generate a file
      */
-    public static void initiateJavaFileGeneration(File file, String className, int genType, List<String> imports,
-                                                  String pkg, YangPluginConfig pluginConfig)
+    public static void initiateJavaFileGeneration(File file, String className,
+                                                  int genType, List<String> imports,
+                                                  String pkg)
             throws IOException {
 
         if (file.exists()) {
             throw new IOException(" file " + file.getName() + " is already generated." +
-                    "please check whether multiple yang files has same module/submodule \"name\" and \"namespace\"" +
-                    "or You may have generated code of previous build present in your directory.");
+                                          ERROR_MSG_FOR_GEN_CODE);
         }
 
         boolean isFileCreated;
         try {
             isFileCreated = file.createNewFile();
             if (!isFileCreated) {
-                throw new IOException("Failed to create " + file.getName() + " class file.");
+                throw new IOException("Failed to create " + file.getName() +
+                                              " class file.");
             }
-            appendContents(file, className, genType, imports, pkg, pluginConfig);
+            appendContents(file, className, genType, imports, pkg);
         } catch (IOException e) {
-            throw new IOException("Failed to append contents in " + file.getName() + " class file.");
+            throw new IOException("Failed to append contents in " + file.getName() +
+                                          " class file.");
         }
     }
 
     /**
      * Initiates generation of file based on generated file type.
      *
-     * @param file      generated file
-     * @param genType   generated file type
-     * @param imports   imports for the file
-     * @param curNode   current YANG node
-     * @param className class name
+     * @param file    generated file
+     * @param genType generated file type
+     * @param imports imports for the file
+     * @param curNode current YANG node
+     * @param name    class name
      * @throws IOException when fails to generate a file
      */
-    public static void initiateJavaFileGeneration(File file, int genType, List<String> imports,
-                                                  YangNode curNode, String className)
+    public static void initiateJavaFileGeneration(File file, int genType,
+                                                  List<String> imports,
+                                                  YangNode curNode, String name)
             throws IOException {
 
         if (file.exists()) {
             throw new IOException(" file " + file.getName() + " is already generated." +
-                    "please check whether multiple yang files has same module/submodule \"name\" and \"namespace\"" +
-                    "or You may have generated code of previous build present in your directory.");
+                                          ERROR_MSG_FOR_GEN_CODE);
         }
         boolean isFileCreated;
         try {
             isFileCreated = file.createNewFile();
             if (!isFileCreated) {
-                throw new IOException("Failed to create " + file.getName() + " class file.");
+                throw new IOException("Failed to create " + file.getName() +
+                                              " class file.");
             }
-            appendContents(file, genType, imports, curNode, className);
+            appendContents(file, genType, imports, curNode, name);
         } catch (IOException e) {
-            throw new IOException("Failed to append contents in " + file.getName() + " class file.");
+            throw new IOException("Failed to append contents in " + file.getName() +
+                                          " class file.");
         }
     }
 
@@ -393,20 +424,24 @@ public final class JavaFileGeneratorUtils {
      * @param className   class name
      * @throws IOException when fails to do IO operations
      */
-    private static void appendContents(File file, int genType, List<String> importsList, YangNode curNode,
+    private static void appendContents(File file, int genType,
+                                       List<String> importsList, YangNode curNode,
                                        String className)
             throws IOException {
 
-        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) curNode)
+                .getJavaFileInfo();
 
         String name = javaFileInfo.getJavaName();
-        String path = javaFileInfo.getBaseCodeGenPath() + javaFileInfo.getPackageFilePath();
+        String path = javaFileInfo.getBaseCodeGenPath() + javaFileInfo
+                .getPackageFilePath();
 
         String pkgString;
-        if (genType == GENERATE_EVENT_CLASS
-                || genType == GENERATE_EVENT_LISTENER_INTERFACE
-                || genType == GENERATE_EVENT_SUBJECT_CLASS) {
-            pkgString = parsePackageString((path + PERIOD + name).toLowerCase(), importsList);
+        if (genType == GENERATE_EVENT_CLASS ||
+                genType == GENERATE_EVENT_LISTENER_INTERFACE ||
+                genType == GENERATE_EVENT_SUBJECT_CLASS) {
+            pkgString = parsePackageString((path + PERIOD + name)
+                                                   .toLowerCase(), importsList);
         } else {
             pkgString = parsePackageString(path, importsList);
         }
@@ -459,11 +494,10 @@ public final class JavaFileGeneratorUtils {
      * @param genType      generated file type
      * @param importsList  list of java imports
      * @param pkg          generated file package
-     * @param pluginConfig plugin configurations
      * @throws IOException when fails to append contents
      */
-    private static void appendContents(File file, String fileName, int genType, List<String> importsList, String pkg,
-                                       YangPluginConfig pluginConfig)
+    private static void appendContents(File file, String fileName, int genType,
+                                       List<String> importsList, String pkg)
             throws IOException {
 
         String pkgString = parsePackageString(pkg, importsList);
@@ -471,15 +505,15 @@ public final class JavaFileGeneratorUtils {
         switch (genType) {
             case GENERATE_TYPEDEF_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, fileName, genType, IMPL_CLASS, pluginConfig);
+                write(file, fileName, genType, IMPL_CLASS);
                 break;
             case GENERATE_UNION_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, fileName, genType, IMPL_CLASS, pluginConfig);
+                write(file, fileName, genType, IMPL_CLASS);
                 break;
             case GENERATE_ENUM_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, fileName, genType, ENUM_CLASS, pluginConfig);
+                write(file, fileName, genType, ENUM_CLASS);
                 break;
             default:
                 break;
@@ -493,30 +527,32 @@ public final class JavaFileGeneratorUtils {
      * @param importsList list of imports
      * @return package string
      */
-    private static String parsePackageString(String javaPkg, List<String> importsList) {
+    private static String parsePackageString(String javaPkg,
+                                             List<String> importsList) {
 
         javaPkg = parsePkg(getJavaPackageFromPackagePath(javaPkg));
         if (importsList != null) {
             if (!importsList.isEmpty()) {
-                return PACKAGE + SPACE + javaPkg + SEMI_COLAN + NEW_LINE;
+                return PACKAGE + SPACE + javaPkg + SEMI_COLON + NEW_LINE;
             } else {
-                return PACKAGE + SPACE + javaPkg + SEMI_COLAN;
+                return PACKAGE + SPACE + javaPkg + SEMI_COLON;
             }
         } else {
-            return PACKAGE + SPACE + javaPkg + SEMI_COLAN;
+            return PACKAGE + SPACE + javaPkg + SEMI_COLON;
         }
     }
 
     /**
-     * Appends other contents to interface, impl and typedef classes. for example : ONOS copyright, imports and
-     * package.
+     * Appends other contents to interface, impl and typedef classes.
+     * for example : ONOS copyright, imports and package.
      *
      * @param file        generated file
      * @param pkg         generated package
      * @param importsList list of imports
      * @throws IOException when fails to append contents
      */
-    private static void appendHeaderContents(File file, String pkg, List<String> importsList)
+    private static void appendHeaderContents(File file, String pkg,
+                                             List<String> importsList)
             throws IOException {
 
         insertDataIntoJavaFile(file, CopyrightHeader.getCopyrightHeader());
@@ -545,28 +581,28 @@ public final class JavaFileGeneratorUtils {
      * @param fileName    file name
      * @throws IOException when fails to write into a file
      */
-    private static void write(File file, int genType, JavaDocType javaDocType, YangNode curNode, String fileName)
+    private static void write(File file, int genType, JavaDocType javaDocType,
+                              YangNode curNode, String fileName)
             throws IOException {
-
-        YangPluginConfig pluginConfig = ((JavaFileInfoContainer) curNode).getJavaFileInfo().getPluginConfig();
-        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig, null));
-        insertDataIntoJavaFile(file, generateClassDefinition(genType, fileName, curNode));
+        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName,
+                                                false, null));
+        insertDataIntoJavaFile(file, generateClassDefinition(genType,
+                                                             fileName, curNode));
     }
 
     /**
      * Writes data to the specific generated file.
      *
-     * @param file         generated file
-     * @param fileName     file name
-     * @param genType      generated file type
-     * @param javaDocType  java doc type
-     * @param pluginConfig plugin configurations
+     * @param file        generated file
+     * @param fileName    file name
+     * @param genType     generated file type
+     * @param javaDocType java doc type
      * @throws IOException when fails to write into a file
      */
-    private static void write(File file, String fileName, int genType, JavaDocType javaDocType,
-                              YangPluginConfig pluginConfig)
-            throws IOException {
-        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false, pluginConfig, null));
+    private static void write(File file, String fileName, int genType,
+                              JavaDocType javaDocType) throws IOException {
+        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName, false,
+                                                null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType, fileName));
     }
 
@@ -605,12 +641,14 @@ public final class JavaFileGeneratorUtils {
     }
 
     /*Validates the set for duplicate names of node identifiers.*/
-    private static boolean validateNodeIdentifierInSet(YangNodeIdentifier nodeId, List<YangAtomicPath> targets) {
+    private static boolean validateNodeIdentifierInSet(
+            YangNodeIdentifier nodeId, List<YangAtomicPath> targets) {
         boolean isPresent = true;
         for (YangAtomicPath target : targets) {
             if (target.getNodeIdentifier().getName().equals(nodeId.getName())) {
                 if (target.getNodeIdentifier().getPrefix() != null) {
-                    isPresent = !target.getNodeIdentifier().getPrefix().equals(nodeId.getPrefix());
+                    isPresent = !target.getNodeIdentifier().getPrefix()
+                            .equals(nodeId.getPrefix());
                 } else {
                     isPresent = nodeId.getPrefix() != null;
                 }
@@ -626,33 +664,37 @@ public final class JavaFileGeneratorUtils {
      */
     public static void addResolvedAugmentedDataNodeImports(YangNode parent) {
         List<YangAtomicPath> targets = getSetOfNodeIdentifiers(parent);
-        TempJavaCodeFragmentFiles tempJavaCodeFragmentFiles = ((JavaCodeGeneratorInfo) parent)
+        TempJavaCodeFragmentFiles tempJavaCodeFragmentFiles = (
+                (JavaCodeGeneratorInfo) parent)
                 .getTempJavaCodeFragmentFiles();
         YangNode augmentedNode;
-        JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo;
+        JavaQualifiedTypeInfoTranslator typeInfo;
         String curNodeName;
-        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent)
+                .getJavaFileInfo();
         for (YangAtomicPath nodeId : targets) {
             augmentedNode = nodeId.getResolvedNode().getParent();
-            if (((JavaFileInfoContainer) augmentedNode).getJavaFileInfo().getJavaName() != null) {
-                curNodeName = ((JavaFileInfoContainer) augmentedNode).getJavaFileInfo().getJavaName();
-            } else {
-                curNodeName = getCapitalCase(getCamelCase(augmentedNode.getName(), parentInfo.getPluginConfig()
-                        .getConflictResolver()));
-            }
+            curNodeName = getCurNodeName(augmentedNode, parentInfo
+                    .getPluginConfig());
 
-            javaQualifiedTypeInfo = getQualifiedTypeInfoOfAugmentedNode(augmentedNode, getCapitalCase(curNodeName),
-                    parentInfo.getPluginConfig());
-            tempJavaCodeFragmentFiles.getServiceTempFiles().getJavaImportData().addImportInfo(javaQualifiedTypeInfo,
-                    parentInfo.getJavaName(), parentInfo.getPackage());
-            if (augmentedNode instanceof YangModule || augmentedNode instanceof YangSubModule) {
-                javaQualifiedTypeInfo = getQualifiedTypeInfoOfAugmentedNode(augmentedNode,
-                        getCapitalCase(curNodeName) + OP_PARAM,
-                        parentInfo.getPluginConfig());
-                tempJavaCodeFragmentFiles.getServiceTempFiles().getJavaImportData().addImportInfo(javaQualifiedTypeInfo,
-                        parentInfo.getJavaName(), parentInfo.getPackage());
-            }
+            typeInfo =
+                    getQTypeInfoOfNode(
+                            augmentedNode, curNodeName + OP_PARAM,
+                            parentInfo.getPluginConfig());
 
+            tempJavaCodeFragmentFiles.getServiceTempFiles()
+                    .getJavaImportData().addImportInfo(
+                    typeInfo, parentInfo.getJavaName(),
+                    parentInfo.getPackage());
+            typeInfo =
+                    getQTypeInfoOfNode(
+                            augmentedNode, curNodeName, parentInfo
+                                    .getPluginConfig());
+
+            tempJavaCodeFragmentFiles.getServiceTempFiles()
+                    .getJavaImportData().addImportInfo(
+                    typeInfo, parentInfo.getJavaName(),
+                    parentInfo.getPackage());
         }
     }
 
@@ -664,13 +706,14 @@ public final class JavaFileGeneratorUtils {
      * @param pluginConfig  plugin configurations
      * @return qualified type info of augmented node
      */
-    private static JavaQualifiedTypeInfoTranslator getQualifiedTypeInfoOfAugmentedNode(YangNode augmentedNode,
-                                                                                       String curNodeName, YangPluginConfig pluginConfig) {
-        JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo = getQualifiedTypeInfoOfCurNode(augmentedNode,
-                getCapitalCase(curNodeName));
+    private static JavaQualifiedTypeInfoTranslator getQTypeInfoOfNode(
+            YangNode augmentedNode, String curNodeName, YangPluginConfig pluginConfig) {
+        JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo =
+                getQualifiedTypeInfoOfCurNode(augmentedNode,
+                                              curNodeName);
         if (javaQualifiedTypeInfo.getPkgInfo() == null) {
             javaQualifiedTypeInfo.setPkgInfo(getNodesPackage(augmentedNode,
-                    pluginConfig));
+                                                             pluginConfig));
         }
         return javaQualifiedTypeInfo;
     }
@@ -682,9 +725,11 @@ public final class JavaFileGeneratorUtils {
      * @param importData            import data
      * @return true if present in imports
      */
-    private static boolean validateQualifiedInfoOfAugmentedNode(JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo,
-                                                                JavaImportData importData) {
-        for (JavaQualifiedTypeInfoTranslator curImportInfo : importData.getImportSet()) {
+    private static boolean validateQualifiedInfoOfAugmentedNode(
+            JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo,
+            JavaImportData importData) {
+        for (JavaQualifiedTypeInfoTranslator curImportInfo : importData
+                .getImportSet()) {
             if (curImportInfo.getClassInfo()
                     .contentEquals(javaQualifiedTypeInfo.getClassInfo())) {
                 return curImportInfo.getPkgInfo()
@@ -701,46 +746,42 @@ public final class JavaFileGeneratorUtils {
      * @param parent        parent node
      * @return augmented class name for data methods in manager and service
      */
-    static String getAugmentedClassNameForDataMethods(YangNode augmentedNode, YangNode parent) {
+    static String getAugmentedClassNameForDataMethods(YangNode augmentedNode,
+                                                      YangNode parent) {
         String curNodeName;
         JavaQualifiedTypeInfoTranslator javaQualifiedTypeInfo;
-        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent)
+                .getJavaFileInfo();
         YangPluginConfig pluginConfig = parentInfo.getPluginConfig();
-        TempJavaServiceFragmentFiles tempJavaServiceFragmentFiles = ((JavaCodeGeneratorInfo) parent)
-                .getTempJavaCodeFragmentFiles().getServiceTempFiles();
-        if (((JavaFileInfoContainer) augmentedNode).getJavaFileInfo().getJavaName() != null) {
-            curNodeName = ((JavaFileInfoContainer) augmentedNode).getJavaFileInfo().getJavaName();
-        } else {
-            curNodeName = getCapitalCase(getCamelCase(augmentedNode.getName(), pluginConfig
-                    .getConflictResolver()));
-        }
+        TempJavaServiceFragmentFiles tempJavaServiceFragmentFiles = (
+                (JavaCodeGeneratorInfo) parent).getTempJavaCodeFragmentFiles()
+                .getServiceTempFiles();
+        curNodeName = getCurNodeName(augmentedNode, pluginConfig);
 
-        javaQualifiedTypeInfo = getQualifiedTypeInfoOfAugmentedNode(augmentedNode,
-                getCapitalCase(curNodeName),
-                parentInfo.getPluginConfig());
+        javaQualifiedTypeInfo = getQTypeInfoOfNode(augmentedNode,
+                                                   getCapitalCase(curNodeName),
+                                                   parentInfo.getPluginConfig());
         if (validateQualifiedInfoOfAugmentedNode(javaQualifiedTypeInfo,
-                tempJavaServiceFragmentFiles.getJavaImportData())) {
+                                                 tempJavaServiceFragmentFiles
+                                                         .getJavaImportData())) {
             return javaQualifiedTypeInfo.getClassInfo();
         } else {
-            return javaQualifiedTypeInfo.getPkgInfo() + PERIOD + javaQualifiedTypeInfo.getClassInfo();
+            return javaQualifiedTypeInfo.getPkgInfo() + PERIOD +
+                    javaQualifiedTypeInfo.getClassInfo();
         }
     }
 
-    /**
-     * Returns parent node name for data methods in manager and service.
-     *
-     * @param parent       parent node
-     * @param pluginConfig plugin configurations
-     * @return parent node name for data methods in manager and service
-     */
-    static String getParentNodeNameForDataMethods(YangNode parent, YangPluginConfig pluginConfig) {
-        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-        if (parentInfo.getJavaName() != null) {
-            return getCapitalCase(parentInfo.getJavaName());
+    //Returns class name of current node
+    static String getCurNodeName(YangNode node, YangPluginConfig config) {
+        if (((JavaFileInfoContainer) node).getJavaFileInfo()
+                .getJavaName() != null) {
+            return getCapitalCase(((JavaFileInfoContainer) node)
+                                          .getJavaFileInfo()
+                                          .getJavaName());
+        } else {
+            return getCapitalCase(getCamelCase(node.getName(), config
+                    .getConflictResolver()));
         }
-        return getCapitalCase(getCamelCase(parent.getName(), pluginConfig
-                .getConflictResolver()));
-
     }
 
     /**
@@ -750,7 +791,8 @@ public final class JavaFileGeneratorUtils {
      * @param attributeType effective type
      * @return name of the effective type
      */
-    public static String isTypeNameLeafref(String attributeName, YangType<?> attributeType) {
+    public static String isTypeNameLeafref(String attributeName,
+                                           YangType<?> attributeType) {
         if (attributeName.equalsIgnoreCase(LEAFREF)) {
             return attributeType.getDataTypeName();
         }
@@ -765,10 +807,10 @@ public final class JavaFileGeneratorUtils {
      */
     public static YangType isTypeLeafref(YangType<?> attributeType) {
         if (attributeType.getDataType() == YangDataTypes.LEAFREF) {
-            YangLeafRef leafRef = (YangLeafRef) attributeType.getDataTypeExtendedInfo();
+            YangLeafRef leafRef = (YangLeafRef) attributeType
+                    .getDataTypeExtendedInfo();
             return leafRef.getEffectiveDataType();
         }
         return attributeType;
     }
-
 }

@@ -56,7 +56,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void builderClassGenerationTest() {
-        String builderClassJavaDoc = getJavaDoc(BUILDER_CLASS, TEST_NAME, false, getStubPluginConfig(), null);
+        String builderClassJavaDoc = getJavaDoc(BUILDER_CLASS, TEST_NAME, false, null);
         assertThat(true, is(builderClassJavaDoc.contains("Represents the builder implementation of")
                 && builderClassJavaDoc.contains(END_STRING)));
     }
@@ -66,7 +66,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void builderInterfaceGenerationTest() {
-        String builderInterfaceJavaDoc = getJavaDoc(BUILDER_INTERFACE, TEST_NAME, false, getStubPluginConfig(), null);
+        String builderInterfaceJavaDoc = getJavaDoc(BUILDER_INTERFACE, TEST_NAME, false, null);
         assertThat(true,
                 is(builderInterfaceJavaDoc.contains("Builder for")
                         && builderInterfaceJavaDoc.contains(END_STRING)));
@@ -77,7 +77,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void buildGenerationTest() {
-        String buildDoc = getJavaDoc(BUILD_METHOD, TEST_NAME, false, getStubPluginConfig(), null);
+        String buildDoc = getJavaDoc(BUILD_METHOD, TEST_NAME, false, null);
         assertThat(true, is(buildDoc.contains("Builds object of") && buildDoc.contains(END_STRING)));
     }
 
@@ -109,7 +109,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void constructorGenerationTest() {
-        String constructorDoc = getJavaDoc(CONSTRUCTOR, TEST_NAME, false, getStubPluginConfig(), null);
+        String constructorDoc = getJavaDoc(CONSTRUCTOR, TEST_NAME, false, null);
         assertThat(true,
                 is(constructorDoc.contains("Creates an instance of ")
                         && constructorDoc.contains("builder object of")
@@ -121,7 +121,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void defaultConstructorGenerationTest() {
-        String defaultConstructorDoc = getJavaDoc(DEFAULT_CONSTRUCTOR, TEST_NAME, false, getStubPluginConfig(), null);
+        String defaultConstructorDoc = getJavaDoc(DEFAULT_CONSTRUCTOR, TEST_NAME, false, null);
         assertThat(true, is(defaultConstructorDoc.contains("Creates an instance of ")
                 && defaultConstructorDoc.contains(END_STRING)));
     }
@@ -131,7 +131,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void getterGenerationTest() {
-        String getterJavaDoc = getJavaDoc(GETTER_METHOD, TEST_NAME, false, getStubPluginConfig(), null);
+        String getterJavaDoc = getJavaDoc(GETTER_METHOD, TEST_NAME, false, null);
         assertThat(true,
                 is(getterJavaDoc.contains("Returns the attribute") && getterJavaDoc.contains(END_STRING)));
     }
@@ -141,7 +141,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void implClassGenerationTest() {
-        String implClassJavaDoc = getJavaDoc(IMPL_CLASS, TEST_NAME, false, getStubPluginConfig(), null);
+        String implClassJavaDoc = getJavaDoc(IMPL_CLASS, TEST_NAME, false, null);
         assertThat(true,
                 is(implClassJavaDoc.contains("Represents the implementation of")
                         && implClassJavaDoc.contains(END_STRING)));
@@ -152,7 +152,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void interfaceGenerationTest() {
-        String interfaceJavaDoc = getJavaDoc(INTERFACE, TEST_NAME, false, getStubPluginConfig(), null);
+        String interfaceJavaDoc = getJavaDoc(INTERFACE, TEST_NAME, false, null);
         assertThat(true,
                 is(interfaceJavaDoc.contains("Abstraction of an entity which represents the functionality of")
                         && interfaceJavaDoc.contains(END_STRING)));
@@ -163,7 +163,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void packageInfoGenerationTest() {
-        String packageInfo = getJavaDoc(PACKAGE_INFO, TEST_NAME, false, getStubPluginConfig(), null);
+        String packageInfo = getJavaDoc(PACKAGE_INFO, TEST_NAME, false, null);
         assertThat(true,
                 is(packageInfo.contains("Implementation of YANG node") && packageInfo.contains(END_STRING)));
     }
@@ -173,7 +173,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void packageInfoGenerationForChildNodeTest() {
-        String packageInfo = getJavaDoc(PACKAGE_INFO, TEST_NAME, true, getStubPluginConfig(), null);
+        String packageInfo = getJavaDoc(PACKAGE_INFO, TEST_NAME, true, null);
         assertThat(true, is(packageInfo.contains("Implementation of YANG node testName's children nodes")
                 && packageInfo.contains(END_STRING)));
     }
@@ -183,7 +183,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void setterGenerationTest() {
-        String setterJavaDoc = getJavaDoc(SETTER_METHOD, TEST_NAME, false, getStubPluginConfig(), null);
+        String setterJavaDoc = getJavaDoc(SETTER_METHOD, TEST_NAME, false, null);
         assertThat(true,
                 is(setterJavaDoc.contains("Returns the builder object of") && setterJavaDoc.contains(END_STRING)));
     }
@@ -193,7 +193,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void typeDefSetterGenerationTest() {
-        String typeDefSetter = getJavaDoc(TYPE_DEF_SETTER_METHOD, TEST_NAME, false, getStubPluginConfig(), null);
+        String typeDefSetter = getJavaDoc(TYPE_DEF_SETTER_METHOD, TEST_NAME, false, null);
         assertThat(true, is(typeDefSetter.contains("Sets the value of") && typeDefSetter.contains(END_STRING)));
     }
 

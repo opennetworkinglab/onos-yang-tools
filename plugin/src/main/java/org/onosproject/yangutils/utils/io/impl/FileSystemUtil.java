@@ -52,7 +52,8 @@ public final class FileSystemUtil {
      */
     static void appendFileContents(File toAppend, File srcFile)
             throws IOException {
-        updateFileHandle(srcFile, NEW_LINE + readAppendFile(toAppend.toString(), FOUR_SPACE_INDENTATION), false);
+        updateFileHandle(srcFile, readAppendFile(toAppend.toString(),
+                                                 FOUR_SPACE_INDENTATION), false);
     }
 
     /**

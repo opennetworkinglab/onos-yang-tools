@@ -16,6 +16,13 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.onosproject.yangutils.datamodel.YangRevision;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -23,13 +30,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.onosproject.yangutils.datamodel.YangRevision;
-import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.core.Is.is;
@@ -132,7 +132,7 @@ public final class JavaIdentifierSyntaxTest {
     @Test
     public void callPrivateConstructors()
             throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-                   InstantiationException, IllegalAccessException, InvocationTargetException {
+            InstantiationException, IllegalAccessException, InvocationTargetException {
 
         Class<?>[] classesToConstruct = {JavaIdentifierSyntax.class};
         for (Class<?> clazz : classesToConstruct) {

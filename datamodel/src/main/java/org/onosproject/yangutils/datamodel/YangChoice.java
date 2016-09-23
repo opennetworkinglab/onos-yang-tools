@@ -15,23 +15,26 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-
-import static org.onosproject.yangutils.datamodel.utils.YangConstructType
-        .CHOICE_DATA;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
-        .DATA_MISSING_ERROR_TAG;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
-        .ERROR_PATH_MISSING_CHOICE;
-import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
-        .MISSING_CHOICE_ERROR_APP_TAG;
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.CHOICE_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_CHOICE_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.CHOICE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CASE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CHOICE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.DATA_MISSING_ERROR_TAG;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.ERROR_PATH_MISSING_CHOICE;
+import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.MISSING_CHOICE_ERROR_APP_TAG;
 
 /*-
  * Reference RFC 6020.
@@ -75,9 +78,8 @@ import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants
 public abstract class YangChoice
         extends YangNode
         implements YangCommonInfo, Parsable, CollisionDetector,
-                   YangAugmentableNode,
-                   YangWhenHolder, YangIfFeatureHolder, YangAppErrorHolder,
-                   YangIsFilterContentNodes, YangConfig {
+        YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder,
+        YangAppErrorHolder, YangIsFilterContentNodes, YangConfig {
 
     private static final long serialVersionUID = 806201604L;
 
@@ -158,7 +160,7 @@ public abstract class YangChoice
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
+    private final List<YangAugment> yangAugmentedInfo;
 
     /**
      * YANG application error information.
@@ -169,34 +171,31 @@ public abstract class YangChoice
      * Create a choice node.
      */
     public YangChoice() {
-        super(YangNodeType.CHOICE_NODE, new HashMap<>());
+        super(CHOICE_NODE, new HashMap<>());
         yangAppErrorInfo = new YangAppErrorInfo();
         ifFeatureList = new LinkedList<>();
+        yangAugmentedInfo = new ArrayList<>();
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(MISSING_CHOICE_ERROR_APP_TAG);
         yangAppErrorInfo.setErrorAppPath(ERROR_PATH_MISSING_CHOICE);
     }
 
     @Override
-    public void addToChildSchemaMap(
-            YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
-        getYsnContextInfoMap()
-                .put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 =
+        getYsnContextInfoMap().put(id, context);
+        YangSchemaNodeContextInfo contextInfo =
                 new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1
-                .setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
-        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getParent().addToChildSchemaMap(schemaNodeIdentifier,
-                                        yangSchemaNodeContextInfo1);
+        contextInfo.setSchemaNode(context.getSchemaNode());
+        contextInfo.setContextSwitchedNode(this);
+        getParent().addToChildSchemaMap(id, contextInfo);
     }
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        String nameSpace = this.getParent().getNameSpace();
+        String nameSpace = getParent().getNameSpace();
         // Set namespace for self node.
         setNameSpace(nameSpace);
     }
@@ -217,8 +216,8 @@ public abstract class YangChoice
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        /*Choice node to be skipped in YANG data tree preperation*/
-        return YangSchemaNodeType.YANG_CHOICE_NODE;
+        /*Choice node to be skipped in YANG data tree preparation*/
+        return YANG_CHOICE_NODE;
     }
 
     /**
@@ -392,8 +391,7 @@ public abstract class YangChoice
             // Check whether default string matches the case
             while (node != null) {
                 if (node instanceof YangCase) {
-                    if (defaultValueInString
-                            .equals(((YangCase) node).getName())) {
+                    if (defaultValueInString.equals(node.getName())) {
                         matched = true;
                         break;
                     }
@@ -404,28 +402,24 @@ public abstract class YangChoice
             if (!matched) {
                 throw new DataModelException(
                         "YANG file error: default string \"" +
-                                defaultValueInString
-                                + "\" not matching choice \"" + getName() +
-                                "\" case.");
+                                defaultValueInString + "\" not matching choice \"" +
+                                getName() + "\" case.");
             }
         }
     }
 
     @Override
-    public void detectCollidingChild(String identifierName,
-                                     YangConstructType dataType)
+    public void detectCollidingChild(String idName, YangConstructType type)
             throws DataModelException {
 
         if (getParent() instanceof YangCase &&
-                dataType != YangConstructType.CASE_DATA) {
-            ((CollisionDetector) getParent())
-                    .detectCollidingChild(identifierName, dataType);
+                type != CASE_DATA) {
+            ((CollisionDetector) getParent()).detectCollidingChild(idName, type);
         }
         YangNode node = getChild();
         while (node != null) {
             if (node instanceof CollisionDetector) {
-                ((CollisionDetector) node)
-                        .detectSelfCollision(identifierName, dataType);
+                ((CollisionDetector) node).detectSelfCollision(idName, type);
             }
             node = node.getNextSibling();
         }
@@ -439,9 +433,9 @@ public abstract class YangChoice
         if (dataType == CHOICE_DATA) {
             if (getName().equals(identifierName)) {
                 throw new DataModelException(
-                        "YANG file error: Identifier collision detected in " +
-                                "choice \"" +
-                                getName() + "\"");
+                        getErrorMsgCollision(COLLISION_DETECTION, getName(),
+                                             getLineNumber(), getCharPosition(),
+                                             CHOICE, getFileName()));
             }
             return;
         }
@@ -458,15 +452,12 @@ public abstract class YangChoice
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
-        }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override
@@ -486,7 +477,7 @@ public abstract class YangChoice
 
     @Override
     public List<YangAugment> getAugmentedInfoList() {
-        return yangAugmentedInfo;
+        return unmodifiableList(yangAugmentedInfo);
     }
 
     @Override

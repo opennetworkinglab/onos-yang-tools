@@ -16,6 +16,17 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.junit.Test;
+import org.onosproject.yangutils.datamodel.YangContainer;
+import org.onosproject.yangutils.datamodel.YangDerivedInfo;
+import org.onosproject.yangutils.datamodel.YangGrouping;
+import org.onosproject.yangutils.datamodel.YangLeaf;
+import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,17 +38,6 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.junit.Test;
-import org.onosproject.yangutils.datamodel.YangContainer;
-import org.onosproject.yangutils.datamodel.YangDerivedInfo;
-import org.onosproject.yangutils.datamodel.YangGrouping;
-import org.onosproject.yangutils.datamodel.YangLeaf;
-import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
-import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -168,7 +168,7 @@ public class InterJarLinkerTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(true, is(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef()
-                .getName().equals("tenant-id")));
+                                    .getName().equals("tenant-id")));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 

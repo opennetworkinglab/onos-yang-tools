@@ -16,19 +16,17 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.junit.Test;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getImportText;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getJavaAttributeDefinition;
-import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getJavaClassDefClose;
-import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
@@ -37,7 +35,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
 
@@ -84,16 +82,7 @@ public class JavaCodeSnippetGenTest {
 
         String imports = getImportText(importInfo);
 
-        assertThat(true, is(imports.equals(IMPORT + PKG_INFO + PERIOD + CLASS_INFO + SEMI_COLAN + NEW_LINE)));
-    }
-
-    /**
-     * Unit test case for java class interface definition close.
-     */
-    @Test
-    public void testForJavaClassDefClose() {
-        String interfaceDef = getJavaClassDefClose();
-        assertThat(true, is(interfaceDef.equals(CLOSE_CURLY_BRACKET)));
+        assertThat(true, is(imports.equals(IMPORT + PKG_INFO + PERIOD + CLASS_INFO + SEMI_COLON + NEW_LINE)));
     }
 
     /**
@@ -103,23 +92,23 @@ public class JavaCodeSnippetGenTest {
     public void testForJavaAttributeInfo() {
 
         String attributeWithoutTypePkg = getJavaAttributeDefinition(null, STRING_DATA_TYPE, YANG_NAME,
-                false, PRIVATE, null);
-        assertThat(true, is(attributeWithoutTypePkg.equals(
-                PRIVATE + SPACE + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLAN + NEW_LINE)));
+                                                                    false, PRIVATE, null);
+        assertThat(true, is(attributeWithoutTypePkg.contains(
+                PRIVATE + SPACE + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLON + NEW_LINE)));
 
         String attributeWithTypePkg = getJavaAttributeDefinition(JAVA_LANG, STRING_DATA_TYPE, YANG_NAME,
-                false, PRIVATE, null);
-        assertThat(true, is(attributeWithTypePkg.equals(PRIVATE + SPACE + JAVA_LANG + PERIOD
-                + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLAN + NEW_LINE)));
+                                                                 false, PRIVATE, null);
+        assertThat(true, is(attributeWithTypePkg.contains(PRIVATE + SPACE + JAVA_LANG + PERIOD
+                                                                  + STRING_DATA_TYPE + SPACE + YANG_NAME + SEMI_COLON + NEW_LINE)));
 
         String attributeWithListPkg = getJavaAttributeDefinition(JAVA_LANG, STRING_DATA_TYPE, YANG_NAME,
-                true, PRIVATE, null);
+                                                                 true, PRIVATE, null);
         assertThat(true, is(attributeWithListPkg.contains(
                 PRIVATE + SPACE + LIST + DIAMOND_OPEN_BRACKET + JAVA_LANG + PERIOD + STRING_DATA_TYPE
                         + DIAMOND_CLOSE_BRACKET + SPACE + YANG_NAME)));
 
         String attributeWithListWithoutPkg = getJavaAttributeDefinition(null, STRING_DATA_TYPE, YANG_NAME,
-                true, PRIVATE, null);
+                                                                        true, PRIVATE, null);
         assertThat(true, is(attributeWithListWithoutPkg.contains(
                 PRIVATE + SPACE + LIST + DIAMOND_OPEN_BRACKET + STRING_DATA_TYPE + DIAMOND_CLOSE_BRACKET + SPACE
                         + YANG_NAME)));

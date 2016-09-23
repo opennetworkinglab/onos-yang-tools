@@ -16,29 +16,33 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
+import org.onosproject.yangutils.datamodel.YangAugment;
+import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangOutput;
+import org.onosproject.yangutils.datamodel.YangRpc;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.RPC_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.RPC_INTERFACE_MASK;
+import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
+import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.addListenersImport;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerator.generateServiceInterfaceFile;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.addResolvedAugmentedDataNodeImports;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getRpcManagerMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getRpcServiceMethod;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.LISTENER_SERVICE;
-import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.Operation.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_INPUT_VAR_NAME;
+import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.VOID;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.generateJavaDocForRpc;
@@ -58,29 +62,14 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
     private static final String RPC_INTERFACE_FILE_NAME = "Rpc";
 
     /**
-     * File name for rpc implementation method.
-     */
-    private static final String RPC_IMPL_FILE_NAME = "RpcImpl";
-
-    /**
-     * File name for generated class file for service suffix.
-     */
-    private static final String SERVICE_FILE_NAME_SUFFIX = "Service";
-
-    /**
      * Temporary file handle for rpc interface.
      */
-    private File rpcInterfaceTempFileHandle;
-
-    /**
-     * Temporary file handle for rpc manager impl.
-     */
-    private File rpcImplTempFileHandle;
+    private final File rpcInterfaceTempFileHandle;
 
     /**
      * Java file handle for rpc interface file.
      */
-    private File serviceInterfaceJavaFileHandle;
+    private File serviceJavaFileHandle;
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -97,11 +86,7 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
                 getJavaFileInfo().getBaseCodeGenPath(),
                 getJavaFileInfo().getPackageFilePath()));
         addGeneratedTempFile(RPC_INTERFACE_MASK);
-        addGeneratedTempFile(RPC_IMPL_MASK);
-
-        rpcInterfaceTempFileHandle =
-                getTemporaryFileHandle(RPC_INTERFACE_FILE_NAME);
-        rpcImplTempFileHandle = getTemporaryFileHandle(RPC_IMPL_FILE_NAME);
+        rpcInterfaceTempFileHandle = getTemporaryFileHandle(RPC_INTERFACE_FILE_NAME);
     }
 
     /**
@@ -111,15 +96,6 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      */
     public File getRpcInterfaceTempFileHandle() {
         return rpcInterfaceTempFileHandle;
-    }
-
-    /**
-     * Retrieves the manager impl temp file.
-     *
-     * @return the manager impl temp file
-     */
-    public File getRpcImplTempFileHandle() {
-        return rpcImplTempFileHandle;
     }
 
     /**
@@ -152,13 +128,11 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
         }
 
         if (notification) {
-            addListenersImport(curNode, imports, ADD, LISTENER_SERVICE);
+            addListenersImport(curNode, imports, ADD);
         }
 
-        serviceInterfaceJavaFileHandle =
-                getJavaFileHandle(getJavaClassName(SERVICE_FILE_NAME_SUFFIX));
-        generateServiceInterfaceFile(serviceInterfaceJavaFileHandle, curNode,
-                                     imports);
+        serviceJavaFileHandle = getJavaFileHandle(getJavaClassName(SERVICE));
+        generateServiceInterfaceFile(serviceJavaFileHandle, curNode, imports);
 
         // Close all the file handles.
         freeTemporaryResources(false);
@@ -167,53 +141,131 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Adds rpc string information to applicable temp file.
      *
-     * @param inputAttr  RPCs input node attribute info
-     * @param outputAttr RPCs output node attribute info
-     * @param rpcName    name of the rpc function
-     * @param config     plugin configurations
+     * @param inAttr  RPCs input node attribute info
+     * @param outAttr RPCs output node attribute info
+     * @param rpcName name of the rpc function
      * @throws IOException IO operation fail
      */
-    private void addRpcString(JavaAttributeInfo inputAttr,
-                              JavaAttributeInfo outputAttr,
-                              YangPluginConfig config, String rpcName)
-            throws IOException {
+    private void addRpcString(JavaAttributeInfo inAttr, JavaAttributeInfo outAttr,
+                              String rpcName) throws IOException {
         String rpcInput = EMPTY_STRING;
         String rpcOutput = VOID;
-        String rpcInputJavaDoc = EMPTY_STRING;
-        if (inputAttr != null) {
-            rpcInput = getCapitalCase(inputAttr.getAttributeName());
+        String rpcIn = EMPTY_STRING;
+        if (inAttr != null) {
+            rpcInput = getCapitalCase(inAttr.getAttributeName());
         }
-        if (outputAttr != null) {
-            rpcOutput = getCapitalCase(outputAttr.getAttributeName());
+        if (outAttr != null) {
+            rpcOutput = getCapitalCase(outAttr.getAttributeName());
         }
         if (!rpcInput.equals(EMPTY_STRING)) {
-            rpcInputJavaDoc = RPC_INPUT_VAR_NAME;
+            rpcIn = RPC_INPUT_VAR_NAME;
         }
         appendToFile(rpcInterfaceTempFileHandle,
-                     generateJavaDocForRpc(rpcName, rpcInputJavaDoc, rpcOutput,
-                                           config) +
-                             getRpcServiceMethod(rpcName, rpcInput, rpcOutput,
-                                                 config) + NEW_LINE);
-        appendToFile(rpcImplTempFileHandle,
-                     getRpcManagerMethod(rpcName, rpcInput, rpcOutput, config) +
-                             NEW_LINE);
+                     generateJavaDocForRpc(rpcName, rpcIn, rpcOutput) +
+                             getRpcServiceMethod(rpcName, rpcInput, rpcOutput));
     }
 
     /**
      * Adds the JAVA rpc snippet information.
      *
-     * @param inputAttr  RPCs input node attribute info
-     * @param outputAttr RPCs output node attribute info
-     * @param config     plugin configurations
-     * @param rpcName    name of the rpc function
+     * @param inAttr  RPCs input node attribute info
+     * @param outAttr RPCs output node attribute info
+     * @param rpcName name of the rpc function
      * @throws IOException IO operation fail
      */
-    public void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo inputAttr,
-                                                        JavaAttributeInfo outputAttr,
-                                                        YangPluginConfig config,
+    public void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo inAttr,
+                                                        JavaAttributeInfo outAttr,
                                                         String rpcName)
             throws IOException {
-        addRpcString(inputAttr, outputAttr, config, rpcName);
+        addRpcString(inAttr, outAttr, rpcName);
+    }
+
+    /**
+     * Creates an attribute info object corresponding to a data model node and
+     * return it.
+     *
+     * @param childNode  child data model node(input / output) for which the java code generation
+     *                   is being handled
+     * @param parentNode parent node (module / sub-module) in which the child node is an attribute
+     * @return AttributeInfo attribute details required to add in temporary
+     * files
+     */
+    public JavaAttributeInfo getChildNodeAsAttributeInParentService(
+            YangNode childNode, YangNode parentNode) {
+
+        String childNodeName = ((JavaFileInfoContainer) childNode)
+                .getJavaFileInfo().getJavaName();
+        /*
+         * Get the import info corresponding to the attribute for import in
+         * generated java files or qualified access
+         */
+        JavaQualifiedTypeInfoTranslator qualifiedTypeInfo =
+                getQualifiedTypeInfoOfCurNode(childNode,
+                                              getCapitalCase(childNodeName));
+        if (!(parentNode instanceof TempJavaCodeFragmentFilesContainer)) {
+            throw new TranslatorException("Parent node does not have file info");
+        }
+
+        boolean isQualified = addImportToService(qualifiedTypeInfo, parentNode);
+        return getAttributeInfoForTheData(qualifiedTypeInfo, childNodeName,
+                                          null, isQualified, false);
+    }
+
+    /**
+     * Adds to service class import list.
+     *
+     * @param importInfo import info
+     * @return true or false
+     */
+    private boolean addImportToService(
+            JavaQualifiedTypeInfoTranslator importInfo, YangNode curNode) {
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) curNode)
+                .getJavaFileInfo();
+        String name = fileInfo.getJavaName();
+        String clsInfo = importInfo.getClassInfo();
+
+        StringBuilder className = new StringBuilder()
+                .append(getCapitalCase(name))
+                .append(SERVICE);
+        return clsInfo.contentEquals(SERVICE) || clsInfo.contentEquals(className) ||
+                getJavaImportData().addImportInfo(importInfo, className.toString(),
+                                                  fileInfo.getPackage());
+    }
+
+    /**
+     * Adds augmented rpc methods to service temp file.
+     *
+     * @param module root node
+     * @throws IOException when fails to do IO operations
+     */
+    public void addAugmentedRpcMethod(RpcNotificationContainer module)
+            throws IOException {
+        JavaAttributeInfo in = null;
+        JavaAttributeInfo out = null;
+        YangNode rpcChild;
+        YangRpc rpc;
+        YangInput input;
+        for (YangAugment info : module.getAugmentList()) {
+            input = (YangInput) info.getAugmentedNode();
+
+            if (input != null) {
+                rpc = (YangRpc) input.getParent();
+                rpcChild = rpc.getChild();
+                while (rpcChild != null) {
+                    if (rpcChild instanceof YangInput) {
+                        in = getChildNodeAsAttributeInParentService(
+                                rpcChild, (YangNode) module);
+                    }
+                    if (rpcChild instanceof YangOutput) {
+                        out = getChildNodeAsAttributeInParentService(
+                                rpcChild, (YangNode) module);
+                    }
+                    rpcChild = rpcChild.getChild();
+                }
+                addJavaSnippetInfoToApplicableTempFiles(in, out, rpc
+                        .getJavaClassNameOrBuiltInType());
+            }
+        }
     }
 
     /**
@@ -225,9 +277,8 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
     @Override
     public void freeTemporaryResources(boolean errorOccurred)
             throws IOException {
-        closeFile(serviceInterfaceJavaFileHandle, errorOccurred);
+        closeFile(serviceJavaFileHandle, errorOccurred);
         closeFile(rpcInterfaceTempFileHandle);
-        closeFile(rpcImplTempFileHandle);
         closeFile(getGetterInterfaceTempFileHandle());
         closeFile(getSetterInterfaceTempFileHandle());
         closeFile(getSetterImplTempFileHandle());

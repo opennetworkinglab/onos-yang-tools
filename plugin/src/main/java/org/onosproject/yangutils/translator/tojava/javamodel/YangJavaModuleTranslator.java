@@ -15,10 +15,6 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaModule;
@@ -29,12 +25,20 @@ import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfRootNode;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.isRootNodesCodeGenRequired;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yangutils.utils.UtilConstants.SBI;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.removeEmptyDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
@@ -49,24 +53,24 @@ public class YangJavaModuleTranslator
     private static final long serialVersionUID = 806201625L;
 
     /**
-     * File handle to maintain temporary java code fragments as per the code snippet types.
+     * File handle to maintain temporary java code fragments as per the code
+     * snippet types.
      */
     private transient TempJavaCodeFragmentFiles tempFileHandle;
 
     /**
      * List of notifications nodes.
      */
-    private transient List<YangNode> notificationNodes;
+    private final transient List<YangNode> notificationNodes;
 
     /**
      * Creates a YANG node of module type.
      */
     public YangJavaModuleTranslator() {
-        super();
         setJavaFileInfo(new JavaFileInfoTranslator());
-        setNotificationNodes(new ArrayList<>());
-        getJavaFileInfo().setGeneratedFileTypes(GENERATE_SERVICE_AND_MANAGER | GENERATE_INTERFACE_WITH_BUILDER);
-
+        notificationNodes = new ArrayList<>();
+        getJavaFileInfo().setGeneratedFileTypes(
+                GENERATE_SERVICE_AND_MANAGER | GENERATE_INTERFACE_WITH_BUILDER);
     }
 
     /**
@@ -77,11 +81,8 @@ public class YangJavaModuleTranslator
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node " +
-                                                  getName() + " in " +
-                                                  getLineNumber() + " at " +
-                                                  getCharPosition()
-                                                  + " in " + getFileName());
+            throw new TranslatorException(
+                    "Missing java info in java datamodel node " + getName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -112,7 +113,8 @@ public class YangJavaModuleTranslator
      * @param fileHandle temporary file handle
      */
     @Override
-    public void setTempJavaCodeFragmentFiles(TempJavaCodeFragmentFiles fileHandle) {
+    public void setTempJavaCodeFragmentFiles(
+            TempJavaCodeFragmentFiles fileHandle) {
         tempFileHandle = fileHandle;
     }
 
@@ -125,22 +127,22 @@ public class YangJavaModuleTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
-        String modulePkg = getRootPackage(getVersion(), getNameSpace(), getRevision(),
+        String modulePkg = getRootPackage(getVersion(), getNameSpace(),
+                                          getRevision(),
                                           yangPlugin.getConflictResolver());
 
         if (isNotificationChildNodePresent(this)) {
-            getJavaFileInfo().setGeneratedFileTypes(getJavaFileInfo().getGeneratedFileTypes()
-                                                            | GENERATE_ALL_EVENT_CLASS_MASK);
+            getJavaFileInfo().setGeneratedFileTypes(
+                    getJavaFileInfo().getGeneratedFileTypes()
+                            | GENERATE_ALL_EVENT_CLASS_MASK);
         }
         try {
             generateCodeOfRootNode(this, yangPlugin, modulePkg);
+            //Add augmented rpc name
+            tempFileHandle.getServiceTempFiles().addAugmentedRpcMethod(this);
         } catch (IOException e) {
-            throw new TranslatorException(
-                    "Failed to prepare generate code entry for module node " +
-                            getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 
@@ -160,16 +162,21 @@ public class YangJavaModuleTranslator
          * The manager class needs to extend the "ListenerRegistry".
          */
         try {
-            if ((getJavaFileInfo().getGeneratedFileTypes() & GENERATE_ALL_EVENT_CLASS_MASK) != 0) {
-                getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_ALL_EVENT_CLASS_MASK, this);
+            if ((getJavaFileInfo().getGeneratedFileTypes() &
+                    GENERATE_ALL_EVENT_CLASS_MASK) != 0) {
+                getTempJavaCodeFragmentFiles().generateJavaFile(
+                        GENERATE_ALL_EVENT_CLASS_MASK, this);
             }
 
             if (isRootNodesCodeGenRequired(this)) {
                 getTempJavaCodeFragmentFiles()
                         .generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
-                if ((getJavaFileInfo().getPluginConfig().getCodeGenerateForSbi() == null)
-                        || (!getJavaFileInfo().getPluginConfig().getCodeGenerateForSbi().equals(SBI))) {
-                    getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_SERVICE_AND_MANAGER, this);
+                if (getJavaFileInfo().getPluginConfig()
+                        .getCodeGenerateForSbi() == null ||
+                        !getJavaFileInfo().getPluginConfig()
+                                .getCodeGenerateForSbi().equals(SBI)) {
+                    getTempJavaCodeFragmentFiles()
+                            .generateJavaFile(GENERATE_SERVICE_AND_MANAGER, this);
                 }
             }
 
@@ -178,11 +185,8 @@ public class YangJavaModuleTranslator
             removeEmptyDirectory(getJavaFileInfo().getBaseCodeGenPath() +
                                          getJavaFileInfo().getPackageFilePath());
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for module node " +
-                                                  getName() + " in " +
-                                                  getLineNumber() + " at " +
-                                                  getCharPosition()
-                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 
@@ -192,16 +196,7 @@ public class YangJavaModuleTranslator
      * @return notification nodes
      */
     public List<YangNode> getNotificationNodes() {
-        return notificationNodes;
-    }
-
-    /**
-     * Sets notifications list.
-     *
-     * @param notificationNodes notification list
-     */
-    private void setNotificationNodes(List<YangNode> notificationNodes) {
-        this.notificationNodes = notificationNodes;
+        return unmodifiableList(notificationNodes);
     }
 
     /**
@@ -210,7 +205,7 @@ public class YangJavaModuleTranslator
      * @param curNode notification node
      */
     private void addToNotificationList(YangNode curNode) {
-        getNotificationNodes().add(curNode);
+        notificationNodes.add(curNode);
     }
 
     /**
@@ -229,6 +224,6 @@ public class YangJavaModuleTranslator
             childNode = childNode.getNextSibling();
         }
 
-        return !getNotificationNodes().isEmpty();
+        return !notificationNodes.isEmpty();
     }
 }

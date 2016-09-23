@@ -15,23 +15,34 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yangutils.datamodel.YangNodeType.USES_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.USES;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeaf;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeafList;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClonedLeavesUnionEnumRef;
+import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LEAF_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LEAF_LIST_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.USES_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -68,8 +79,9 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClo
  */
 public abstract class YangUses
         extends YangNode
-        implements YangCommonInfo, Parsable, Resolvable, CollisionDetector, YangWhenHolder,
-        YangIfFeatureHolder, YangTranslatorOperatorNode {
+        implements YangCommonInfo, Parsable, Resolvable, CollisionDetector,
+        YangWhenHolder, YangIfFeatureHolder, YangTranslatorOperatorNode,
+        LeafRefInvalidHolder {
 
     private static final long serialVersionUID = 806201617L;
 
@@ -117,21 +129,6 @@ public abstract class YangUses
     private ResolvableStatus resolvableStatus;
 
     /**
-     * Effective list of nodes of grouping that needs to replicated at YANG uses.
-     */
-    private List<YangNode> resolvedGroupingNodes;
-
-    /**
-     * Effective list of leaves of grouping that needs to replicated at YANG uses.
-     */
-    private List<List<YangLeaf>> resolvedGroupingLeaves;
-
-    /**
-     * Effective list of leaf lists of grouping that needs to replicated at YANG uses.
-     */
-    private List<List<YangLeafList>> resolvedGroupingLeafLists;
-
-    /**
      * Effective list of leaf lists of grouping that needs to replicated at YANG uses.
      */
     private List<YangEntityToResolveInfoImpl> entityToResolveInfoList;
@@ -145,19 +142,16 @@ public abstract class YangUses
      * Creates an YANG uses node.
      */
     public YangUses() {
-        super(YangNodeType.USES_NODE, null);
+        super(USES_NODE, null);
         nodeIdentifier = new YangNodeIdentifier();
         resolvableStatus = ResolvableStatus.UNRESOLVED;
-        resolvedGroupingNodes = new LinkedList<>();
-        resolvedGroupingLeaves = new LinkedList<>();
-        resolvedGroupingLeafLists = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
         entityToResolveInfoList = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
         // Do nothing.
     }
@@ -169,7 +163,7 @@ public abstract class YangUses
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
                                      YangSchemaNode yangSchemaNode) {
         // Do nothing.
         // TODO
@@ -177,25 +171,7 @@ public abstract class YangUses
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
-    }
-
-    /**
-     * Returns the list of entity to resolve.
-     *
-     * @return the list of entity to resolve
-     */
-    public List<YangEntityToResolveInfoImpl> getEntityToResolveInfoList() {
-        return entityToResolveInfoList;
-    }
-
-    /**
-     * Sets the list of entity to resolve.
-     *
-     * @param entityToResolveInfoList the list of entity to resolve
-     */
-    public void setEntityToResolveInfoList(List<YangEntityToResolveInfoImpl> entityToResolveInfoList) {
-        this.entityToResolveInfoList = entityToResolveInfoList;
+        return YANG_NON_DATA_NODE;
     }
 
     /**
@@ -206,10 +182,11 @@ public abstract class YangUses
      */
     public void addEntityToResolve(YangEntityToResolveInfoImpl entityToResolve)
             throws DataModelException {
-        if (getEntityToResolveInfoList() == null) {
-            setEntityToResolveInfoList(new LinkedList<YangEntityToResolveInfoImpl>());
+        if (entityToResolveInfoList == null) {
+            entityToResolveInfoList = new
+                    LinkedList<>();
         }
-        getEntityToResolveInfoList().add(entityToResolve);
+        entityToResolveInfoList.add(entityToResolve);
     }
 
     /**
@@ -317,7 +294,7 @@ public abstract class YangUses
      */
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.USES_DATA;
+        return USES_DATA;
     }
 
     /**
@@ -385,10 +362,11 @@ public abstract class YangUses
         YangGrouping referredGrouping = getRefGroup();
 
         if (referredGrouping == null) {
-            throw new DataModelException("YANG uses linker error, cannot resolve uses " + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException("YANG uses linker error, cannot resolve" +
+                                                 " uses " + getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() + " in " +
+                                                 getFileName() + "\"");
 
         } else {
             /*
@@ -403,23 +381,23 @@ public abstract class YangUses
         YangNode usesParentNode = getParentNodeInGenCode(this);
         if (!(usesParentNode instanceof YangLeavesHolder)
                 || !(usesParentNode instanceof CollisionDetector)) {
-            throw new DataModelException("YANG uses holder construct is wrong "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    "YANG uses holder construct is wrong " + getName() + " in " +
+                            getLineNumber() + " at " + getCharPosition() +
+                            " in " + getFileName() + "\"");
         }
 
         YangLeavesHolder usesParentLeavesHolder = (YangLeavesHolder) usesParentNode;
         if (referredGrouping.getListOfLeaf() != null) {
             for (YangLeaf leaf : referredGrouping.getListOfLeaf()) {
-                YangLeaf clonedLeaf = null;
+                YangLeaf clonedLeaf;
                 try {
-                    ((CollisionDetector) usesParentLeavesHolder).detectCollidingChild(leaf.getName(),
-                            YangConstructType.LEAF_DATA);
+                    ((CollisionDetector) usesParentLeavesHolder)
+                            .detectCollidingChild(leaf.getName(), LEAF_DATA);
                     clonedLeaf = leaf.clone();
                     if (getCurrentGroupingDepth() == 0) {
-                        YangEntityToResolveInfoImpl resolveInfo = resolveYangConstructsUnderGroupingForLeaf(
+                        YangEntityToResolveInfoImpl resolveInfo
+                                = resolveYangConstructsUnderGroupingForLeaf(
                                 clonedLeaf, usesParentLeavesHolder, this);
                         if (resolveInfo != null) {
                             addEntityToResolve(resolveInfo);
@@ -435,15 +413,15 @@ public abstract class YangUses
         }
         if (referredGrouping.getListOfLeafList() != null) {
             for (YangLeafList leafList : referredGrouping.getListOfLeafList()) {
-                YangLeafList clonedLeafList = null;
+                YangLeafList clonedLeafList;
                 try {
-                    ((CollisionDetector) usesParentLeavesHolder).detectCollidingChild(leafList.getName(),
-                            YangConstructType.LEAF_LIST_DATA);
+                    ((CollisionDetector) usesParentLeavesHolder)
+                            .detectCollidingChild(leafList.getName(), LEAF_LIST_DATA);
                     clonedLeafList = leafList.clone();
                     if (getCurrentGroupingDepth() == 0) {
                         YangEntityToResolveInfoImpl resolveInfo =
-                                resolveYangConstructsUnderGroupingForLeafList(clonedLeafList,
-                                        usesParentLeavesHolder, this);
+                                resolveYangConstructsUnderGroupingForLeafList(
+                                        clonedLeafList, usesParentLeavesHolder, this);
                         if (resolveInfo != null) {
                             addEntityToResolve(resolveInfo);
                         }
@@ -451,7 +429,6 @@ public abstract class YangUses
                 } catch (CloneNotSupportedException | DataModelException e) {
                     throw new DataModelException(e.getMessage());
                 }
-
                 clonedLeafList.setContainedIn(usesParentLeavesHolder);
                 usesParentLeavesHolder.addLeafList(clonedLeafList);
             }
@@ -463,7 +440,7 @@ public abstract class YangUses
             throw new DataModelException(e.getMessage());
         }
         updateClonedLeavesUnionEnumRef(usesParentLeavesHolder);
-        return getEntityToResolveInfoList();
+        return unmodifiableList(entityToResolveInfoList);
     }
 
     /**
@@ -475,7 +452,7 @@ public abstract class YangUses
      */
     private boolean checkIsUnresolvedRecursiveUsesInGrouping(YangGrouping referredGrouping) {
 
-        /**
+        /*
          * Search the grouping node's children for presence of uses node.
          */
         TraversalType curTraversal = ROOT;
@@ -488,8 +465,8 @@ public abstract class YangUses
 
             // if child nodes has uses, then add it to resolution stack
             if (curNode instanceof YangUses) {
-                if (((YangUses) curNode).getResolvableStatus() != ResolvableStatus.RESOLVED) {
-                    setResolvableStatus(ResolvableStatus.INTRA_FILE_RESOLVED);
+                if (((YangUses) curNode).getResolvableStatus() != RESOLVED) {
+                    setResolvableStatus(INTRA_FILE_RESOLVED);
                     return true;
                 }
             }
@@ -507,102 +484,6 @@ public abstract class YangUses
             }
         }
         return false;
-    }
-
-    /**
-     * Clone the resolved uses contained in grouping to the uses of grouping.
-     *
-     * @param usesInGrouping resolved uses in grouping
-     * @param usesHolder     holder of uses
-     */
-    private void addResolvedUsesInfoOfGrouping(YangUses usesInGrouping,
-                                               YangLeavesHolder usesHolder)
-            throws DataModelException {
-        for (YangNode usesResolvedNode : usesInGrouping.getUsesResolvedNodeList()) {
-            addNodeOfGrouping(usesResolvedNode);
-        }
-
-        for (List<YangLeaf> leavesList : usesInGrouping.getUsesResolvedLeavesList()) {
-            addLeavesOfGrouping(cloneLeavesList(leavesList, usesHolder));
-        }
-
-        for (List<YangLeafList> listOfLeafLists : usesInGrouping.getUsesResolvedListOfLeafList()) {
-            addListOfLeafListOfGrouping(
-                    cloneListOfLeafList(listOfLeafLists, usesHolder));
-        }
-    }
-
-    /**
-     * Clone the list of leaves and return the cloned list leaves.
-     *
-     * @param listOfLeaves   list of leaves to be cloned
-     * @param usesParentNode parent of the cloned location
-     * @return cloned list of leaves
-     * @throws DataModelException a violation in data model rule
-     */
-    private List<YangLeaf> cloneLeavesList(List<YangLeaf> listOfLeaves,
-                                           YangLeavesHolder usesParentNode)
-            throws DataModelException {
-        if (listOfLeaves == null || listOfLeaves.size() == 0) {
-            throw new DataModelException("No leaves to clone "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
-        }
-
-        List<YangLeaf> newLeavesList = new LinkedList<YangLeaf>();
-        for (YangLeaf leaf : listOfLeaves) {
-            YangLeaf clonedLeaf;
-            try {
-                ((CollisionDetector) usesParentNode).detectCollidingChild(leaf.getName(),
-                        YangConstructType.LEAF_DATA);
-                clonedLeaf = leaf.clone();
-            } catch (CloneNotSupportedException | DataModelException e) {
-                throw new DataModelException(e.getMessage());
-            }
-
-            clonedLeaf.setContainedIn(usesParentNode);
-            newLeavesList.add(clonedLeaf);
-        }
-
-        return newLeavesList;
-    }
-
-    /**
-     * Clone the list of leaf list.
-     *
-     * @param listOfLeafList list of leaf list that needs to be cloned
-     * @param usesParentNode parent of uses
-     * @return cloned list of leaf list
-     */
-    private List<YangLeafList> cloneListOfLeafList(List<YangLeafList> listOfLeafList,
-            YangLeavesHolder usesParentNode)
-            throws DataModelException {
-        if (listOfLeafList == null || listOfLeafList.size() == 0) {
-            throw new DataModelException("No leaf lists to clone "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
-        }
-
-        List<YangLeafList> newListOfLeafList = new LinkedList<YangLeafList>();
-        for (YangLeafList leafList : listOfLeafList) {
-            YangLeafList clonedLeafList;
-            try {
-                ((CollisionDetector) usesParentNode).detectCollidingChild(leafList.getName(),
-                        YangConstructType.LEAF_LIST_DATA);
-                clonedLeafList = leafList.clone();
-            } catch (CloneNotSupportedException | DataModelException e) {
-                throw new DataModelException(e.getMessage());
-            }
-
-            clonedLeafList.setContainedIn(usesParentNode);
-            newListOfLeafList.add(clonedLeafList);
-        }
-
-        return newListOfLeafList;
     }
 
     @Override
@@ -626,82 +507,24 @@ public abstract class YangUses
             throws DataModelException {
 
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as uses \""
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    getErrorMsgCollision(COLLISION_DETECTION, getName(),
+                                         getLineNumber(), getCharPosition(),
+                                         USES, getFileName()));
         }
-    }
-
-    /**
-     * Adds the node under grouping to the effective uses resolved info.
-     *
-     * @param nodeInGrouping node defined under grouping which needs to be copied in
-     *                       the context of uses
-     */
-    public void addNodeOfGrouping(YangNode nodeInGrouping) {
-        resolvedGroupingNodes.add(nodeInGrouping);
-    }
-
-    /**
-     * Returns the effective list of nodes added due to uses linking.
-     *
-     * @return effective list of nodes added due to uses linking
-     */
-    public List<YangNode> getUsesResolvedNodeList() {
-        return resolvedGroupingNodes;
-    }
-
-    /**
-     * Adds the leaves under grouping to the effective uses resolved info.
-     *
-     * @param leavesInGrouping Leaves defined under grouping which needs to be copied in
-     *                         the context of uses
-     */
-    public void addLeavesOfGrouping(List<YangLeaf> leavesInGrouping) {
-        resolvedGroupingLeaves.add(leavesInGrouping);
-    }
-
-    /**
-     * Returns the effective list of Leaves added due to uses linking.
-     *
-     * @return effective list of Leaves added due to uses linking
-     */
-    public List<List<YangLeaf>> getUsesResolvedLeavesList() {
-        return resolvedGroupingLeaves;
-    }
-
-    /**
-     * Adds the leaf-lists under grouping to the effective uses resolved info.
-     *
-     * @param leafListsInGrouping leaf-lists defined under grouping which needs to be copied in
-     *                            the context of uses
-     */
-    public void addListOfLeafListOfGrouping(List<YangLeafList> leafListsInGrouping) {
-        resolvedGroupingLeafLists.add(leafListsInGrouping);
-    }
-
-    /**
-     * Returns the effective list of Leaves added due to uses linking.
-     *
-     * @return effective list of Leaves added due to uses linking
-     */
-    public List<List<YangLeafList>> getUsesResolvedListOfLeafList() {
-        return resolvedGroupingLeafLists;
     }
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
+        if (ifFeatureList == null) {
+            ifFeatureList = new LinkedList<>();
         }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override

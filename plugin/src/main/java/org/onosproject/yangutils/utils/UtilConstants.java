@@ -153,7 +153,7 @@ public final class UtilConstants {
      * JavaDocs's description for getter method.
      */
     public static final String JAVA_DOC_FOR_VALIDATOR_RETURN =
-            " * @return true if value is in range";
+            " true if value is in range";
 
     /**
      * JavaDocs's description for constructor.
@@ -165,11 +165,6 @@ public final class UtilConstants {
      * JavaDocs's description for build method.
      */
     public static final String JAVA_DOC_BUILD = " * Builds object of ";
-
-    /**
-     * JavaDocs's return statement for build method.
-     */
-    public static final String JAVA_DOC_BUILD_RETURN = "object of ";
 
     /**
      * JavaDocs's statement for builder object.
@@ -203,6 +198,11 @@ public final class UtilConstants {
     public static final String DEFAULT = "default";
 
     /**
+     * Static attribute for default.
+     */
+    public static final String DEFAULT_CAPS = "Default";
+
+    /**
      * Static attribute for java code generation for sbi.
      */
     public static final String SBI = "sbi";
@@ -226,6 +226,11 @@ public final class UtilConstants {
      * Static attribute for period.
      */
     public static final String PERIOD = ".";
+
+    /**
+     * Static attribute for compare to.
+     */
+    public static final String COMPARE_TO = "compareTo";
 
     /**
      * Static attribute for period.
@@ -288,11 +293,6 @@ public final class UtilConstants {
     public static final String OMIT_NULL_VALUE_STRING = "omitNullValues()";
 
     /**
-     * Static attribute for colan.
-     */
-    public static final String COLAN = ":";
-
-    /**
      * Static attribute for underscore.
      */
     public static final String UNDER_SCORE = "_";
@@ -300,7 +300,7 @@ public final class UtilConstants {
     /**
      * Static attribute for semi-colan.
      */
-    public static final String SEMI_COLAN = ";";
+    public static final String SEMI_COLON = ";";
 
     /**
      * Static attribute for hyphen.
@@ -313,14 +313,14 @@ public final class UtilConstants {
     public static final String SPACE = " ";
 
     /**
+     * Static attribute for isSelectAllSchemaChild.
+     */
+    public static final String SELECT_ALL_CHILD = "isSelectAllSchemaChild";
+
+    /**
      * Static attribute for schema name.
      */
     public static final String SCHEMA_NAME = "schemaName";
-
-    /**
-     * Static attribute for schema name value.
-     */
-    public static final String STR_VAL = "stringValue";
 
     /**
      * Static attribute for validateRange.
@@ -482,11 +482,6 @@ public final class UtilConstants {
      * Static attribute for subject.
      */
     public static final String SUBJECT = "Subject";
-
-    /**
-     * Static attribute for ListenerRegistry.
-     */
-    public static final String LISTENER_REG = "ListenerRegistry";
 
     /**
      * Static attribute for ListenerService.
@@ -719,6 +714,11 @@ public final class UtilConstants {
     public static final String TO = "to";
 
     /**
+     * Static attribute for to syntax.
+     */
+    public static final String TO_CAPS = "To";
+
+    /**
      * Static attribute for true syntax.
      */
     public static final String TRUE = "true";
@@ -736,7 +736,7 @@ public final class UtilConstants {
     /**
      * Static attribute for temp.
      */
-    public static final String TEMP = "temp";
+    public static final String TEMP = "Temp";
 
     /**
      * Static attribute for YANG file directory.
@@ -752,6 +752,11 @@ public final class UtilConstants {
      * Static attribute for diamond close bracket syntax.
      */
     public static final String DIAMOND_CLOSE_BRACKET = ">";
+
+    /**
+     * Static attribute for event type.
+     */
+    public static final String EVENT_TYPE = ".Type";
 
     /**
      * Static attribute for exception syntax.
@@ -913,6 +918,10 @@ public final class UtilConstants {
      * Static attribute for is LeafIdentifier enum prefix.
      */
     public static final String LEAF_IDENTIFIER = "LeafIdentifier";
+    /**
+     * Static attribute for is leaf.
+     */
+    public static final String LEAF = "leaf";
 
     /**
      * Static attribute for four space indentation.
@@ -1123,6 +1132,11 @@ public final class UtilConstants {
     public static final String QUESTION_MARK = "?";
 
     /**
+     * Static variable for forType string.
+     */
+    public static final String FOR_TYPE_STRING = " for type ";
+
+    /**
      * List of keywords in java, this is used for checking if the input does not
      * contain these keywords.
      */
@@ -1220,9 +1234,9 @@ public final class UtilConstants {
     public static final String BUILDER = "Builder";
 
     /**
-     * Static attribute for manager syntax.
+     * Static attribute for builder syntax.
      */
-    public static final String MANAGER = "Manager";
+    public static final String BUILDER_LOWER_CASE = "builder";
 
     /**
      * Static attribute for service syntax.
@@ -1365,13 +1379,13 @@ public final class UtilConstants {
      * Static attribute for more object import class.
      */
     public static final String GOOGLE_MORE_OBJECT_IMPORT_CLASS =
-            "MoreObjects;\n";
+            "MoreObjects";
 
     /**
      * Static attribute for to string method.
      */
     public static final String GOOGLE_MORE_OBJECT_METHOD_STRING =
-            " MoreObjects.toStringHelper(getClass())";
+            "MoreObjects.toStringHelper(getClass())";
 
     /**
      * Static attribute for java utilities import package.
@@ -1386,12 +1400,18 @@ public final class UtilConstants {
     /**
      * Static attribute for java utilities objects import class.
      */
-    public static final String JAVA_UTIL_OBJECTS_IMPORT_CLASS = "Objects;\n";
+    public static final String JAVA_UTIL_OBJECTS_IMPORT_CLASS = "Objects";
 
     /**
      * Static attribute for AugmentedInfo class.
      */
     public static final String YANG_AUGMENTED_INFO = "YangAugmentedInfo";
+
+    /**
+     * Static attribute for AugmentedInfo class.
+     */
+    public static final String YANG_AUGMENTED_INFO_LOWER_CASE =
+            "yangAugmentedInfo";
 
     /**
      * Static attribute for augmented.
@@ -1414,7 +1434,7 @@ public final class UtilConstants {
     public static final String SET = "Set";
 
     /**
-     * Comment to be added for autogenerated impl methods.
+     * Comment to be added for auto generated impl methods.
      */
     public static final String YANG_UTILS_TODO =
             "//TODO: YANG utils generated code";
@@ -1451,12 +1471,87 @@ public final class UtilConstants {
             " is not supported.";
 
     /**
+     * Static attribute for "is invalid" information.
+     */
+    public static final String IS_INVALID = " is invalid.";
+
+    /**
+     * Static attribute for data model tree error information.
+     */
+    public static final String INVALID_TREE = "Internal datamodel error: " +
+            "Datamodel tree is not correct";
+
+    /**
      * Static attribute for currently unsupported error information.
      */
     public static final String CURRENTLY_UNSUPPORTED =
             " is not supported in current version, please check wiki" +
                     " for YANG utils road map.";
 
+    /**
+     * Static attribute for leaf ref target node error information.
+     */
+    public static final String LEAFREF_ERROR = "YANG file error: The target" +
+            " node, in the leafref path ";
+
+    /**
+     * Static attribute for leaf holder error information.
+     */
+    public static final String LEAF_HOLDER_ERROR = "Referred node should be of" +
+            " type leaves holder in ";
+
+    /**
+     * Static attribute for invalid resolve entity error information.
+     */
+    public static final String INVALID_RESOLVED_ENTITY = "Data Model " +
+            "Exception: Entity to resolved is other than type/uses";
+
+    /**
+     * Static attribute for invalid resolve entity error information.
+     */
+    public static final String INVALID_ENTITY = "Data Model Exception: Entity " +
+            "to resolved is other than identityref";
+
+    /**
+     * Static attribute for invalid state error information.
+     */
+    public static final String INVALID_LINKER_STATE = "Data Model Exception: " +
+            "Unsupported, linker state";
+
+    /**
+     * Static attribute for leaf ref resolve entity error information.
+     */
+    public static final String FAILED_TO_FIND_LEAD_INFO_HOLDER = "YANG file " +
+            "error: Unable to find base leaf/leaf-list for given leafref path ";
+
+    /**
+     * Static attribute for compiler annotation resolve entity error
+     * information.
+     */
+    public static final String FAILED_TO_FIND_ANNOTATION = "Failed to link " +
+            "compiler annotation ";
+
+    /**
+     * Static attribute for failed to link entity error information.
+     */
+    public static final String FAILED_TO_LINK = "Failed to link ";
+
+    /**
+     * Static attribute for un-resolve entity error information.
+     */
+    public static final String UNRESOLVABLE = "Data Model Exception: Entity " +
+            "to resolved is not Resolvable";
+
+    /**
+     * Static attribute for invalid resolve entity error information.
+     */
+    public static final String LINKER_ERROR = "Data Model Exception: Entity" +
+            " to resolved is other than type/uses/if-feature/leafref/base/identityref";
+
+    /**
+     * Static attribute for invalid resolve entity error information.
+     */
+    public static final String INVALID_TARGET = "Invalid target node type ";
     /**
      * Static attribute for typedef linker error information.
      */
@@ -1564,7 +1659,7 @@ public final class UtilConstants {
      * Static attribute for YANG node operation type attribute.
      */
     public static final String OPERATION_TYPE_ATTRIBUTE =
-            "NodeOperationType";
+            "OpType";
 
     /**
      * Static attribute for event class.
@@ -1620,6 +1715,29 @@ public final class UtilConstants {
      * Static attribute for YANG.
      */
     public static final String YANG = "yang";
+
+    /**
+     * Static attribute for error msg.
+     */
+    public static final String ERROR_MSG_FOR_GEN_CODE = "please check whether " +
+            "multiple yang" + " files has same module/submodule" +
+            " \"name\" and \"namespace\"" + "or You may have generated code of" +
+            " previous build present in your directory.";
+
+    /**
+     * Static attribute for error msg.
+     */
+    public static final String ERROR_MSG_JAVA_IDENTITY = "Expected java " +
+            "identity instance node ";
+    /**
+     * Static attribute for in.
+     */
+    public static final String IN = " in ";
+
+    /**
+     * Static attribute for at.
+     */
+    public static final String AT = " at ";
 
     // No instantiation.
     private UtilConstants() {

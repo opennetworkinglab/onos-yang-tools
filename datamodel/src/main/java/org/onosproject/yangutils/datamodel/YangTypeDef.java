@@ -15,14 +15,21 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.TYPEDEF_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.TYPEDEF;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPEDEF_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -94,19 +101,19 @@ public abstract class YangTypeDef
      * List of YANG type, for typedef it will have single type.
      * This is done to unify the code with union.
      */
-    private List<YangType<?>> typeList;
+    private final List<YangType<?>> typeList;
 
     /**
      * Creates a typedef node.
      */
     public YangTypeDef() {
-        super(YangNodeType.TYPEDEF_NODE, null);
+        super(TYPEDEF_NODE, null);
         typeList = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -118,14 +125,15 @@ public abstract class YangTypeDef
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode node) {
         // Do nothing, to be handled during linking.
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        return YANG_NON_DATA_NODE;
     }
 
     /**
@@ -212,8 +220,8 @@ public abstract class YangTypeDef
      * @return the data type
      */
     public YangType<?> getTypeDefBaseType() {
-        if (!getTypeList().isEmpty()) {
-            return getTypeList().get(0);
+        if (!typeList.isEmpty()) {
+            return typeList.get(0);
         }
         return null;
     }
@@ -224,7 +232,7 @@ public abstract class YangTypeDef
      * @param dataType the data type
      */
     public void setDataType(YangType<?> dataType) {
-        getTypeList().add(0, dataType);
+        typeList.add(0, dataType);
     }
 
     /**
@@ -252,7 +260,7 @@ public abstract class YangTypeDef
      */
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.TYPEDEF_DATA;
+        return TYPEDEF_DATA;
     }
 
     /**
@@ -274,14 +282,15 @@ public abstract class YangTypeDef
     @Override
     public void validateDataOnExit()
             throws DataModelException {
-        if (defaultValueInString != null && !defaultValueInString.isEmpty() && getTypeDefBaseType() != null) {
+        if (defaultValueInString != null && !defaultValueInString.isEmpty() &&
+                getTypeDefBaseType() != null) {
             getTypeDefBaseType().isValidValue(defaultValueInString);
         }
     }
 
     @Override
     public List<YangType<?>> getTypeList() {
-        return typeList;
+        return unmodifiableList(typeList);
     }
 
     @Override
@@ -295,11 +304,10 @@ public abstract class YangTypeDef
     public void detectSelfCollision(String identifierName, YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as typedef \""
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    getErrorMsgCollision(COLLISION_DETECTION, getName(),
+                                         getLineNumber(), getCharPosition(),
+                                         TYPEDEF, getFileName()));
         }
     }
 }

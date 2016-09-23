@@ -16,12 +16,16 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.APP_DATA_STRUCTURE;
 
 /**
  * Represents data model node to maintain information defined in YANG app-data-structure.
@@ -69,17 +73,8 @@ public class YangAppDataStructure extends DefaultLocationInfo
      *
      * @return the list of key field names
      */
-    public List<String> getKeyList() {
-        return keyList;
-    }
-
-    /**
-     * Sets the list of key field names.
-     *
-     * @param keyList the list of key field names
-     */
-    public void setKeyList(List<String> keyList) {
-        this.keyList = keyList;
+    private List<String> getKeyList() {
+        return unmodifiableList(keyList);
     }
 
     /**
@@ -88,10 +83,10 @@ public class YangAppDataStructure extends DefaultLocationInfo
      * @param key key field name
      */
     public void addKey(String key) {
-        if (getKeyList() == null) {
-            setKeyList(new LinkedList<>());
+        if (keyList == null) {
+            keyList = new LinkedList<>();
         }
-        getKeyList().add(key);
+        keyList.add(key);
     }
 
     /**
@@ -114,7 +109,7 @@ public class YangAppDataStructure extends DefaultLocationInfo
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.APP_DATA_STRUCTURE;
+        return APP_DATA_STRUCTURE;
     }
 
     @Override

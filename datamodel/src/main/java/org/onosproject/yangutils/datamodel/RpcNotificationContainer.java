@@ -16,6 +16,8 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.util.List;
+
 /**
  * Represents class having rpc and notification.
  */
@@ -31,9 +33,22 @@ public interface RpcNotificationContainer {
     /**
      * Adds to notification enumeration map.
      *
-     * @param nameOfNotificationInEnum name of notification in enum
-     * @param notficationSchemaNode    schema node of notification
+     * @param enumName   name of notification in enum
+     * @param schemaNode schema node of notification
      */
-    void addToNotificationEnumMap(String nameOfNotificationInEnum,
-                                  YangSchemaNode notficationSchemaNode);
+    void addToNotificationEnumMap(String enumName, YangSchemaNode schemaNode);
+
+    /**
+     * Adds augment which is augmenting input node to augment list.
+     *
+     * @param augment augment which is augmenting input
+     */
+    void addToAugmentList(YangAugment augment);
+
+    /**
+     * Returns augment list.
+     *
+     * @return augment list
+     */
+    List<YangAugment> getAugmentList();
 }

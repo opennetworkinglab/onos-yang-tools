@@ -43,6 +43,11 @@ public enum TranslatorErrorType {
     INVALID_LEAF_HOLDER("Invalid holder of leaf"),
 
     /**
+     * Represents the invalid child node.
+     */
+    INVALID_CHILD_NODE("Invalid child of node "),
+
+    /**
      * Represents the invalid leaf list without JAVA information.
      */
     INVALID_LEAF_LIST("Leaf-list does not have java information"),
@@ -61,16 +66,15 @@ public enum TranslatorErrorType {
     /**
      * Represents that code generation failed for a node at exit.
      */
-    FAIL_AT_EXIT("Failed to generate code for notification node"),
+    FAIL_AT_EXIT("Failed to generate code for "),
 
     /**
      * Represents that code generation preparation failed for a node at entry.
      */
-    FAIL_AT_ENTRY("Failed to prepare generate code entry for " +
-                          "notification node");
+    FAIL_AT_ENTRY("Failed to prepare generate code entry for ");
 
     // Prefix of an error type.
-    private String prefix;
+    private final String prefix;
 
     /**
      * Creates translator error type.

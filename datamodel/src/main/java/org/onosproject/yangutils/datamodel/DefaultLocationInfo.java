@@ -23,10 +23,7 @@ public class DefaultLocationInfo implements LocationInfo {
 
     private transient int lineNumber;
     private transient int charPosition;
-    private transient String fileName;
-
-    public DefaultLocationInfo() {
-    }
+    private String fileName;
 
     @Override
     public int getLineNumber() {
@@ -45,7 +42,7 @@ public class DefaultLocationInfo implements LocationInfo {
 
     @Override
     public void setCharPosition(int charPositionInLine) {
-        this.charPosition = charPositionInLine;
+        charPosition = charPositionInLine;
     }
 
     @Override
@@ -55,6 +52,6 @@ public class DefaultLocationInfo implements LocationInfo {
 
     @Override
     public void setFileName(String name) {
-        this.fileName = name;
+        fileName = name;
     }
 }

@@ -15,15 +15,23 @@
  */
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
-
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.CASE_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.CASE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.INVALID_CASE_HOLDER;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CASE_DATA;
 
@@ -96,8 +104,8 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.CASE_D
  */
 public abstract class YangCase
         extends YangNode
-        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector, YangAugmentableNode,
-        YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes {
+        implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
+        YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201603L;
 
@@ -136,33 +144,34 @@ public abstract class YangCase
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
+    private final List<YangAugment> yangAugmentedInfo;
 
     /**
      * Creates a choice node.
      */
     public YangCase() {
-        super(YangNodeType.CASE_NODE, new HashMap<>());
+        super(CASE_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
+        yangAugmentedInfo = new ArrayList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 = new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1.setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
-        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getParent().addToChildSchemaMap(schemaNodeIdentifier, yangSchemaNodeContextInfo1);
+        getYsnContextInfoMap().put(id, context);
+        YangSchemaNodeContextInfo contextInfo = new YangSchemaNodeContextInfo();
+        contextInfo.setSchemaNode(context.getSchemaNode());
+        contextInfo.setContextSwitchedNode(this);
+        getParent().addToChildSchemaMap(id, contextInfo);
     }
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        String nameSpace = this.getParent().getNameSpace();
+        String nameSpace = getParent().getNameSpace();
         // Set namespace for self node.
         setNameSpace(nameSpace);
         /*
@@ -179,14 +188,15 @@ public abstract class YangCase
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode node) {
         //For non data nodes, default child to be added to parent node.
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        return YANG_NON_DATA_NODE;
     }
 
     /**
@@ -236,7 +246,7 @@ public abstract class YangCase
      */
     @Override
     public List<YangLeaf> getListOfLeaf() {
-        return listOfLeaf;
+        return unmodifiableList(listOfLeaf);
     }
 
     /**
@@ -256,7 +266,7 @@ public abstract class YangCase
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
     }
 
     /**
@@ -266,7 +276,7 @@ public abstract class YangCase
      */
     @Override
     public List<YangLeafList> getListOfLeafList() {
-        return listOfLeafList;
+        return unmodifiableList(listOfLeafList);
     }
 
     /**
@@ -286,7 +296,7 @@ public abstract class YangCase
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
     }
 
     /**
@@ -364,12 +374,11 @@ public abstract class YangCase
     @Override
     public void detectCollidingChild(String identifierName, YangConstructType dataType)
             throws DataModelException {
-        if (!(getParent() instanceof YangChoice || getParent() instanceof YangAugment)) {
-            throw new DataModelException("Internal Data Model Tree Error: Invalid/Missing holder in case " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName());
+        if (!(getParent() instanceof YangChoice ||
+                getParent() instanceof YangAugment)) {
+            throw new DataModelException(getErrorMsg(
+                    INVALID_CASE_HOLDER, getName(), getLineNumber(),
+                    getCharPosition(), getFileName()));
         }
         // Traverse up in tree to ask parent choice start collision detection.
         ((CollisionDetector) getParent()).detectCollidingChild(identifierName, dataType);
@@ -381,11 +390,9 @@ public abstract class YangCase
 
         if (dataType == CASE_DATA) {
             if (getName().equals(identifierName)) {
-                throw new DataModelException("YANG File Error: Identifier collision detected in case \"" +
-                        getName() + " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                throw new DataModelException(getErrorMsgCollision(
+                        COLLISION_DETECTION, getName(), getLineNumber(),
+                        getCharPosition(), CASE, getFileName()));
             }
             return;
         }
@@ -396,15 +403,12 @@ public abstract class YangCase
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
-        }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override
@@ -424,17 +428,17 @@ public abstract class YangCase
 
     @Override
     public List<YangAugment> getAugmentedInfoList() {
-        return yangAugmentedInfo;
+        return unmodifiableList(yangAugmentedInfo);
     }
 
     @Override
     public void setLeafNameSpaceAndAddToParentSchemaMap() {
         // Add namespace for all leafs.
-        for (YangLeaf yangLeaf : getListOfLeaf()) {
+        for (YangLeaf yangLeaf : listOfLeaf) {
             yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
         // Add namespace for all leaf list.
-        for (YangLeafList yangLeafList : getListOfLeafList()) {
+        for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }

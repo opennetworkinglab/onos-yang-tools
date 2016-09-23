@@ -16,6 +16,13 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
+import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangRevision;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
+import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -25,15 +32,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.onosproject.yangutils.datamodel.YangNode;
-import org.onosproject.yangutils.datamodel.YangRevision;
-import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
-import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
-
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yangutils.utils.UtilConstants.COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
@@ -73,26 +73,26 @@ public final class JavaIdentifierSyntax {
     /**
      * Returns the root package string.
      *
-     * @param version          YANG version
-     * @param nameSpace        name space of the module
-     * @param revision         revision of the module defined
-     * @param conflictResolver object of YANG to java naming conflict util
+     * @param version   YANG version
+     * @param nameSpace name space of the module
+     * @param revision  revision of the module defined
+     * @param resolver  object of YANG to java naming conflict util
      * @return the root package string
      */
-    public static String getRootPackage(byte version, String nameSpace, YangRevision revision,
-                                        YangToJavaNamingConflictUtil conflictResolver) {
+    public static String getRootPackage(byte version, String nameSpace,
+                                        YangRevision revision,
+                                        YangToJavaNamingConflictUtil resolver) {
 
-        String pkg;
-        pkg = DEFAULT_BASE_PKG;
-        pkg = pkg + PERIOD;
-        pkg = pkg + getYangVersion(version);
-        pkg = pkg + PERIOD;
-        pkg = pkg + getPkgFromNameSpace(nameSpace, conflictResolver);
+        StringBuilder pkg = new StringBuilder(DEFAULT_BASE_PKG)
+                .append(PERIOD)
+                .append(getYangVersion(version))
+                .append(PERIOD)
+                .append(getPkgFromNameSpace(nameSpace, resolver));
         if (revision != null) {
-            pkg = pkg + PERIOD;
-            pkg = pkg + getYangRevisionStr(revision.getRevDate());
+            pkg.append(PERIOD)
+                    .append(getYangRevisionStr(revision.getRevDate()));
         }
-        return pkg.toLowerCase();
+        return pkg.toString().toLowerCase();
     }
 
 
@@ -109,19 +109,21 @@ public final class JavaIdentifierSyntax {
     /**
      * Returns package name from name space.
      *
-     * @param nameSpace        name space of YANG module
-     * @param conflictResolver object of YANG to java naming conflict util
+     * @param nameSpace name space of YANG module
+     * @param resolver  object of YANG to java naming conflict util
      * @return java package name as per java rules
      */
-    private static String getPkgFromNameSpace(String nameSpace, YangToJavaNamingConflictUtil conflictResolver) {
+    private static String getPkgFromNameSpace(String nameSpace,
+                                              YangToJavaNamingConflictUtil resolver) {
 
         ArrayList<String> pkgArr = new ArrayList<>();
         nameSpace = nameSpace.replace(QUOTES, EMPTY_STRING);
-        String properNameSpace = nameSpace.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLAN);
-        String[] nameSpaceArr = properNameSpace.split(COLAN);
+        String properNameSpace = nameSpace.replaceAll
+                (REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+        String[] nameSpaceArr = properNameSpace.split(COLON);
 
         Collections.addAll(pkgArr, nameSpaceArr);
-        return getPkgFrmArr(pkgArr, conflictResolver);
+        return getPkgFrmArr(pkgArr, resolver);
     }
 
     /**
@@ -135,17 +137,17 @@ public final class JavaIdentifierSyntax {
         String dateInString = sdf.format(date);
         String[] revisionArr = dateInString.split(HYPHEN);
 
-        String rev = REVISION_PREFIX;
-        rev = rev + revisionArr[INDEX_ZERO];
+        StringBuilder rev = new StringBuilder(REVISION_PREFIX)
+                .append(revisionArr[INDEX_ZERO]);
 
         for (int i = INDEX_ONE; i < revisionArr.length; i++) {
             Integer val = Integer.parseInt(revisionArr[i]);
             if (val < VALUE_CHECK) {
-                rev = rev + ZERO;
+                rev.append(ZERO);
             }
-            rev = rev + val;
+            rev.append(val);
         }
-        return rev;
+        return rev.toString();
     }
 
     /**
@@ -157,7 +159,7 @@ public final class JavaIdentifierSyntax {
      */
     private static String getPkgFrmArr(ArrayList<String> pkgArr, YangToJavaNamingConflictUtil conflictResolver) {
 
-        String pkg = EMPTY_STRING;
+        StringBuilder pkg = new StringBuilder();
         int size = pkgArr.size();
         int i = 0;
         for (String member : pkgArr) {
@@ -166,13 +168,13 @@ public final class JavaIdentifierSyntax {
                 String prefix = getPrefixForIdentifier(conflictResolver);
                 member = prefix + member;
             }
-            pkg = pkg + member;
+            pkg.append(member);
             if (i != size - 1) {
-                pkg = pkg + PERIOD;
+                pkg.append(PERIOD);
             }
             i++;
         }
-        return pkg;
+        return pkg.toString();
     }
 
     /**
@@ -183,9 +185,9 @@ public final class JavaIdentifierSyntax {
      */
     public static String getEnumJavaAttribute(String name) {
 
-        name = name.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLAN);
-        String[] strArray = name.split(COLAN);
-        String output = EMPTY_STRING;
+        name = name.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+        String[] strArray = name.split(COLON);
+        StringBuilder output = new StringBuilder();
         if (strArray[0].isEmpty()) {
             List<String> stringArrangement = new ArrayList<>();
             stringArrangement.addAll(Arrays.asList(strArray).subList(1, strArray.length));
@@ -193,11 +195,11 @@ public final class JavaIdentifierSyntax {
         }
         for (int i = 0; i < strArray.length; i++) {
             if (i > 0 && i < strArray.length) {
-                output = output + UNDER_SCORE;
+                output.append(UNDER_SCORE);
             }
-            output = output + strArray[i];
+            output.append(strArray[i]);
         }
-        return output;
+        return output.toString();
     }
 
     /**
@@ -212,24 +214,28 @@ public final class JavaIdentifierSyntax {
             throw new TranslatorException("current node must have java file info " +
                                                   yangNode.getName() + " in " +
                                                   yangNode.getLineNumber() + " at " +
-                                                  yangNode.getCharPosition()
-                                                  + " in " + yangNode.getFileName());
+                                                  yangNode.getCharPosition() +
+                                                  " in " + yangNode.getFileName());
         }
         String pkgInfo;
-        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo();
-        String pkg = getAbsolutePackagePath(javaFileInfo.getBaseCodeGenPath(), javaFileInfo.getPackageFilePath());
+        JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) yangNode)
+                .getJavaFileInfo();
+        String pkg = getAbsolutePackagePath(javaFileInfo.getBaseCodeGenPath(),
+                                            javaFileInfo.getPackageFilePath());
+        JavaFileInfoTranslator parentInfo;
         if (!doesPackageExist(pkg)) {
             try {
                 File pack = createDirectories(pkg);
                 YangNode parent = getParentNodeInGenCode(yangNode);
                 if (parent != null) {
-                    pkgInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo().getJavaName();
-                    addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg), true,
-                                   ((JavaFileInfoContainer) parent).getJavaFileInfo().getPluginConfig());
+                    parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
+                    pkgInfo = parentInfo.getJavaName();
+                    addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg),
+                                   true);
                 } else {
-                    pkgInfo = ((JavaFileInfoContainer) yangNode).getJavaFileInfo().getJavaName();
-                    addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg), false,
-                                   ((JavaFileInfoContainer) yangNode).getJavaFileInfo().getPluginConfig());
+                    pkgInfo = javaFileInfo.getJavaName();
+                    addPackageInfo(pack, pkgInfo, getJavaPackageFromPackagePath(pkg),
+                                   false);
                 }
             } catch (IOException e) {
                 throw new IOException("failed to create package-info file");

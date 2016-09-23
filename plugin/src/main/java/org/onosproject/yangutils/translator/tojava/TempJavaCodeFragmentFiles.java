@@ -16,12 +16,12 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
-import java.io.IOException;
-
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
@@ -55,12 +55,12 @@ public class TempJavaCodeFragmentFiles {
     /**
      * Has the temporary files required for enumeration generated classes.
      */
-    private TempJavaEnumerationFragmentFiles enumerationTempFiles;
+    private TempJavaEnumerationFragmentFiles enumTempFiles;
 
     /**
      * Has the temporary files required for enumeration generated classes.
      */
-    private TempJavaEventFragmentFiles tempJavaEventFragmentFiles;
+    private TempJavaEventFragmentFiles eventTempFiles;
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -71,26 +71,26 @@ public class TempJavaCodeFragmentFiles {
     public TempJavaCodeFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
-        if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
-            setBeanTempFiles(new TempJavaBeanFragmentFiles(javaFileInfo));
+        int genType = javaFileInfo.getGeneratedFileTypes();
+        if ((genType & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
+            beanTempFiles = new TempJavaBeanFragmentFiles(javaFileInfo);
         }
 
-        if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_TYPE_CLASS) != 0) {
-            setTypeTempFiles(new TempJavaTypeFragmentFiles(javaFileInfo));
+        if ((genType & GENERATE_TYPE_CLASS) != 0) {
+            typeTempFiles = new TempJavaTypeFragmentFiles(javaFileInfo);
         }
 
-        if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_ENUM_CLASS) != 0) {
-            setEnumerationTempFiles(new TempJavaEnumerationFragmentFiles(javaFileInfo));
+        if ((genType & GENERATE_ENUM_CLASS) != 0) {
+            enumTempFiles = new TempJavaEnumerationFragmentFiles(javaFileInfo);
         }
 
-        if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_SERVICE_AND_MANAGER) != 0) {
-            setServiceTempFiles(new TempJavaServiceFragmentFiles(javaFileInfo));
+        if ((genType & GENERATE_SERVICE_AND_MANAGER) != 0) {
+            serviceTempFiles = new TempJavaServiceFragmentFiles(javaFileInfo);
         }
 
-        if ((javaFileInfo.getGeneratedFileTypes() & GENERATE_ALL_EVENT_CLASS_MASK) != 0) {
-            setEventFragmentFiles(new TempJavaEventFragmentFiles(javaFileInfo));
+        if ((genType & GENERATE_ALL_EVENT_CLASS_MASK) != 0) {
+            eventTempFiles = new TempJavaEventFragmentFiles(javaFileInfo);
         }
-
     }
 
     /**
@@ -103,15 +103,6 @@ public class TempJavaCodeFragmentFiles {
     }
 
     /**
-     * Sets temp file handle for bean file generation.
-     *
-     * @param beanTempFiles temp file handle for bean file generation
-     */
-    private void setBeanTempFiles(TempJavaBeanFragmentFiles beanTempFiles) {
-        this.beanTempFiles = beanTempFiles;
-    }
-
-    /**
      * Retrieves the temp file handle for data type file generation.
      *
      * @return temp file handle for data type file generation
@@ -120,14 +111,6 @@ public class TempJavaCodeFragmentFiles {
         return typeTempFiles;
     }
 
-    /**
-     * Sets temp file handle for data type file generation.
-     *
-     * @param typeTempFiles temp file handle for data type file generation
-     */
-    private void setTypeTempFiles(TempJavaTypeFragmentFiles typeTempFiles) {
-        this.typeTempFiles = typeTempFiles;
-    }
 
     /**
      * Retrieves the temp file handle for service file generation.
@@ -139,31 +122,12 @@ public class TempJavaCodeFragmentFiles {
     }
 
     /**
-     * Sets temp file handle for service file generation.
-     *
-     * @param serviceTempFiles temp file handle for service file generation
-     */
-    private void setServiceTempFiles(TempJavaServiceFragmentFiles serviceTempFiles) {
-        this.serviceTempFiles = serviceTempFiles;
-    }
-
-    /**
      * Retrieves the temp file handle for enumeration file generation.
      *
      * @return temp file handle for enumeration file generation
      */
-    public TempJavaEnumerationFragmentFiles getEnumerationTempFiles() {
-        return enumerationTempFiles;
-    }
-
-    /**
-     * Sets temp file handle for enumeration file generation.
-     *
-     * @param enumerationTempFiles temp file handle for enumeration file generation
-     */
-    private void setEnumerationTempFiles(
-            TempJavaEnumerationFragmentFiles enumerationTempFiles) {
-        this.enumerationTempFiles = enumerationTempFiles;
+    public TempJavaEnumerationFragmentFiles getEnumTempFiles() {
+        return enumTempFiles;
     }
 
     /**
@@ -172,18 +136,8 @@ public class TempJavaCodeFragmentFiles {
      * @return temp file handle for enumeration file generation
      */
     public TempJavaEventFragmentFiles getEventFragmentFiles() {
-        return tempJavaEventFragmentFiles;
+        return eventTempFiles;
     }
-
-    /**
-     * Sets temp file handle for event file generation.
-     *
-     * @param tempJavaEventFragmentFiles temp file handle for event file generation
-     */
-    private void setEventFragmentFiles(TempJavaEventFragmentFiles tempJavaEventFragmentFiles) {
-        this.tempJavaEventFragmentFiles = tempJavaEventFragmentFiles;
-    }
-
 
     /**
      * Constructs java code exit.
@@ -196,35 +150,35 @@ public class TempJavaCodeFragmentFiles {
             throws IOException {
 
         if ((fileType & GENERATE_INTERFACE_WITH_BUILDER) != 0) {
-            getBeanTempFiles().generateJavaFile(fileType, curNode);
+            beanTempFiles.generateJavaFile(fileType, curNode);
         }
 
         /*
          * Creates user defined data type class file.
          */
         if ((fileType & GENERATE_TYPE_CLASS) != 0) {
-            getTypeTempFiles().generateJavaFile(fileType, curNode);
+            typeTempFiles.generateJavaFile(fileType, curNode);
         }
 
         /*
          * Creates service and manager class file.
          */
         if (fileType == GENERATE_SERVICE_AND_MANAGER) {
-            getServiceTempFiles().generateJavaFile(GENERATE_SERVICE_AND_MANAGER, curNode);
+            serviceTempFiles.generateJavaFile(GENERATE_SERVICE_AND_MANAGER, curNode);
         }
 
         /*
          * Creates event, event listener and event subject files.
          */
         if (fileType == GENERATE_ALL_EVENT_CLASS_MASK) {
-            getEventFragmentFiles().generateJavaFile(GENERATE_ALL_EVENT_CLASS_MASK, curNode);
+            eventTempFiles.generateJavaFile(GENERATE_ALL_EVENT_CLASS_MASK, curNode);
         }
 
         /*
          * Creates enumeration class file.
          */
         if (fileType == GENERATE_ENUM_CLASS) {
-            getEnumerationTempFiles().generateJavaFile(GENERATE_ENUM_CLASS, curNode);
+            enumTempFiles.generateJavaFile(GENERATE_ENUM_CLASS, curNode);
         }
     }
 
@@ -232,14 +186,13 @@ public class TempJavaCodeFragmentFiles {
      * Add all the type in the current data model node as part of the
      * generated temporary file.
      *
-     * @param yangTypeHolder YANG java data model node which has type info, eg union / typedef
-     * @param pluginConfig   plugin configurations for naming convention
+     * @param typeHolder YANG java data model node which has type info, eg union / typedef
+     * @param config     plugin configurations for naming convention
      * @throws IOException IO operation fail
      */
-    void addTypeInfoToTempFiles(YangTypeHolder yangTypeHolder, YangPluginConfig pluginConfig)
+    void addTypeInfoToTempFiles(YangTypeHolder typeHolder, YangPluginConfig config)
             throws IOException {
-        getTypeTempFiles()
-                .addTypeInfoToTempFiles(yangTypeHolder, pluginConfig);
+        typeTempFiles.addTypeInfoToTempFiles(typeHolder, config);
     }
 
     /**
@@ -251,8 +204,8 @@ public class TempJavaCodeFragmentFiles {
      */
     public String addBuildMethodForInterface(YangPluginConfig pluginConfig)
             throws IOException {
-        if (getBeanTempFiles() != null) {
-            return getBeanTempFiles().addBuildMethodForInterface(pluginConfig);
+        if (beanTempFiles != null) {
+            return beanTempFiles.addBuildMethodForInterface();
         }
         throw new TranslatorException("build method only supported for bean class");
     }
@@ -260,27 +213,24 @@ public class TempJavaCodeFragmentFiles {
     /**
      * Adds default constructor for class.
      *
-     * @param modifier     modifier for constructor.
-     * @param toAppend     string which need to be appended with the class name
-     * @param pluginConfig plugin configurations
-     * @param curNode      YANG node
+     * @param modifier modifier for constructor.
+     * @param toAppend string which need to be appended with the class name
      * @return default constructor for class
      * @throws IOException when fails to append to file
      */
-    public String addDefaultConstructor(String modifier, String toAppend, YangPluginConfig pluginConfig,
-                                        YangNode curNode)
+    public String addDefaultConstructor(String modifier, String toAppend)
             throws IOException {
         boolean isSuffix = false;
         if (toAppend.equals(BUILDER)) {
             isSuffix = true;
         }
-        if (getTypeTempFiles() != null) {
-            return getTypeTempFiles()
-                    .addDefaultConstructor(modifier, toAppend, pluginConfig, isSuffix);
+        if (typeTempFiles != null) {
+            return typeTempFiles.addDefaultConstructor(modifier, toAppend,
+                                                       isSuffix);
         }
-
-        if (getBeanTempFiles() != null) {
-            return getBeanTempFiles().addDefaultConstructor(modifier, toAppend, pluginConfig, isSuffix);
+        if (beanTempFiles != null) {
+            return beanTempFiles.addDefaultConstructor(modifier, toAppend,
+                                                       isSuffix);
         }
 
         throw new TranslatorException("default constructor should not be added");
@@ -289,49 +239,46 @@ public class TempJavaCodeFragmentFiles {
     /**
      * Adds build method's implementation for class.
      *
-     * @param curNode YANG node
      * @return build method implementation for class
      * @throws IOException when fails to append to temporary file
      */
-    public String addBuildMethodImpl(YangNode curNode)
+    public String addBuildMethodImpl()
             throws IOException {
-        if (getBeanTempFiles() != null) {
-            return getBeanTempFiles().addBuildMethodImpl();
+        if (beanTempFiles != null) {
+            return beanTempFiles.addBuildMethodImpl();
         }
-
         throw new TranslatorException("build should not be added");
     }
 
     /**
      * Removes all temporary file handles.
+     * when translator fails to generate java files we need to close
+     * all open file handles include temporary files and java files
      *
-     * @param isErrorOccurred when translator fails to generate java files we need to close
-     *                        all open file handles include temporary files and java files.
+     * @param isErrorOccurred if error occurred
      * @throws IOException when failed to delete the temporary files
      */
     void freeTemporaryResources(boolean isErrorOccurred)
             throws IOException {
 
-        if (getBeanTempFiles() != null) {
-            getBeanTempFiles().freeTemporaryResources(isErrorOccurred);
+        if (beanTempFiles != null) {
+            beanTempFiles.freeTemporaryResources(isErrorOccurred);
         }
 
-        if (getTypeTempFiles() != null) {
-            getTypeTempFiles().freeTemporaryResources(isErrorOccurred);
+        if (typeTempFiles != null) {
+            typeTempFiles.freeTemporaryResources(isErrorOccurred);
         }
 
-        if (getEnumerationTempFiles() != null) {
-            getEnumerationTempFiles().freeTemporaryResources(isErrorOccurred);
+        if (enumTempFiles != null) {
+            enumTempFiles.freeTemporaryResources(isErrorOccurred);
         }
 
-        if (getServiceTempFiles() != null) {
-            getServiceTempFiles().freeTemporaryResources(isErrorOccurred);
+        if (serviceTempFiles != null) {
+            serviceTempFiles.freeTemporaryResources(isErrorOccurred);
         }
 
-        if (getEventFragmentFiles() != null) {
-            getEventFragmentFiles().freeTemporaryResources(isErrorOccurred);
+        if (eventTempFiles != null) {
+            eventTempFiles.freeTemporaryResources(isErrorOccurred);
         }
-
     }
-
 }

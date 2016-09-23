@@ -16,8 +16,6 @@
 
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.IOException;
-
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaEnumeration;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
@@ -26,8 +24,13 @@ import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 
 /**
  * Represents YANG java enumeration information extended to support java code generation.
@@ -48,7 +51,6 @@ public class YangJavaEnumerationTranslator
      * Creates YANG java enumeration object.
      */
     public YangJavaEnumerationTranslator() {
-        super();
         setJavaFileInfo(new JavaFileInfoTranslator());
         getJavaFileInfo().setGeneratedFileTypes(GENERATE_ENUM_CLASS);
     }
@@ -63,10 +65,7 @@ public class YangJavaEnumerationTranslator
 
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+                                                  getName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -113,12 +112,8 @@ public class YangJavaEnumerationTranslator
         try {
             generateCodeOfNode(this, yangPlugin);
         } catch (IOException e) {
-            throw new TranslatorException(
-                    "Failed to prepare generate code entry for enumeration node " +
-                            getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 
@@ -132,11 +127,8 @@ public class YangJavaEnumerationTranslator
         try {
             getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_ENUM_CLASS, this);
         } catch (IOException e) {
-            throw new TranslatorException("Failed to generate code for enumeration node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + " " + e.getLocalizedMessage());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
+                                                      e.getLocalizedMessage()));
         }
     }
 

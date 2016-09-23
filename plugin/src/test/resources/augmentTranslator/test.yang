@@ -110,5 +110,30 @@ module test {
         }
      }
 
+   augment /test1:rpc-input/test1:input {
+           leaf leaf2 {
+                type int32;
+            }
+   }
+
+   augment /test1:rpc-output/test1:output {
+           leaf leaf2 {
+                type int32;
+            }
+   }
+
+   augment /test1:rpc-input-output/test1:output {
+           leaf leaf2 {
+                type int32;
+            }
+   }
+
+   augment /test1:rpc-input-output/test1:input {
+           leaf leaf2 {
+                type int32;
+            }
+   }
+
+
 }
     

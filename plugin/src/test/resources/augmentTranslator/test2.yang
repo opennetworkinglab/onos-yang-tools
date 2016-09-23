@@ -26,5 +26,35 @@ module test1 {
             }
         }
     }
+
+    rpc rpc-input {
+       input {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+    }
+
+    rpc rpc-output {
+       output {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+    }
+
+    rpc rpc-input-output {
+       input {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+       output {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+    }
+
 }
     

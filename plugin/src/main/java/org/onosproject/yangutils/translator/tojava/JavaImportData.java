@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static java.util.Collections.sort;
+import static java.util.Collections.unmodifiableSortedSet;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.utils.UtilConstants.ABSTRACT_EVENT;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BITSET;
@@ -29,22 +32,16 @@ import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER;
 import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH_MAP;
-import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_MATH;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
-import static org.onosproject.yangutils.utils.UtilConstants.LISTENER_REG;
 import static org.onosproject.yangutils.utils.UtilConstants.LISTENER_SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.MAP;
-import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.ONOS_EVENT_PKG;
-import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
-import static java.util.Collections.sort;
 
 /**
  * Represents that generated Java file can contain imports.
@@ -70,23 +67,15 @@ public class JavaImportData {
      * Sorted set of import info, to be used to maintain the set of classes to
      * be imported in the generated class.
      */
-    private SortedSet<JavaQualifiedTypeInfoTranslator> importSet;
+    private final SortedSet<JavaQualifiedTypeInfoTranslator> importSet;
 
     /**
      * Creates java import data object.
      */
     public JavaImportData() {
-        setImportSet(new TreeSet<>());
+        importSet = new TreeSet<>();
     }
 
-    /**
-     * Returns if the list needs to be imported.
-     *
-     * @return true if any of the attribute needs to be maintained as a list
-     */
-    private boolean getIfListImported() {
-        return isListToImport;
-    }
 
     /**
      * Sets the status of importing list.
@@ -97,30 +86,13 @@ public class JavaImportData {
         isListToImport = isList;
     }
 
-    /**
-     * Is Queue to be imported due to compiler annotations.
-     *
-     * @return status of queue import
-     */
-    public boolean isQueueToImport() {
-        return isQueueToImport;
-    }
-
-    /**
-     * Is Set to be imported due to compiler annotations.
-     *
-     * @return status of set import
-     */
-    public boolean isSetToImport() {
-        return isSetToImport;
-    }
 
     /**
      * Sets the status of the queue to be imported due to compiler annotations.
      *
      * @param queueToImport status of queue to import
      */
-    public void setQueueToImport(boolean queueToImport) {
+    void setQueueToImport(boolean queueToImport) {
         isQueueToImport = queueToImport;
     }
 
@@ -129,7 +101,7 @@ public class JavaImportData {
      *
      * @param setToImport status of set to import
      */
-    public void setSetToImport(boolean setToImport) {
+    void setSetToImport(boolean setToImport) {
         isSetToImport = setToImport;
     }
 
@@ -139,16 +111,7 @@ public class JavaImportData {
      * @return the set containing the imported class/interface info
      */
     public SortedSet<JavaQualifiedTypeInfoTranslator> getImportSet() {
-        return importSet;
-    }
-
-    /**
-     * Assigns the set containing the imported class/interface info.
-     *
-     * @param importSet the set containing the imported class/interface info
-     */
-    private void setImportSet(SortedSet<JavaQualifiedTypeInfoTranslator> importSet) {
-        this.importSet = importSet;
+        return unmodifiableSortedSet(importSet);
     }
 
     /**
@@ -178,7 +141,8 @@ public class JavaImportData {
             return true;
         } else if (newImportInfo.getPkgInfo() == null) {
             /*
-             * If the package info is null, then it is not a candidate for import / qualified access
+             * If the package info is null, then it is not a candidate for import
+              * / qualified access
              */
             return false;
         }
@@ -190,7 +154,8 @@ public class JavaImportData {
          */
         if (newImportInfo.getPkgInfo().contentEquals(classPkg)) {
             /*
-             * Package of the referred attribute and the generated class is same, so no need import
+             * Package of the referred attribute and the generated class is same,
+              * so no need import
              * or qualified access.
              */
             return false;
@@ -207,7 +172,7 @@ public class JavaImportData {
         /*
          * Import is added, so it is a member for non qualified access
          */
-        getImportSet().add(newImportInfo);
+        importSet.add(newImportInfo);
         return false;
     }
 
@@ -222,24 +187,21 @@ public class JavaImportData {
         List<String> imports = new ArrayList<>();
 
         for (JavaQualifiedTypeInfoTranslator importInfo : getImportSet()) {
-            if (!importInfo.getPkgInfo().equals(EMPTY_STRING) && importInfo.getClassInfo() != null
-                    && !importInfo.getPkgInfo().equals(JAVA_LANG)) {
-                importString = IMPORT + importInfo.getPkgInfo() + PERIOD + importInfo.getClassInfo() + SEMI_COLAN
-                        + NEW_LINE;
-
+            if (!importInfo.getPkgInfo().equals(EMPTY_STRING) &&
+                    importInfo.getClassInfo() != null &&
+                    !importInfo.getPkgInfo().equals(JAVA_LANG)) {
+                importString = getImportString(importInfo.getPkgInfo(), importInfo
+                        .getClassInfo());
                 imports.add(importString);
             }
         }
-
-        if (getIfListImported()) {
+        if (isListToImport) {
             imports.add(getImportForList());
         }
-
-        if (isQueueToImport()) {
+        if (isQueueToImport) {
             imports.add(getImportForQueue());
         }
-
-        if (isSetToImport()) {
+        if (isSetToImport) {
             imports.add(getImportForSet());
         }
 
@@ -253,7 +215,8 @@ public class JavaImportData {
      * @return import for hash and equals method
      */
     String getImportForHashAndEquals() {
-        return IMPORT + JAVA_UTIL_OBJECTS_IMPORT_PKG + PERIOD + JAVA_UTIL_OBJECTS_IMPORT_CLASS;
+        return getImportString(JAVA_UTIL_OBJECTS_IMPORT_PKG,
+                               JAVA_UTIL_OBJECTS_IMPORT_CLASS);
     }
 
     /**
@@ -262,7 +225,8 @@ public class JavaImportData {
      * @return import for to string method
      */
     String getImportForToString() {
-        return IMPORT + GOOGLE_MORE_OBJECT_IMPORT_PKG + PERIOD + GOOGLE_MORE_OBJECT_IMPORT_CLASS;
+        return getImportString(GOOGLE_MORE_OBJECT_IMPORT_PKG,
+                               GOOGLE_MORE_OBJECT_IMPORT_CLASS);
     }
 
     /**
@@ -271,7 +235,7 @@ public class JavaImportData {
      * @return import for to bitset method
      */
     String getImportForToBitSet() {
-        return IMPORT + JAVA_UTIL_OBJECTS_IMPORT_PKG + PERIOD + BITSET + SEMI_COLAN + NEW_LINE;
+        return getImportString(JAVA_UTIL_OBJECTS_IMPORT_PKG, BITSET);
     }
 
     /**
@@ -280,7 +244,7 @@ public class JavaImportData {
      * @return import for list attribute
      */
     String getImportForList() {
-        return IMPORT + COLLECTION_IMPORTS + PERIOD + LIST + SEMI_COLAN + NEW_LINE;
+        return getImportString(COLLECTION_IMPORTS, LIST);
     }
 
     /**
@@ -288,8 +252,8 @@ public class JavaImportData {
      *
      * @return import for queue attribute
      */
-    public String getImportForQueue() {
-        return IMPORT + COLLECTION_IMPORTS + PERIOD + QUEUE + SEMI_COLAN + NEW_LINE;
+    private String getImportForQueue() {
+        return getImportString(COLLECTION_IMPORTS, QUEUE);
     }
 
     /**
@@ -297,8 +261,8 @@ public class JavaImportData {
      *
      * @return import for set attribute
      */
-    public String getImportForSet() {
-        return IMPORT + COLLECTION_IMPORTS + PERIOD + SET + SEMI_COLAN + NEW_LINE;
+    private String getImportForSet() {
+        return getImportString(COLLECTION_IMPORTS, SET);
     }
 
     /**
@@ -307,16 +271,7 @@ public class JavaImportData {
      * @return import string for ListenerService class
      */
     public String getListenerServiceImport() {
-        return IMPORT + ONOS_EVENT_PKG + PERIOD + LISTENER_SERVICE + SEMI_COLAN + NEW_LINE;
-    }
-
-    /**
-     * Returns import string for ListenerRegistry class.
-     *
-     * @return import string for ListenerRegistry class
-     */
-    public String getListenerRegistryImport() {
-        return IMPORT + ONOS_EVENT_PKG + PERIOD + LISTENER_REG + SEMI_COLAN + NEW_LINE;
+        return getImportString(ONOS_EVENT_PKG, LISTENER_SERVICE);
     }
 
     /**
@@ -325,7 +280,7 @@ public class JavaImportData {
      * @return import string for AbstractEvent class
      */
     String getAbstractEventsImport() {
-        return IMPORT + ONOS_EVENT_PKG + PERIOD + ABSTRACT_EVENT + SEMI_COLAN + NEW_LINE;
+        return getImportString(ONOS_EVENT_PKG, ABSTRACT_EVENT);
     }
 
     /**
@@ -334,7 +289,7 @@ public class JavaImportData {
      * @return import string for EventListener class
      */
     String getEventListenerImport() {
-        return IMPORT + ONOS_EVENT_PKG + PERIOD + EVENT_LISTENER + SEMI_COLAN + NEW_LINE;
+        return getImportString(ONOS_EVENT_PKG, EVENT_LISTENER);
     }
 
     /**
@@ -343,7 +298,7 @@ public class JavaImportData {
      * @return import string for map class
      */
     String getMapImport() {
-        return IMPORT + COLLECTION_IMPORTS + PERIOD + MAP + SEMI_COLAN + NEW_LINE;
+        return getImportString(COLLECTION_IMPORTS, MAP);
     }
 
     /**
@@ -352,7 +307,7 @@ public class JavaImportData {
      * @return import string for hash map class
      */
     String getHashMapImport() {
-        return IMPORT + COLLECTION_IMPORTS + PERIOD + HASH_MAP + SEMI_COLAN + NEW_LINE;
+        return getImportString(COLLECTION_IMPORTS, HASH_MAP);
     }
 
     /**
@@ -361,7 +316,7 @@ public class JavaImportData {
      * @return import for big integer
      */
     public String getBigIntegerImport() {
-        return IMPORT + JAVA_MATH + PERIOD +
-                BIG_INTEGER + SEMI_COLAN + NEW_LINE;
+        return getImportString(JAVA_MATH, BIG_INTEGER);
     }
+
 }

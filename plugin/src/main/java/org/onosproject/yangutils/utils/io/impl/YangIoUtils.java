@@ -16,6 +16,10 @@
 
 package org.onosproject.yangutils.utils.io.impl;
 
+import org.apache.commons.io.FileUtils;
+import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,21 +28,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
-import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
-
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
-import static org.onosproject.yangutils.utils.UtilConstants.COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.HASH;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_KEY_WORDS;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
@@ -60,9 +59,10 @@ import static org.onosproject.yangutils.utils.UtilConstants.REGEX_WITH_DIGITS;
 import static org.onosproject.yangutils.utils.UtilConstants.REGEX_WITH_SINGLE_CAPITAL_CASE;
 import static org.onosproject.yangutils.utils.UtilConstants.REGEX_WITH_SINGLE_CAPITAL_CASE_AND_DIGITS_SMALL_CASES;
 import static org.onosproject.yangutils.utils.UtilConstants.REGEX_WITH_UPPERCASE;
-import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLAN;
+import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
+import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.UNDER_SCORE;
 import static org.onosproject.yangutils.utils.UtilConstants.UNUSED;
@@ -80,7 +80,7 @@ public final class YangIoUtils {
 
     private static final int LINE_SIZE = 118;
     private static final int SUB_LINE_SIZE = 116;
-    private static final int ZERO = 0;
+    private static final int SUB_SIZE = 60;
 
     /**
      * Creates an instance of YANG io utils.
@@ -110,26 +110,24 @@ public final class YangIoUtils {
     /**
      * Adds package info file for the created directory.
      *
-     * @param path         directory path
-     * @param classInfo    class info for the package
-     * @param pack         package of the directory
-     * @param isChildNode  is it a child node
-     * @param pluginConfig plugin configurations
+     * @param path        directory path
+     * @param classInfo   class info for the package
+     * @param pack        package of the directory
+     * @param isChildNode is it a child node
      * @throws IOException when fails to create package info file
      */
-    public static void addPackageInfo(File path, String classInfo, String pack, boolean isChildNode,
-                                      YangPluginConfig pluginConfig)
-            throws IOException {
+    public static void addPackageInfo(File path, String classInfo, String pack,
+                                      boolean isChildNode) throws IOException {
 
         pack = parsePkg(pack);
-
         try {
 
             File packageInfo = new File(path + SLASH + "package-info.java");
             if (!packageInfo.exists()) {
                 boolean isGenerated = packageInfo.createNewFile();
                 if (!isGenerated) {
-                    throw new IOException("failed to generated package-info " + path);
+                    throw new IOException("failed to generated package-info " +
+                                                  path);
                 }
             }
             FileWriter fileWriter = new FileWriter(packageInfo);
@@ -137,16 +135,18 @@ public final class YangIoUtils {
 
             bufferedWriter.write(getCopyrightHeader());
             //TODO: get the compiler annotations and pass the info
-            bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode, pluginConfig, null));
-            String pkg = PACKAGE + SPACE + pack + SEMI_COLAN;
+            bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode,
+                                            null));
+            String pkg = PACKAGE + SPACE + pack + SEMI_COLON;
             if (pkg.length() > LINE_SIZE) {
-                pkg = whenDelimiterIsPresent(pkg, LINE_SIZE);
+                pkg = processModifications(pkg, LINE_SIZE);
             }
             bufferedWriter.write(pkg);
             bufferedWriter.close();
             fileWriter.close();
         } catch (IOException e) {
-            throw new IOException("Exception occurred while creating package info file.");
+            throw new IOException("Exception occurred while creating package info" +
+                                          " file.");
         }
     }
 
@@ -190,7 +190,8 @@ public final class YangIoUtils {
                 FileUtils.deleteDirectory(generatedDirectory);
             } catch (IOException e) {
                 throw new IOException(
-                        "Failed to delete the generated files in " + generatedDirectory + " directory");
+                        "Failed to delete the generated files in " +
+                                generatedDirectory + " directory");
             }
         }
     }
@@ -217,7 +218,7 @@ public final class YangIoUtils {
             for (File current : fileList) {
                 if (current.isDirectory()) {
                     stack.push(current.toString());
-                    if (current.getName().endsWith("-Temp")) {
+                    if (current.getName().endsWith(HYPHEN + TEMP)) {
                         store.add(current);
                     }
                 }
@@ -236,11 +237,17 @@ public final class YangIoUtils {
      * @param removalString extra chars
      * @return new string
      */
-    public static String trimAtLast(String valueString, String removalString) {
+    public static String trimAtLast(String valueString, String...
+            removalString) {
         StringBuilder stringBuilder = new StringBuilder(valueString);
-        int index = valueString.lastIndexOf(removalString);
-        if (index != -1) {
-            stringBuilder.deleteCharAt(index);
+        String midString;
+        int index;
+        for (String remove : removalString) {
+            midString = stringBuilder.toString();
+            index = midString.lastIndexOf(remove);
+            if (index != -1) {
+                stringBuilder.deleteCharAt(index);
+            }
         }
         return stringBuilder.toString();
     }
@@ -253,14 +260,16 @@ public final class YangIoUtils {
      * @param replacingString string with which replacement is to be done
      * @return new string
      */
-    public static String replaceLast(String valueString, String removalString, String replacingString) {
+    public static String replaceLast(String valueString, String removalString,
+                                     String replacingString) {
         StringBuilder stringBuilder = new StringBuilder(valueString);
         int index = valueString.lastIndexOf(removalString);
         if (index != -1) {
             stringBuilder.replace(index, index + 1, replacingString);
         } else {
-            stringBuilder.append(NEW_LINE + EIGHT_SPACE_INDENTATION + UNUSED + OPEN_PARENTHESIS + ONE +
-                                         CLOSE_PARENTHESIS + SEMI_COLAN);
+            stringBuilder.append(NEW_LINE + EIGHT_SPACE_INDENTATION + UNUSED +
+                                         OPEN_PARENTHESIS + ONE +
+                                         CLOSE_PARENTHESIS + SEMI_COLON);
         }
         return stringBuilder.toString();
 
@@ -297,7 +306,8 @@ public final class YangIoUtils {
      * @param pathOfJavaPkg   java package of the file being generated
      * @return absolute path of the package in canonical form
      */
-    public static String getAbsolutePackagePath(String baseCodeGenPath, String pathOfJavaPkg) {
+    public static String getAbsolutePackagePath(String baseCodeGenPath,
+                                                String pathOfJavaPkg) {
         return baseCodeGenPath + pathOfJavaPkg;
     }
 
@@ -313,7 +323,8 @@ public final class YangIoUtils {
         try {
             appendFileContents(appendFile, srcFile);
         } catch (IOException e) {
-            throw new IOException("Failed to merge " + appendFile + " in " + srcFile);
+            throw new IOException("Failed to merge " + appendFile + " in " +
+                                          srcFile);
         }
     }
 
@@ -345,23 +356,16 @@ public final class YangIoUtils {
             throws IOException {
         FileReader fileReader = new FileReader(dataFile);
         BufferedReader bufferReader = new BufferedReader(fileReader);
-        String append;
         try {
             StringBuilder stringBuilder = new StringBuilder();
             String line = bufferReader.readLine();
 
             while (line != null) {
                 if (line.length() > LINE_SIZE) {
-                    if (line.contains(PERIOD)) {
-                        line = whenDelimiterIsPresent(line, LINE_SIZE);
-                    } else if (line.contains(SPACE)) {
-                        line = whenSpaceIsPresent(line, LINE_SIZE);
-                    }
-                    stringBuilder.append(line);
-                } else {
-                    append = line + NEW_LINE;
-                    stringBuilder.append(append);
+                    line = processModifications(line, LINE_SIZE);
                 }
+                stringBuilder.append(line);
+                stringBuilder.append(NEW_LINE);
                 line = bufferReader.readLine();
             }
             FileWriter writer = new FileWriter(dataFile);
@@ -374,119 +378,220 @@ public final class YangIoUtils {
         }
     }
 
-    /* When delimiters are present in the given line. */
-    private static String whenDelimiterIsPresent(String line, int lineSize) {
-        StringBuilder stringBuilder = new StringBuilder();
-        String append;
-        if (line.length() > lineSize) {
-            String[] strArray = line.split(Pattern.quote(PERIOD));
-            stringBuilder = updateString(strArray, stringBuilder, PERIOD, lineSize);
-        } else {
-            append = line + NEW_LINE;
-            stringBuilder.append(append);
+    /**
+     * Resolves validation of line length by modifying the string.
+     *
+     * @param line     current line string
+     * @param lineSize line size for change
+     * @return modified line string
+     */
+    private static String processModifications(String line, int lineSize) {
+        int period = getArrayLength(line, PERIOD);
+        int space = getArrayLength(line, SPACE);
+        if (period > space) {
+            return merge(getForPeriod(line), PERIOD, lineSize);
         }
-        String[] strArray = stringBuilder.toString().split(NEW_LINE);
-        StringBuilder tempBuilder = new StringBuilder();
-        for (String str : strArray) {
-            if (str.length() > SUB_LINE_SIZE) {
-                if (line.contains(PERIOD) && !line.contains(PERIOD + HASH + OPEN_PARENTHESIS)) {
-                    String[] strArr = str.split(Pattern.quote(PERIOD));
-                    tempBuilder = updateString(strArr, tempBuilder, PERIOD, SUB_LINE_SIZE);
-                } else if (str.contains(SPACE)) {
-                    tempBuilder.append(whenSpaceIsPresent(str, SUB_LINE_SIZE));
-                }
-            } else {
-                append = str + NEW_LINE;
-                tempBuilder.append(append);
-            }
-        }
-        return tempBuilder.toString();
-
+        return merge(getForSpace(line), SPACE, lineSize);
     }
 
-    /* When spaces are present in the given line. */
-    private static String whenSpaceIsPresent(String line, int lineSize) {
-        StringBuilder stringBuilder = new StringBuilder();
-        String append;
-        if (line.length() > lineSize) {
-            String[] strArray = line.split(SPACE);
-            stringBuilder = updateString(strArray, stringBuilder, SPACE, lineSize);
-        } else {
-            append = line + NEW_LINE;
-            stringBuilder.append(append);
-        }
-
-        String[] strArray = stringBuilder.toString().split(NEW_LINE);
-        StringBuilder tempBuilder = new StringBuilder();
-        for (String str : strArray) {
-            if (str.length() > LINE_SIZE) {
-                if (str.contains(SPACE)) {
-                    String[] strArr = str.split(SPACE);
-                    tempBuilder = updateString(strArr, tempBuilder, SPACE, SUB_LINE_SIZE);
+    /**
+     * Returns count of pattern in line.
+     *
+     * @param line    line string
+     * @param pattern pattern followed in line
+     * @return count of pattern in line
+     */
+    private static int getArrayLength(String line, String pattern) {
+        String[] array = line.split(Pattern.quote(pattern));
+        int len = array.length;
+        if (pattern.equals(SPACE)) {
+            for (String str : array) {
+                if (str.equals(EMPTY_STRING)) {
+                    len--;
                 }
-            } else {
-                append = str + NEW_LINE;
-                tempBuilder.append(append);
             }
         }
-        return tempBuilder.toString();
+        return len - 1;
     }
 
-    /* Updates the given line with the given size conditions. */
-    private static StringBuilder updateString(String[] strArray, StringBuilder stringBuilder, String string,
-                                              int lineSize) {
+    /**
+     * Returns array list of string in case of period.
+     *
+     * @param line line string
+     * @return array list of string in case of period
+     */
+    private static ArrayList<String> getForPeriod(String line) {
+        String[] array = line.split(Pattern.quote(PERIOD));
+        return getSplitArray(array, PERIOD);
+    }
 
-        StringBuilder tempBuilder = new StringBuilder();
+    /**
+     * Returns array list of string in case of space.
+     *
+     * @param line line string
+     * @return array list of string in case of space
+     */
+    private static ArrayList<String> getForSpace(String line) {
+        String[] array = line.split(SPACE);
+        return getSplitArray(array, SPACE);
+    }
+
+    /**
+     * Merges strings to form a new string.
+     *
+     * @param list     list of strings
+     * @param pattern  pattern
+     * @param lineSize line size
+     * @return merged string
+     */
+    private static String merge(ArrayList<String> list, String pattern, int lineSize) {
+        StringBuilder builder = new StringBuilder();
+        StringBuilder fine = new StringBuilder();
         String append;
-        for (String str : strArray) {
-            if (strArray[strArray.length - 1].contains(OPEN_CURLY_BRACKET)) {
-                if (str.equals(strArray[strArray.length - 2])
-                        && !str.equals(strArray[0])
-                        && tempBuilder.length() < SUB_LINE_SIZE) {
-                    String tempString = stringBuilder.toString();
-                    stringBuilder.delete(ZERO, stringBuilder.length());
-                    tempString = trimAtLast(tempString, string);
-                    stringBuilder.append(tempString);
-                    if (string.equals(PERIOD)) {
-                        append = NEW_LINE + TWELVE_SPACE_INDENTATION + PERIOD + str + string;
-                    } else {
-                        append = NEW_LINE + TWELVE_SPACE_INDENTATION + str + string;
-                    }
-                    stringBuilder.append(append);
-                    append = EMPTY_STRING;
-                    tempBuilder.delete(ZERO, tempBuilder.length());
-                    tempBuilder.append(TWELVE_SPACE_INDENTATION);
-                } else {
-                    append = str + string;
-                    tempBuilder.append(append);
+        String pre;
+        String present = EMPTY_STRING;
+        //Add one blank string in list to handle border limit cases.
+        list.add(EMPTY_STRING);
+        Iterator<String> listIt = list.iterator();
+        ArrayList<String> arrayList = new ArrayList<>();
+        int length;
+        StringBuilder spaces = new StringBuilder();
+        while (listIt.hasNext()) {
+            pre = present;
+            present = listIt.next();
+            //check is present string is more than 80 char.
+            if (present.length() > SUB_SIZE) {
+                int period = getArrayLength(present, PERIOD);
+                int space = getArrayLength(present, SPACE);
+                if (period > space) {
+                    // in such case present string should be resolved.
+                    present = processModifications(present, SUB_SIZE);
+                    builder.append(present);
                 }
-            } else {
-                append = str + string;
-                tempBuilder.append(append);
             }
-            if (tempBuilder.length() > lineSize) {
-                String tempString = stringBuilder.toString();
-                stringBuilder.delete(ZERO, stringBuilder.length());
-                tempString = trimAtLast(tempString, string);
-                stringBuilder.append(tempString);
-                if (string.equals(PERIOD)) {
-                    append = NEW_LINE + TWELVE_SPACE_INDENTATION + PERIOD + str + string;
-                } else {
-                    append = NEW_LINE + TWELVE_SPACE_INDENTATION + str + string;
+            length = builder.length();
+            //If length of builder is less than the given length then append
+            // it to builder.
+            if (length <= lineSize) {
+                //fill the space builder to provide proper indentation.
+                if (present.equals(EMPTY_STRING)) {
+                    spaces.append(SPACE);
                 }
-                stringBuilder.append(append);
-                tempBuilder.delete(ZERO, tempBuilder.length());
-                tempBuilder.append(TWELVE_SPACE_INDENTATION);
+                //append to builder
+                builder.append(present);
+                builder.append(pattern);
+                fine.append(pre);
+                //do not append pattern in case of empty strings.
+                if (!pre.equals(EMPTY_STRING)) {
+                    fine.append(pattern);
+                }
             } else {
-                stringBuilder.append(append);
+                // now the length is more than given size so trim the pattern
+                // for the string and add it to list,
+                fine = getReplacedString(fine, pattern);
+                arrayList.add(fine.toString());
+                // clear all.
+                builder.delete(0, length);
+                fine.delete(0, fine.length());
+                // append indentation
+                if (pattern.contains(PERIOD)) {
+                    append = NEW_LINE + spaces +
+                            TWELVE_SPACE_INDENTATION +
+                            PERIOD;
+                } else {
+                    append = NEW_LINE + spaces + TWELVE_SPACE_INDENTATION;
+                }
+                // builder needs to move one step forward to fine builder so
+                // append present and pre strings to builder with pattern.
+                builder.append(append);
+                builder.append(pre);
+                builder.append(pattern);
+                builder.append(present);
+                builder.append(pattern);
+                fine.append(append);
+                fine.append(pre);
+                if (!pre.equals(EMPTY_STRING)) {
+                    fine.append(pattern);
+                }
             }
         }
-        String tempString = stringBuilder.toString();
-        tempString = trimAtLast(tempString, string);
-        stringBuilder.delete(ZERO, stringBuilder.length());
-        append = tempString + NEW_LINE;
-        stringBuilder.append(append);
-        return stringBuilder;
+
+        builder = getReplacedString(builder, pattern);
+
+        //need to remove extra string added from the builder.
+        if (builder.toString().lastIndexOf(pattern) == builder.length() - 1) {
+            builder = getReplacedString(builder, pattern);
+        }
+        arrayList.add(builder.toString());
+        fine.delete(0, fine.length());
+        for (String str : arrayList) {
+            fine.append(str);
+        }
+        //No need to append extra spaces.
+        if (pattern.equals(PERIOD)) {
+            return fine.toString();
+        }
+        return spaces + fine.toString();
+    }
+
+    /**
+     * Trims extra pattern strings for builder string.
+     *
+     * @param builder builder
+     * @param pattern pattern
+     * @return modified string
+     */
+    private static StringBuilder getReplacedString(StringBuilder builder, String
+            pattern) {
+        String temp = builder.toString();
+        temp = trimAtLast(temp, pattern);
+        int length = builder.length();
+        builder.delete(0, length);
+        builder.append(temp);
+        return builder;
+    }
+
+    /**
+     * Creates array list to process line string modification.
+     *
+     * @param array   array of strings
+     * @param pattern pattern
+     * @return list to process line string modification
+     */
+    private static ArrayList<String> getSplitArray(String[] array, String pattern) {
+        ArrayList<String> newArray = new ArrayList<>();
+        int count = 0;
+        String temp;
+        for (String str : array) {
+            if (!str.contains(OPEN_CURLY_BRACKET)) {
+                if (str.length() > SUB_LINE_SIZE) {
+                    count = getSplitString(str, newArray, count);
+                } else {
+                    newArray.add(str);
+                    count++;
+                }
+            } else {
+                if (newArray.isEmpty()) {
+                    newArray.add(str);
+                } else {
+                    temp = newArray.get(count - 1);
+                    newArray.remove(count - 1);
+                    newArray.add(count - 1, temp + pattern + str);
+                }
+            }
+        }
+
+        return newArray;
+    }
+
+    private static int getSplitString(String str,
+                                      ArrayList<String> newArray, int count) {
+        String[] array = str.split(SPACE);
+        for (String st : array) {
+            newArray.add(st + SPACE);
+            count++;
+        }
+        return count;
     }
 
     /**
@@ -697,8 +802,8 @@ public final class YangIoUtils {
                                                            HYPHEN + replacementForHyphen.toLowerCase() + HYPHEN);
             }
         }
-        yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_IDENTIFIER_SPECIAL_CHAR, COLAN);
-        String[] strArray = yangIdentifier.split(COLAN);
+        yangIdentifier = yangIdentifier.replaceAll(REGEX_FOR_IDENTIFIER_SPECIAL_CHAR, COLON);
+        String[] strArray = yangIdentifier.split(COLON);
         if (strArray[0].isEmpty()) {
             List<String> stringArrangement = new ArrayList<>();
             stringArrangement.addAll(Arrays.asList(strArray).subList(1, strArray.length));
@@ -720,8 +825,9 @@ public final class YangIoUtils {
             prefixForIdentifier = conflictResolver.getPrefixForIdentifier();
         }
         if (prefixForIdentifier != null) {
-            prefixForIdentifier = prefixForIdentifier.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLAN);
-            String[] strArray = prefixForIdentifier.split(COLAN);
+            prefixForIdentifier = prefixForIdentifier.replaceAll
+                    (REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+            String[] strArray = prefixForIdentifier.split(COLON);
             try {
                 if (strArray[0].isEmpty()) {
                     List<String> stringArrangement = new ArrayList<>();
@@ -749,7 +855,7 @@ public final class YangIoUtils {
      */
     public static void removeEmptyDirectory(String path) {
         int index;
-        while (path != null && !path.equals("")) {
+        while (path != null && !path.isEmpty()) {
             if (!removeDirectory(path)) {
                 break;
             } else {
@@ -767,7 +873,7 @@ public final class YangIoUtils {
             if (files != null && files.length == 0) {
                 isDeleted = dir.delete();
             } else if (files != null && files.length == 1) {
-                if (files[0].getName().equals("package-info.java")
+                if ("package-info.java".equals(files[0].getName())
                         || files[0].getName().endsWith("-temp")) {
                     isDeleted = dir.delete();
                 }
@@ -775,5 +881,4 @@ public final class YangIoUtils {
         }
         return isDeleted;
     }
-
 }
