@@ -16,23 +16,23 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import java.io.IOException;
-import java.util.ListIterator;
-
 import org.junit.Test;
+import org.onosproject.yangutils.datamodel.YangContainer;
+import org.onosproject.yangutils.datamodel.YangInput;
+import org.onosproject.yangutils.datamodel.YangLeaf;
+import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeType;
 import org.onosproject.yangutils.datamodel.YangRpc;
-import org.onosproject.yangutils.datamodel.YangInput;
-import org.onosproject.yangutils.datamodel.YangLeaf;
-import org.onosproject.yangutils.datamodel.YangList;
-import org.onosproject.yangutils.datamodel.YangContainer;
-import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangStatusType;
+import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
+
+import java.io.IOException;
+import java.util.ListIterator;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -61,7 +61,7 @@ public class InputListenerTest {
         assertThat(yangRpc.getName(), is("activate-software-image"));
 
         YangInput yangInput = (YangInput) yangRpc.getChild();
-        assertThat(yangInput.getName(), is("activate-software-image_input"));
+        assertThat(yangInput.getName(), is("input"));
         ListIterator<YangLeaf> leafIterator = yangInput.getListOfLeaf().listIterator();
         YangLeaf leafInfo = leafIterator.next();
 
@@ -102,7 +102,7 @@ public class InputListenerTest {
         assertThat(yangRpc.getName(), is("activate-software-image"));
 
         YangInput yangInput = (YangInput) yangRpc.getChild();
-        assertThat(yangInput.getName(), is("activate-software-image_input"));
+        assertThat(yangInput.getName(), is("input"));
         YangTypeDef typeDef = (YangTypeDef) yangInput.getChild();
         assertThat(typeDef.getName(), is("my-type"));
         assertThat(typeDef.getStatus(), is(YangStatusType.DEPRECATED));

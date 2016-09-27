@@ -1682,6 +1682,16 @@ public final class UtilConstants {
             "OpType";
 
     /**
+     * Static attribute for input keyword to be suffixed with rpc name.
+     */
+    public static final String INPUT_KEYWORD = "_input";
+
+    /**
+     * Static attribute for output keyword to be suffixed with rpc name.
+     */
+    public static final String OUTPUT_KEYWORD = "_output";
+
+    /**
      * Static attribute for event class.
      */
     public static final String EVENT_CLASS = "event class";

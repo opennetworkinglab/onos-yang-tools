@@ -39,6 +39,7 @@ import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorTyp
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yangutils.translator.tojava.YangDataModelFactory.getYangInputNode;
+import static org.onosproject.yangutils.utils.UtilConstants.INPUT;
 
 /*
  * Reference: RFC6020 and YANG ANTLR Grammar
@@ -67,8 +68,6 @@ import static org.onosproject.yangutils.translator.tojava.YangDataModelFactory.g
  */
 public final class InputListener {
 
-    private static final String INPUT_KEYWORD = "_input";
-
     /**
      * Creates a new input listener.
      */
@@ -92,8 +91,7 @@ public final class InputListener {
         if (curData instanceof YangRpc) {
 
             YangInput yangInput = getYangInputNode(JAVA_GENERATION);
-            yangInput.setName(((YangRpc) curData).getName() + INPUT_KEYWORD);
-
+            yangInput.setName(INPUT);
             yangInput.setLineNumber(ctx.getStart().getLine());
             yangInput.setCharPosition(ctx.getStart().getCharPositionInLine());
             yangInput.setFileName(listener.getFileName());

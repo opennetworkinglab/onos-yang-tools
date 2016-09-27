@@ -21,16 +21,20 @@ import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
+import org.onosproject.yangutils.datamodel.YangOutput;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaEnumerationTranslator;
+import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaInputTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTranslator;
+import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaOutputTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
@@ -50,6 +54,8 @@ import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsgForCodeGenerator;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.INPUT_KEYWORD;
+import static org.onosproject.yangutils.utils.UtilConstants.OUTPUT_KEYWORD;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
@@ -79,13 +85,35 @@ public final class YangJavaModelUtils {
         if (info instanceof YangJavaAugmentTranslator) {
             updatePackageForAugmentInfo(info, config);
         } else {
-            translator.setJavaName(getCamelCase(((YangNode) info).getName(),
-                                                config.getConflictResolver()));
+            setNodeJavaName(info, config);
             translator.setJavaAttributeName(info.getJavaFileInfo()
                                                     .getJavaName());
             translator.setPackage(getCurNodePackage((YangNode) info));
         }
         updateCommonPackageInfo(translator, info, config);
+    }
+
+    /**
+     * The java name for input, output is prefixed with rpc name and other
+     * nodes are set by taking its own name from YANG.
+     *
+     * @param info   YANG java file info node
+     * @param config YANG plugin config
+     */
+    private static void setNodeJavaName(JavaCodeGeneratorInfo info,
+                                        YangPluginConfig config) {
+        String javaGenName;
+        if (info instanceof YangJavaInputTranslator) {
+            javaGenName = ((YangInput) info).getParent().getName() +
+                    INPUT_KEYWORD;
+        } else if (info instanceof YangJavaOutputTranslator) {
+            javaGenName = ((YangOutput) info).getParent().getName() +
+                    OUTPUT_KEYWORD;
+        } else {
+            javaGenName = ((YangNode) info).getName();
+        }
+        info.getJavaFileInfo().setJavaName(getCamelCase(
+                javaGenName, config.getConflictResolver()));
     }
 
     /**
