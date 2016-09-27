@@ -644,6 +644,16 @@ public final class UtilConstants {
     public static final String SPLIT_STRING = "split";
 
     /**
+     * Static attribute for Pattern.
+     */
+    public static final String PATTERN = "Pattern";
+
+    /**
+     * Static attribute for Quote.
+     */
+    public static final String QUOTE_STRING = "quote";
+
+    /**
      * Static attribute for from syntax.
      */
     public static final String FROM_STRING_METHOD_NAME = "fromString";
@@ -687,6 +697,11 @@ public final class UtilConstants {
      * Static attribute for if.
      */
     public static final String IF = "if";
+
+    /**
+     * Static attribute for else-if.
+     */
+    public static final String ELSE_IF = "else if";
 
     /**
      * Static attribute for of.
@@ -1357,6 +1372,11 @@ public final class UtilConstants {
      * Static attribute for collections.
      */
     public static final String COLLECTION_IMPORTS = "java.util";
+
+    /**
+     * Static attribute for regex.
+     */
+    public static final String REGEX_IMPORTS = "java.util.regex";
 
     /**
      * Static attribute for map.

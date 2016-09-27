@@ -18,6 +18,8 @@ package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
+import org.onosproject.yangutils.datamodel.YangBit;
+import org.onosproject.yangutils.datamodel.YangBits;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
@@ -44,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.sort;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
@@ -152,39 +155,52 @@ import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFiltering
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.addDefaultConstructor;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getTypeFiles;
+import static org.onosproject.yangutils.utils.UtilConstants.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER_INTERFACE;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
+import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_PARAMETER_FUNCTION_CALL;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENCODE_TO_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM_CLASS;
+import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_SUBJECT_NAME_SUFFIX;
+import static org.onosproject.yangutils.utils.UtilConstants.GET;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_ENCODER;
+import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.IMPL_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE_METHOD_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
+import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.TO;
+import static org.onosproject.yangutils.utils.UtilConstants.TRIM_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.TYPEDEF_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.UNION_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
@@ -837,6 +853,8 @@ public final class JavaFileGenerator {
             String attributeName = attr.getAttributeName();
             String bitsToStringMethod =
                     getOverRideString() + methodSig +
+                            getToStringForBits(attr.getAttributeName(),
+                                                   (YangBits) type.getDataTypeExtendedInfo()) +
                             getReturnString(attributeName, EIGHT_SPACE_INDENTATION) +
                             PERIOD + TO + STRING_DATA_TYPE + openClose +
                             methodClose;
@@ -1326,5 +1344,39 @@ public final class JavaFileGenerator {
                 !holder.getListOfLeaf().isEmpty() ||
                 holder.getListOfLeafList() != null &&
                         !holder.getListOfLeafList().isEmpty();
+    }
+
+    /**
+     * Generates toString code for bits.
+     *
+     * @param attributeName generated variable for bits
+     * @param yangBits parsed yang bits
+     * @return generated toString code for bits.
+     */
+    private static String getToStringForBits(String attributeName, YangBits yangBits) {
+        String lines = EIGHT_SPACE_INDENTATION + STRING_DATA_TYPE + SPACE + TMP_VAL + SPACE + EQUAL + SPACE +
+                QUOTES + QUOTES + SEMI_COLON + NEW_LINE;
+        Integer key;
+        YangBit bit;
+        String bitName;
+        for (Map.Entry<Integer, YangBit> entry : yangBits.getBitPositionMap().entrySet()) {
+            key = entry.getKey();
+            bit = entry.getValue();
+            if (bit == null) {
+                return null;
+            }
+
+            bitName = bit.getBitName();
+            // Add if condition to check bit position
+            lines += EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS + attributeName +
+                    PERIOD + GET + OPEN_PARENTHESIS + key + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS +
+                    SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWELVE_SPACE_INDENTATION + TMP_VAL + SPACE +
+                    ADD + EQUAL + SPACE + QUOTES + bitName + SPACE + QUOTES + SEMI_COLON + NEW_LINE +
+                    EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
+        }
+
+        lines += EIGHT_SPACE_INDENTATION + TMP_VAL + PERIOD + TRIM_STRING + EMPTY_PARAMETER_FUNCTION_CALL +
+                SEMI_COLON + NEW_LINE;
+        return lines;
     }
 }

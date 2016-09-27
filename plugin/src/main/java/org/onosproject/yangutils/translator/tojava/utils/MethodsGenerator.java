@@ -17,6 +17,8 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
+import org.onosproject.yangutils.datamodel.YangBit;
+import org.onosproject.yangutils.datamodel.YangBits;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangEnum;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
@@ -29,6 +31,7 @@ import org.onosproject.yangutils.utils.io.impl.JavaDocGen;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
@@ -90,6 +93,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
+import static org.onosproject.yangutils.utils.UtilConstants.ELSE_IF;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_PARAMETER_FUNCTION_CALL;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
@@ -131,11 +136,13 @@ import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.OTHER;
 import static org.onosproject.yangutils.utils.UtilConstants.OVERRIDE;
 import static org.onosproject.yangutils.utils.UtilConstants.PARSE_INT;
+import static org.onosproject.yangutils.utils.UtilConstants.PATTERN;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILTERING;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yangutils.utils.UtilConstants.QUOTE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.REPLACE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
@@ -161,6 +168,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.TO_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.TRIM_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.TRUE;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
+import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF_SET;
@@ -194,6 +202,8 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 public final class MethodsGenerator {
     private static final String BITS_STRING_ARRAY_VAR = "bitsTemp";
     private static final String BIT_TEMP_VAR = "bitTemp";
+    private static final String BIT_NAMES_VAR = "bitNames";
+    private static final String BIT_NAME_VAR = "bitName";
 
     /**
      * Creates an instance of method generator.
@@ -783,7 +793,7 @@ public final class MethodsGenerator {
         return EIGHT_SPACE_INDENTATION + StringGenerator.getTrySubString() +
                 StringGenerator.getNewLineAndSpace(TWELVE_SPACE_INDENTATION) +
                 getParsedSubString(attr, fromAttr) +
-                StringGenerator.getNewLineAndSpace(TWELVE_SPACE_INDENTATION) +
+                StringGenerator.getNewLineAndSpace(FOUR_SPACE_INDENTATION) +
                 StringGenerator.getReturnOfSubString() +
                 StringGenerator.getNewLineAndSpace(EIGHT_SPACE_INDENTATION) +
                 StringGenerator.getCatchSubString() +
@@ -806,81 +816,8 @@ public final class MethodsGenerator {
                 .getDataType();
         switch (types) {
             case BITS:
-                String lines =
-                        targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE +
-                                NEW + SPACE + targetDataType + OPEN_PARENTHESIS +
-                                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            valInString = valInString.replace("{", " ");\n";
-             */
-                lines = TWELVE_SPACE_INDENTATION + FROM_STRING_PARAM_NAME + SPACE +
-                        EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD +
-                        REPLACE_STRING + OPEN_PARENTHESIS + SINGLE_QUOTE +
-                        OPEN_CURLY_BRACKET + SINGLE_QUOTE + COMMA + SPACE +
-                        SINGLE_QUOTE + SPACE + SINGLE_QUOTE + CLOSE_PARENTHESIS +
-                        SEMI_COLON + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            valInString = valInString.replace({, " ");\n";
-             */
-                lines = TWELVE_SPACE_INDENTATION + FROM_STRING_PARAM_NAME + SPACE +
-                        EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD +
-                        REPLACE_STRING + OPEN_PARENTHESIS + SINGLE_QUOTE +
-                        CLOSE_CURLY_BRACKET + SINGLE_QUOTE + COMMA + SPACE +
-                        SINGLE_QUOTE + SPACE + SINGLE_QUOTE + CLOSE_PARENTHESIS +
-                        SEMI_COLON + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            valInString = valInString.trim();\n"
-             */
-                lines = TWELVE_SPACE_INDENTATION + FROM_STRING_PARAM_NAME + SPACE +
-                        EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD +
-                        TRIM_STRING + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                        SEMI_COLON + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            String[] bitsTemp = valInString.split(",", 0);\n"
-             */
-                lines = TWELVE_SPACE_INDENTATION + STRING_DATA_TYPE +
-                        SQUARE_BRACKETS + SPACE + BITS_STRING_ARRAY_VAR + SPACE +
-                        EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD +
-                        SPLIT_STRING + OPEN_PARENTHESIS + QUOTES + COMMA + QUOTES +
-                        COMMA + SPACE + ZERO + CLOSE_PARENTHESIS + SEMI_COLON +
-                        NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            for (String bitTemp : bitsTemp) {\n"
-             */
-                lines = TWELVE_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS +
-                        STRING_DATA_TYPE + SPACE + BIT_TEMP_VAR + SPACE + COLON +
-                        SPACE + BITS_STRING_ARRAY_VAR + CLOSE_PARENTHESIS + SPACE +
-                        OPEN_CURLY_BRACKET + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"                bitTemp = bitTemp.trim();\n"
-             */
-                lines = SIXTEEN_SPACE_INDENTATION + BIT_TEMP_VAR + SPACE + EQUAL +
-                        SPACE + BIT_TEMP_VAR + PERIOD + TRIM_STRING +
-                        OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                        SEMI_COLON + NEW_LINE;
-                builder.append(lines);
-            /*
-             *"                tmpVal.set(Integer.parseInt(bitTemp));\n"
-             */
-                lines = SIXTEEN_SPACE_INDENTATION + TMP_VAL + PERIOD +
-                        SET_METHOD_PREFIX + OPEN_PARENTHESIS + INTEGER_WRAPPER +
-                        PERIOD + PARSE_INT + OPEN_PARENTHESIS + BIT_TEMP_VAR +
-                        CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + SEMI_COLON +
-                        NEW_LINE;
-                builder.append(lines);
-            /*
-             *"            }\n"
-             */
-                lines = TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
-                        NEW_LINE;
-                builder.append(lines);
-                return builder.toString();
+                return getFromStringForBits(attr, (YangBits) fromStringAttr.getAttributeType()
+                    .getDataTypeExtendedInfo());
             case BINARY:
                 return targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE +
                         BASE64 + PERIOD + GET_DECODER + OPEN_PARENTHESIS +
@@ -1662,5 +1599,61 @@ public final class MethodsGenerator {
                 "        getSelectLeafFlags().set(leaf.getLeafIndex());\n" +
                 "        return this;\n" +
                 "    }\n";
+    }
+
+    /**
+     * Generates fromString code for bits.
+     *
+     * @param attr attribute information
+     * @param yangBits parsed yang bits
+     * @return generated fromString code for bits.
+     */
+    private static String getFromStringForBits(JavaAttributeInfo attr, YangBits yangBits) {
+        String targetDataType = getReturnType(attr);
+        String key;
+        YangBit bit;
+        // Split the input string and check each bit name falls in configured yang file
+        String lines = targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE + NEW + SPACE + targetDataType +
+                OPEN_PARENTHESIS + CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
+                TWELVE_SPACE_INDENTATION + STRING_DATA_TYPE + SQUARE_BRACKETS + SPACE + BIT_NAMES_VAR + SPACE +
+                EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD + TRIM_STRING + EMPTY_PARAMETER_FUNCTION_CALL +
+                PERIOD + SPLIT_STRING + OPEN_PARENTHESIS + PATTERN + PERIOD + QUOTE_STRING +
+                OPEN_PARENTHESIS +  QUOTES + SPACE + QUOTES + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + SEMI_COLON +
+                NEW_LINE +
+                TWELVE_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS + STRING_DATA_TYPE + SPACE + BIT_NAME_VAR +
+                SPACE + COLON + SPACE + BIT_NAMES_VAR + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+        boolean firstIf = true;
+        String ifCondition = IF;
+        for (Map.Entry<String, YangBit> entry : yangBits.getBitNameMap().entrySet()) {
+            key = entry.getKey();
+            bit = entry.getValue();
+            if (bit == null) {
+                return null;
+            }
+            if (firstIf) {
+                lines += SIXTEEN_SPACE_INDENTATION;
+            }
+            // Add condition checking for bit name
+            lines += ifCondition + SPACE + OPEN_PARENTHESIS + BIT_NAME_VAR + PERIOD +
+                    EQUALS_STRING + OPEN_PARENTHESIS + QUOTES + key + QUOTES + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS +
+                    SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
+                    TWENTY_SPACE_INDENTATION + TMP_VAL + PERIOD + SET_METHOD_PREFIX + OPEN_PARENTHESIS +
+                    bit.getPosition() + CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE + SIXTEEN_SPACE_INDENTATION +
+                    CLOSE_CURLY_BRACKET;
+            if (firstIf) {
+                ifCondition = SPACE + ELSE_IF;
+                firstIf = false;
+            }
+        }
+
+        if (!firstIf) {
+            // This means at least one if condition is added in code generation
+            // Now add else condition for validation
+            lines += SPACE + ELSE + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWENTY_SPACE_INDENTATION + RETURN +
+                    SPACE + NULL + SEMI_COLON + NEW_LINE + SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
+        }
+
+        lines += NEW_LINE + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
+        return lines;
     }
 }
