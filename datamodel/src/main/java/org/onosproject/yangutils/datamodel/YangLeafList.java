@@ -474,7 +474,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @param nameSpace namespace
      */
-    public void setLeafNameSpaceAndAddToParentSchemaMap(String nameSpace) {
+    public void setLeafNameSpaceAndAddToParentSchemaMap(YangNamespace nameSpace) {
         setNameSpace(nameSpace);
         // Process addition of leaf to schema node map.
         ((YangNode) getContainedIn()).processAdditionOfSchemaNodeToCurNodeMap(getName(), getNameSpace(), this);
@@ -520,7 +520,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
     }
 
     @Override
-    public String getNameSpace() {
+    public YangNamespace getNameSpace() {
         return yangSchemaNodeIdentifier.getNameSpace();
     }
 
@@ -529,7 +529,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @param namespace namespace of the node
      */
-    public void setNameSpace(String namespace) {
+    public void setNameSpace(YangNamespace namespace) {
         if (yangSchemaNodeIdentifier == null) {
             yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }

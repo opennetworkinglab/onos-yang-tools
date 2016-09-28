@@ -96,7 +96,7 @@ public abstract class YangSubModule
         extends YangNode
         implements YangLeavesHolder, YangDesc, YangReference, Parsable,
         CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
-        YangFeatureHolder, YangIsFilterContentNodes {
+        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace {
 
     private static final long serialVersionUID = 806201614L;
 
@@ -261,6 +261,11 @@ public abstract class YangSubModule
      * List of augments which are augmenting input.
      */
     private final List<YangAugment> augments;
+
+    /**
+     * YANG defined namespace.
+     */
+    private String namespace;
 
     /**
      * Creates a sub module node.
@@ -685,7 +690,8 @@ public abstract class YangSubModule
     public void linkWithModule(Set<YangNode> yangNodeSet)
             throws DataModelException {
         belongsTo.linkWithModule(yangNodeSet);
-        setNameSpace(belongsTo.getModuleNode().getNameSpace());
+        namespace = ((YangNamespace) belongsTo.getModuleNode())
+                .getModuleNamespace();
     }
 
     @Override
@@ -803,5 +809,19 @@ public abstract class YangSubModule
      */
     public List<YangAugment> getAugmentList() {
         return unmodifiableList(augments);
+    }
+
+    @Override
+    public String getModuleNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public String getModuleName() {
+        return getName();
+    }
+
+    public void setModuleNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

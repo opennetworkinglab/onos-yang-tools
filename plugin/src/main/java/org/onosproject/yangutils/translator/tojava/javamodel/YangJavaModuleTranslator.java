@@ -127,7 +127,7 @@ public class YangJavaModuleTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
-        String modulePkg = getRootPackage(getVersion(), getNameSpace(),
+        String modulePkg = getRootPackage(getVersion(), getModuleNamespace(),
                                           getRevision(),
                                           yangPlugin.getConflictResolver());
 

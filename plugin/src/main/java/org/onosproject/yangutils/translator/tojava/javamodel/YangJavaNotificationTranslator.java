@@ -122,6 +122,11 @@ public class YangJavaNotificationTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
 
+        // Obtain the notification name as per enum in notification.
+        String enumName = getEnumJavaAttribute(getName().toUpperCase());
+        ((RpcNotificationContainer) getParent())
+                .addToNotificationEnumMap(enumName, this);
+
         /*
          * As part of the notification support the following files needs to be
          * generated.
@@ -183,28 +188,5 @@ public class YangJavaNotificationTranslator
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
                                                       e.getLocalizedMessage()));
         }
-    }
-
-    @Override
-    public void setNameSpaceAndAddToParentSchemaMap() {
-        // Get parent namespace.
-        if (getParent() != null) {
-            String nameSpace = getParent().getNameSpace();
-            // Set namespace for self node.
-            setNameSpace(nameSpace);
-            // Process addition of leaf to the child schema map of parent.
-            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
-            // Obtain the notification name as per enum in notification.
-            String enumName = getEnumJavaAttribute(getName().toUpperCase());
-
-            ((RpcNotificationContainer) getParent())
-                    .addToNotificationEnumMap(enumName, this);
-
-        }
-        /*
-         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
-         * and leaf list.
-         */
-        setLeafNameSpaceAndAddToParentSchemaMap();
     }
 }

@@ -32,7 +32,7 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
     private String name;
 
     // Namespace of YANG data node.
-    private String namespace;
+    private YangNamespace namespace;
 
     /**
      * Creates an instance of YANG data node identifier.
@@ -63,7 +63,7 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
      *
      * @return namespace of the node
      */
-    public String getNameSpace() {
+    public YangNamespace getNameSpace() {
         return namespace;
     }
 
@@ -72,7 +72,7 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
      *
      * @param namespace namespace of the node
      */
-    public void setNameSpace(String namespace) {
+    public void setNameSpace(YangNamespace namespace) {
         this.namespace = namespace;
     }
 
@@ -83,8 +83,22 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
             return true;
         }
         if (obj instanceof YangSchemaNodeIdentifier) {
-            final YangSchemaNodeIdentifier other = (YangSchemaNodeIdentifier) obj;
-            return Objects.equals(name, other.name) && Objects.equals(namespace, other.namespace);
+            YangSchemaNodeIdentifier other = (YangSchemaNodeIdentifier) obj;
+
+            if (!Objects.equals(name, other.name)) {
+                return false;
+            }
+            final String name = namespace.getModuleName();
+            final String otherName = other.getNameSpace().getModuleName();
+            if (name != null && otherName != null) {
+                return namespace.getModuleName()
+                        .equals(other.getNameSpace().getModuleName());
+            }
+            final String nspace = namespace.getModuleNamespace();
+            final String otherNspace = other.getNameSpace().getModuleNamespace();
+            if (nspace != null && otherNspace != null) {
+                return nspace.equals(otherNspace);
+            }
         }
         return false;
     }

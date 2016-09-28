@@ -15,6 +15,7 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
+import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaSubModule;
@@ -126,7 +127,7 @@ public class YangJavaSubModuleTranslator
      * @return the name space string of the module.
      */
     public String getNameSpaceFromModule() {
-        return getBelongsTo().getModuleNode().getNameSpace();
+        return ((YangModule) (getBelongsTo().getModuleNode())).getModuleNamespace();
     }
 
     /**

@@ -90,7 +90,7 @@ public final class NamespaceListener {
         switch (tmpNode.getYangConstructType()) {
             case MODULE_DATA: {
                 YangModule module = (YangModule) tmpNode;
-                module.setNameSpace(removeQuotesAndHandleConcat(ctx.string().getText()));
+                module.setModuleNamespace(removeQuotesAndHandleConcat(ctx.string().getText()));
                 break;
             }
             default:

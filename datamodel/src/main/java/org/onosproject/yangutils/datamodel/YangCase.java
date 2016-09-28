@@ -170,10 +170,8 @@ public abstract class YangCase
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
-        // Get parent namespace.
-        String nameSpace = getParent().getNameSpace();
-        // Set namespace for self node.
-        setNameSpace(nameSpace);
+        // Get parent namespace and set namespace for self node.
+        setNameSpace(getParent().getNameSpace());
         /*
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
          * and leaf list.

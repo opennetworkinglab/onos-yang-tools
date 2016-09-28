@@ -88,14 +88,14 @@ public class SchemaNodeTest {
                 .getNextSibling();
         YangSchemaNodeIdentifier yangInputNode = new YangSchemaNodeIdentifier();
         yangInputNode.setName("input");
-        yangInputNode.setNameSpace("http://huawei.com");
+        yangInputNode.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(yangRpcNode.getChildSchema(yangInputNode).getSchemaNode(),
                    is(yangRpcNode.getChild()));
 
         YangSchemaNodeIdentifier yangOutputNode = new
                 YangSchemaNodeIdentifier();
         yangOutputNode.setName("output");
-        yangOutputNode.setNameSpace("http://huawei.com");
+        yangOutputNode.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(yangRpcNode.getChildSchema(yangOutputNode).getSchemaNode(),
                    is(yangRpcNode.getChild().getNextSibling()));
 
@@ -104,7 +104,7 @@ public class SchemaNodeTest {
         YangSchemaNodeIdentifier yangInputLeafNode = new
                 YangSchemaNodeIdentifier();
         yangInputLeafNode.setName("image-name");
-        yangInputLeafNode.setNameSpace("http://huawei.com");
+        yangInputLeafNode.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(yangInput.getChildSchema(yangInputLeafNode),
                    is(notNullValue()));
 
@@ -112,7 +112,7 @@ public class SchemaNodeTest {
         YangSchemaNodeIdentifier yangOutputLeafNode = new
                 YangSchemaNodeIdentifier();
         yangOutputLeafNode.setName("image-name");
-        yangOutputLeafNode.setNameSpace("http://huawei.com");
+        yangOutputLeafNode.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(yangOutput.getChildSchema(yangOutputLeafNode),
                    is(notNullValue()));
 
@@ -123,7 +123,7 @@ public class SchemaNodeTest {
         YangSchemaNodeIdentifier yangSchemaNodeIdentifier =
                 new YangSchemaNodeIdentifier();
         yangSchemaNodeIdentifier.setName("testcontainer");
-        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(schemaMap.get(yangSchemaNodeIdentifier), is(notNullValue()));
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo =
                 schemaMap.get(yangSchemaNodeIdentifier);
@@ -136,12 +136,12 @@ public class SchemaNodeTest {
                 rootNode.getChild()
                         .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("testleaf");
-        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(schemaMap2.get(yangSchemaNodeIdentifier),
                    is(notNullValue()));
 
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(schemaMap2.get(yangSchemaNodeIdentifier),
                    is(notNullValue()));
 
@@ -151,7 +151,7 @@ public class SchemaNodeTest {
                 rootNode.getChild().getChild()
                         .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(schemaMap3.get(yangSchemaNodeIdentifier),
                    is(notNullValue()));
         YangSchemaNodeContextInfo yangSchemaNodeContextInfo3 =
@@ -164,7 +164,7 @@ public class SchemaNodeTest {
                 rootNode.getChild().getChild().getChild()
                         .getYsnContextInfoMap();
         yangSchemaNodeIdentifier.setName("pretzel");
-        yangSchemaNodeIdentifier.setNameSpace("http://huawei.com");
+        yangSchemaNodeIdentifier.setNameSpace(yangRpcNode.getNameSpace());
         assertThat(schemaMap4.get(yangSchemaNodeIdentifier),
                    is(notNullValue()));
 

@@ -327,7 +327,7 @@ public abstract class YangNode extends DefaultLocationInfo
      * @param namespace namespace of the node
      */
     protected void processAdditionOfSchemaNodeToParentMap(String name,
-                                                          String namespace) {
+                                                          YangNamespace namespace) {
         processAdditionOfSchemaNodeToMap(name, namespace, this, getParent());
     }
 
@@ -339,7 +339,7 @@ public abstract class YangNode extends DefaultLocationInfo
      * @param yangSchemaNode YANG schema node
      */
     public void processAdditionOfSchemaNodeToCurNodeMap(String name,
-                                                        String namespace,
+                                                        YangNamespace namespace,
                                                         YangSchemaNode yangSchemaNode) {
         processAdditionOfSchemaNodeToMap(name, namespace, yangSchemaNode, this);
     }
@@ -353,7 +353,7 @@ public abstract class YangNode extends DefaultLocationInfo
      * @param childSchemaMapHolder child schema map holder
      */
     private void processAdditionOfSchemaNodeToMap(String name,
-                                                  String namespace,
+                                                  YangNamespace namespace,
                                                   YangSchemaNode yangSchemaNode,
                                                   YangNode childSchemaMapHolder) {
         // Addition of node to schema node map.
@@ -734,12 +734,14 @@ public abstract class YangNode extends DefaultLocationInfo
      */
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        if (this.getParent() != null) {
-            String nameSpace = this.getParent().getNameSpace();
-            // Set namespace for self node.
-            setNameSpace(nameSpace);
+        if (getParent() != null) {
+            // Get parent namespace and set namespace for self node.
+            setNameSpace(getParent().getNameSpace());
             // Process addition of leaf to the child schema map of parent.
             processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
+        } else {
+            // Module/Sub-module
+            setNameSpace((YangNamespace) this);
         }
         /*
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
@@ -817,7 +819,7 @@ public abstract class YangNode extends DefaultLocationInfo
     }
 
     @Override
-    public String getNameSpace() {
+    public YangNamespace getNameSpace() {
         return yangSchemaNodeIdentifier.getNameSpace();
     }
 
@@ -826,7 +828,7 @@ public abstract class YangNode extends DefaultLocationInfo
      *
      * @param namespace namespace of the node
      */
-    public void setNameSpace(String namespace) {
+    public void setNameSpace(YangNamespace namespace) {
         if (yangSchemaNodeIdentifier == null) {
             yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }

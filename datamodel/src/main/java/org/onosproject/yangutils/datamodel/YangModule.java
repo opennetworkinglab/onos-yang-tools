@@ -87,7 +87,7 @@ public abstract class YangModule
         extends YangNode
         implements YangLeavesHolder, YangDesc, YangReference, Parsable,
         CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
-        YangFeatureHolder, YangIsFilterContentNodes {
+        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace {
 
     private static final long serialVersionUID = 806201610L;
 
@@ -257,6 +257,11 @@ public abstract class YangModule
      * List of augments which augmenting to an input in rpc.
      */
     private final List<YangAugment> augments;
+
+    /**
+     * YANG defined namespace.
+     */
+    private String namespace;
 
     /**
      * Creates a YANG node of module type.
@@ -797,5 +802,19 @@ public abstract class YangModule
      */
     public List<YangAugment> getAugmentList() {
         return unmodifiableList(augments);
+    }
+
+    @Override
+    public String getModuleNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public String getModuleName() {
+        return getName();
+    }
+
+    public void setModuleNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

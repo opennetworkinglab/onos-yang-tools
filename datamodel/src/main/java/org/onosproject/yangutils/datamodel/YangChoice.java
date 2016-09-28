@@ -194,10 +194,8 @@ public abstract class YangChoice
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
-        // Get parent namespace.
-        String nameSpace = getParent().getNameSpace();
-        // Set namespace for self node.
-        setNameSpace(nameSpace);
+        // Get parent namespace and set namespace for self node.
+        setNameSpace(getParent().getNameSpace());
     }
 
     @Override

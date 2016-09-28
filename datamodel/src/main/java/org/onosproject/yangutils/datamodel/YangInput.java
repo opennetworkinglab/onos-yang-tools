@@ -218,27 +218,4 @@ public abstract class YangInput
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
-
-    @Override
-    public void setNameSpaceAndAddToParentSchemaMap() {
-        // Get parent namespace.
-        if (this.getParent() != null) {
-            String nameSpace = this.getParent().getNameSpace();
-            // Set namespace for self node.
-            setNameSpace(nameSpace);
-            // Process addition of leaf to the child schema map of parent.
-            processAdditionOfSchemaNodeToParentMap("input", getNameSpace());
-        }
-        /*
-         * Check if node contains leaf/leaf-list, if yes add namespace for leaf
-         * and leaf list.
-         */
-        if (this instanceof YangLeavesHolder) {
-            ((YangLeavesHolder) this).setLeafNameSpaceAndAddToParentSchemaMap();
-        }
-    }
-    /*
-     * TODO analyze the reason to have RPC name prepended in input name in
-     * input Listener.
-     */
 }

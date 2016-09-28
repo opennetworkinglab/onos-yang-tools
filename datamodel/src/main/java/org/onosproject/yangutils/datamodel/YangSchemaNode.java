@@ -112,11 +112,11 @@ public interface YangSchemaNode extends LocationInfo {
     String getJavaAttributeName();
 
     /**
-     * Sets name of the node.
+     * Returns namespace of the node.
      *
-     * @return name of the node
+     * @return namespace of the node
      */
-    String getNameSpace();
+    YangNamespace getNameSpace();
 
     /**
      * Checks for the presence of notification in module/sub-module. Exception

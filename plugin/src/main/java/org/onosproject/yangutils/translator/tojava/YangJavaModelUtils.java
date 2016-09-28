@@ -575,7 +575,8 @@ public final class YangJavaModelUtils {
         StringBuilder pkg = new StringBuilder();
         if (node instanceof YangJavaModuleTranslator) {
             YangJavaModuleTranslator module = (YangJavaModuleTranslator) node;
-            pkg.append(getRootPackage(module.getVersion(), module.getNameSpace(),
+            pkg.append(getRootPackage(module.getVersion(),
+                                      module.getModuleNamespace(),
                                       module.getRevision(),
                                       config.getConflictResolver()));
         } else if (node instanceof YangJavaSubModuleTranslator) {

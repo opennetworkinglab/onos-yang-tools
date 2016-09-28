@@ -51,7 +51,8 @@ public class NamespaceListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/NamespaceInDoubleQuotes.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getNameSpace(), is("urn:ietf:params:xml:ns:yang:ietf-ospf"));
+        assertThat(((YangModule) node).getModuleNamespace(), is
+                ("urn:ietf:params:xml:ns:yang:ietf-ospf"));
     }
 
     /**
@@ -63,7 +64,7 @@ public class NamespaceListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/NamespaceWithoutQuotes.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getNameSpace(), is("urn:ietf:params:xml:ns:yang:ietf-ospf"));
+        assertThat(((YangModule) node).getModuleNamespace(), is("urn:ietf:params:xml:ns:yang:ietf-ospf"));
     }
 
     /**
