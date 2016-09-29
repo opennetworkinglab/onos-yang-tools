@@ -101,6 +101,11 @@ public abstract class YangNode extends DefaultLocationInfo
     private boolean isDescendantNodeAugmented;
 
     /**
+     * Referred schema node, only applicable during grouping.
+     */
+    private YangNode referredSchemaNode;
+
+    /**
      * Returns the priority of the node.
      *
      * @return priority of the node
@@ -392,6 +397,7 @@ public abstract class YangNode extends DefaultLocationInfo
     public YangNode clone(YangUses yangUses)
             throws CloneNotSupportedException {
         YangNode clonedNode = (YangNode) super.clone();
+        clonedNode.referredSchemaNode = this;
         if (clonedNode instanceof YangLeavesHolder) {
             try {
                 cloneLeaves((YangLeavesHolder) clonedNode, yangUses);
@@ -858,5 +864,10 @@ public abstract class YangNode extends DefaultLocationInfo
             throws DataModelException {
         throw new DataModelException("Method called for schema node other " +
                                              "then module/sub-module");
+    }
+
+    @Override
+    public YangSchemaNode getReferredSchema() {
+        return referredSchemaNode;
     }
 }

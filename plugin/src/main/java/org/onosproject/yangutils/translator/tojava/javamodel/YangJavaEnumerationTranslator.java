@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaEnumeration;
+import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -110,6 +111,9 @@ public class YangJavaEnumerationTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         try {
+            if (getReferredSchema() != null) {
+                throw new InvalidNodeForTranslatorException();
+            }
             generateCodeOfNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,

@@ -15,8 +15,6 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.IOException;
-
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaTypeDef;
@@ -27,6 +25,8 @@ import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
@@ -67,10 +67,10 @@ public class YangJavaTypeDefTranslator
 
         if (javaFileInfo == null) {
             throw new TranslatorException("Missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -114,6 +114,11 @@ public class YangJavaTypeDefTranslator
      */
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
+        if (getReferredSchema() != null) {
+            throw new InvalidNodeForTranslatorException();
+        }
+        // TODO update the below exception in all related places, remove file
+        // name and other information.
         YangType typeInTypeDef = this.getTypeDefBaseType();
         InvalidNodeForTranslatorException exception = new InvalidNodeForTranslatorException();
         exception.setFileName(this.getFileName());
@@ -135,7 +140,6 @@ public class YangJavaTypeDefTranslator
                             + "in " + getLineNumber() + " at " + getCharPosition() + " in " + getFileName()
                             + " " + e.getLocalizedMessage());
         }
-
     }
 
     /**
@@ -154,5 +158,4 @@ public class YangJavaTypeDefTranslator
                             + " " + e.getLocalizedMessage());
         }
     }
-
 }

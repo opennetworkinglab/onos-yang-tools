@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaUnion;
+import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -108,6 +109,9 @@ public class YangJavaUnionTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         try {
+            if (getReferredSchema() != null) {
+                throw new InvalidNodeForTranslatorException();
+            }
             generateCodeOfNode(this, yangPlugin);
         } catch (IOException e) {
             throw new TranslatorException(

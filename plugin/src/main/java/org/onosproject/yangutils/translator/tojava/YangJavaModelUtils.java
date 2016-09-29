@@ -21,11 +21,13 @@ import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangOutput;
+import org.onosproject.yangutils.datamodel.YangSchemaNode;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
 import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
@@ -336,6 +338,16 @@ public final class YangJavaModelUtils {
                                                 info));
         }
 
+        YangSchemaNode node = getRefSchema(info);
+        if (node != null) {
+            YangNode parent = ((YangNode) info).getParent();
+            if (!(parent instanceof YangGrouping)) {
+                addCurNodeInfoInParentTempFile((YangNode) node, isMultiInstance,
+                                               config, parent);
+            }
+            return;
+        }
+
         /*
          * Generate the Java files corresponding to the current node.
          */
@@ -346,6 +358,29 @@ public final class YangJavaModelUtils {
          */
         addCurNodeInfoInParentTempFile((YangNode) info, isMultiInstance,
                                        config);
+    }
+
+    /**
+     * Returns referred schema node in case of grouping uses.
+     *
+     * @param info YANG java file info node
+     * @return referred schema node
+     */
+    private static YangSchemaNode getRefSchema(JavaCodeGeneratorInfo info) {
+
+        YangSchemaNode node = ((YangSchemaNode) info);
+        if (node.getReferredSchema() == null) {
+            return null;
+        }
+
+        /*
+         * Obtain last referred node in case grouping is embedded inside
+         * another grouping.
+         */
+        while (node.getReferredSchema() != null) {
+            node = node.getReferredSchema();
+        }
+        return node;
     }
 
     /**

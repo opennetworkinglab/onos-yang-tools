@@ -351,6 +351,7 @@ public final class DataModelUtils {
             List<YangLeaf> clonedLeavesList = new LinkedList<>();
             for (YangLeaf leaf : currentListOfLeaves) {
                 YangLeaf clonedLeaf = leaf.clone();
+                clonedLeaf.setReferredLeaf(leaf);
                 if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
                             resolveYangConstructsUnderGroupingForLeaf(clonedLeaf, leavesHolder, yangUses);
@@ -369,6 +370,7 @@ public final class DataModelUtils {
             List<YangLeafList> clonedListOfLeafList = new LinkedList<>();
             for (YangLeafList leafList : currentListOfLeafList) {
                 YangLeafList clonedLeafList = leafList.clone();
+                clonedLeafList.setReferredSchemaLeafList(leafList);
                 if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
                     YangEntityToResolveInfoImpl resolveInfo =
                             resolveYangConstructsUnderGroupingForLeafList(clonedLeafList, leavesHolder,

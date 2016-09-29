@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava.javamodel;
 import java.io.IOException;
 
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaList;
+import org.onosproject.yangutils.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -110,6 +111,9 @@ public class YangJavaListTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         try {
             generateCodeAndUpdateInParent(this, yangPlugin, true);
+            if (getReferredSchema() != null) {
+                throw new InvalidNodeForTranslatorException();
+            }
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code entry for list node " +

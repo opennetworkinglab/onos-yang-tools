@@ -32,6 +32,7 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangOutput;
 import org.onosproject.yangutils.datamodel.YangSubModule;
+import org.onosproject.yangutils.datamodel.YangUses;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 
 import java.util.ArrayList;
@@ -670,7 +671,8 @@ public class YangXpathLinker<T> {
                     return node;
                 }
             }
-            if (node.getName().equals(curNodeId.getName())) {
+            if (node.getName().equals(curNodeId.getName()) &&
+                    !(node instanceof YangUses)) {
                 return node;
             }
             node = node.getNextSibling();

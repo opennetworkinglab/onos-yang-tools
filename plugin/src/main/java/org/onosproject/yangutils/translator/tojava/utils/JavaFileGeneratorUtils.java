@@ -489,11 +489,11 @@ public final class JavaFileGeneratorUtils {
     /**
      * Appends all the contents into a generated java file.
      *
-     * @param file         generated file
-     * @param fileName     generated file name
-     * @param genType      generated file type
-     * @param importsList  list of java imports
-     * @param pkg          generated file package
+     * @param file        generated file
+     * @param fileName    generated file name
+     * @param genType     generated file type
+     * @param importsList list of java imports
+     * @param pkg         generated file package
      * @throws IOException when fails to append contents
      */
     private static void appendContents(File file, String fileName, int genType,
@@ -794,9 +794,13 @@ public final class JavaFileGeneratorUtils {
     public static String isTypeNameLeafref(String attributeName,
                                            YangType<?> attributeType) {
         if (attributeName.equalsIgnoreCase(LEAFREF)) {
-            return attributeType.getDataTypeName();
+            YangLeafRef leafRef = (YangLeafRef) attributeType.getDataTypeExtendedInfo();
+            if (!leafRef.isInGrouping()) {
+                return attributeType.getDataTypeName();
+            }
         }
         return attributeName;
+        // TODO handle union scenario, having multiple leafref.
     }
 
     /**
@@ -809,7 +813,9 @@ public final class JavaFileGeneratorUtils {
         if (attributeType.getDataType() == YangDataTypes.LEAFREF) {
             YangLeafRef leafRef = (YangLeafRef) attributeType
                     .getDataTypeExtendedInfo();
-            return leafRef.getEffectiveDataType();
+            if (!leafRef.isInGrouping()) {
+                return leafRef.getEffectiveDataType();
+            }
         }
         return attributeType;
     }

@@ -16,8 +16,6 @@
 
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.util.Stack;
-
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangIdentity;
@@ -32,6 +30,8 @@ import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
+
+import java.util.Stack;
 
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getCurNodePackage;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
@@ -49,6 +49,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_MATH;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_WRAPPER;
+import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_WRAPPER;
@@ -109,6 +110,10 @@ public final class AttributesJavaDataType {
             case INSTANCE_IDENTIFIER:
                 return STRING_DATA_TYPE;
             case LEAFREF:
+                YangType refType = getReferredTypeFromLeafref(yangType);
+                if (refType == null) {
+                    return OBJECT_STRING;
+                }
                 return getJavaDataType(getReferredTypeFromLeafref(yangType));
             default:
                 throw new TranslatorException("given data type is not supported. " +
@@ -165,13 +170,9 @@ public final class AttributesJavaDataType {
                 case BINARY:
                     return BYTE + SQUARE_BRACKETS;
                 case LEAFREF:
-                    YangType<?> referredType = getReferredTypeFromLeafref(yangType);
-                    return getJavaImportClass(referredType, true, pluginConfig);
+                    return getLeafRefImpClass(yangType, pluginConfig, true);
                 case IDENTITYREF:
-                    YangIdentityRef identityRef = (YangIdentityRef) yangType.getDataTypeExtendedInfo();
-                    YangIdentity identity = identityRef.getReferredIdentity();
-                    return getCapitalCase(getCamelCase(identity.
-                            getName(), pluginConfig));
+                    return getIdentityRefImpClass(yangType, pluginConfig);
                 case EMPTY:
                     return BOOLEAN_WRAPPER;
                 case UNION:
@@ -204,12 +205,9 @@ public final class AttributesJavaDataType {
                 case DECIMAL64:
                     return BIG_DECIMAL;
                 case LEAFREF:
-                    YangType<?> referredType = getReferredTypeFromLeafref(yangType);
-                    return getJavaImportClass(referredType, false, pluginConfig);
+                    return getLeafRefImpClass(yangType, pluginConfig, false);
                 case IDENTITYREF:
-                    YangIdentityRef identityRef = (YangIdentityRef) yangType.getDataTypeExtendedInfo();
-                    YangIdentity identity = identityRef.getReferredIdentity();
-                    return getCapitalCase(getCamelCase(identity.getName(), pluginConfig));
+                    return getIdentityRefImpClass(yangType, pluginConfig);
                 case EMPTY:
                     return BOOLEAN_DATA_TYPE;
                 case UNION:
@@ -261,8 +259,7 @@ public final class AttributesJavaDataType {
                 case BITS:
                     return COLLECTION_IMPORTS;
                 case LEAFREF:
-                    YangType<?> referredType = getReferredTypeFromLeafref(yangType);
-                    return getJavaImportPackage(referredType, true, conflictResolver);
+                    return getLeafRefImpPkg(yangType, conflictResolver, true);
                 case IDENTITYREF:
                     return getIdentityRefPackage(yangType, conflictResolver);
                 case UNION:
@@ -291,8 +288,7 @@ public final class AttributesJavaDataType {
                 case BITS:
                     return COLLECTION_IMPORTS;
                 case LEAFREF:
-                    YangType<?> referredType = getReferredTypeFromLeafref(yangType);
-                    return getJavaImportPackage(referredType, false, conflictResolver);
+                    return getLeafRefImpPkg(yangType, conflictResolver, false);
                 case IDENTITYREF:
                     return getIdentityRefPackage(yangType, conflictResolver);
                 case UNION:
@@ -333,10 +329,7 @@ public final class AttributesJavaDataType {
         }
 
         YangJavaTypeDefTranslator typedef = (YangJavaTypeDefTranslator) ((YangDerivedInfo<?>) var).getReferredTypeDef();
-        if (typedef.getJavaFileInfo().getPackage() == null) {
-            return getPackageFromParent(typedef.getParent(), conflictResolver);
-        }
-        return typedef.getJavaFileInfo().getPackage();
+        return getTypePackage(typedef, conflictResolver);
     }
 
     /**
@@ -357,10 +350,7 @@ public final class AttributesJavaDataType {
         }
 
         YangJavaUnionTranslator union = (YangJavaUnionTranslator) type.getDataTypeExtendedInfo();
-        if (union.getJavaFileInfo().getPackage() == null) {
-            return getPackageFromParent(union.getParent(), conflictResolver);
-        }
-        return union.getJavaFileInfo().getPackage();
+        return getTypePackage(union, conflictResolver);
     }
 
     /**
@@ -380,10 +370,7 @@ public final class AttributesJavaDataType {
                                                   + " in " + type.getFileName());
         }
         YangJavaEnumerationTranslator enumeration = (YangJavaEnumerationTranslator) type.getDataTypeExtendedInfo();
-        if (enumeration.getJavaFileInfo().getPackage() == null) {
-            return getPackageFromParent(enumeration.getParent(), conflictResolver);
-        }
-        return enumeration.getJavaFileInfo().getPackage();
+        return getTypePackage(enumeration, conflictResolver);
     }
 
     /**
@@ -403,11 +390,32 @@ public final class AttributesJavaDataType {
                                                   + " in " + type.getFileName());
         }
         YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
-        YangJavaIdentityTranslator identity = (YangJavaIdentityTranslator) (identityRef.getReferredIdentity());
-        if (identity.getJavaFileInfo().getPackage() == null) {
-            return getPackageFromParent(identity.getParent(), conflictResolver);
+        if (identityRef.isInGrouping()) {
+            return JAVA_LANG;
         }
-        return identity.getJavaFileInfo().getPackage();
+        YangJavaIdentityTranslator identity = (YangJavaIdentityTranslator) (identityRef.getReferredIdentity());
+        return getTypePackage(identity, conflictResolver);
+    }
+
+    /**
+     * Returns type package.
+     *
+     * @param info             YANG code generator info
+     * @param conflictResolver object of YANG to java naming conflict util
+     * @return type java package
+     */
+    private static String getTypePackage(JavaCodeGeneratorInfo info,
+                                         YangToJavaNamingConflictUtil conflictResolver) {
+        YangNode node = (YangNode) info;
+        // Check for referred schema type node for grouping scenario.
+        while (node.getReferredSchema() != null) {
+            node = (YangNode) node.getReferredSchema();
+        }
+        info = (JavaCodeGeneratorInfo) node;
+        if (info.getJavaFileInfo().getPackage() == null) {
+            return getPackageFromParent(node.getParent(), conflictResolver);
+        }
+        return info.getJavaFileInfo().getPackage();
     }
 
     /**
@@ -476,7 +484,6 @@ public final class AttributesJavaDataType {
                                                       yangNode.getLineNumber() + " at " +
                                                       yangNode.getCharPosition()
                                                       + " in " + yangNode.getFileName());
-
             }
 
             ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
@@ -513,7 +520,53 @@ public final class AttributesJavaDataType {
      * @return type from the leafref
      */
     private static YangType<?> getReferredTypeFromLeafref(YangType type) {
-        YangLeafRef<?> leafRefInfo = (YangLeafRef<?>) type.getDataTypeExtendedInfo();
-        return leafRefInfo.getEffectiveDataType();
+        YangLeafRef<?> lri = (YangLeafRef<?>) type.getDataTypeExtendedInfo();
+        return lri.isInGrouping() ? null : lri.getEffectiveDataType();
+    }
+
+    /**
+     * Returns leaf ref import string.
+     *
+     * @param type   YANG type
+     * @param cnfg   YANG to java naming conflict util
+     * @param isList true if list, false otherwise
+     * @return import class
+     */
+    private static String getLeafRefImpClass(
+            YangType type, YangToJavaNamingConflictUtil cnfg, boolean isList) {
+        YangType<?> rt = getReferredTypeFromLeafref(type);
+        return rt == null ? OBJECT_STRING : getJavaImportClass(rt, isList,
+                                                               cnfg);
+    }
+
+    /**
+     * Returns identity ref import class.
+     *
+     * @param type YANG type
+     * @param cnfg YANG to java naming conflict util
+     * @return import class
+     */
+    private static String getIdentityRefImpClass(
+            YangType type, YangToJavaNamingConflictUtil cnfg) {
+        YangIdentityRef ir = (YangIdentityRef) type.getDataTypeExtendedInfo();
+        if (ir.isInGrouping()) {
+            return OBJECT_STRING;
+        }
+        YangIdentity identity = ir.getReferredIdentity();
+        return getCapitalCase(getCamelCase(identity.getName(), cnfg));
+    }
+
+    /**
+     * Returns leaf ref import package.
+     *
+     * @param type   YANG type
+     * @param cnfg   YANG to java naming conflict util
+     * @param isList true if list, false otherwise
+     * @return import package
+     */
+    private static String getLeafRefImpPkg(
+            YangType type, YangToJavaNamingConflictUtil cnfg, boolean isList) {
+        YangType<?> rt = getReferredTypeFromLeafref(type);
+        return rt == null ? JAVA_LANG : getJavaImportPackage(rt, isList, cnfg);
     }
 }

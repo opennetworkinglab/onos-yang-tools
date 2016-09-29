@@ -35,13 +35,13 @@ import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
 import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPEDEF_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.UNION_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
-        .constructExtendedListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
-        .constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
@@ -141,12 +141,12 @@ public final class TypeListener {
 
                     type.setResolvableStatus(UNRESOLVED);
 
-                    if (listener.getGroupingDepth() == 0) {
-                        // Add resolution information to the list
-                        YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangType>(type,
-                                (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
-                        addToResolutionList(resolutionInfo, ctx);
-                    }
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(
+                                    type,(YangNode) parentNodeOfLeaf, errorLine,
+                                    errorPosition);
+                    addToResolutionList(resolutionInfo, ctx);
                 }
                 break;
             case LEAF_LIST_DATA:
@@ -173,13 +173,12 @@ public final class TypeListener {
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
-                    if (listener.getGroupingDepth() == 0) {
-                        // Add resolution information to the list
-                        YangResolutionInfoImpl resolutionInfo =
-                                new YangResolutionInfoImpl<YangType>(type, (YangNode) parentNodeOfLeafList, errorLine,
-                                        errorPosition);
-                        addToResolutionList(resolutionInfo, ctx);
-                    }
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(
+                                    type, (YangNode) parentNodeOfLeafList,
+                                    errorLine, errorPosition);
+                    addToResolutionList(resolutionInfo, ctx);
                 }
                 break;
             case UNION_DATA:
@@ -205,12 +204,11 @@ public final class TypeListener {
 
                     type.setResolvableStatus(UNRESOLVED);
 
-                    if (listener.getGroupingDepth() == 0) {
-                        // Add resolution information to the list
-                        YangResolutionInfoImpl resolutionInfo =
-                                new YangResolutionInfoImpl<YangType>(type, unionNode, errorLine, errorPosition);
-                        addToResolutionList(resolutionInfo, ctx);
-                    }
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(
+                                    type, unionNode, errorLine, errorPosition);
+                    addToResolutionList(resolutionInfo, ctx);
                 }
 
                 break;
@@ -229,12 +227,11 @@ public final class TypeListener {
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     type.setResolvableStatus(UNRESOLVED);
-                    if (listener.getGroupingDepth() == 0) {
-                        // Add resolution information to the list
-                        YangResolutionInfoImpl resolutionInfo =
-                                new YangResolutionInfoImpl<YangType>(type, typeDef, errorLine, errorPosition);
-                        addToResolutionList(resolutionInfo, ctx);
-                    }
+                    // Add resolution information to the list
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangType>(
+                                    type, typeDef, errorLine, errorPosition);
+                    addToResolutionList(resolutionInfo, ctx);
                 }
                 break;
             //TODO: deviate replacement statement.

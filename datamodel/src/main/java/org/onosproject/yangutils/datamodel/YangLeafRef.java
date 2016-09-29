@@ -112,6 +112,11 @@ public class YangLeafRef<T> extends DefaultLocationInfo
     private Map<String, String> prefixAndItsImportedModule;
 
     /**
+     * Flag to indicate whether the leaf ref is inside grouping.
+     */
+    private boolean inGrouping;
+
+    /**
      * Returns the prefix in the leafref path and its imported node name.
      *
      * @return the list of leafref prefix and imported node name
@@ -522,5 +527,23 @@ public class YangLeafRef<T> extends DefaultLocationInfo
             throws CloneNotSupportedException {
         YangLeafRef<T> clonedLeafRef = (YangLeafRef<T>) super.clone();
         return clonedLeafRef;
+    }
+
+    /**
+     * Returns flag value indicating whether leafref is inside grouping.
+     *
+     * @return true if leafref is in grouping, false otherwise
+     */
+    public boolean isInGrouping() {
+        return inGrouping;
+    }
+
+    /**
+     * Sets in grouping flag.
+     *
+     * @param inGrouping flag
+     */
+    public void setInGrouping(boolean inGrouping) {
+        this.inGrouping = inGrouping;
     }
 }

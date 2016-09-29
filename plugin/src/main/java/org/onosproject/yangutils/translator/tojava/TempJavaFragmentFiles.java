@@ -558,9 +558,26 @@ public class TempJavaFragmentFiles {
              */
             return;
         }
+        addCurNodeInfoInParentTempFile(curNode, isList, config, parent);
+    }
+
+    /**
+     * Adds current node info as and attribute to a specified parent generated
+     * file. In case of grouping parent will be referred grouping node or
+     * referred node in grouping.
+     *
+     * @param curNode current node
+     * @param isList  is list construct
+     * @param config  plugin configurations
+     * @param parent  parent node
+     * @throws IOException IO operation exception
+     */
+    protected static void addCurNodeInfoInParentTempFile(
+            YangNode curNode, boolean isList, YangPluginConfig config,
+            YangNode parent)
+            throws IOException {
         TempJavaBeanFragmentFiles tempFiles =
                 getBeanFiles((JavaCodeGeneratorInfo) parent);
-
         JavaAttributeInfo attr =
                 getCurNodeAsAttributeInTarget(curNode, parent, isList,
                                               tempFiles);

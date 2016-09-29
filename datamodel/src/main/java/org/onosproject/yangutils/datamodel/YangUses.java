@@ -395,6 +395,7 @@ public abstract class YangUses
                     ((CollisionDetector) usesParentLeavesHolder)
                             .detectCollidingChild(leaf.getName(), LEAF_DATA);
                     clonedLeaf = leaf.clone();
+                    clonedLeaf.setReferredLeaf(leaf);
                     if (getCurrentGroupingDepth() == 0) {
                         YangEntityToResolveInfoImpl resolveInfo
                                 = resolveYangConstructsUnderGroupingForLeaf(
@@ -418,6 +419,7 @@ public abstract class YangUses
                     ((CollisionDetector) usesParentLeavesHolder)
                             .detectCollidingChild(leafList.getName(), LEAF_LIST_DATA);
                     clonedLeafList = leafList.clone();
+                    clonedLeafList.setReferredSchemaLeafList(leafList);
                     if (getCurrentGroupingDepth() == 0) {
                         YangEntityToResolveInfoImpl resolveInfo =
                                 resolveYangConstructsUnderGroupingForLeafList(
@@ -458,7 +460,8 @@ public abstract class YangUses
         TraversalType curTraversal = ROOT;
         YangNode curNode = referredGrouping.getChild();
         while (curNode != null) {
-            if (curNode.getName().equals(referredGrouping.getName())) {
+            if (curNode == referredGrouping || (curNode instanceof YangUses &&
+            curNode.getName().equals(referredGrouping.getName()))) {
                 // if we have traversed all the child nodes, then exit from loop
                 return false;
             }

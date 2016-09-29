@@ -19,6 +19,8 @@ package org.onosproject.yangutils.translator.tojava;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+
 /**
  * Abstraction of an entity which provides Code generator functionalities.
  */
@@ -37,7 +39,8 @@ public interface JavaCodeGenerator {
      * Traverse the schema of application and generate corresponding code.
      *
      * @throws TranslatorException when fails to generate java code
+     * @throws IOException         a violation in IO rule
      */
     void generateCodeExit()
-            throws TranslatorException;
+            throws TranslatorException, IOException;
 }

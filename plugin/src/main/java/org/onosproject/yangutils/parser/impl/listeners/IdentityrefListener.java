@@ -121,6 +121,8 @@ public final class IdentityrefListener {
                         resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
                                 (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
                         addToResolutionList(resolutionInfo, ctx);
+                    } else {
+                        identityRef.setInGrouping(true);
                     }
                     break;
                 case LEAF_LIST_DATA:
@@ -145,6 +147,8 @@ public final class IdentityrefListener {
                         resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
                                 (YangNode) parentNodeOfLeafList, errorLine, errorPosition);
                         addToResolutionList(resolutionInfo, ctx);
+                    } else {
+                        identityRef.setInGrouping(true);
                     }
                     break;
                 case UNION_DATA:
@@ -164,9 +168,14 @@ public final class IdentityrefListener {
                         resolutionInfo = new YangResolutionInfoImpl<YangIdentityRef>(identityRef,
                                 (YangNode) parentNodeOfUnionNode, errorLine, errorPosition);
                         addToResolutionList(resolutionInfo, ctx);
+                    } else {
+                        identityRef.setInGrouping(true);
                     }
                     break;
                 case TYPEDEF_DATA:
+                    if (listener.getGroupingDepth() != 0) {
+                        identityRef.setInGrouping(true);
+                    }
                     /**
                      * Do not add the identity ref to resolution list. It needs to be
                      * added to resolution list, when leaf/leaf list references to

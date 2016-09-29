@@ -69,6 +69,11 @@ public class YangIdentityRef
      */
     private boolean isIdentityForInterFileGroupingResolution;
 
+    /**
+     * Flag to indicate whether the leaf ref is inside grouping.
+     */
+    private boolean inGrouping;
+
     // Creates a specific identityref of node.
     public YangIdentityRef() {
         super(YangNodeType.IDENTITYREF_NODE, null);
@@ -265,4 +270,21 @@ public class YangIdentityRef
         throw new RuntimeException("Attribute name is not applicable ");
     }
 
+    /**
+     * Returns flag value indicating whether leafref is inside grouping.
+     *
+     * @return true if leafref is in grouping, false otherwise
+     */
+    public boolean isInGrouping() {
+        return inGrouping;
+    }
+
+    /**
+     * Sets in grouping flag.
+     *
+     * @param inGrouping flag
+     */
+    public void setInGrouping(boolean inGrouping) {
+        this.inGrouping = inGrouping;
+    }
 }

@@ -139,6 +139,8 @@ public final class LeafrefListener {
                     YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangLeafRef>(leafRef,
                             (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
                     addToResolutionList(resolutionInfo);
+                } else {
+                    leafRef.setInGrouping(true);
                 }
                 break;
 
@@ -163,12 +165,17 @@ public final class LeafrefListener {
                     YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<YangLeafRef>(leafRef,
                             (YangNode) parentNodeOfLeafList, errorLine, errorPosition);
                     addToResolutionList(resolutionInfoImpl);
+                } else {
+                    leafRef.setInGrouping(true);
                 }
                 break;
 
             case TYPEDEF_DATA:
                 Parsable parentNodeOfLeafref = listener.getParsedDataStack().peek();
                 leafRef.setParentNodeOfLeafref((YangNode) parentNodeOfLeafref);
+                if (listener.getGroupingDepth() != 0) {
+                    leafRef.setInGrouping(true);
+                }
                 /*
                  * Do not add the leaf ref to resolution list. It needs to be
                  * added to resolution list, when leaf/leaf list references to

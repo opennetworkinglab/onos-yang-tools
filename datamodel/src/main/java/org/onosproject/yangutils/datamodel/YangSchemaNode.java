@@ -129,17 +129,21 @@ public interface YangSchemaNode extends LocationInfo {
             throws DataModelException;
 
     /**
-     * Returns notification shcema node corresponding to the name of
-     * notification
-     * as per the generated code enumeration. This is to be used for
-     * notification
-     * processing in YMS.
+     * Returns notification schema node corresponding to the name of
+     * notification as per the generated code enumeration. This is to be used
+     * for notification processing in YMS.
      *
-     * @param notificationNameInEnum notification name as per the generated
-     *                               code enumeration.
+     * @param notificationNameInEnum notification name in enum
      * @return notification schema node
      * @throws DataModelException a violation in data model rule
      */
     YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
             throws DataModelException;
+
+    /**
+     * Returns referred schema node in case of grouping.
+     *
+     * @return referred schema node
+     */
+    YangSchemaNode getReferredSchema();
 }

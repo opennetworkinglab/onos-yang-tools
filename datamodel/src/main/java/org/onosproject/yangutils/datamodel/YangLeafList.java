@@ -152,6 +152,11 @@ public abstract class YangLeafList extends DefaultLocationInfo
     private List<YangIfFeature> ifFeatureList;
 
     /**
+     * Referred schema leaf list.
+     */
+    private YangLeafList referredLeafList;
+
+    /**
      * Creates a YANG leaf-list.
      */
     public YangLeafList() {
@@ -540,5 +545,19 @@ public abstract class YangLeafList extends DefaultLocationInfo
     public YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
             throws DataModelException {
         throw new DataModelException("Method called for schema node other then module/sub-module");
+    }
+
+    @Override
+    public YangLeafList getReferredSchema() {
+        return referredLeafList;
+    }
+
+    /**
+     * Sets referred schema leaf-list. This is only applicable for grouping.
+     *
+     * @param leafList referred schema leaf-list
+     */
+    public void setReferredSchemaLeafList(YangLeafList leafList) {
+        referredLeafList = leafList;
     }
 }

@@ -59,7 +59,7 @@ public class SchemaNodeTest {
     @Test
     public void processSchemaNodeMap()
             throws IOException, ParserException,
-                   MojoExecutionException, DataModelException {
+            MojoExecutionException, DataModelException {
 
         String searchDir = "src/test/resources/schemaMap";
         utilManager
@@ -193,8 +193,8 @@ public class SchemaNodeTest {
     @Test(expected = DataModelException.class)
     public void processNotificationEnumMapInvalidScenario()
             throws IOException,
-                   ParserException, MojoExecutionException,
-                   DataModelException {
+            ParserException, MojoExecutionException,
+            DataModelException {
 
         String searchDir = "src/test/resources/schemaMap";
         utilManager

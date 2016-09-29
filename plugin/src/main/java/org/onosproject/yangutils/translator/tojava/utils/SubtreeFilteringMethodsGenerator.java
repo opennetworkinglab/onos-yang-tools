@@ -216,16 +216,27 @@ public final class SubtreeFilteringMethodsGenerator {
                     getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
                             attributeName);
         } else if (dataType.getDataType() == LEAFREF) {
-            YangType type = ((YangLeafRef) dataType.getDataTypeExtendedInfo())
-                    .getEffectiveDataType();
-            if (StringGenerator.isPrimitiveDataType(type.getDataType())) {
-                attrQualifiedType =
-                        getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
-                                attributeName);
-            } else {
+
+            // When leafref in grouping.
+            if (((YangLeafRef) dataType.getDataTypeExtendedInfo())
+                    .isInGrouping()) {
                 attrQualifiedType =
                         getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
                                 attributeName);
+            } else {
+
+                YangType type = ((YangLeafRef) dataType.getDataTypeExtendedInfo())
+                        .getEffectiveDataType();
+
+                if (StringGenerator.isPrimitiveDataType(type.getDataType())) {
+                    attrQualifiedType =
+                            getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
+                                    attributeName);
+                } else {
+                    attrQualifiedType =
+                            getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
+                                    attributeName);
+                }
             }
         } else {
             attrQualifiedType =
