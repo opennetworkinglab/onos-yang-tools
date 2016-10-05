@@ -24,7 +24,7 @@
         <version>1</version>
     </parent>
 
-    <artifactId>onos-yang-tools</artifactId>
+    <artifactId>onos-yang-utils</artifactId>
     <version>1.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -34,6 +34,8 @@
 
     <modules>
         <module>datamodel</module>
+        <module>generator</module>
+        <module>parser</module>
         <module>plugin</module>
     </modules>
 

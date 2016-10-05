@@ -24,7 +24,7 @@
         <version>1.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>onos-yang-utils-plugin</artifactId>
+    <artifactId>onos-yang-utils-generator</artifactId>
     <version>1.9-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
@@ -32,16 +32,6 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-datamodel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-generator</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-parser</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
