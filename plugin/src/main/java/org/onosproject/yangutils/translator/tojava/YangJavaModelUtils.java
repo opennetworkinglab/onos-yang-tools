@@ -22,11 +22,9 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangGrouping;
-import org.onosproject.yangutils.datamodel.YangInput;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
-import org.onosproject.yangutils.datamodel.YangOutput;
 import org.onosproject.yangutils.datamodel.YangSchemaNode;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
@@ -106,10 +104,10 @@ public final class YangJavaModelUtils {
                                         YangPluginConfig config) {
         String javaGenName;
         if (info instanceof YangJavaInputTranslator) {
-            javaGenName = ((YangInput) info).getParent().getName() +
+            javaGenName = ((YangJavaInputTranslator) info).getParent().getName() +
                     INPUT_KEYWORD;
         } else if (info instanceof YangJavaOutputTranslator) {
-            javaGenName = ((YangOutput) info).getParent().getName() +
+            javaGenName = ((YangJavaOutputTranslator) info).getParent().getName() +
                     OUTPUT_KEYWORD;
         } else {
             javaGenName = ((YangNode) info).getName();
@@ -222,8 +220,6 @@ public final class YangJavaModelUtils {
             /*
              * Module / sub module node code generation.
              */
-            translator.getServiceTempFiles()
-                    .addCurNodeLeavesInfoToTempFiles((YangNode) info, config);
             if (info instanceof YangJavaModuleTranslator) {
                 if (!((YangJavaModuleTranslator) info).getNotificationNodes()
                         .isEmpty()) {

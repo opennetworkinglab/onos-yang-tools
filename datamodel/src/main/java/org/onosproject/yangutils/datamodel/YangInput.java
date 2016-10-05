@@ -25,7 +25,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.INPUT_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.INPUT;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.INPUT_DATA;
 
 /*
  * Reference RFC 6020.
@@ -87,22 +94,23 @@ public abstract class YangInput
      */
     private List<YangLeafList> listOfLeafList;
 
-    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
+    private final List<YangAugment> yangAugmentedInfo;
 
     /**
      * Create a rpc input node.
      */
     public YangInput() {
-        super(YangNodeType.INPUT_NODE, new HashMap<>());
+        super(INPUT_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
+        yangAugmentedInfo = new ArrayList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        getYsnContextInfoMap().put(id, context);
     }
 
     @Override
@@ -112,7 +120,7 @@ public abstract class YangInput
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
                                      YangSchemaNode yangSchemaNode) {
         //For non data nodes, default child to be added to parent node.
         // TODO
@@ -120,7 +128,7 @@ public abstract class YangInput
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YANG_SINGLE_INSTANCE_NODE;
     }
 
     @Override
@@ -136,18 +144,16 @@ public abstract class YangInput
                                     YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input " +
-                                                 "identifier detected, same " +
-                                                 "as input \"" + getName() +
-                                                 " in " + getLineNumber() +
-                                                 " at " + getCharPosition() +
-                                                 " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    getErrorMsgCollision(COLLISION_DETECTION, getName(),
+                                         getLineNumber(), getCharPosition(),
+                                         INPUT, getFileName()));
         }
     }
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.INPUT_DATA;
+        return INPUT_DATA;
     }
 
     @Override
@@ -164,7 +170,7 @@ public abstract class YangInput
 
     @Override
     public List<YangLeaf> getListOfLeaf() {
-        return listOfLeaf;
+        return unmodifiableList(listOfLeaf);
     }
 
     @Override
@@ -174,12 +180,12 @@ public abstract class YangInput
 
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
     }
 
     @Override
     public List<YangLeafList> getListOfLeafList() {
-        return listOfLeafList;
+        return unmodifiableList(listOfLeafList);
     }
 
     @Override
@@ -189,7 +195,7 @@ public abstract class YangInput
 
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
     }
 
     @Override
@@ -204,17 +210,17 @@ public abstract class YangInput
 
     @Override
     public List<YangAugment> getAugmentedInfoList() {
-        return yangAugmentedInfo;
+        return unmodifiableList(yangAugmentedInfo);
     }
 
     @Override
     public void setLeafNameSpaceAndAddToParentSchemaMap() {
         // Add namespace for all leafs.
-        for (YangLeaf yangLeaf : getListOfLeaf()) {
+        for (YangLeaf yangLeaf : listOfLeaf) {
             yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
         // Add namespace for all leaf list.
-        for (YangLeafList yangLeafList : getListOfLeafList()) {
+        for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT64;
@@ -59,6 +60,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
  * Represents implementation of java data type code fragments temporary implementations. Maintains the temp files
  * required specific for user defined data type java snippet generation.
  */
+//TODO: Update with multi type handler framework.
 public class TempJavaTypeFragmentFiles
         extends TempJavaFragmentFiles {
 
@@ -71,16 +73,6 @@ public class TempJavaTypeFragmentFiles
      * File name for construction for special type like union, typedef.
      */
     private static final String CONSTRUCTOR_FOR_TYPE_FILE_NAME = "ConstructorForType";
-
-    /**
-     * File name for typedef class file name suffix.
-     */
-    private static final String TYPEDEF_CLASS_FILE_NAME_SUFFIX = EMPTY_STRING;
-
-    /**
-     * File name for generated class file for special type like union, typedef suffix.
-     */
-    private static final String UNION_TYPE_CLASS_FILE_NAME_SUFFIX = EMPTY_STRING;
 
     /**
      * Integer index in type list.
@@ -162,6 +154,8 @@ public class TempJavaTypeFragmentFiles
      */
     private JavaAttributeInfo uLongAttribute;
 
+    private List<YangType<?>> local = new ArrayList<>();
+
     /**
      * Creates an instance of temporary java code fragment.
      *
@@ -177,12 +171,13 @@ public class TempJavaTypeFragmentFiles
          * Initialize getterImpl, attributes, hash code, equals and to strings
          * when generation file type matches to typeDef class mask.
          */
-        addGeneratedTempFile(OF_STRING_IMPL_MASK);
-        addGeneratedTempFile(CONSTRUCTOR_FOR_TYPE_MASK);
-        addGeneratedTempFile(FROM_STRING_IMPL_MASK);
+        addGeneratedTempFile(OF_STRING_IMPL_MASK | CONSTRUCTOR_FOR_TYPE_MASK |
+                                     FROM_STRING_IMPL_MASK);
 
-        setOfStringImplTempFileHandle(getTemporaryFileHandle(OF_STRING_METHOD_FILE_NAME));
-        setConstructorForTypeTempFileHandle(getTemporaryFileHandle(CONSTRUCTOR_FOR_TYPE_FILE_NAME));
+        ofStringImplTempFileHandle = getTemporaryFileHandle(
+                OF_STRING_METHOD_FILE_NAME);
+        constructorForTypeTempFileHandle = getTemporaryFileHandle(
+                CONSTRUCTOR_FOR_TYPE_FILE_NAME);
 
     }
 
@@ -194,15 +189,6 @@ public class TempJavaTypeFragmentFiles
 
     public File getConstructorForTypeTempFileHandle() {
         return constructorForTypeTempFileHandle;
-    }
-
-    /**
-     * Sets type class constructor method's temporary file handle.
-     *
-     * @param constructorForTypeTempFileHandle type class constructor method's temporary file handle
-     */
-    private void setConstructorForTypeTempFileHandle(File constructorForTypeTempFileHandle) {
-        this.constructorForTypeTempFileHandle = constructorForTypeTempFileHandle;
     }
 
     /**
@@ -252,101 +238,112 @@ public class TempJavaTypeFragmentFiles
     }
 
     /**
-     * Set of string method's temporary file handle.
-     *
-     * @param ofStringImplTempFileHandle of string method's temporary file handle
-     */
-    private void setOfStringImplTempFileHandle(File ofStringImplTempFileHandle) {
-        this.ofStringImplTempFileHandle = ofStringImplTempFileHandle;
-    }
-
-    /**
      * Adds all the type in the current data model node as part of the generated temporary file.
      *
      * @param yangTypeHolder YANG java data model node which has type info, eg union / typedef
-     * @param pluginConfig   plugin configurations for naming conventions
+     * @param config         plugin configurations for naming conventions
      * @throws IOException IO operation fail
      */
-    void addTypeInfoToTempFiles(YangTypeHolder yangTypeHolder, YangPluginConfig pluginConfig)
+    void addTypeInfoToTempFiles(YangTypeHolder yangTypeHolder, YangPluginConfig config)
             throws IOException {
 
         List<YangType<?>> typeList = yangTypeHolder.getTypeList();
         if (typeList != null) {
-            for (YangType<?> yangType : typeList) {
-                if (!(yangType instanceof YangJavaTypeTranslator)) {
-                    throw new TranslatorException("Type does not have Java info " +
-                                                          yangType.getDataTypeName() + " in " + yangType.getLineNumber() + " at " + yangType
-                            .getCharPosition()
-                                                          + " in " + yangType.getFileName());
+            List<YangType<?>> types = validateTypes(typeList);
+            for (YangType<?> type : types) {
+                if (!(type instanceof YangJavaTypeTranslator)) {
+                    throw new TranslatorException(
+                            "Type does not have Java info " + type
+                                    .getDataTypeName() + " in " + type
+                                    .getLineNumber() + " at " + type
+                                    .getCharPosition() + " in " +
+                                    type.getFileName());
                 }
-                JavaAttributeInfo javaAttributeInfo = getAttributeForType(yangType, pluginConfig);
+                JavaAttributeInfo javaAttributeInfo = getAttributeForType(type,
+                                                                          config);
+                if (type.getDataType() == BITS) {
+                    addBitsHandler(javaAttributeInfo, type, this);
+                }
                 addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfo,
-                                                        pluginConfig, typeList);
+                                                        config, types);
             }
-            addTypeConstructor(pluginConfig);
-            addMethodsInConflictCase(pluginConfig);
+            addTypeConstructor();
+            addMethodsInConflictCase(config);
         }
     }
 
     /**
      * Returns java attribute.
      *
-     * @param yangType     YANG type
-     * @param pluginConfig plugin configurations
+     * @param type   YANG type
+     * @param config plugin configurations
      * @return java attribute
      */
-    private JavaAttributeInfo getAttributeForType(YangType yangType, YangPluginConfig pluginConfig) {
-        YangJavaTypeTranslator javaType = (YangJavaTypeTranslator) yangType;
-        javaType.updateJavaQualifiedInfo(pluginConfig.getConflictResolver());
-        String typeName = javaType.getDataTypeName();
-        typeName = getCamelCase(typeName, pluginConfig.getConflictResolver());
+    private JavaAttributeInfo getAttributeForType(YangType type,
+                                                  YangPluginConfig config) {
+        YangJavaTypeTranslator javaType = (YangJavaTypeTranslator) type;
+        javaType.updateJavaQualifiedInfo(config.getConflictResolver());
+        String typeName = getCamelCase(javaType.getDataTypeName(), config
+                .getConflictResolver());
         return getAttributeInfoForTheData(
-                javaType.getJavaQualifiedInfo(),
-                typeName, javaType,
-                getIsQualifiedAccessOrAddToImportList(javaType.getJavaQualifiedInfo()),
-                false);
+                javaType.getJavaQualifiedInfo(), typeName, javaType,
+                getIsQualifiedAccessOrAddToImportList(
+                        javaType.getJavaQualifiedInfo()), false);
     }
 
     /**
      * Adds the new attribute info to the target generated temporary files for union class.
      *
-     * @param javaAttributeInfo the attribute info that needs to be added to temporary files
-     * @param pluginConfig      plugin configurations
-     * @param typeList          type list
+     * @param attr   the attribute info that needs to be added to temporary files
+     * @param config plugin configurations
+     * @param types  type list
      * @throws IOException IO operation fail
      */
-    private void addJavaSnippetInfoToApplicableTempFiles(JavaAttributeInfo javaAttributeInfo,
-                                                         YangPluginConfig pluginConfig, List<YangType<?>> typeList)
+    private void addJavaSnippetInfoToApplicableTempFiles(
+            JavaAttributeInfo attr, YangPluginConfig config, List<YangType<?>> types)
             throws IOException {
 
-        YangDataTypes attrType = javaAttributeInfo.getAttributeType().getDataType();
+        YangDataTypes attrType = attr.getAttributeType().getDataType();
 
         if (attrType == INT16 || attrType == UINT8) {
-            boolean isShortConflict = validateForConflictingShortTypes(typeList);
-            javaAttributeInfo.setShortConflict(isShortConflict);
-            updateAttributeCondition(javaAttributeInfo);
+            boolean isShortConflict = validateForConflictingShortTypes(types);
+            attr.setShortConflict(isShortConflict);
+            updateAttributeCondition(attr);
             if (!isShortConflict) {
-                addMethodsWhenNoConflictingTypes(javaAttributeInfo, pluginConfig);
+                addMethodsWhenNoConflictingTypes(attr, config, types);
             }
         } else if (attrType == INT32 || attrType == UINT16) {
-            boolean isIntConflict = validateForConflictingIntTypes(typeList);
-            javaAttributeInfo.setIntConflict(isIntConflict);
-            updateAttributeCondition(javaAttributeInfo);
+            boolean isIntConflict = validateForConflictingIntTypes(types);
+            attr.setIntConflict(isIntConflict);
+            updateAttributeCondition(attr);
             if (!isIntConflict) {
-                addMethodsWhenNoConflictingTypes(javaAttributeInfo, pluginConfig);
+                addMethodsWhenNoConflictingTypes(attr, config, types);
             }
         } else if (attrType == INT64 || attrType == UINT32) {
-            boolean isLongConflict = validateForConflictingLongTypes(typeList);
-            javaAttributeInfo.setLongConflict(isLongConflict);
-            updateAttributeCondition(javaAttributeInfo);
+            boolean isLongConflict = validateForConflictingLongTypes(types);
+            attr.setLongConflict(isLongConflict);
+            updateAttributeCondition(attr);
             if (!isLongConflict) {
-                addMethodsWhenNoConflictingTypes(javaAttributeInfo, pluginConfig);
+                addMethodsWhenNoConflictingTypes(attr, config, types);
             }
         } else {
-            addMethodsWhenNoConflictingTypes(javaAttributeInfo, pluginConfig);
+            addMethodsWhenNoConflictingTypes(attr, config, types);
         }
-        super.addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfo, pluginConfig);
+        super.addJavaSnippetInfoToApplicableTempFiles(attr, config);
 
+    }
+
+    private List<YangType<?>> validateTypes(List<YangType<?>> types) {
+        String curType;
+        List<String> preType = new ArrayList<>();
+        for (YangType type : types) {
+            curType = type.getDataTypeName();
+            if (!preType.contains(curType)) {
+                preType.add(curType);
+                local.add(type);
+            }
+        }
+        return local;
     }
 
     /**
@@ -354,17 +351,19 @@ public class TempJavaTypeFragmentFiles
      *
      * @param javaAttributeInfo java attribute info
      * @param pluginConfig      plugin configurations
+     * @param types             YANG type
      * @throws IOException when fails to do IO operations
      */
     private void addMethodsWhenNoConflictingTypes(JavaAttributeInfo javaAttributeInfo,
-                                                  YangPluginConfig pluginConfig)
+                                                  YangPluginConfig pluginConfig, List<YangType<?>> types)
             throws IOException {
         if ((getGeneratedTempFiles() & OF_STRING_IMPL_MASK) != 0) {
             addOfStringMethod(javaAttributeInfo, pluginConfig);
         }
 
         if ((getGeneratedTempFiles() & CONSTRUCTOR_FOR_TYPE_MASK) != 0) {
-            addTypeConstructor(javaAttributeInfo, pluginConfig);
+            addTypeConstructor(javaAttributeInfo, types.indexOf
+                    (javaAttributeInfo.getAttributeType()));
         }
     }
 
@@ -463,67 +462,84 @@ public class TempJavaTypeFragmentFiles
                                                                                newAttrInfo.getAttributeType(),
                                                                                getIsQualifiedAccessOrAddToImportList(qualifiedInfoOfFromString), false);
 
-        addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
+        addFromStringMethod(newAttrInfo, fromStringAttributeInfo, getGeneratedJavaClassName());
     }
 
     /**
      * Adds type constructor.
      *
-     * @param attr         attribute info
-     * @param pluginConfig plugin configurations
+     * @param attr  attribute info
+     * @param count count of types
      * @throws IOException when fails to append to temporary file
      */
-    private void addTypeConstructor(JavaAttributeInfo attr, YangPluginConfig pluginConfig)
+    private void addTypeConstructor(JavaAttributeInfo attr, int count)
             throws IOException {
-        appendToFile(getConstructorForTypeTempFileHandle(), getTypeConstructorStringAndJavaDoc(attr,
-                                                                                               getGeneratedJavaClassName()) + NEW_LINE);
+        appendToFile(getConstructorForTypeTempFileHandle(),
+                     getTypeConstructorStringAndJavaDoc(
+                             attr, getGeneratedJavaClassName(), getGeneratedJavaFiles(), count)
+                             + NEW_LINE);
     }
 
     /**
      * Adds type constructor.
      *
-     * @param pluginConfig plugin configurations
      * @throws IOException when fails to append to temporary file
      */
-    private void addTypeConstructor(YangPluginConfig pluginConfig)
+    private void addTypeConstructor()
             throws IOException {
         JavaAttributeInfo attr = getIntAttribute();
         if (attr != null) {
             attr = getUIntAttribute();
+        }
+        boolean index = getIntIndex() < getUIntIndex();
+        int count;
+        if (index) {
+            count = getIntIndex();
+        } else {
+            count = getUIntIndex();
         }
         if (attr != null) {
             if (attr.isIntConflict()) {
                 appendToFile(getConstructorForTypeTempFileHandle(), getTypeConstructorStringAndJavaDoc(
                         getIntAttribute(),
                         getUIntAttribute(), getGeneratedJavaClassName(), INT_TYPE_CONFLICT,
-                        getIntIndex()
-                                < getUIntIndex()) + NEW_LINE);
+                        index, count) + NEW_LINE);
             }
         }
         attr = getLongAttribute();
         if (attr != null) {
             attr = getULongAttribute();
         }
+        index = getLongIndex() < getULongIndex();
+        if (index) {
+            count = getLongIndex();
+        } else {
+            count = getULongIndex();
+        }
         if (attr != null) {
             if (attr.isLongConflict()) {
                 appendToFile(getConstructorForTypeTempFileHandle(), getTypeConstructorStringAndJavaDoc(
                         getLongAttribute(),
                         getULongAttribute(), getGeneratedJavaClassName(), LONG_TYPE_CONFLICT,
-                        getLongIndex()
-                                < getULongIndex()) + NEW_LINE);
+                        index, count) + NEW_LINE);
             }
         }
         attr = getShortAttribute();
         if (attr != null) {
             attr = getUInt8Attribute();
         }
+        index = getShortIndex() < getUInt8Index();
+        if (index) {
+            count = getShortIndex();
+        } else {
+            count = getUInt8Index();
+        }
         if (attr != null) {
             if (attr.isShortConflict()) {
                 appendToFile(getConstructorForTypeTempFileHandle(), getTypeConstructorStringAndJavaDoc(
                         getShortAttribute(),
                         getUInt8Attribute(), getGeneratedJavaClassName(), SHORT_TYPE_CONFLICT,
-                        getShortIndex()
-                                < getUInt8Index()) + NEW_LINE);
+                        index, count) + NEW_LINE);
             }
         }
     }
@@ -587,29 +603,26 @@ public class TempJavaTypeFragmentFiles
         }
 
         createPackage(curNode);
+        addImportsToStringAndHasCodeMethods(imports, true);
 
         /*
          * Creates type def class file.
          */
         if ((fileType & GENERATE_TYPEDEF_CLASS) != 0) {
-            addImportsToStringAndHasCodeMethods(imports, true);
-            setTypedefClassJavaFileHandle(getJavaFileHandle(getJavaClassName(TYPEDEF_CLASS_FILE_NAME_SUFFIX)));
-
-            // In case if data type is binary, MoreObjects is not required and should be removed.
-            if (curNode instanceof YangTypeHolder) {
-                YangType yangType = ((YangTypeHolder) curNode).getTypeList().get(0);
-                if (yangType.getDataType() == YangDataTypes.BINARY) {
-                    imports.remove(getJavaImportData().getImportForToString());
-                }
-            }
+            setTypedefClassJavaFileHandle(getJavaFileHandle(
+                    getJavaClassName(EMPTY_STRING)));
             generateTypeDefClassFile(getTypedefClassJavaFileHandle(), curNode, imports);
+        }
+        String bit = getJavaImportData().getImportForToBitSet();
+        if (!imports.contains(bit)) {
+            imports.add(bit);
         }
         /*
          * Creates type class file.
          */
         if ((fileType & GENERATE_UNION_CLASS) != 0) {
-            addImportsToStringAndHasCodeMethods(imports, true);
-            setTypeClassJavaFileHandle(getJavaFileHandle(getJavaClassName(UNION_TYPE_CLASS_FILE_NAME_SUFFIX)));
+            setTypeClassJavaFileHandle(getJavaFileHandle(
+                    getJavaClassName(EMPTY_STRING)));
             generateUnionClassFile(getTypeClassJavaFileHandle(), curNode, imports);
         }
 

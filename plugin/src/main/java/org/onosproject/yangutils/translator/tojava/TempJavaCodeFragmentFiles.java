@@ -198,11 +198,10 @@ public class TempJavaCodeFragmentFiles {
     /**
      * Adds build method for interface.
      *
-     * @param pluginConfig plugin configurations
      * @return build method for interface
      * @throws IOException when fails to append to temporary file
      */
-    public String addBuildMethodForInterface(YangPluginConfig pluginConfig)
+    public String addBuildMethodForInterface()
             throws IOException {
         if (beanTempFiles != null) {
             return beanTempFiles.addBuildMethodForInterface();
@@ -258,7 +257,7 @@ public class TempJavaCodeFragmentFiles {
      * @param isErrorOccurred if error occurred
      * @throws IOException when failed to delete the temporary files
      */
-    void freeTemporaryResources(boolean isErrorOccurred)
+    public void freeTemporaryResources(boolean isErrorOccurred)
             throws IOException {
 
         if (beanTempFiles != null) {

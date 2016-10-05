@@ -17,12 +17,11 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
-import org.onosproject.yangutils.datamodel.YangBit;
-import org.onosproject.yangutils.datamodel.YangBits;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangEnum;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
@@ -31,14 +30,15 @@ import org.onosproject.yangutils.utils.io.impl.JavaDocGen;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.EIGHT_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
+import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWELVE_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getAugmentMapTypeString;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getCurNodeName;
@@ -54,13 +54,27 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.INTERFACE_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.brackets;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getBitSetAttr;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCatchSubString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCompareToString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getForLoopString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getGreaterThanCondition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getIfConditionBegin;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getLesserThanCondition;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getListAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getMoreObjectAttr;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNewInstance;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNewLineAndSpace;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOmitNullValueString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOverRideString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getParseFromStringMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getPatternQuoteString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getQuotedString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getReturnOfSubString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getReturnString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getSetValueParaCondition;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getTrySubString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getValueLeafSetString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.ifAndAndCondition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.ifConditionForIntInTypeDefConstructor;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.ifEqualEqualCondition;
@@ -77,6 +91,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
+import static org.onosproject.yangutils.utils.UtilConstants.BITS;
+import static org.onosproject.yangutils.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILD;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
@@ -93,8 +109,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
-import static org.onosproject.yangutils.utils.UtilConstants.ELSE_IF;
-import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_PARAMETER_FUNCTION_CALL;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
@@ -111,10 +125,10 @@ import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD_PREFIX;
 import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_METHOD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH_CODE_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.HELPER;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
-import static org.onosproject.yangutils.utils.UtilConstants.INTEGER_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
@@ -124,27 +138,25 @@ import static org.onosproject.yangutils.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
+import static org.onosproject.yangutils.utils.UtilConstants.NOT;
 import static org.onosproject.yangutils.utils.UtilConstants.NULL;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJ;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OF;
 import static org.onosproject.yangutils.utils.UtilConstants.ONE;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.OTHER;
 import static org.onosproject.yangutils.utils.UtilConstants.OVERRIDE;
-import static org.onosproject.yangutils.utils.UtilConstants.PARSE_INT;
-import static org.onosproject.yangutils.utils.UtilConstants.PATTERN;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILTERING;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
-import static org.onosproject.yangutils.utils.UtilConstants.QUOTE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
-import static org.onosproject.yangutils.utils.UtilConstants.REPLACE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_INPUT_VAR_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
@@ -152,7 +164,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SELECT_ALL_CHILD;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SET_METHOD_PREFIX;
 import static org.onosproject.yangutils.utils.UtilConstants.SET_SELECT_LEAF;
-import static org.onosproject.yangutils.utils.UtilConstants.SINGLE_QUOTE;
+import static org.onosproject.yangutils.utils.UtilConstants.SET_VALUE_PARA;
 import static org.onosproject.yangutils.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.SPLIT_STRING;
@@ -163,19 +175,17 @@ import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
-import static org.onosproject.yangutils.utils.UtilConstants.TO;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_CAPS;
+import static org.onosproject.yangutils.utils.UtilConstants.TO_STRING_METHOD;
 import static org.onosproject.yangutils.utils.UtilConstants.TRIM_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.TRUE;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
-import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.VOID;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
-import static org.onosproject.yangutils.utils.UtilConstants.ZERO;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUILD_METHOD;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.CONSTRUCTOR;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CONSTRUCTOR;
@@ -200,8 +210,6 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
  * Represents generator for methods of generated files based on the file type.
  */
 public final class MethodsGenerator {
-    private static final String BITS_STRING_ARRAY_VAR = "bitsTemp";
-    private static final String BIT_TEMP_VAR = "bitTemp";
     private static final String BIT_NAMES_VAR = "bitNames";
     private static final String BIT_NAME_VAR = "bitName";
 
@@ -348,8 +356,8 @@ public final class MethodsGenerator {
             return getGetter(attrQualifiedType, attributeName,
                              generatedJavaFiles);
         }
-        String attrParam = StringGenerator.getListAttribute(attrQualifiedType,
-                                                            attr.getCompilerAnnotation());
+        String attrParam = getListAttribute(attrQualifiedType,
+                                            attr.getCompilerAnnotation());
         return getGetter(attrParam, attributeName, generatedJavaFiles);
     }
 
@@ -371,7 +379,7 @@ public final class MethodsGenerator {
                     //Append method body.
                     .append(methodBody(MANAGER_METHODS, null, null,
                                        EIGHT_SPACE_INDENTATION, null,
-                                       type, false))
+                                       type, false, null))
                     .append(signatureClose())
                     //Append method close.
                     .append(methodClose(FOUR_SPACE));
@@ -383,7 +391,7 @@ public final class MethodsGenerator {
                 //Append method body.
                 .append(methodBody(GETTER, name, name,
                                    EIGHT_SPACE_INDENTATION, null,
-                                   type, false))
+                                   type, false, null))
                 .append(signatureClose())
                 //Append method close.
                 .append(methodClose(FOUR_SPACE));
@@ -411,8 +419,8 @@ public final class MethodsGenerator {
             return getSetter(className, attributeName, attrQualifiedType,
                              generatedJavaFiles, isTypeNull, false);
         }
-        String attrParam = StringGenerator.getListAttribute(attrQualifiedType,
-                                                            attr.getCompilerAnnotation());
+        String attrParam = getListAttribute(attrQualifiedType,
+                                            attr.getCompilerAnnotation());
         return getSetter(className, attributeName, attrParam,
                          generatedJavaFiles, isTypeNull, true);
     }
@@ -440,7 +448,7 @@ public final class MethodsGenerator {
                     //Append method body.
                     .append(methodBody(MANAGER_METHODS, null, null,
                                        EIGHT_SPACE_INDENTATION, null, null,
-                                       false))
+                                       false, null))
                     .append(methodClose(FOUR_SPACE));
             return builder.toString();
         }
@@ -451,7 +459,7 @@ public final class MethodsGenerator {
                     //Append method body.
                     .append(methodBody(SETTER, name, name,
                                        EIGHT_SPACE_INDENTATION, null, null,
-                                       false))
+                                       false, null))
                     .append(methodClose(FOUR_SPACE));
             return builder.toString();
         }
@@ -459,14 +467,14 @@ public final class MethodsGenerator {
                                        PUBLIC, name, getCapitalCase(className) +
                                                BUILDER, type, CLASS_TYPE));
         if (!isTypeNull && !isList) {
-            builder.append(StringGenerator.getValueLeafSetString(name));
+            builder.append(getValueLeafSetString(name));
         } else {
             builder.append(EMPTY_STRING);
         }
         //Append method body.
         builder.append(methodBody(SETTER, name, name,
                                   EIGHT_SPACE_INDENTATION, null, null,
-                                  true))
+                                  true, null))
                 //Append method close.
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
@@ -496,7 +504,7 @@ public final class MethodsGenerator {
         return methodSignature(getCapitalCase(name), SET_METHOD_PREFIX, PUBLIC,
                                name, VOID, type, CLASS_TYPE) +
                 methodBody(SETTER, name, name, EIGHT_SPACE_INDENTATION, null,
-                           null, false) + methodClose(FOUR_SPACE);
+                           null, false, null) + methodClose(FOUR_SPACE);
     }
 
     /**
@@ -517,7 +525,7 @@ public final class MethodsGenerator {
             return getGetterInterfaceString(returnType, yangName,
                                             genType);
         }
-        String listAttr = StringGenerator.getListAttribute(returnType, annotation);
+        String listAttr = getListAttribute(returnType, annotation);
         return getGetterInterfaceString(listAttr, yangName, genType);
     }
 
@@ -560,7 +568,7 @@ public final class MethodsGenerator {
                                             genType);
         }
 
-        String listAttr = StringGenerator.getListAttribute(attrType, annotation);
+        String listAttr = getListAttribute(attrType, annotation);
         return getSetterInterfaceString(className, attrName, listAttr, genType);
     }
 
@@ -653,11 +661,11 @@ public final class MethodsGenerator {
             case GENERATE_SERVICE_AND_MANAGER:
                 return methodBody(MethodBodyTypes.CONSTRUCTOR, attrName,
                                   attrCaps, EIGHT_SPACE_INDENTATION, GET, null,
-                                  false);
+                                  false, null);
             default:
                 return methodBody(MethodBodyTypes.CONSTRUCTOR, attrName,
                                   attrName, EIGHT_SPACE_INDENTATION, EMPTY_STRING,
-                                  null, false);
+                                  null, false, null);
         }
     }
 
@@ -697,7 +705,7 @@ public final class MethodsGenerator {
                                CLASS_TYPE) +
                 methodBody(MethodBodyTypes.BUILD, type, BUILD,
                            EIGHT_SPACE_INDENTATION, EMPTY_STRING,
-                           null, false) +
+                           null, false, null) +
                 methodClose(FOUR_SPACE);
     }
 
@@ -721,14 +729,13 @@ public final class MethodsGenerator {
      * @return string method's open string
      */
     static String getToStringMethodOpen() {
-        String line;
         StringBuilder builder = new StringBuilder(getOverRideString());
-        builder.append(methodSignature(TO + STRING_DATA_TYPE, EMPTY_STRING,
+        builder.append(methodSignature(TO_STRING_METHOD, EMPTY_STRING,
                                        PUBLIC, null, STRING_DATA_TYPE, null,
                                        CLASS_TYPE));
-        line = getReturnString(GOOGLE_MORE_OBJECT_METHOD_STRING,
-                               EIGHT_SPACE_INDENTATION) + NEW_LINE;
-        builder.append(line);
+        builder.append(getReturnString(GOOGLE_MORE_OBJECT_METHOD_STRING,
+                                       EIGHT_SPACE_INDENTATION)).append(NEW_LINE)
+                .append(getOmitNullValueString());
         return builder.toString();
     }
 
@@ -738,7 +745,7 @@ public final class MethodsGenerator {
      * @return to string method close string
      */
     static String getToStringMethodClose() {
-        return TWELVE_SPACE_INDENTATION + PERIOD + TO + STRING_DATA_TYPE +
+        return TWELVE_SPACE_INDENTATION + PERIOD + TO_STRING_METHOD +
                 brackets(OPEN_CLOSE_BRACKET, null, null) + signatureClose() +
                 methodClose(FOUR_SPACE);
     }
@@ -746,13 +753,12 @@ public final class MethodsGenerator {
     /**
      * Returns to string method for class.
      *
-     * @param attr attribute info
-     * @return to string method
+     * @param attr java attribute
+     * @return to string method for class
      */
     public static String getToStringMethod(JavaAttributeInfo attr) {
-        String attributeName = attr.getAttributeName();
-        return methodBody(TO_STRING, attributeName, null,
-                          TWELVE_SPACE_INDENTATION, null, null, false);
+        return methodBody(TO_STRING, attr.getAttributeName(), null,
+                          TWELVE_SPACE_INDENTATION, null, null, false, null);
     }
 
     /**
@@ -785,19 +791,18 @@ public final class MethodsGenerator {
      * @param attr     attribute info
      * @param fromAttr attribute info for the from string wrapper
      *                 type
+     * @param name     class name
      * @return from string method's body string
      */
     public static String getFromStringMethod(JavaAttributeInfo attr,
-                                             JavaAttributeInfo fromAttr) {
+                                             JavaAttributeInfo fromAttr, String name) {
 
-        return EIGHT_SPACE_INDENTATION + StringGenerator.getTrySubString() +
-                StringGenerator.getNewLineAndSpace(TWELVE_SPACE_INDENTATION) +
-                getParsedSubString(attr, fromAttr) +
-                StringGenerator.getNewLineAndSpace(FOUR_SPACE_INDENTATION) +
-                StringGenerator.getReturnOfSubString() +
-                StringGenerator.getNewLineAndSpace(EIGHT_SPACE_INDENTATION) +
-                StringGenerator.getCatchSubString() +
-                StringGenerator.getNewLineAndSpace(EIGHT_SPACE_INDENTATION) +
+        return EIGHT_SPACE_INDENTATION + getTrySubString() +
+                getNewLineAndSpace(TWELVE_SPACE_INDENTATION) +
+                getParsedSubString(attr, fromAttr, name) +
+                getReturnOfSubString() + EIGHT_SPACE_INDENTATION +
+                getCatchSubString() +
+                getNewLineAndSpace(EIGHT_SPACE_INDENTATION) +
                 CLOSE_CURLY_BRACKET;
     }
 
@@ -805,32 +810,49 @@ public final class MethodsGenerator {
      * Returns sub string with parsed statement for union's from string method.
      *
      * @param attr attribute info
+     * @param name class name
      * @return sub string with parsed statement for union's from string method
      */
     private static String getParsedSubString(JavaAttributeInfo attr,
-                                             JavaAttributeInfo fromStringAttr) {
+                                             JavaAttributeInfo fromStringAttr, String name) {
 
         String targetDataType = getReturnType(attr);
-        StringBuilder builder = new StringBuilder();
         YangDataTypes types = fromStringAttr.getAttributeType()
                 .getDataType();
+        StringBuilder method = new StringBuilder();
         switch (types) {
             case BITS:
-                return getFromStringForBits(attr, (YangBits) fromStringAttr.getAttributeType()
-                    .getDataTypeExtendedInfo());
+                return targetDataType + SPACE + TMP_VAL + SPACE + EQUAL +
+                        SPACE + getCapitalCase(name) + getCapitalCase(attr.getAttributeName()) +
+                        PERIOD + FROM_STRING_METHOD_NAME +
+                        brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
+                                 FROM_STRING_PARAM_NAME, null) + signatureClose();
             case BINARY:
-                return targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE +
-                        BASE64 + PERIOD + GET_DECODER + OPEN_PARENTHESIS +
-                        CLOSE_PARENTHESIS + PERIOD + DECODE + OPEN_PARENTHESIS +
-                        FROM_STRING_PARAM_NAME + CLOSE_PARENTHESIS + SEMI_COLON
-                        + NEW_LINE;
+                return method.append(targetDataType).append(SPACE).append(TMP_VAL)
+                        .append(SPACE).append(EQUAL).append(SPACE).append(
+                                geStringConverterForBinary(FROM_STRING_PARAM_NAME))
+                        .append(signatureClose()).toString();
             default:
                 return targetDataType + SPACE + TMP_VAL + SPACE + EQUAL +
-                        SPACE + StringGenerator.getParseFromStringMethod(
+                        SPACE + getParseFromStringMethod(
                         targetDataType, fromStringAttr.getAttributeType()) +
-                        OPEN_PARENTHESIS + FROM_STRING_PARAM_NAME +
-                        CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE;
+                        brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
+                                 FROM_STRING_PARAM_NAME, null) + signatureClose();
         }
+    }
+
+    /**
+     * Returns to string converter for binary type.
+     *
+     * @param var variable name
+     * @return to string method body
+     */
+    private static String geStringConverterForBinary(String var) {
+        StringBuilder builder = new StringBuilder();
+        return builder.append(BASE64).append(PERIOD)
+                .append(GET_DECODER).append(OPEN_CLOSE_BRACKET_STRING).append(PERIOD)
+                .append(DECODE).append(brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
+                                                var, null)).toString();
     }
 
     /**
@@ -971,7 +993,7 @@ public final class MethodsGenerator {
         return methodSignature(OF, EMPTY_STRING, PUBLIC + SPACE + STATIC,
                                VALUE, name, type, CLASS_TYPE) +
                 methodBody(MethodBodyTypes.OF_METHOD, name, null,
-                           EIGHT_SPACE_INDENTATION, EMPTY_STRING, null, false) +
+                           EIGHT_SPACE_INDENTATION, EMPTY_STRING, null, false, null) +
                 methodClose(FOUR_SPACE);
     }
 
@@ -980,14 +1002,17 @@ public final class MethodsGenerator {
      *
      * @param attr      attribute info
      * @param className class name
+     * @param genType   generate file type
+     * @param count     type count
      * @return string and java doc for constructor of type class
      */
     public static String getTypeConstructorStringAndJavaDoc(
-            JavaAttributeInfo attr, String className) {
+            JavaAttributeInfo attr, String className, int genType, int count) {
         String attrType = getReturnType(attr);
         String attrName = attr.getAttributeName();
         return getJavaDoc(TYPE_CONSTRUCTOR, attrName, false, null) +
-                getTypeConstructorString(attrType, attrName, className);
+                getTypeConstructorString(attrType, attrName, className,
+                                         genType, count);
     }
 
     /**
@@ -998,11 +1023,12 @@ public final class MethodsGenerator {
      * @param genType  class name
      * @param type     conflict validate type
      * @param addFirst whether int came first or uInt came first
+     * @param count    type count
      * @return string and java doc for constructor of type class
      */
     public static String getTypeConstructorStringAndJavaDoc(
             JavaAttributeInfo attr1, JavaAttributeInfo attr2, String genType,
-            ValidatorTypeForUnionTypes type, boolean addFirst) {
+            ValidatorTypeForUnionTypes type, boolean addFirst, int count) {
 
         String attrType = getReturnType(attr1);
         String attrName1 = "";
@@ -1016,9 +1042,9 @@ public final class MethodsGenerator {
         }
         if (attr2 != null) {
             if (addFirst) {
-                attrName1 = attr2.getAttributeName();
-            } else {
                 attrName2 = attr2.getAttributeName();
+            } else {
+                attrName1 = attr2.getAttributeName();
             }
         }
 
@@ -1037,7 +1063,7 @@ public final class MethodsGenerator {
         return getJavaDoc(TYPE_CONSTRUCTOR, doc, false, appDataStructure) +
                 getTypeConstructorString(attrType, attrName1,
                                          attrName2, genType,
-                                         type, addFirst);
+                                         type, addFirst, count);
     }
 
     /**
@@ -1046,14 +1072,26 @@ public final class MethodsGenerator {
      * @param type      data type
      * @param name      attribute name
      * @param className class name
+     * @param genType   generated file type
+     * @param count     type count
      * @return type constructor string
      */
     private static String getTypeConstructorString(String type, String name,
-                                                   String className) {
-        return methodSignature(className, EMPTY_STRING, PUBLIC, name,
-                               null, type, CLASS_TYPE) +
-                methodBody(SETTER, name, null, EIGHT_SPACE_INDENTATION,
-                           EMPTY_STRING, null, false) + methodClose(FOUR_SPACE);
+                                                   String className, int genType, int count) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(
+                methodSignature(className, EMPTY_STRING, PUBLIC, name,
+                                null, type, CLASS_TYPE));
+        if (genType == GENERATE_UNION_CLASS) {
+            builder.append(EIGHT_SPACE_INDENTATION).append(SET_VALUE_PARA)
+                    .append(PERIOD).append(SET_METHOD_PREFIX).append(
+                    brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, count + EMPTY_STRING,
+                             null)).append(signatureClose());
+        }
+        builder.append(methodBody(SETTER, name, null, EIGHT_SPACE_INDENTATION,
+                                  EMPTY_STRING, null, false, null))
+                .append(methodClose(FOUR_SPACE));
+        return builder.toString();
     }
 
     /**
@@ -1062,26 +1100,30 @@ public final class MethodsGenerator {
      * @param type      data type
      * @param attr1     attribute attr1
      * @param className class attr1
+     * @param count     type count
      * @return type constructor string
      */
     private static String getTypeConstructorString(
             String type, String attr1, String attr2, String className,
-            ValidatorTypeForUnionTypes validatorType, boolean addInt) {
-
+            ValidatorTypeForUnionTypes validatorType, boolean addInt, int count) {
         StringBuilder constructor = new StringBuilder(
-                methodSignature(className, EMPTY_STRING, null, type,
+                methodSignature(className, EMPTY_STRING, PUBLIC, attr1,
                                 null, type, CLASS_TYPE))
+                .append(EIGHT_SPACE_INDENTATION).append(SET_VALUE_PARA)
+                .append(PERIOD).append(SET_METHOD_PREFIX).append(
+                        brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, count + EMPTY_STRING,
+                                 null)).append(signatureClose())
                 .append(ifConditionForIntInTypeDefConstructor(validatorType,
-                                                              addInt))
+                                                              addInt, attr1))
                 .append(methodBody(SETTER, attr1, null,
                                    TWELVE_SPACE_INDENTATION, EMPTY_STRING,
-                                   null, false));
+                                   null, false, attr1));
         String str = EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE +
                 ELSE + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
         constructor.append(str)
                 .append(methodBody(SETTER, attr2, null,
                                    TWELVE_SPACE_INDENTATION, EMPTY_STRING,
-                                   null, false))
+                                   null, false, attr1))
                 .append(methodClose(FOUR_SPACE))
                 .append(methodClose(EIGHT_SPACE));
 
@@ -1096,8 +1138,8 @@ public final class MethodsGenerator {
     static String getAddAugmentInfoMethodInterface() {
         StringBuilder builder = new StringBuilder(generateForAddAugmentation());
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put(OBJECT_STRING, VALUE);
-        map.put(CLASS_STRING, CLASS + OBJECT_STRING);
+        map.put(VALUE, OBJECT_STRING);
+        map.put(CLASS + OBJECT_STRING, CLASS_STRING);
         builder.append(multiAttrMethodSignature(ADD_STRING + YANG_AUGMENTED_INFO,
                                                 EMPTY_STRING, EMPTY_STRING,
                                                 VOID, map, INTERFACE_TYPE));
@@ -1112,13 +1154,13 @@ public final class MethodsGenerator {
     static String getAddAugmentInfoMethodImpl() {
         StringBuilder builder = new StringBuilder(getOverRideString());
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put(OBJECT_STRING, VALUE);
-        map.put(CLASS_STRING, CLASS + OBJECT_STRING);
+        map.put(VALUE, OBJECT_STRING);
+        map.put(CLASS + OBJECT_STRING, CLASS_STRING);
         builder.append(multiAttrMethodSignature(ADD_STRING + YANG_AUGMENTED_INFO,
                                                 EMPTY_STRING, PUBLIC,
                                                 VOID, map, CLASS_TYPE))
                 .append(methodBody(AUGMENTED_MAP_ADD, null, null,
-                                   EIGHT_SPACE_INDENTATION, null, null, false))
+                                   EIGHT_SPACE_INDENTATION, null, null, false, null))
                 .append(methodClose(FOUR_SPACE))
                 .append(NEW_LINE);
         return builder.toString();
@@ -1147,7 +1189,7 @@ public final class MethodsGenerator {
                                 PUBLIC, CLASS + OBJECT_STRING, OBJECT_STRING,
                                 CLASS_STRING, CLASS_TYPE) +
                 methodBody(AUGMENTED_MAP_GET_VALUE, null, null,
-                           EIGHT_SPACE_INDENTATION, null, null, false) +
+                           EIGHT_SPACE_INDENTATION, null, null, false, null) +
                 methodClose(FOUR_SPACE);
     }
 
@@ -1175,7 +1217,7 @@ public final class MethodsGenerator {
                 YANG_AUGMENTED_INFO_LOWER_CASE + MAP, EMPTY_STRING, PUBLIC, null,
                 getAugmentMapTypeString(), null, CLASS_TYPE) +
                 methodBody(AUGMENTED_MAP_GETTER, null, null,
-                           EIGHT_SPACE_INDENTATION, null, null, false) +
+                           EIGHT_SPACE_INDENTATION, null, null, false, null) +
                 methodClose(FOUR_SPACE);
     }
 
@@ -1189,17 +1231,17 @@ public final class MethodsGenerator {
         StringBuilder builder = new StringBuilder();
         String clsName = getSmallCase(className);
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put(INT, clsName);
-        map.put(STRING_DATA_TYPE, SCHEMA_NAME);
+        map.put(clsName, INT);
+        map.put(SCHEMA_NAME, STRING_DATA_TYPE);
         builder.append(multiAttrMethodSignature(className, EMPTY_STRING,
                                                 EMPTY_STRING, null,
                                                 map, CLASS_TYPE))
                 .append(methodBody(SETTER, clsName, EMPTY_STRING,
                                    EIGHT_SPACE_INDENTATION, EMPTY_STRING,
-                                   EMPTY_STRING, false))
+                                   EMPTY_STRING, false, null))
                 .append(methodBody(SETTER, SCHEMA_NAME, EMPTY_STRING,
                                    EIGHT_SPACE_INDENTATION, EMPTY_STRING,
-                                   EMPTY_STRING, false))
+                                   EMPTY_STRING, false, null))
                 .append(methodClose(FOUR_SPACE));
 
         return builder.toString();
@@ -1439,7 +1481,7 @@ public final class MethodsGenerator {
                                                 String name,
                                                 boolean isRoot) {
         String attrName = attr.getAttributeName();
-        String retString = "";
+        String retString = EMPTY_STRING;
         if (!isRoot) {
             retString = getOverRideString();
         }
@@ -1505,8 +1547,8 @@ public final class MethodsGenerator {
                 "     * @return match result\n" +
                 "     */\n";
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put(name, getSmallCase(name));
-        map.put(BOOLEAN_DATA_TYPE, SELECT_ALL_CHILD);
+        map.put(getSmallCase(name), name);
+        map.put(SELECT_ALL_CHILD, BOOLEAN_DATA_TYPE);
 
         return method + multiAttrMethodSignature(PROCESS_SUBTREE_FILTERING,
                                                  EMPTY_STRING, EMPTY_STRING,
@@ -1604,56 +1646,115 @@ public final class MethodsGenerator {
     /**
      * Generates fromString code for bits.
      *
-     * @param attr attribute information
-     * @param yangBits parsed yang bits
      * @return generated fromString code for bits.
      */
-    private static String getFromStringForBits(JavaAttributeInfo attr, YangBits yangBits) {
-        String targetDataType = getReturnType(attr);
-        String key;
-        YangBit bit;
+    private static String getFromStringForBits(String bitClassName) {
+        StringBuilder sBuild = new StringBuilder();
+        sBuild.append(methodSignature(FROM_STRING_METHOD_NAME, null,
+                                      PUBLIC + SPACE + STATIC,
+                                      FROM_STRING_PARAM_NAME,
+                                      BIT_SET, STRING_DATA_TYPE, CLASS_TYPE))
+                .append(EIGHT_SPACE_INDENTATION)
+                .append(getBitSetAttr(EMPTY_STRING));
         // Split the input string and check each bit name falls in configured yang file
-        String lines = targetDataType + SPACE + TMP_VAL + SPACE + EQUAL + SPACE + NEW + SPACE + targetDataType +
-                OPEN_PARENTHESIS + CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + STRING_DATA_TYPE + SQUARE_BRACKETS + SPACE + BIT_NAMES_VAR + SPACE +
-                EQUAL + SPACE + FROM_STRING_PARAM_NAME + PERIOD + TRIM_STRING + EMPTY_PARAMETER_FUNCTION_CALL +
-                PERIOD + SPLIT_STRING + OPEN_PARENTHESIS + PATTERN + PERIOD + QUOTE_STRING +
-                OPEN_PARENTHESIS +  QUOTES + SPACE + QUOTES + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + SEMI_COLON +
-                NEW_LINE +
-                TWELVE_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS + STRING_DATA_TYPE + SPACE + BIT_NAME_VAR +
-                SPACE + COLON + SPACE + BIT_NAMES_VAR + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
-        boolean firstIf = true;
-        String ifCondition = IF;
-        for (Map.Entry<String, YangBit> entry : yangBits.getBitNameMap().entrySet()) {
-            key = entry.getKey();
-            bit = entry.getValue();
-            if (bit == null) {
-                return null;
-            }
-            if (firstIf) {
-                lines += SIXTEEN_SPACE_INDENTATION;
-            }
-            // Add condition checking for bit name
-            lines += ifCondition + SPACE + OPEN_PARENTHESIS + BIT_NAME_VAR + PERIOD +
-                    EQUALS_STRING + OPEN_PARENTHESIS + QUOTES + key + QUOTES + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS +
-                    SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
-                    TWENTY_SPACE_INDENTATION + TMP_VAL + PERIOD + SET_METHOD_PREFIX + OPEN_PARENTHESIS +
-                    bit.getPosition() + CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE + SIXTEEN_SPACE_INDENTATION +
-                    CLOSE_CURLY_BRACKET;
-            if (firstIf) {
-                ifCondition = SPACE + ELSE_IF;
-                firstIf = false;
-            }
-        }
+        sBuild.append(EIGHT_SPACE_INDENTATION).append(STRING_DATA_TYPE)
+                .append(SQUARE_BRACKETS).append(SPACE).append(BIT_NAMES_VAR)
+                .append(SPACE).append(EQUAL).append(SPACE).append(FROM_STRING_PARAM_NAME)
+                .append(PERIOD).append(TRIM_STRING).append(OPEN_CLOSE_BRACKET_STRING)
+                .append(PERIOD).append(SPLIT_STRING).append(brackets(
+                OPEN_CLOSE_BRACKET_WITH_VALUE, getPatternQuoteString(SPACE),
+                null)).append(signatureClose()).append(getForLoopString(
+                EIGHT_SPACE_INDENTATION, STRING_DATA_TYPE, BIT_NAME_VAR,
+                BIT_NAMES_VAR));
 
-        if (!firstIf) {
-            // This means at least one if condition is added in code generation
-            // Now add else condition for validation
-            lines += SPACE + ELSE + SPACE + OPEN_CURLY_BRACKET + NEW_LINE + TWENTY_SPACE_INDENTATION + RETURN +
-                    SPACE + NULL + SEMI_COLON + NEW_LINE + SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET;
-        }
+        String small = getSmallCase(bitClassName);
+        sBuild.append(TWELVE_SPACE_INDENTATION).append(bitClassName).append
+                (SPACE).append(small).append(SPACE).append(EQUAL).append
+                (SPACE).append(bitClassName).append(PERIOD).append(OF).append
+                (brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, BIT_NAME_VAR, null))
+                .append(signatureClose());
+        String condition = small + SPACE + NOT + EQUAL + SPACE + NULL;
+        sBuild.append(getIfConditionBegin(TWELVE_SPACE_INDENTATION, condition))
+                .append(TWELVE_SPACE_INDENTATION)
+                .append(TMP_VAL).append(PERIOD).append(SET_METHOD_PREFIX)
+                .append(OPEN_PARENTHESIS)
+                .append(small).append(PERIOD).append(small).append(
+                OPEN_CLOSE_BRACKET_STRING).append(CLOSE_PARENTHESIS)
+                .append(signatureClose()).append(methodClose(TWELVE_SPACE))
+                .append(methodClose(EIGHT_SPACE));
+        sBuild.append(getReturnString(TMP_VAL, EIGHT_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        return sBuild.toString();
+    }
 
-        lines += NEW_LINE + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
-        return lines;
+    /**
+     * Returns union class's to string method.
+     *
+     * @param types list of types
+     * @return union class's to string method
+     */
+    static String getUnionToStringMethod(List<YangType<?>> types) {
+
+        StringBuilder builder = new StringBuilder(getOverRideString());
+        builder.append(methodSignature(TO_STRING_METHOD, null, PUBLIC, null,
+                                       STRING_DATA_TYPE, null, CLASS_TYPE))
+                .append(getMoreObjectAttr());
+        for (YangType type : types) {
+            builder.append(getIfConditionBegin(
+                    EIGHT_SPACE_INDENTATION, getSetValueParaCondition(
+                            types.indexOf(type))))
+                    .append(TWELVE_SPACE_INDENTATION).append(HELPER).append(
+                    methodBody(TO_STRING, getCamelCase(type.getDataTypeName()
+                            , null), null, EMPTY_STRING, null, null, false, null))
+                    .append(signatureClose()).append(methodClose(EIGHT_SPACE));
+        }
+        builder.append(getReturnString(HELPER, EIGHT_SPACE_INDENTATION))
+                .append(PERIOD).append(TO_STRING_METHOD)
+                .append(OPEN_CLOSE_BRACKET_STRING).append(signatureClose())
+                .append(methodClose(FOUR_SPACE));
+        return builder.toString();
+    }
+
+    /**
+     * Returns from string method for bits class.
+     *
+     * @param className bits class name
+     * @return from string method for bits class
+     */
+    static String getBitSetEnumClassFromString(String className) {
+        return getJavaDoc(FROM_METHOD, className, false, null) +
+                getFromStringForBits(className);
+    }
+
+    static String getBitSetEnumClassToString(String className,
+                                             YangEnumeration enumeration) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(methodSignature(TO_STRING_METHOD, null, PUBLIC, BITS,
+                                       STRING_DATA_TYPE, BIT_SET, CLASS_TYPE))
+                .append(getMoreObjectAttr());
+        String condition;
+        String name;
+        for (YangEnum yangEnum : enumeration.getEnumSet()) {
+            name = yangEnum.getNamedValue();
+            condition = BITS + PERIOD + GET + OPEN_PARENTHESIS +
+                    className + PERIOD + getEnumJavaAttribute(name).toUpperCase()
+                    + PERIOD + getSmallCase(className)
+                    + OPEN_CLOSE_BRACKET_STRING + CLOSE_PARENTHESIS;
+
+
+            builder.append(getIfConditionBegin(
+                    EIGHT_SPACE_INDENTATION, condition))
+                    .append(TWELVE_SPACE_INDENTATION).append(HELPER).append(
+                    PERIOD).append(ADD_STRING).append(OPEN_PARENTHESIS)
+                    .append(getQuotedString(name)).append(COMMA).append(SPACE)
+                    .append(getQuotedString(name)).append(CLOSE_PARENTHESIS)
+                    .append(signatureClose()).append(methodClose(EIGHT_SPACE));
+        }
+        builder.append(getReturnString(HELPER, EIGHT_SPACE_INDENTATION))
+                .append(PERIOD).append(TO_STRING_METHOD)
+                .append(OPEN_CLOSE_BRACKET_STRING).append(signatureClose())
+                .append(methodClose(FOUR_SPACE));
+        return builder.toString();
     }
 }

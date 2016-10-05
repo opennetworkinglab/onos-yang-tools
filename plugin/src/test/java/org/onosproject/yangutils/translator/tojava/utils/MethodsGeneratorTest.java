@@ -20,16 +20,19 @@ import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getBuild;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getBuildForInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getConstructor;
@@ -43,6 +46,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterForTypeDefClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getTypeConstructorStringAndJavaDoc;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getUnionToStringMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCheckNotNull;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
@@ -92,6 +96,17 @@ public final class MethodsGeneratorTest {
 
     private static final String CLASS_NAME = "Testname";
     private static final String ATTRIBUTE_NAME = "testname";
+    private static final String SET = "setValue.set(0);\n";
+    private static final String UNION = "    @Override\n" +
+            "    public String toString() {\n" +
+            "        MoreObjects.ToStringHelper helper =" +
+            " MoreObjects.toStringHelper(getClass())\n" +
+            "                .omitNullValues();\n" +
+            "        if (setValue.get(0)) {\n" +
+            "            helper.add(\"string\", string);\n" +
+            "        }\n" +
+            "        return helper.toString();\n" +
+            "    }";
 
     /**
      * Unit test for private constructor.
@@ -122,12 +137,24 @@ public final class MethodsGeneratorTest {
     @Test
     public void getTypeConstructorTest() {
 
-        YangPluginConfig pluginConfig = new YangPluginConfig();
         JavaAttributeInfo testAttr = getTestAttribute();
-        String test = getTypeConstructorStringAndJavaDoc(testAttr, CLASS_NAME
-        );
+        String test = getTypeConstructorStringAndJavaDoc(
+                testAttr, CLASS_NAME, GENERATE_TYPEDEF_CLASS, 0);
         assertThat(true, is(test.contains(PUBLIC + SPACE + CLASS_NAME +
                                                   OPEN_PARENTHESIS)));
+    }
+
+    /**
+     * Unit test case for checking the parse builder and type constructor.
+     */
+    @Test
+    public void getTypeConstructorForUnionTest() {
+        JavaAttributeInfo testAttr = getTestAttribute();
+        String test = getTypeConstructorStringAndJavaDoc(
+                testAttr, CLASS_NAME, GENERATE_UNION_CLASS, 0);
+        assertThat(true, is(test.contains(PUBLIC + SPACE + CLASS_NAME +
+                                                  OPEN_PARENTHESIS)));
+        assertThat(true, is(test.contains(SET)));
     }
 
     /**
@@ -176,7 +203,6 @@ public final class MethodsGeneratorTest {
     @Test
     public void getConstructorTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
-        YangPluginConfig pluginConfig = new YangPluginConfig();
         String method = getConstructor(testAttr, GENERATE_SERVICE_AND_MANAGER
         );
         assertThat(true, is(method.contains(
@@ -191,7 +217,6 @@ public final class MethodsGeneratorTest {
      */
     @Test
     public void getConstructorStartTest() {
-        YangPluginConfig pluginConfig = new YangPluginConfig();
         String method = getConstructorStart(CLASS_NAME, false);
         assertThat(true, is(method.contains(
                 PROTECTED + SPACE + DEFAULT_CAPS + CLASS_NAME +
@@ -224,6 +249,18 @@ public final class MethodsGeneratorTest {
                         OPEN_PARENTHESIS + QUOTES + testAttr.getAttributeName() +
                         QUOTES + COMMA + SPACE + testAttr.getAttributeName() +
                         CLOSE_PARENTHESIS)));
+    }
+
+    /**
+     * Test for to string method.
+     */
+    @Test
+    public void getToStringMethodForUnionTest() {
+        JavaAttributeInfo testAttr = getTestAttribute();
+        List<YangType<?>> types = new ArrayList<>();
+        types.add(testAttr.getAttributeType());
+        String method = getUnionToStringMethod(types);
+        assertThat(true, is(method.contains(UNION)));
     }
 
     /**

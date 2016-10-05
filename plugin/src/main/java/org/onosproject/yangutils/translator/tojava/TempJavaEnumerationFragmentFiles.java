@@ -24,6 +24,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ENUM_IMPL_MASK;
@@ -59,6 +60,7 @@ public class TempJavaEnumerationFragmentFiles
      * Java file handle for enum class.
      */
     private File enumClassJavaFileHandle;
+    private boolean isEnumClass;
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -66,7 +68,7 @@ public class TempJavaEnumerationFragmentFiles
      * @param javaFileInfo generated java file info
      * @throws IOException when fails to create new file handle
      */
-    TempJavaEnumerationFragmentFiles(JavaFileInfoTranslator javaFileInfo)
+    public TempJavaEnumerationFragmentFiles(JavaFileInfoTranslator javaFileInfo)
             throws IOException {
 
         super(javaFileInfo);
@@ -106,7 +108,8 @@ public class TempJavaEnumerationFragmentFiles
      * @param config  plugin configurations
      * @throws IOException when fails to do IO operations
      */
-    void addEnumAttributeToTempFiles(YangNode curNode, YangPluginConfig config)
+    public void addEnumAttributeToTempFiles(YangNode curNode,
+                                            YangPluginConfig config)
             throws IOException {
 
         addJavaSnippetInfoToApplicableTempFiles(getJavaAttributeForEnum(config),
@@ -174,9 +177,11 @@ public class TempJavaEnumerationFragmentFiles
     @Override
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
+
+        List<String> imports = this.getJavaImportData().getImports();
         createPackage(curNode);
         enumClassJavaFileHandle = getJavaFileHandle(getJavaClassName(EMPTY_STRING));
-        generateEnumClassFile(enumClassJavaFileHandle, curNode);
+        generateEnumClassFile(enumClassJavaFileHandle, curNode, imports);
         freeTemporaryResources(false);
     }
 
@@ -191,6 +196,21 @@ public class TempJavaEnumerationFragmentFiles
             throws IOException {
         closeFile(enumClassJavaFileHandle, isErrorOccurred);
         closeFile(enumClassTempFileHandle, true);
-        super.freeTemporaryResources(isErrorOccurred);
+        if (isEnumClass) {
+            super.freeTemporaryResources(isErrorOccurred);
+        }
+    }
+
+    public boolean isEnumClass() {
+        return isEnumClass;
+    }
+
+    /**
+     * Sets  true if free super resources is required.
+     *
+     * @param enumClass true if free super resources is required
+     */
+    public void setEnumClass(boolean enumClass) {
+        isEnumClass = enumClass;
     }
 }

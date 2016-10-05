@@ -27,23 +27,26 @@ import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
+import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaGroupingTranslator;
+import org.onosproject.yangutils.translator.tojava.utils.BitsJavaInfoHandler;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
-import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPE_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
@@ -98,6 +101,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorT
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST_IMPORT;
+import static org.onosproject.yangutils.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
@@ -106,6 +110,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION_IMPORT;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_CLASS;
@@ -398,6 +403,11 @@ public class TempJavaFragmentFiles {
     private boolean isAttributePresent;
 
     /**
+     * List of bits attributes.
+     */
+    private List<BitsJavaInfoHandler> bitsHandler = new ArrayList<>();
+
+    /**
      * Creates an instance of temp JAVA fragment files.
      */
     TempJavaFragmentFiles() {
@@ -460,13 +470,13 @@ public class TempJavaFragmentFiles {
         if (javaFlagSet(GENERATE_TYPE_CLASS)) {
             addGeneratedTempFile(ATTRIBUTES_MASK | GETTER_FOR_CLASS_MASK |
                                          HASH_CODE_IMPL_MASK | EQUALS_IMPL_MASK |
-                                         TO_STRING_IMPL_MASK |
                                          FROM_STRING_IMPL_MASK);
+
+            if (getGeneratedJavaFiles() != GENERATE_UNION_CLASS) {
+                addGeneratedTempFile(TO_STRING_IMPL_MASK);
+            }
         }
-        //Initialize temp files to generate enum class.
-        if (javaFlagSet(GENERATE_ENUM_CLASS)) {
-            addGeneratedTempFile(FROM_STRING_IMPL_MASK);
-        }
+
         //Set temporary file handles
         if (tempFlagSet(ATTRIBUTES_MASK)) {
             attributesTempFileHandle =
@@ -712,12 +722,57 @@ public class TempJavaFragmentFiles {
                                     boolean listAttribute) {
         container.setConflictResolveConfig(config.getConflictResolver());
         container.updateJavaQualifiedInfo();
-        return getAttributeInfoForTheData(
+        addImportForLeafInfo(tempFiles, container);
+        JavaAttributeInfo attr = getAttributeInfoForTheData(
                 container.getJavaQualifiedInfo(),
                 container.getJavaName(config.getConflictResolver()),
                 container.getDataType(),
                 tempFiles.getIsQualifiedAccessOrAddToImportList(
                         container.getJavaQualifiedInfo()), listAttribute);
+        if (container.getDataType().getDataType() == YangDataTypes.BITS) {
+            addBitsHandler(attr, container.getDataType(), tempFiles);
+        }
+        return attr;
+    }
+
+    /**
+     * Adds bits handler attribute for bits to string method.
+     *
+     * @param attr      attribute
+     * @param type      type
+     * @param tempFiles temp fragment file
+     */
+    static void addBitsHandler(JavaAttributeInfo attr, YangType type,
+                               TempJavaFragmentFiles tempFiles) {
+        BitsJavaInfoHandler handler
+                = new BitsJavaInfoHandler(attr, type);
+        tempFiles.getBitsHandler().add(handler);
+    }
+
+    /**
+     * Adds attribute types import to leaf info container's parent.
+     *
+     * @param tempFiles temp java file
+     * @param container leaf info container
+     */
+    private static void addImportForLeafInfo(TempJavaFragmentFiles tempFiles,
+                                             JavaLeafInfoContainer container) {
+        String containedInCls = getCapitalCase(tempFiles.getJavaFileInfo()
+                                                       .getJavaName());
+        String containedInPkg = tempFiles.getJavaFileInfo().getPackage();
+        JavaQualifiedTypeInfoTranslator info = new JavaQualifiedTypeInfoTranslator();
+        if (container.getDataType().getDataType() == YangDataTypes.BITS) {
+            //Add bitset import for type and leaf value flags.
+            info = new JavaQualifiedTypeInfoTranslator();
+            info.setClassInfo(BIT_SET);
+            info.setPkgInfo(JAVA_UTIL_PKG);
+            tempFiles.getJavaImportData().addImportInfo(info, containedInCls,
+                                                        containedInPkg);
+        }
+        tempFiles.getJavaImportData().addImportInfo(
+                (JavaQualifiedTypeInfoTranslator) container
+                        .getJavaQualifiedInfo(), containedInCls, containedInPkg);
+
     }
 
     /**
@@ -1112,13 +1167,11 @@ public class TempJavaFragmentFiles {
         name.append(getGeneratedJavaClassName());
         if (rootNode && !toAppend.equals(BUILDER)) {
             name.append(OP_PARAM);
-            return getDefaultConstructorString(name.toString(), modifier
-            );
+            return getDefaultConstructorString(name.toString(), modifier);
         }
         if (suffix) {
             name.append(toAppend);
-            return getDefaultConstructorString(name.toString(), modifier
-            );
+            return getDefaultConstructorString(name.toString(), modifier);
         }
         StringBuilder appended = new StringBuilder();
         if (toAppend.equals(DEFAULT)) {
@@ -1172,13 +1225,14 @@ public class TempJavaFragmentFiles {
      *
      * @param attr           type attribute info
      * @param fromStringAttr from string attribute info
+     * @param genClassName   generated class name
      * @throws IOException when fails to append to temporary file
      */
     void addFromStringMethod(JavaAttributeInfo attr,
-                             JavaAttributeInfo fromStringAttr)
+                             JavaAttributeInfo fromStringAttr, String genClassName)
             throws IOException {
         appendToFile(fromStringImplTempFileHandle,
-                     getFromStringMethod(attr, fromStringAttr) + NEW_LINE);
+                     getFromStringMethod(attr, fromStringAttr, genClassName) + NEW_LINE);
     }
 
     /**
@@ -1489,7 +1543,8 @@ public class TempJavaFragmentFiles {
                                 typeInfo, newAttrInfo.getAttributeName(),
                                 attrType, getIsQualifiedAccessOrAddToImportList(
                                         typeInfo), false);
-                addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
+                addFromStringMethod(newAttrInfo, fromStringAttributeInfo,
+                                    getGeneratedJavaClassName());
             }
         }
     }
@@ -1584,17 +1639,7 @@ public class TempJavaFragmentFiles {
                 addArrayListImport(imports);
             }
 
-            boolean leavesPresent;
-            if (curNode instanceof YangLeavesHolder) {
-                YangLeavesHolder leavesHolder = (YangLeavesHolder) curNode;
-                leavesPresent = leavesHolder.getListOfLeaf() != null &&
-                        !leavesHolder.getListOfLeaf().isEmpty() ||
-                        leavesHolder.getListOfLeafList() != null &&
-                                !leavesHolder.getListOfLeafList().isEmpty();
-                if (leavesPresent) {
-                    addBitsetImport(imports);
-                }
-            }
+            addBitsAndBase64Imports(curNode, imports);
             if (curNode instanceof YangAugmentableNode) {
                 addImportsForAugmentableClass(imports, true, false, curNode);
                 addInvocationExceptionImport(imports);
@@ -1637,8 +1682,17 @@ public class TempJavaFragmentFiles {
         }
     }
 
-    private void addBitsetImport(List<String> imports) {
-        imports.add(javaImportData.getImportForToBitSet());
+    //Adds import for bitset and base64 list.
+    private void addBitsAndBase64Imports(YangNode curNode, List<String> imports) {
+        if (curNode instanceof YangLeavesHolder) {
+            YangLeavesHolder holder = (YangLeavesHolder) curNode;
+            String impt = this.getJavaImportData()
+                    .getImportForToBitSet();
+            if (!holder.getListOfLeaf().isEmpty() &&
+                    !imports.contains(impt)) {
+                imports.add(impt);
+            }
+        }
     }
 
     /**
@@ -1875,4 +1929,14 @@ public class TempJavaFragmentFiles {
     private boolean tempFlagSet(int flag) {
         return (tempFilesFlagSet & flag) != 0;
     }
+
+    /**
+     * Returns list of bits attributes.
+     *
+     * @return list of bits attributes
+     */
+    public List<BitsJavaInfoHandler> getBitsHandler() {
+        return bitsHandler;
+    }
+
 }

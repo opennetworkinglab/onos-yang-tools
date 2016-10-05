@@ -51,6 +51,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_RPC;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_SETTERS;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_SETTERS_COMMON;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
+import static org.onosproject.yangutils.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE_ASTERISK;
@@ -74,7 +75,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.VOID;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 
 /**
  * Represents javadoc for the generated classes.
@@ -587,8 +587,8 @@ public final class JavaDocGen {
     public static String generateForValidatorMethod() {
         return getJavaDocStartLine(VALIDATE_RANGE, JAVA_DOC_FOR_VALIDATOR) +
                 getJavaDocEmptyAsteriskLine() +
-                trimAtLast(getJavaDocParamLine(MIN_RANGE, MIN_RANGE), NEW_LINE) +
                 getJavaDocParamLine(MIN_RANGE, MIN_RANGE) +
+                getJavaDocParamLine(MAX_RANGE, MIN_RANGE) +
                 getJavaDocReturnLine(JAVA_DOC_FOR_VALIDATOR_RETURN) +
                 getJavaDocEndLine();
     }

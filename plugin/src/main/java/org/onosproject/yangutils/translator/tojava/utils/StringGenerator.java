@@ -41,9 +41,11 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIfConditionForAddToListMethod;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
+import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
 import static org.onosproject.yangutils.utils.UtilConstants.AT;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_DECIMAL;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
+import static org.onosproject.yangutils.utils.UtilConstants.BITSET;
 import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
@@ -74,6 +76,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.FOR;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.FROM_STRING_METHOD_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.GET;
+import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_METHOD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yangutils.utils.UtilConstants.IMPORT;
@@ -88,12 +91,14 @@ import static org.onosproject.yangutils.utils.UtilConstants.LONG_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.MAP;
+import static org.onosproject.yangutils.utils.UtilConstants.MORE_OBJ_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OF;
 import static org.onosproject.yangutils.utils.UtilConstants.OMIT_NULL_VALUE_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.OVERRIDE;
@@ -102,19 +107,24 @@ import static org.onosproject.yangutils.utils.UtilConstants.PARSE_BYTE;
 import static org.onosproject.yangutils.utils.UtilConstants.PARSE_INT;
 import static org.onosproject.yangutils.utils.UtilConstants.PARSE_LONG;
 import static org.onosproject.yangutils.utils.UtilConstants.PARSE_SHORT;
+import static org.onosproject.yangutils.utils.UtilConstants.PATTERN;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PUT;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
+import static org.onosproject.yangutils.utils.UtilConstants.QUOTE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
+import static org.onosproject.yangutils.utils.UtilConstants.SET_VALUE_PARA;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
+import static org.onosproject.yangutils.utils.UtilConstants.STRING_BUILDER;
+import static org.onosproject.yangutils.utils.UtilConstants.STRING_BUILDER_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.TRY;
@@ -136,7 +146,6 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 /**
  * Represents string generator for translator.
  */
-@SuppressWarnings("HardcodedFileSeparator")
 public final class StringGenerator {
 
     private StringGenerator() {
@@ -203,8 +212,8 @@ public final class StringGenerator {
     static String getNewInstance(String returnType, String varName,
                                  String space, String value) {
         return space + returnType + SPACE + varName + SPACE + EQUAL + SPACE +
-                NEW + returnType + brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
-                                            value, null) + signatureClose();
+                NEW + SPACE + returnType + brackets(
+                OPEN_CLOSE_BRACKET_WITH_VALUE, value, null) + signatureClose();
     }
 
     /**
@@ -270,20 +279,24 @@ public final class StringGenerator {
      * @param prefix          prefix for internal method
      * @param paramType       parameter type
      * @param isBuilderSetter is for builder setter
+     * @param setterVal       value to set in setter
      * @return body of the method
      */
     static String methodBody(MethodBodyTypes type, String paraName,
                              String methodName,
                              String space, String prefix,
-                             String paramType, boolean isBuilderSetter) {
+                             String paramType, boolean isBuilderSetter, String setterVal) {
         StringBuilder builder = new StringBuilder();
         String body;
         switch (type) {
             case GETTER:
                 return getReturnString(paraName, space);
             case SETTER:
+                if (setterVal == null) {
+                    setterVal = paraName;
+                }
                 body = space + THIS + PERIOD + paraName + SPACE + EQUAL + SPACE +
-                        paraName + signatureClose();
+                        setterVal + signatureClose();
                 builder.append(body);
                 if (isBuilderSetter) {
                     body = getReturnString(THIS + signatureClose(), space);
@@ -341,13 +354,24 @@ public final class StringGenerator {
                                 OPEN_CLOSE_BRACKET_WITH_VALUE, VALUE, null)
                                 + signatureClose(), space);
             case TO_STRING:
-                return space + PERIOD + ADD_STRING + OPEN_PARENTHESIS + QUOTES +
-                        paraName + QUOTES + COMMA + SPACE + paraName +
+                return getToStringMethodsAddString(space, paraName) + paraName +
                         CLOSE_PARENTHESIS;
             case EQUALS_METHOD:
             default:
                 return null;
         }
+    }
+
+    /**
+     * Returns to string method's add string.
+     *
+     * @param space    indentation
+     * @param paraName parameter name
+     * @return to string method's add string
+     */
+    static String getToStringMethodsAddString(String space, String paraName) {
+        return space + PERIOD + ADD_STRING + OPEN_PARENTHESIS +
+                getQuotedString(paraName) + COMMA + SPACE;
     }
 
     /**
@@ -462,6 +486,9 @@ public final class StringGenerator {
             method = modifier + SPACE;
         }
         methodBuilder.append(method);
+        if (prefix == null) {
+            prefix = EMPTY_STRING;
+        }
         if (methodReturnType != null) {
             method = methodReturnType + SPACE + prefix + methodName;
         } else {
@@ -471,7 +498,7 @@ public final class StringGenerator {
         methodBuilder.append(method)
                 .append(OPEN_PARENTHESIS);
         for (Map.Entry<String, String> param : params.entrySet()) {
-            methodBuilder.append(methodParam(param.getKey(), param.getValue()));
+            methodBuilder.append(methodParam(param.getValue(), param.getKey()));
             methodBuilder.append(commaWithSpace());
         }
         String para = methodBuilder.toString();
@@ -504,6 +531,9 @@ public final class StringGenerator {
         String method = EMPTY_STRING;
         if (modifier != null) {
             method = modifier + SPACE;
+        }
+        if (prefix == null) {
+            prefix = EMPTY_STRING;
         }
         methodBuilder.append(method);
         if (methodReturnType != null) {
@@ -637,10 +667,11 @@ public final class StringGenerator {
      *
      * @param type     type of conflict
      * @param addFirst true int/long need to be added first
+     * @param val      value to set
      * @return if condition string for typedef constructor
      */
     static String ifConditionForIntInTypeDefConstructor(ValidatorTypeForUnionTypes type,
-                                                        boolean addFirst) {
+                                                        boolean addFirst, String val) {
         String condition =
                 EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS +
                         VALIDATE_RANGE + OPEN_PARENTHESIS;
@@ -649,28 +680,28 @@ public final class StringGenerator {
             case INT_TYPE_CONFLICT:
                 if (addFirst) {
                     condition = condition + INT_MIN_RANGE + COMMA + SPACE +
-                            INT_MAX_RANGE + COMMA + SPACE + VALUE;
+                            INT_MAX_RANGE + COMMA + SPACE + val;
                 } else {
                     condition = condition + UINT_MIN_RANGE + COMMA + SPACE +
-                            UINT_MAX_RANGE + COMMA + SPACE + VALUE;
+                            UINT_MAX_RANGE + COMMA + SPACE + val;
                 }
                 break;
             case LONG_TYPE_CONFLICT:
                 if (addFirst) {
                     condition = condition + LONG_MIN_RANGE + COMMA + SPACE +
-                            LONG_MAX_RANGE + COMMA + SPACE + VALUE;
+                            LONG_MAX_RANGE + COMMA + SPACE + val;
                 } else {
                     condition = condition + ULONG_MIN_RANGE + COMMA + SPACE +
-                            ULONG_MAX_RANGE + COMMA + SPACE + VALUE;
+                            ULONG_MAX_RANGE + COMMA + SPACE + val;
                 }
                 break;
             case SHORT_TYPE_CONFLICT:
                 if (addFirst) {
                     condition = condition + SHORT_MIN_RANGE + COMMA + SPACE +
-                            SHORT_MAX_RANGE + COMMA + SPACE + VALUE;
+                            SHORT_MAX_RANGE + COMMA + SPACE + val;
                 } else {
                     condition = condition + UINT8_MIN_RANGE + COMMA + SPACE +
-                            UINT8_MAX_RANGE + COMMA + SPACE + VALUE;
+                            UINT8_MAX_RANGE + COMMA + SPACE + val;
                 }
                 break;
             default:
@@ -717,10 +748,10 @@ public final class StringGenerator {
             case EMPTY:
             case BOOLEAN:
                 return BOOLEAN_WRAPPER + PERIOD + PARSE_BOOLEAN;
-            case BITS:
-            case UNION:
             case ENUMERATION:
+                return targetDataType + PERIOD + OF;
             case DERIVED:
+            case UNION:
                 return targetDataType + PERIOD + FROM_STRING_METHOD_NAME;
             default:
                 throw new TranslatorException("given data type is not " +
@@ -752,7 +783,7 @@ public final class StringGenerator {
      * @return sub string with return statement for union's from string method
      */
     static String getReturnOfSubString() {
-        return getReturnString(OF, EIGHT_SPACE_INDENTATION) +
+        return getReturnString(OF, TWELVE_SPACE_INDENTATION) +
                 brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, TMP_VAL, null) +
                 signatureClose();
     }
@@ -1053,5 +1084,110 @@ public final class StringGenerator {
         return new StringBuilder().append(msg).append(name).append(IN)
                 .append(line).append(AT).append(position).append(IN)
                 .append(fileName).toString();
+    }
+
+    /**
+     * Returns string builder attribute string;
+     *
+     * @param init  first param to be appended to string builder
+     * @param space indentation space
+     * @return string builder attribute
+     */
+    static String getStringBuilderAttr(String init, String space) {
+        StringBuilder builder = new StringBuilder(space);
+        builder.append(STRING_BUILDER).append(SPACE).append(STRING_BUILDER_VAR)
+                .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
+                .append(SPACE).append(STRING_BUILDER).append(
+                brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, getQuotedString(init), null))
+                .append(signatureClose());
+        return builder.toString();
+    }
+
+    /**
+     * Returns quoted string.
+     *
+     * @param name name to be quoted
+     * @return quoted string
+     */
+    static String getQuotedString(String name) {
+        return QUOTES + name + QUOTES;
+    }
+
+    /**
+     * Returns string builder's append string.
+     *
+     * @param append data to be append
+     * @param space  indentation
+     * @return string builder's append string
+     */
+    static String getStringBuilderAppendString(String append, String space) {
+        return space + STRING_BUILDER_VAR + PERIOD + APPEND + OPEN_PARENTHESIS +
+                append + CLOSE_PARENTHESIS + signatureClose();
+    }
+
+    /**
+     * Returns pattern quote string.
+     *
+     * @param type type for pattern is needed
+     * @return pattern quote string
+     */
+    static String getPatternQuoteString(String type) {
+        return PATTERN + PERIOD + QUOTE_STRING + brackets(
+                OPEN_CLOSE_BRACKET_WITH_VALUE, getQuotedString(type), null);
+    }
+
+    /**
+     * Returns bitset attribute.
+     *
+     * @param indentation indentation
+     * @return bitset attribute
+     */
+    static String getBitSetAttr(String indentation) {
+        StringBuilder builder = new StringBuilder(indentation);
+        return builder.append(BITSET).append(SPACE).append(TMP_VAL)
+                .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
+                .append(SPACE).append(BITSET).append(OPEN_CLOSE_BRACKET_STRING)
+                .append(signatureClose()).toString();
+    }
+
+    /**
+     * Returns for loop string
+     *
+     * @param space indentation
+     * @param type  data type
+     * @param var   variable
+     * @param data  data variable/collection
+     * @return for loop string
+     */
+    static String getForLoopString(String space, String type, String var,
+                                   String data) {
+        return space + FOR + SPACE + OPEN_PARENTHESIS + type + SPACE + var +
+                SPACE + COLON + SPACE + data + CLOSE_PARENTHESIS +
+                methodSignatureClose(CLASS_TYPE);
+    }
+
+    /**
+     * Returns set value parameter's get string for union to string method.
+     *
+     * @param count count of type
+     * @return get string
+     */
+    static String getSetValueParaCondition(int count) {
+        return SET_VALUE_PARA + PERIOD + GET + brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
+                                                        count + EMPTY_STRING, null);
+    }
+
+    /**
+     * Returns more object attr for union to string method.
+     *
+     * @return more object attr for union to string method
+     */
+    static String getMoreObjectAttr() {
+        StringBuilder attr = new StringBuilder(EIGHT_SPACE_INDENTATION);
+        String[] array = {NEW_LINE};
+        attr.append(MORE_OBJ_ATTR).append(GOOGLE_MORE_OBJECT_METHOD_STRING)
+                .append(NEW_LINE).append(FOUR_SPACE_INDENTATION).append(trimAtLast(
+                getOmitNullValueString(), array)).append(signatureClose());
+        return attr.toString();
     }
 }

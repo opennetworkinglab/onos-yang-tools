@@ -164,7 +164,8 @@ final class ClassDefinitionGenerator {
      * @return enum file class definition
      */
     private static String getEnumClassDefinition(String yangName) {
-        return getDefaultDefinition(ENUM, yangName, PUBLIC);
+        return trimAtLast(getDefaultDefinition(ENUM, yangName, PUBLIC),
+                          NEW_LINE);
     }
 
     /**

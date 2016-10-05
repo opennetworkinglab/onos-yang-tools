@@ -36,6 +36,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.signatureClose;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
+import static org.onosproject.yangutils.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
@@ -56,6 +57,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
@@ -66,6 +68,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.SCHEMA_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
+import static org.onosproject.yangutils.utils.UtilConstants.SET_VALUE_PARA;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SHORT_MIN_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
@@ -233,8 +236,8 @@ public final class JavaCodeSnippetGen {
     /**
      * Returns string for enum's attribute for enum class.
      *
-     * @param name   name of attribute
-     * @param value  value of the enum
+     * @param name  name of attribute
+     * @param value value of the enum
      * @return string for enum's attribute
      */
     public static String generateEnumAttributeStringWithSchemaName(
@@ -320,7 +323,7 @@ public final class JavaCodeSnippetGen {
         return getJavaAttributeDefinition(null, INT, className,
                                           false, PRIVATE, null) +
                 getJavaAttributeDefinition(null, STRING_DATA_TYPE, SCHEMA_NAME,
-                                           false, PRIVATE, null);
+                                           false, PRIVATE, null) + NEW_LINE;
     }
 
     /**
@@ -417,9 +420,9 @@ public final class JavaCodeSnippetGen {
     private static String getTypeConflictAttributeStrings(String modifier,
                                                           String attr1,
                                                           String att2) {
-        return NEW_LINE + FOUR_SPACE_INDENTATION + modifier + SPACE +
+        return FOUR_SPACE_INDENTATION + modifier + SPACE +
                 attr1 + FOUR_SPACE_INDENTATION + modifier +
-                SPACE + att2;
+                SPACE + att2 + NEW_LINE;
     }
 
     /**
@@ -482,5 +485,20 @@ public final class JavaCodeSnippetGen {
     static String getYangAugmentedMapObjectForConstruct() {
         return "        this.yangAugmentedInfoMap = builderObject" +
                 ".yangAugmentedInfoMap();\n";
+    }
+
+    /**
+     * Returns set value parameter for union class.
+     *
+     * @return set value parameter for union class.
+     */
+    static String getSetValueParaForUnionClass() {
+        String[] array = {NEW_LINE, SEMI_COLON};
+        return new StringBuilder().append(trimAtLast(
+                getJavaAttributeDefinition(null, BIT_SET, SET_VALUE_PARA,
+                                           false, PRIVATE, null), array))
+                .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
+                .append(SPACE).append(BIT_SET).append(OPEN_CLOSE_BRACKET_STRING)
+                .append(signatureClose()).toString();
     }
 }

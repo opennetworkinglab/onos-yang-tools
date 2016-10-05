@@ -45,7 +45,7 @@ public final class YangFileScanner {
      * @throws IOException          when files get deleted while performing the
      *                              operations
      */
-    static List<String> getJavaFiles(String root) throws IOException {
+    public static List<String> getJavaFiles(String root) throws IOException {
         return getFiles(root, JAVA_FILE_EXTENSION);
     }
 

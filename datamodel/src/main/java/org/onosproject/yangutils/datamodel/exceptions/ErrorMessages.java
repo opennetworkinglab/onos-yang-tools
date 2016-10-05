@@ -28,6 +28,8 @@ public final class ErrorMessages {
     private static final String AS = "as ";
     public static final String QUOTES = "\"";
     public static final String CASE = " case ";
+    public static final String INPUT = " input ";
+    public static final String OUTPUT = " output ";
     public static final String CHOICE = " choice ";
     public static final String GROUPING = " grouping ";
     public static final String TYPEDEF = " typedef ";
@@ -95,5 +97,4 @@ public final class ErrorMessages {
                 .append(QUOTES);
         return builder.toString();
     }
-
 }

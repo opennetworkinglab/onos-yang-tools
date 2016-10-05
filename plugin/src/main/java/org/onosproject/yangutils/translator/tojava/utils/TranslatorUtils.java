@@ -118,7 +118,7 @@ public final class TranslatorUtils {
      * @param curNode current YANG node
      * @return type files
      */
-    static TempJavaTypeFragmentFiles getTypeFiles(YangNode curNode) {
+    public static TempJavaTypeFragmentFiles getTypeFiles(YangNode curNode) {
         return ((TempJavaCodeFragmentFilesContainer) curNode)
                 .getTempJavaCodeFragmentFiles().getTypeTempFiles();
     }

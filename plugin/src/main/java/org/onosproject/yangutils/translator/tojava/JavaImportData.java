@@ -35,11 +35,13 @@ import static org.onosproject.yangutils.utils.UtilConstants.HASH_MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_MATH;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
-import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_PKG;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_REGEX_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.LISTENER_SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.ONOS_EVENT_PKG;
+import static org.onosproject.yangutils.utils.UtilConstants.PATTERN;
 import static org.onosproject.yangutils.utils.UtilConstants.QUEUE;
 import static org.onosproject.yangutils.utils.UtilConstants.SET;
 
@@ -215,7 +217,7 @@ public class JavaImportData {
      * @return import for hash and equals method
      */
     String getImportForHashAndEquals() {
-        return getImportString(JAVA_UTIL_OBJECTS_IMPORT_PKG,
+        return getImportString(JAVA_UTIL_PKG,
                                JAVA_UTIL_OBJECTS_IMPORT_CLASS);
     }
 
@@ -224,7 +226,7 @@ public class JavaImportData {
      *
      * @return import for to string method
      */
-    String getImportForToString() {
+    public String getImportForToString() {
         return getImportString(GOOGLE_MORE_OBJECT_IMPORT_PKG,
                                GOOGLE_MORE_OBJECT_IMPORT_CLASS);
     }
@@ -234,8 +236,17 @@ public class JavaImportData {
      *
      * @return import for to bitset method
      */
-    String getImportForToBitSet() {
-        return getImportString(JAVA_UTIL_OBJECTS_IMPORT_PKG, BITSET);
+    public String getImportForToBitSet() {
+        return getImportString(JAVA_UTIL_PKG, BITSET);
+    }
+
+    /**
+     * Returns import for to bitset method.
+     *
+     * @return import for to bitset method
+     */
+    public String getImportForPattern() {
+        return getImportString(JAVA_UTIL_REGEX_PKG, PATTERN);
     }
 
     /**

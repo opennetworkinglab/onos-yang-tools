@@ -57,7 +57,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.CONTINUE;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
-import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_PARAMETER_FUNCTION_CALL;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_VAR;
@@ -144,7 +144,7 @@ public final class SubtreeFilteringMethodsGenerator {
         attrQualifiedType = getIfFilterContentMatchMethodImpl(attributeName,
                                                               type);
         return EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS
-                + GET_VALUE_LEAF_FLAGS + EMPTY_PARAMETER_FUNCTION_CALL +
+                + GET_VALUE_LEAF_FLAGS + OPEN_CLOSE_BRACKET_STRING +
                 PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
                 LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
                 PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS +
@@ -163,7 +163,7 @@ public final class SubtreeFilteringMethodsGenerator {
                 TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE +
                 EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + ELSE +
                 SPACE + IF + SPACE + OPEN_PARENTHESIS +
-                GET_SELECT_LEAF_FLAGS + EMPTY_PARAMETER_FUNCTION_CALL +
+                GET_SELECT_LEAF_FLAGS + OPEN_CLOSE_BRACKET_STRING +
                 PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
                 LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
                 PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS + SPACE +
@@ -174,7 +174,7 @@ public final class SubtreeFilteringMethodsGenerator {
                 SPACE + TRUE + SEMI_COLON + NEW_LINE +
                 TWELVE_SPACE_INDENTATION + SUBTREE_FILTERING_RESULT_BUILDER +
                 PERIOD + attributeName + OPEN_PARENTHESIS + APP_INSTANCE +
-                PERIOD + attributeName + EMPTY_PARAMETER_FUNCTION_CALL +
+                PERIOD + attributeName + OPEN_CLOSE_BRACKET_STRING +
                 CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
                 EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
     }
@@ -648,7 +648,7 @@ public final class SubtreeFilteringMethodsGenerator {
 
         method += EIGHT_SPACE_INDENTATION + RETURN + SPACE +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + BUILD +
-                EMPTY_PARAMETER_FUNCTION_CALL + SEMI_COLON + NEW_LINE +
+                OPEN_CLOSE_BRACKET_STRING + SEMI_COLON + NEW_LINE +
                 FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
 
         return method;
@@ -686,7 +686,7 @@ public final class SubtreeFilteringMethodsGenerator {
 
         method += SIXTEEN_SPACE_INDENTATION + type + SPACE + "result = " +
                 name + PERIOD + PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS +
-                APP_INSTANCE + PERIOD + name + EMPTY_PARAMETER_FUNCTION_CALL
+                APP_INSTANCE + PERIOD + name + OPEN_CLOSE_BRACKET_STRING
                 + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
                 NEW_LINE;
 
@@ -737,7 +737,7 @@ public final class SubtreeFilteringMethodsGenerator {
                                                    type + SPACE + name,
                                                    APP_INSTANCE + PERIOD +
                                                            name +
-                                                           EMPTY_PARAMETER_FUNCTION_CALL);
+                                                           OPEN_CLOSE_BRACKET_STRING);
 
         method = method + SIXTEEN_SPACE_INDENTATION +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
@@ -749,7 +749,7 @@ public final class SubtreeFilteringMethodsGenerator {
         //If need to explicitly participate in query
         method += StringGenerator
                 .getElseIfConditionBegin(EIGHT_SPACE_INDENTATION,
-                                         name + EMPTY_PARAMETER_FUNCTION_CALL +
+                                         name + OPEN_CLOSE_BRACKET_STRING +
                                                  SPACE + NOT + EQUAL +
                                                  SPACE + NULL);
 
@@ -762,7 +762,7 @@ public final class SubtreeFilteringMethodsGenerator {
         //If there is any parameter in the query condition
         method += StringGenerator
                 .getIfConditionBegin(TWELVE_SPACE_INDENTATION, NOT + name +
-                        EMPTY_PARAMETER_FUNCTION_CALL + PERIOD + IS_EMPTY);
+                        OPEN_CLOSE_BRACKET_STRING + PERIOD + IS_EMPTY);
 
         if (isLeafList) {
             /*
@@ -771,12 +771,12 @@ public final class SubtreeFilteringMethodsGenerator {
             method += StringGenerator
                     .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
                                          APP_INSTANCE + PERIOD + name +
-                                                 EMPTY_PARAMETER_FUNCTION_CALL +
+                                                 OPEN_CLOSE_BRACKET_STRING +
                                                  SPACE + EQUAL + EQUAL + SPACE +
                                                  NULL + SPACE + OR_OPERATION
                                                  + SPACE + APP_INSTANCE +
                                                  PERIOD + name +
-                                                 EMPTY_PARAMETER_FUNCTION_CALL +
+                                                 OPEN_CLOSE_BRACKET_STRING +
                                                  PERIOD + IS_EMPTY);
 
             method += TWENTY_SPACE_INDENTATION + RETURN + SPACE + FALSE +
@@ -787,7 +787,7 @@ public final class SubtreeFilteringMethodsGenerator {
             // for instance iterator
             method += StringGenerator.getCollectionIteratorForLoopBegin(
                     SIXTEEN_SPACE_INDENTATION, type + SPACE + name,
-                    name + EMPTY_PARAMETER_FUNCTION_CALL);
+                    name + OPEN_CLOSE_BRACKET_STRING);
 
             method += TWENTY_SPACE_INDENTATION + BOOLEAN_DATA_TYPE + SPACE +
                     "flag" + SPACE + EQUAL + SPACE + FALSE + SEMI_COLON +
@@ -800,7 +800,7 @@ public final class SubtreeFilteringMethodsGenerator {
                                                                "2",
                                                        APP_INSTANCE + PERIOD +
                                                                name +
-                                                               EMPTY_PARAMETER_FUNCTION_CALL);
+                                                               OPEN_CLOSE_BRACKET_STRING);
 
             //the content match leaf list attribute value matches
             method += StringGenerator
@@ -842,12 +842,12 @@ public final class SubtreeFilteringMethodsGenerator {
             method += StringGenerator
                     .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
                                          APP_INSTANCE + PERIOD + name +
-                                                 EMPTY_PARAMETER_FUNCTION_CALL +
+                                                 OPEN_CLOSE_BRACKET_STRING +
                                                  SPACE + NOT + EQUAL + SPACE +
                                                  NULL + SPACE + AND_OPERATION +
                                                  SPACE + NOT + APP_INSTANCE +
                                                  PERIOD + name +
-                                                 EMPTY_PARAMETER_FUNCTION_CALL +
+                                                 OPEN_CLOSE_BRACKET_STRING +
                                                  PERIOD + IS_EMPTY);
 
             /*
@@ -857,13 +857,13 @@ public final class SubtreeFilteringMethodsGenerator {
                     .getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
                                                        type + SPACE + name,
                                                        name +
-                                                               EMPTY_PARAMETER_FUNCTION_CALL);
+                                                               OPEN_CLOSE_BRACKET_STRING);
 
             //loop all the app instance(s)
             method += StringGenerator.getCollectionIteratorForLoopBegin(
                     TWENTY_FOUR_SPACE_INDENTATION, type + SPACE + name + "2",
                     APP_INSTANCE + PERIOD + name +
-                            EMPTY_PARAMETER_FUNCTION_CALL);
+                            OPEN_CLOSE_BRACKET_STRING);
 
             method += TWENTY_EIGHT_SPACE_INDENTATION + type + SPACE +
                     "result = " + name + PERIOD +
@@ -903,12 +903,12 @@ public final class SubtreeFilteringMethodsGenerator {
         method += StringGenerator
                 .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
                                      APP_INSTANCE + PERIOD + name
-                                             + EMPTY_PARAMETER_FUNCTION_CALL +
+                                             + OPEN_CLOSE_BRACKET_STRING +
                                              SPACE + NOT + EQUAL + SPACE +
                                              NULL + SPACE + AND_OPERATION +
                                              SPACE + NOT + APP_INSTANCE +
                                              PERIOD + name +
-                                             EMPTY_PARAMETER_FUNCTION_CALL +
+                                             OPEN_CLOSE_BRACKET_STRING +
                                              PERIOD + IS_EMPTY);
 
         method = method + StringGenerator
@@ -916,7 +916,7 @@ public final class SubtreeFilteringMethodsGenerator {
                                                    type + SPACE + name,
                                                    APP_INSTANCE + PERIOD +
                                                            name +
-                                                           EMPTY_PARAMETER_FUNCTION_CALL);
+                                                           OPEN_CLOSE_BRACKET_STRING);
 
         method = method + TWENTY_FOUR_SPACE_INDENTATION +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING

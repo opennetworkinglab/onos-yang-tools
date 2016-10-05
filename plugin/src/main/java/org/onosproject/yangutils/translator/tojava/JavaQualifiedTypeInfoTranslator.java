@@ -39,8 +39,6 @@ import static org.onosproject.yangutils.translator.tojava.javamodel
 import static org.onosproject.yangutils.translator.tojava.javamodel
         .AttributesJavaDataType.getJavaImportPackage;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
-import static org.onosproject.yangutils.utils.UtilConstants.REGEX_IMPORTS;
-import static org.onosproject.yangutils.utils.UtilConstants.PATTERN;
 
 /**
  * Represents the information about individual imports in the generated file.
@@ -218,9 +216,6 @@ public class JavaQualifiedTypeInfoTranslator
         if (referredTypesAttrInfo.getAttributeType().getDataType() == BINARY) {
             qualifiedInfoOfFromString.setClassInfo(BASE64);
             qualifiedInfoOfFromString.setPkgInfo(COLLECTION_IMPORTS);
-        } else if (referredTypesAttrInfo.getAttributeType().getDataType() == BITS) {
-            qualifiedInfoOfFromString.setClassInfo(PATTERN);
-            qualifiedInfoOfFromString.setPkgInfo(REGEX_IMPORTS);
         } else {
             qualifiedInfoOfFromString.setClassInfo(
                     getJavaImportClass(referredTypesAttrInfo.getAttributeType(),

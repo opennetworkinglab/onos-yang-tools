@@ -115,6 +115,7 @@ public class YangJavaEnumerationTranslator
                 throw new InvalidNodeForTranslatorException();
             }
             generateCodeOfNode(this, yangPlugin);
+            tempFileHandle.getEnumTempFiles().setEnumClass(true);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
                                                       e.getLocalizedMessage()));
