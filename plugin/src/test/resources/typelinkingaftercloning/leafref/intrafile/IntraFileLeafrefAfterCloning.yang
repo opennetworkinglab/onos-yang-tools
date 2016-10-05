@@ -1,0 +1,52 @@
+module org-open-road-m-device {
+    namespace "http://org/openroadm/device";
+    prefix org-open-road-m-device;
+
+    leaf uri {
+        type string;
+    }
+    leaf-list id {
+        type value;
+    }
+    typedef value {
+        type uint8;
+    }
+
+    grouping device-common {
+        leaf node-id {
+            type leafref {
+                path "/uri";
+            }
+            description
+                "Globally unique identifier for a device.";
+            config true;
+            default "open-road-m";
+        }
+        leaf-list node-ref {
+            type leafref {
+                path "/id";
+            }
+        }
+        container network-ref {
+            leaf node-id {
+                type leafref {
+                    path "/id";
+                }
+                description
+                    "Globally unique identifier for a device.";
+                config true;
+                default "open-road-m";
+            }
+            leaf-list node-ref {
+                type leafref {
+                    path "/uri";
+                }
+            }
+        }
+    }
+
+    list node {
+        config false;
+        uses device-common;
+    }
+}

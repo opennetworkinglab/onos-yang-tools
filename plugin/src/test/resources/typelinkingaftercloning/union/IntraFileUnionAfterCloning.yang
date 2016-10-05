@@ -1,0 +1,81 @@
+module org-open-road-m-device {
+    namespace "http://org/openroadm/device";
+    prefix org-open-road-m-device;
+
+    identity syslog-facility {
+        description
+            "The base identity to represent syslog facilities";
+    }
+
+    identity syslog-usability {
+        description
+            "The base identity to represent syslog usabilities";
+    }
+
+    identity syslog-availability {
+        description
+            "The base identity to represent syslog availabilities";
+    }
+
+    typedef value {
+        type identityref {
+            base syslog-availability;
+        }
+    }
+
+    typedef correct {
+        type union {
+            type union {
+                type identityref {
+                    base syslog-availability;
+                }
+                type value;
+            }
+            type identityref {
+                base syslog-usability;
+            }
+        }
+    }
+
+    grouping device-common {
+        leaf facility {
+            type union {
+               type union {
+                   type union {
+                       type identityref {
+                           base syslog-usability;
+                       }
+                       type correct;
+                   }
+                   type identityref {
+                       base syslog-facility;
+                   }
+               }
+               type value;
+            }
+        }
+        container network-ref {
+            leaf-list facility {
+                type union {
+                   type union {
+                       type union {
+                           type identityref {
+                               base syslog-usability;
+                           }
+                           type correct;
+                       }
+                       type identityref {
+                           base syslog-facility;
+                       }
+                   }
+                   type value;
+                }
+            }
+        }
+    }
+
+    list node {
+        config false;
+        uses device-common;
+    }
+}

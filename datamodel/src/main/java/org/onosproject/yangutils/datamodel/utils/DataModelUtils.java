@@ -16,22 +16,6 @@
 
 package org.onosproject.yangutils.datamodel.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 import org.onosproject.yangutils.datamodel.CollisionDetector;
 import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
@@ -57,6 +41,22 @@ import org.onosproject.yangutils.datamodel.YangUnion;
 import org.onosproject.yangutils.datamodel.YangUses;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Represents utilities for data model tree.
@@ -337,195 +337,306 @@ public final class DataModelUtils {
     }
 
     /**
-     * Clones the list of leaves and list of leaf list in the leaves holder.
+     * Adds the list of leaf present under a node to resolution list, after
+     * cloning. Under the cloned node, with cloned leaf, attributes are set
+     * and added to resolution list.
      *
-     * @param leavesHolder YANG node potentially containing leaves or leaf lists
-     * @param yangUses     instance of YANG uses
-     * @throws CloneNotSupportedException clone is not supported
+     * @param clonedNode holder node
+     * @param yangUses   YANG uses
+     * @throws CloneNotSupportedException clone not supported error
      * @throws DataModelException         data model error
      */
-    public static void cloneLeaves(YangLeavesHolder leavesHolder, YangUses yangUses)
+    public static void cloneListOfLeaf(
+            YangLeavesHolder clonedNode, YangUses yangUses)
             throws CloneNotSupportedException, DataModelException {
-        List<YangLeaf> currentListOfLeaves = leavesHolder.getListOfLeaf();
-        if (currentListOfLeaves != null) {
-            List<YangLeaf> clonedLeavesList = new LinkedList<>();
-            for (YangLeaf leaf : currentListOfLeaves) {
+
+        List<YangLeaf> leaves = clonedNode.getListOfLeaf();
+        if (isListPresent(leaves)) {
+            List<YangLeaf> clonedLeaves = new LinkedList<>();
+            for (YangLeaf leaf : leaves) {
                 YangLeaf clonedLeaf = leaf.clone();
                 clonedLeaf.setReferredLeaf(leaf);
-                if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
-                    YangEntityToResolveInfoImpl resolveInfo =
-                            resolveYangConstructsUnderGroupingForLeaf(clonedLeaf, leavesHolder, yangUses);
-                    if (resolveInfo != null) {
-                        yangUses.addEntityToResolve(resolveInfo);
-                    }
-                }
-                clonedLeaf.setContainedIn(leavesHolder);
-                clonedLeavesList.add(clonedLeaf);
+                addUnresolvedType(yangUses, clonedLeaf, (YangNode) clonedNode);
+                clonedLeaf.setContainedIn(clonedNode);
+                clonedLeaves.add(clonedLeaf);
             }
-            leavesHolder.setListOfLeaf(clonedLeavesList);
+            clonedNode.setListOfLeaf(clonedLeaves);
         }
+    }
 
-        List<YangLeafList> currentListOfLeafList = leavesHolder.getListOfLeafList();
-        if (currentListOfLeafList != null) {
-            List<YangLeafList> clonedListOfLeafList = new LinkedList<>();
-            for (YangLeafList leafList : currentListOfLeafList) {
+    /**
+     * Adds all the unresolved type under leaf/leaf-list to the resolution
+     * list, after cloning. This makes the resolution to happen after cloning
+     * of the grouping. Adds resolution with cloned node holder under which
+     * cloned type is present.
+     *
+     * @param yangUses   YANG uses
+     * @param clonedObj  cloned type object
+     * @param clonedNode holder node
+     * @throws DataModelException data model error
+     */
+    public static void addUnresolvedType(
+            YangUses yangUses, Object clonedObj,
+            YangNode clonedNode) throws DataModelException {
+
+        List<YangEntityToResolveInfoImpl> infoList;
+        if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
+            infoList = getTypesToBeResolved(clonedObj, clonedNode, yangUses);
+            if (isListPresent(infoList)) {
+                yangUses.addEntityToResolve(infoList);
+            }
+        }
+    }
+
+    /**
+     * Returns true if list object is non-null and non-empty; false otherwise.
+     *
+     * @param listObj list object
+     * @return true if list object is non-null and non-empty; false otherwise
+     */
+    private static boolean isListPresent(List listObj) {
+        return listObj != null && !listObj.isEmpty();
+    }
+
+    /**
+     * Adds the list of leaf-list present under a node to resolution list,
+     * after cloning. Under the cloned node, with cloned leaf-list,
+     * attributes are set and added to resolution list.
+     *
+     * @param clonedNode cloned holder
+     * @param yangUses   YANG uses
+     * @throws CloneNotSupportedException clone not supported error
+     * @throws DataModelException         data model error
+     */
+    public static void cloneListOfLeafList(
+            YangLeavesHolder clonedNode, YangUses yangUses)
+            throws CloneNotSupportedException, DataModelException {
+
+        List<YangLeafList> listOfLeafList = clonedNode.getListOfLeafList();
+        if (isListPresent(listOfLeafList)) {
+            List<YangLeafList> clonedList = new LinkedList<>();
+            for (YangLeafList leafList : listOfLeafList) {
                 YangLeafList clonedLeafList = leafList.clone();
                 clonedLeafList.setReferredSchemaLeafList(leafList);
-                if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
-                    YangEntityToResolveInfoImpl resolveInfo =
-                            resolveYangConstructsUnderGroupingForLeafList(clonedLeafList, leavesHolder,
-                                    yangUses);
-                    if (resolveInfo != null) {
-                        yangUses.addEntityToResolve(resolveInfo);
-                    }
-                }
-                clonedLeafList.setContainedIn(leavesHolder);
-                clonedListOfLeafList.add(clonedLeafList);
+                addUnresolvedType(yangUses, clonedLeafList,
+                                  (YangNode) clonedNode);
+                clonedLeafList.setContainedIn(clonedNode);
+                clonedList.add(clonedLeafList);
             }
-            leavesHolder.setListOfLeafList(clonedListOfLeafList);
+            clonedNode.setListOfLeafList(clonedList);
         }
     }
 
     /**
-     * Resolves leafref in leaf, which are under grouping by adding it to the resolution list.
+     * Returns types that has to be resolved for a single leaf/leaf-list.
+     * Identifies the object to be leaf/leaf-list and assigns respective
+     * parameters to resolve the types under leaf/leaf-list.
      *
-     * @param clonedLeaf       cloned leaf in uses from grouping
-     * @param leafParentHolder holder of the leaf from uses
-     * @param yangUses         YANG uses
-     * @return entity of leafref which has to be resolved
+     * @param clonedObj  leaf/leaf-list object
+     * @param holderNode holder node
+     * @param yangUses   YANG uses
+     * @return list of resolvable entities in a leaf/leaf-list
      * @throws DataModelException data model error
      */
-    public static YangEntityToResolveInfoImpl resolveLeafrefUnderGroupingForLeaf(YangLeaf clonedLeaf,
-                                                                                 YangLeavesHolder leafParentHolder, YangUses yangUses)
-            throws
-            DataModelException {
-        if (clonedLeaf.getDataType().getDataTypeExtendedInfo() instanceof YangLeafRef) {
-            YangLeafRef leafrefForCloning = (YangLeafRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
-            // Conversion of prefixes in absolute path while cloning them.
-            convertThePrefixesDuringChange(leafrefForCloning, yangUses);
-            leafrefForCloning.setParentNodeOfLeafref((YangNode) leafParentHolder);
-            YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
-            yangEntityToResolveInfo.setEntityToResolve(leafrefForCloning);
-            yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
-            yangEntityToResolveInfo.setLineNumber(leafrefForCloning.getLineNumber());
-            yangEntityToResolveInfo.setCharPosition(leafrefForCloning.getCharPosition());
-            return yangEntityToResolveInfo;
+    private static List<YangEntityToResolveInfoImpl> getTypesToBeResolved(
+            Object clonedObj, YangNode holderNode,
+            YangUses yangUses) throws DataModelException {
+
+        YangType type;
+        if (clonedObj instanceof YangLeaf) {
+            YangLeaf clonedLeaf = (YangLeaf) clonedObj;
+            type = clonedLeaf.getDataType();
+            return getUnresolvedTypeList(type.getDataType(), type, holderNode,
+                                         yangUses, true);
         }
-        return null;
+        YangLeafList clonedLeafList = (YangLeafList) clonedObj;
+        type = clonedLeafList.getDataType();
+        return getUnresolvedTypeList(type.getDataType(), type, holderNode,
+                                     yangUses, false);
     }
 
     /**
-     * Resolves leafRef, identityRef and derived type in leaf, which are under grouping by adding it to the resolution
-     * list.
+     * Returns list of resolvable entities from the type of leaf/leaf-list.
+     * If the type is leaf-ref, identity-ref, derived or union with type
+     * resolution required, it has to be resolved from the place where it is
+     * cloned. So, the resolution list added with these entities. When a type
+     * require no resolution then null is returned, so it will never be added
+     * to resolution list.
      *
-     * @param clonedLeaf       cloned leaf in uses from grouping
-     * @param leafParentHolder holder of the leaf from uses
-     * @param yangUses         YANG uses
-     * @return entity of leafRef/identityRef/derived type which has to be resolved
+     * @param dataTypes data type of type
+     * @param type      type of leaf/leaf-list
+     * @param holder    holder node of type
+     * @param yangUses  YANG uses
+     * @param isLeaf    leaf or leaf-list
+     * @return list of resolvable entities for a leaf/leaf-list.
      * @throws DataModelException data model error
      */
-    public static YangEntityToResolveInfoImpl resolveYangConstructsUnderGroupingForLeaf(YangLeaf clonedLeaf,
-                                                                                        YangLeavesHolder leafParentHolder, YangUses yangUses)
-            throws DataModelException {
-        int lineNumber;
-        int charPosition;
-        YangDataTypes dataTypes = clonedLeaf.getDataType().getDataType();
-        YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
+    private static List<YangEntityToResolveInfoImpl> getUnresolvedTypeList(
+            YangDataTypes dataTypes, YangType type, YangNode holder,
+            YangUses yangUses, boolean isLeaf) throws DataModelException {
+
+        List<YangEntityToResolveInfoImpl> infoList = new ArrayList<>();
+        YangEntityToResolveInfoImpl entity = null;
+        List<YangEntityToResolveInfoImpl> entityList = null;
 
         switch (dataTypes) {
             case LEAFREF:
-                YangLeafRef leafRefForCloning = (YangLeafRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
-                // Conversion of prefixes in absolute path while cloning them.
-                convertThePrefixesDuringChange(leafRefForCloning, yangUses);
-                leafRefForCloning.setParentNodeOfLeafref((YangNode) leafParentHolder);
-                yangEntityToResolveInfo.setEntityToResolve(leafRefForCloning);
-                lineNumber = leafRefForCloning.getCharPosition();
-                charPosition = leafRefForCloning.getLineNumber();
+                entity = getLeafRefResolvableEntity(type, yangUses, holder);
                 break;
 
             case IDENTITYREF:
-                YangIdentityRef identityRef = (YangIdentityRef) clonedLeaf.getDataType().getDataTypeExtendedInfo();
-                if (identityRef.isIdentityForInterFileGroupingResolution()) {
-                    return null;
-                }
-                yangEntityToResolveInfo.setEntityToResolve(identityRef);
-                lineNumber = identityRef.getCharPosition();
-                charPosition = identityRef.getLineNumber();
+                entity = getIdentityRefResolvableEntity(type, holder);
                 break;
 
             case DERIVED:
-                YangType type = clonedLeaf.getDataType();
-                if (type.isTypeForInterFileGroupingResolution()) {
-                    return null;
-                }
-                yangEntityToResolveInfo.setEntityToResolve(type);
-                lineNumber = type.getCharPosition();
-                charPosition = type.getLineNumber();
+                entity = getDerivedResolvableEntity(type, holder, isLeaf);
+                break;
+
+            case UNION:
+                entityList = getUnionResolvableEntity(type, isLeaf);
                 break;
 
             default:
                 return null;
         }
-
-        yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
-        yangEntityToResolveInfo.setCharPosition(charPosition);
-        yangEntityToResolveInfo.setLineNumber(lineNumber);
-        return yangEntityToResolveInfo;
+        infoList.add(entity);
+        if (isListPresent(entityList)) {
+            infoList.addAll(entityList);
+        }
+        return infoList;
     }
 
     /**
-     * Resolves leafRef, identityRef and derived type in leaf-list, which are under grouping by adding it to the
-     * resolution list.
+     * Returns resolvable entity when the type is leaf-ref. It changes the
+     * prefixes from grouping to uses, then changes the parent node to the
+     * cloned node, sets needed information to entity such as line number,
+     * position number and holder.
      *
-     * @param clonedLeafList   cloned leaf-list in uses from grouping
-     * @param leafParentHolder holder of the leaf from uses
-     * @param yangUses         YANG uses
-     * @return entity of leafRef/identityRef/derived type which has to be resolved
+     * @param type     YANG type of leaf-ref
+     * @param yangUses YANG uses
+     * @param holder   cloned holder
+     * @return entity to resolve for leaf-ref
      * @throws DataModelException data model error
      */
-    public static YangEntityToResolveInfoImpl resolveYangConstructsUnderGroupingForLeafList(
-            YangLeafList clonedLeafList, YangLeavesHolder leafParentHolder, YangUses yangUses)
+    private static YangEntityToResolveInfoImpl getLeafRefResolvableEntity(
+            YangType type, YangUses yangUses, YangNode holder)
             throws DataModelException {
-        int lineNumber;
-        int charPosition;
-        YangDataTypes dataTypes = clonedLeafList.getDataType().getDataType();
-        YangEntityToResolveInfoImpl yangEntityToResolveInfo = new YangEntityToResolveInfoImpl();
-        switch (dataTypes) {
-            case LEAFREF:
-                YangLeafRef leafRefForCloning = (YangLeafRef) clonedLeafList.getDataType().getDataTypeExtendedInfo();
-                // Conversion of prefixes in absolute path while cloning them.
-                convertThePrefixesDuringChange(leafRefForCloning, yangUses);
-                leafRefForCloning.setParentNodeOfLeafref((YangNode) leafParentHolder);
-                yangEntityToResolveInfo.setEntityToResolve(leafRefForCloning);
-                lineNumber = leafRefForCloning.getCharPosition();
-                charPosition = leafRefForCloning.getLineNumber();
-                break;
-            case IDENTITYREF:
-                YangIdentityRef identityRef = (YangIdentityRef) clonedLeafList.getDataType().getDataTypeExtendedInfo();
 
-                if (identityRef.isIdentityForInterFileGroupingResolution()) {
-                    return null;
-                }
-                yangEntityToResolveInfo.setEntityToResolve(identityRef);
-                lineNumber = identityRef.getCharPosition();
-                charPosition = identityRef.getLineNumber();
-                break;
-            case DERIVED:
-                YangType type = clonedLeafList.getDataType();
-                if (type.isTypeForInterFileGroupingResolution() && type.isTypeNotResolvedTillRootNode()) {
-                    return null;
-                }
-                yangEntityToResolveInfo.setEntityToResolve(type);
-                lineNumber = type.getCharPosition();
-                charPosition = type.getLineNumber();
-                break;
-            default:
-                return null;
+        YangEntityToResolveInfoImpl<YangLeafRef> leafRefInfo =
+                new YangEntityToResolveInfoImpl<>();
+        YangLeafRef leafRef = (YangLeafRef) type.getDataTypeExtendedInfo();
+
+        // Conversion of prefixes in absolute path while cloning them.
+        convertThePrefixesDuringChange(leafRef, yangUses);
+        leafRef.setParentNodeOfLeafref(holder);
+        leafRefInfo.setEntityToResolve(leafRef);
+
+        return setInformationInEntity(
+                leafRefInfo, holder, leafRef.getCharPosition(),
+                leafRef.getLineNumber());
+    }
+
+    /**
+     * Returns resolvable entity when the type is identity-ref. It sets needed
+     * information to entity such as line number,position number and holder.
+     * Returns null when identity is for inter grouping.
+     *
+     * @param type   YANG type for identity-ref
+     * @param holder holder node
+     * @return entity to resolve for identity-ref
+     */
+    private static YangEntityToResolveInfoImpl getIdentityRefResolvableEntity(
+            YangType type, YangNode holder) {
+
+        YangEntityToResolveInfoImpl<YangIdentityRef> identityRefInfo =
+                new YangEntityToResolveInfoImpl<>();
+        YangIdentityRef identityRef =
+                (YangIdentityRef) type.getDataTypeExtendedInfo();
+
+        if (identityRef.isIdentityForInterFileGroupingResolution()) {
+            return null;
         }
-        yangEntityToResolveInfo.setHolderOfEntityToResolve((YangNode) leafParentHolder);
-        yangEntityToResolveInfo.setCharPosition(charPosition);
-        yangEntityToResolveInfo.setLineNumber(lineNumber);
-        return yangEntityToResolveInfo;
+
+        identityRefInfo.setEntityToResolve(identityRef);
+        return setInformationInEntity(
+                identityRefInfo, holder, identityRef.getCharPosition(),
+                identityRef.getLineNumber());
+    }
+
+    /**
+     * Returns resolvable entity when the type is derived. It sets needed
+     * information to entity such as line number,position number and holder.
+     * Returns null when identity is for inter grouping.
+     *
+     * @param type   derived YANG type
+     * @param holder holder node
+     * @param isLeaf leaf or leaf-list
+     * @return entity to resolve for derived type
+     */
+    private static YangEntityToResolveInfoImpl getDerivedResolvableEntity(
+            YangType<?> type, YangNode holder, boolean isLeaf) {
+
+        YangEntityToResolveInfoImpl<YangType<?>> derivedInfo =
+                new YangEntityToResolveInfoImpl<>();
+        if (type.isTypeForInterFileGroupingResolution()) {
+            return null;
+        }
+        if (!isLeaf && type.isTypeNotResolvedTillRootNode()) {
+            return null;
+        }
+
+        derivedInfo.setEntityToResolve(type);
+        return setInformationInEntity(
+                derivedInfo, holder, type.getCharPosition(),
+                type.getLineNumber());
+    }
+
+    /**
+     * Sets the information needed for adding the entity into resolution
+     * list, such as line number, position number and cloned holder node.
+     *
+     * @param entity  resolvable entity
+     * @param holder  cloned holder node
+     * @param charPos character position
+     * @param lineNum line number
+     * @return resolvable entity after setting info
+     */
+    private static YangEntityToResolveInfoImpl<?> setInformationInEntity(
+            YangEntityToResolveInfoImpl<?> entity, YangNode holder,
+            int charPos, int lineNum) {
+
+        entity.setHolderOfEntityToResolve(holder);
+        entity.setCharPosition(charPos);
+        entity.setLineNumber(lineNum);
+        return entity;
+    }
+
+    /**
+     * Returns resolvable entity under union. When types under union have
+     * identity-ref, derived and union, the function call is done recursively
+     * to get resolvable entity and adds it to list.
+     *
+     * @param type   union YANG type
+     * @param isLeaf leaf or leaf-list
+     * @return resolvable entity list after setting info
+     * @throws DataModelException data model error
+     */
+    private static List<YangEntityToResolveInfoImpl> getUnionResolvableEntity(
+            YangType type, boolean isLeaf) throws DataModelException {
+
+        YangUnion union = (YangUnion) type.getDataTypeExtendedInfo();
+        List<YangType<?>> typeList = union.getTypeList();
+        List<YangEntityToResolveInfoImpl> unionList = new ArrayList<>();
+        List<YangEntityToResolveInfoImpl> entity;
+
+        for (YangType unionType : typeList) {
+            entity = getUnresolvedTypeList(unionType.getDataType(),
+                                           unionType, union, null, isLeaf);
+            if (isListPresent(entity)) {
+                unionList.addAll(entity);
+            }
+        }
+        return unionList;
     }
 
     /**

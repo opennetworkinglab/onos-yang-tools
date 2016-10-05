@@ -15,15 +15,17 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.util.Map;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
+
+import java.io.Serializable;
+import java.util.Map;
 
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.cloneLeaves;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.cloneListOfLeaf;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.cloneListOfLeafList;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClonedLeavesUnionEnumRef;
 
 /**
@@ -400,7 +402,8 @@ public abstract class YangNode extends DefaultLocationInfo
         clonedNode.referredSchemaNode = this;
         if (clonedNode instanceof YangLeavesHolder) {
             try {
-                cloneLeaves((YangLeavesHolder) clonedNode, yangUses);
+                cloneListOfLeaf((YangLeavesHolder) clonedNode, yangUses);
+                cloneListOfLeafList((YangLeavesHolder) clonedNode, yangUses);
             } catch (DataModelException e) {
                 throw new CloneNotSupportedException(e.getMessage());
             }

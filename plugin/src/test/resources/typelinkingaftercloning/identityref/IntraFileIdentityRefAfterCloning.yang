@@ -1,0 +1,74 @@
+module org-open-road-m-device {
+    namespace "http://org/openroadm/device";
+    prefix org-open-road-m-device;
+
+    identity syslog-facility {
+        description
+            "The base identity to represent syslog facilities";
+    }
+    typedef value {
+        type identityref {
+            base syslog-facility;
+        }
+    }
+
+    grouping device-common {
+        leaf facility {
+            type union {
+                type identityref {
+                    base syslog-facility;
+                }
+                type enumeration {
+                    enum "all" {
+                        description
+                            "This enum describes the case where all
+                            facilities are requested.";
+                    }
+                }
+            }
+        }
+        leaf node-id {
+            type identityref {
+                base syslog-facility;
+            }
+            description
+                "Globally unique identifier for a device.";
+            config true;
+        }
+        leaf-list node-ref {
+            type value;
+        }
+        container network-ref {
+            leaf-list facility {
+                type union {
+                    type identityref {
+                        base syslog-facility;
+                    }
+                    type enumeration {
+                        enum "all" {
+                            description
+                                "This enum describes the case where all
+                                facilities are requested.";
+                        }
+                    }
+                }
+            }
+            leaf-list node-ref {
+                type identityref {
+                    base syslog-facility;
+                }
+                description
+                    "Globally unique identifier for a device.";
+                config true;
+            }
+            leaf node-id {
+                type value;
+            }
+        }
+    }
+
+    list node {
+        config false;
+        uses device-common;
+    }
+}

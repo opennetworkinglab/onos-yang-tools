@@ -33,10 +33,9 @@ import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DA
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.USES;
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addUnresolvedType;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeaf;
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.resolveYangConstructsUnderGroupingForLeafList;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClonedLeavesUnionEnumRef;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
@@ -180,13 +179,14 @@ public abstract class YangUses
      * @param entityToResolve entity to resolved
      * @throws DataModelException a violation of data model rules
      */
-    public void addEntityToResolve(YangEntityToResolveInfoImpl entityToResolve)
+    public void addEntityToResolve(
+            List<YangEntityToResolveInfoImpl> entityToResolve)
             throws DataModelException {
         if (entityToResolveInfoList == null) {
             entityToResolveInfoList = new
                     LinkedList<>();
         }
-        entityToResolveInfoList.add(entityToResolve);
+        entityToResolveInfoList.addAll(entityToResolve);
     }
 
     /**
@@ -387,52 +387,39 @@ public abstract class YangUses
                             " in " + getFileName() + "\"");
         }
 
-        YangLeavesHolder usesParentLeavesHolder = (YangLeavesHolder) usesParentNode;
+        YangLeavesHolder usesParent = (YangLeavesHolder) usesParentNode;
         if (referredGrouping.getListOfLeaf() != null) {
             for (YangLeaf leaf : referredGrouping.getListOfLeaf()) {
                 YangLeaf clonedLeaf;
                 try {
-                    ((CollisionDetector) usesParentLeavesHolder)
+                    ((CollisionDetector) usesParent)
                             .detectCollidingChild(leaf.getName(), LEAF_DATA);
                     clonedLeaf = leaf.clone();
                     clonedLeaf.setReferredLeaf(leaf);
-                    if (getCurrentGroupingDepth() == 0) {
-                        YangEntityToResolveInfoImpl resolveInfo
-                                = resolveYangConstructsUnderGroupingForLeaf(
-                                clonedLeaf, usesParentLeavesHolder, this);
-                        if (resolveInfo != null) {
-                            addEntityToResolve(resolveInfo);
-                        }
-                    }
+                    addUnresolvedType(this, clonedLeaf, (YangNode) usesParent);
                 } catch (CloneNotSupportedException | DataModelException e) {
                     throw new DataModelException(e.getMessage());
                 }
 
-                clonedLeaf.setContainedIn(usesParentLeavesHolder);
-                usesParentLeavesHolder.addLeaf(clonedLeaf);
+                clonedLeaf.setContainedIn(usesParent);
+                usesParent.addLeaf(clonedLeaf);
             }
         }
         if (referredGrouping.getListOfLeafList() != null) {
             for (YangLeafList leafList : referredGrouping.getListOfLeafList()) {
                 YangLeafList clonedLeafList;
                 try {
-                    ((CollisionDetector) usesParentLeavesHolder)
+                    ((CollisionDetector) usesParent)
                             .detectCollidingChild(leafList.getName(), LEAF_LIST_DATA);
                     clonedLeafList = leafList.clone();
                     clonedLeafList.setReferredSchemaLeafList(leafList);
-                    if (getCurrentGroupingDepth() == 0) {
-                        YangEntityToResolveInfoImpl resolveInfo =
-                                resolveYangConstructsUnderGroupingForLeafList(
-                                        clonedLeafList, usesParentLeavesHolder, this);
-                        if (resolveInfo != null) {
-                            addEntityToResolve(resolveInfo);
-                        }
-                    }
+                    addUnresolvedType(this, clonedLeafList,
+                                      (YangNode) usesParent);
                 } catch (CloneNotSupportedException | DataModelException e) {
                     throw new DataModelException(e.getMessage());
                 }
-                clonedLeafList.setContainedIn(usesParentLeavesHolder);
-                usesParentLeavesHolder.addLeafList(clonedLeafList);
+                clonedLeafList.setContainedIn(usesParent);
+                usesParent.addLeafList(clonedLeafList);
             }
         }
 
@@ -441,7 +428,7 @@ public abstract class YangUses
         } catch (DataModelException e) {
             throw new DataModelException(e.getMessage());
         }
-        updateClonedLeavesUnionEnumRef(usesParentLeavesHolder);
+        updateClonedLeavesUnionEnumRef(usesParent);
         return unmodifiableList(entityToResolveInfoList);
     }
 
