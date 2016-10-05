@@ -19,6 +19,7 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
@@ -413,6 +414,9 @@ public abstract class YangNode extends DefaultLocationInfo
         clonedNode.setChild(null);
         clonedNode.setNextSibling(null);
         clonedNode.setPreviousSibling(null);
+        clonedNode.yangSchemaNodeIdentifier =
+                clonedNode.yangSchemaNodeIdentifier.clone();
+        clonedNode.ysnContextInfoMap = new HashMap<>();
         return clonedNode;
     }
 

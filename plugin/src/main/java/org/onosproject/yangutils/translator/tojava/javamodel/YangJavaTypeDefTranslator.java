@@ -32,6 +32,7 @@ import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangData
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateJava;
 
 /**
  * Represents type define information extended to support java code generation.
@@ -150,7 +151,7 @@ public class YangJavaTypeDefTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_TYPEDEF_CLASS, this);
+            generateJava(GENERATE_TYPEDEF_CLASS, this);
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code for typedef node " + getName()

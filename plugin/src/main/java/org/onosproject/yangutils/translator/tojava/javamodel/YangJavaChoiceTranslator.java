@@ -28,6 +28,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeAndUpdateInParent;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateJava;
 
 /**
  * Represents choice information extended to support java code generation.
@@ -111,9 +112,6 @@ public class YangJavaChoiceTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         try {
             generateCodeAndUpdateInParent(this, yangPlugin, false);
-            if (getReferredSchema() != null) {
-                throw new InvalidNodeForTranslatorException();
-            }
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code entry for choice node " +
@@ -130,7 +128,7 @@ public class YangJavaChoiceTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(INTERFACE_MASK, this);
+            generateJava(INTERFACE_MASK, this);
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for choice node " +
                     getName() + " in " +

@@ -287,4 +287,9 @@ public class YangIdentityRef
     public void setInGrouping(boolean inGrouping) {
         this.inGrouping = inGrouping;
     }
+
+    @Override
+    public YangNode clone(YangUses yangUses) throws CloneNotSupportedException {
+        return (YangNode) super.clone();
+    }
 }

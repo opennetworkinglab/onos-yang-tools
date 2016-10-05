@@ -28,6 +28,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateJava;
 
 /**
  * Represents union information extended to support java code generation.
@@ -131,7 +132,7 @@ public class YangJavaUnionTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_UNION_CLASS, this);
+            generateJava(GENERATE_UNION_CLASS, this);
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for union node " + getName() + " in " +
                     getLineNumber() + " at " +

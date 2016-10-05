@@ -28,6 +28,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeAndUpdateInParent;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateJava;
 
 /**
  * Represents YANG list information extended to support java code generation.
@@ -111,9 +112,6 @@ public class YangJavaListTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
         try {
             generateCodeAndUpdateInParent(this, yangPlugin, true);
-            if (getReferredSchema() != null) {
-                throw new InvalidNodeForTranslatorException();
-            }
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code entry for list node " +
@@ -132,7 +130,7 @@ public class YangJavaListTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
+            generateJava(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for list node " +
                     getName() + " in " +

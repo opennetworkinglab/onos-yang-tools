@@ -549,4 +549,14 @@ public abstract class YangUses
     public void setName(String name) {
         nodeIdentifier.setName(name);
     }
+
+    @Override
+    public YangNode clone(YangUses node) throws CloneNotSupportedException {
+        YangNode clnNode = (YangNode) super.clone();
+        clnNode.setParent(null);
+        clnNode.setChild(null);
+        clnNode.setNextSibling(null);
+        clnNode.setPreviousSibling(null);
+        return clnNode;
+    }
 }

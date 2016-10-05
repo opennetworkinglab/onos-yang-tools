@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateJava;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
@@ -130,7 +131,7 @@ public class YangJavaEnumerationTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(GENERATE_ENUM_CLASS, this);
+            generateJava(GENERATE_ENUM_CLASS, this);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
                                                       e.getLocalizedMessage()));

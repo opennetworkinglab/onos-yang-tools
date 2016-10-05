@@ -24,7 +24,7 @@ import java.util.Objects;
  * Namespace will be present only if node is module/sub-module or augmented node.
  */
 public class YangSchemaNodeIdentifier extends DefaultLocationInfo
-        implements Serializable {
+        implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 806201648L;
 
@@ -101,6 +101,11 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
             }
         }
         return false;
+    }
+
+    @Override
+    public YangSchemaNodeIdentifier clone() throws CloneNotSupportedException {
+        return (YangSchemaNodeIdentifier) super.clone();
     }
 
     @Override

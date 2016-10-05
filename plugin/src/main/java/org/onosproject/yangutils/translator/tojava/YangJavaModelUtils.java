@@ -334,11 +334,28 @@ public final class YangJavaModelUtils {
                                                 info));
         }
 
-        YangSchemaNode node = getRefSchema(info);
-        if (node != null) {
+        /*
+         * For second level and below cloned nodes code shouldn't be
+         * generated also they needn't be added in parent, since
+         * generated code will be under grouping, cloned node is only
+         * used for YANG namespace.
+         */
+        YangNode n = (YangNode) info;
+        if (n.getReferredSchema() != null &&
+                !(((YangNode) n.getReferredSchema()).getParent() instanceof
+                        YangGrouping)) {
+            return;
+        }
+        /*
+         * If first level cloned node, then it needs to be imported in the
+         * generated code. In case uses under grouping, it would further have
+         * second level uses, hence needn't add in parent grouping.
+         */
+        YangSchemaNode rn = getRefSchema(info);
+        if (rn != null) {
             YangNode parent = ((YangNode) info).getParent();
             if (!(parent instanceof YangGrouping)) {
-                addCurNodeInfoInParentTempFile((YangNode) node, isMultiInstance,
+                addCurNodeInfoInParentTempFile((YangNode) rn, isMultiInstance,
                                                config, parent);
             }
             return;
@@ -646,5 +663,23 @@ public final class YangJavaModelUtils {
                                  config.getConflictResolver())) + name;
         }
         return AUGMENTED + name;
+    }
+
+    /**
+     * Generated java code during exit.
+     *
+     * @param type generated file type
+     * @param node current YANG node
+     * @throws IOException when fails to generate java files
+     */
+    public static void  generateJava(int type, YangNode node)
+            throws IOException {
+        /*
+         * Call for file generation if node is not under uses.
+         */
+        if(node.getReferredSchema() == null) {
+            ((TempJavaCodeFragmentFilesContainer) node)
+                .getTempJavaCodeFragmentFiles().generateJavaFile(type, node);
+        }
     }
 }

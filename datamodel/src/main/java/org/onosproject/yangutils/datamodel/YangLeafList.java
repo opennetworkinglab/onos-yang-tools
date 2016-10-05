@@ -359,7 +359,9 @@ public abstract class YangLeafList extends DefaultLocationInfo
     @Override
     public YangLeafList clone()
             throws CloneNotSupportedException {
-        return (YangLeafList) super.clone();
+        YangLeafList cll  = (YangLeafList) super.clone();
+        cll.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier.clone();
+        return cll;
     }
 
     /**
