@@ -20,21 +20,31 @@
 
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onos-yang-tools</artifactId>
+        <artifactId>onos-yang-utils</artifactId>
         <version>1.9-SNAPSHOT</version>
     </parent>
 
     <artifactId>onos-yang-datamodel</artifactId>
     <version>1.9-SNAPSHOT</version>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.5.4</version>
-                <extensions>true</extensions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
