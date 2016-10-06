@@ -16,9 +16,17 @@
 
 package org.onosproject.yangutils.parser.impl.parserutils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangImport;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -35,16 +43,6 @@ import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import static org.onosproject.yangutils.datamodel.YangPathArgType.ABSOLUTE_PATH;
 import static org.onosproject.yangutils.datamodel.YangPathArgType.RELATIVE_PATH;
@@ -83,7 +81,6 @@ public final class ListenerUtil {
     private static final String ONE = "1";
     private static final int IDENTIFIER_LENGTH = 64;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private static final Log log = LogFactory.getLog(ListenerUtil.class);
 
     /**
      * Creates a new listener util.
@@ -998,8 +995,8 @@ public final class ListenerUtil {
                 + errorInfo);
         parserException.setLine(ctx.getStart().getLine());
         parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-        log.info(parserException.getMessage() + " at position " + parserException.getCharPositionInLine() +
-                         " in line " + parserException.getLineNumber() + " of yang file " + fileName);
+        //FIXME this exception should probably be thrown rather than just logged
+        //throw parserException;
     }
 
     /**

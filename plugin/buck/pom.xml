@@ -19,40 +19,44 @@
 
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onos-yang-utils</artifactId>
+        <artifactId>onos-yang-plugins</artifactId>
         <version>1.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>onos-yang-plugins</artifactId>
-    <version>1.9-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <modules>
-        <module>maven</module>
-        <module>buck</module>
-    </modules>
+    <artifactId>onos-yang-buck-plugin</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-datamodel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-parser</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-generator</artifactId>
-            <version>${project.version}</version>
+            <artifactId>buck-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>com.google.guava:guava</exclude>
+                        </excludes>
+                    </artifactSet>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
-
-
