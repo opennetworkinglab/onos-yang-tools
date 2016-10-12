@@ -143,6 +143,7 @@ public class YangLibraryDescription
                                 /* additionalClasspathEntries */ ImmutableSet.<Path>of(),
                                 new JavacToJarStepFactory(javacOptions, JavacOptionsAmender.IDENTITY),
                                 /* resourcesRoot */ Optional.<Path>absent(),
+                                /* manifestFile */ Optional.absent(),
                                 /* mavenCoords */ Optional.<String>absent(),
                                 /* tests */ ImmutableSortedSet.<BuildTarget>of(),
                                 /* classesToRemoveFromJar */ ImmutableSet.<Pattern>of()));
