@@ -16,13 +16,13 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
@@ -73,6 +73,30 @@ public class TypeDefTranslatorTest {
         utilManager.translateToJava(yangPluginConfig);
 
         deleteDirectory("target/typedefTranslator/");
+
+    }
+
+    /**
+     * Checks typedef translation should not result in any exception.
+     *
+     * @throws MojoExecutionException
+     */
+    @Test
+    public void processTypeDefWithUnionAndBitsTranslator() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory("target/typedefTranslator/");
+        String searchDir = "src/test/resources/typedefTranslator/union";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir("target/typedefTranslator/");
+        utilManager.translateToJava(yangPluginConfig);
+
+        //deleteDirectory("target/typedefTranslator/");
 
     }
 

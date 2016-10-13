@@ -16,23 +16,27 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LEAFREF_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.DATA_MISSING_ERROR_TAG;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.ERROR_PATH_LEAFREF_LEAF;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.INSTANCE_REQUIRED_ERROR_APP_TAG;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
 
 /*
  * Reference:RFC 6020.
@@ -162,6 +166,9 @@ public class YangLeafRef<T> extends DefaultLocationInfo
      */
     public YangLeafRef() {
         yangAppErrorInfo = new YangAppErrorInfo();
+        prefixAndItsImportedModule = new HashMap<>();
+        atomicPath = new ArrayList<>();
+        ifFeatureList = new ArrayList<>();
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(INSTANCE_REQUIRED_ERROR_APP_TAG);
         yangAppErrorInfo.setErrorAppPath(ERROR_PATH_LEAFREF_LEAF);
@@ -245,7 +252,7 @@ public class YangLeafRef<T> extends DefaultLocationInfo
      * @return list of atomic path
      */
     public List<YangAtomicPath> getAtomicPath() {
-        return atomicPath;
+        return unmodifiableList(atomicPath);
     }
 
     /**
@@ -295,15 +302,12 @@ public class YangLeafRef<T> extends DefaultLocationInfo
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
-        }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override
@@ -313,7 +317,7 @@ public class YangLeafRef<T> extends DefaultLocationInfo
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.LEAFREF_DATA;
+        return LEAFREF_DATA;
     }
 
     @Override
@@ -382,7 +386,7 @@ public class YangLeafRef<T> extends DefaultLocationInfo
             YangLeaf yangLeaf = ((YangLeaf) getReferredLeafOrLeafList());
             YangType baseType = yangLeaf.getDataType();
 
-            if (baseType.getDataType() == YangDataTypes.LEAFREF) {
+            if (baseType.getDataType() == LEAFREF) {
                 YangLeafRef referredLeafRefInfo = (YangLeafRef) (yangLeaf.getDataType().getDataTypeExtendedInfo());
 
                 //Check whether the referred typedef is resolved.
@@ -450,7 +454,7 @@ public class YangLeafRef<T> extends DefaultLocationInfo
             YangLeafList yangLeafList = ((YangLeafList) getReferredLeafOrLeafList());
             YangType baseType = yangLeafList.getDataType();
 
-            if (baseType.getDataType() == YangDataTypes.LEAFREF) {
+            if (baseType.getDataType() == LEAFREF) {
                 YangLeafRef referredLeafRefInfo = (YangLeafRef) yangLeafList.getDataType().getDataTypeExtendedInfo();
 
                 //Check whether the referred typedef is resolved.

@@ -34,7 +34,7 @@ import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUI
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.CONSTRUCTOR;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CONSTRUCTOR;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
-import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.IMPL_CLASS;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.INTERFACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.PACKAGE_INFO;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
@@ -141,7 +141,7 @@ public final class JavaDocGenTest {
      */
     @Test
     public void implClassGenerationTest() {
-        String implClassJavaDoc = getJavaDoc(IMPL_CLASS, TEST_NAME, false, null);
+        String implClassJavaDoc = getJavaDoc(DEFAULT_CLASS, TEST_NAME, false, null);
         assertThat(true,
                 is(implClassJavaDoc.contains("Represents the implementation of")
                         && implClassJavaDoc.contains(END_STRING)));

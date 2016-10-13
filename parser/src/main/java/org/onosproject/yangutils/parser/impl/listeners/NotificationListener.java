@@ -17,10 +17,8 @@
 package org.onosproject.yangutils.parser.impl.listeners;
 
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
-import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNotification;
-import org.onosproject.yangutils.datamodel.YangSubModule;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
@@ -109,7 +107,7 @@ public final class NotificationListener {
                                  NOTIFICATION_DATA);
 
         Parsable curData = listener.getParsedDataStack().peek();
-        if (curData instanceof YangModule || curData instanceof YangSubModule) {
+        if (curData instanceof RpcNotificationContainer) {
 
             YangNotification notification = getYangNotificationNode(JAVA_GENERATION);
             notification.setName(identifier);

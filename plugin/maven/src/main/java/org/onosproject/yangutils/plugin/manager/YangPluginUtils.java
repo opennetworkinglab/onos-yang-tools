@@ -16,10 +16,20 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
+import org.apache.maven.project.MavenProject;
+import org.onosproject.yangutils.datamodel.YangNode;
+import org.slf4j.Logger;
+import org.sonatype.plexus.build.incremental.BuildContext;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -28,15 +38,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Resource;
-import org.apache.maven.project.MavenProject;
-import org.onosproject.yangutils.datamodel.YangNode;
-import org.slf4j.Logger;
-import org.sonatype.plexus.build.incremental.BuildContext;
-
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.parseJarFile;
+import static org.onosproject.yangutils.utils.UtilConstants.COLON;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAR;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
@@ -56,7 +60,10 @@ public final class YangPluginUtils {
     private static final String TARGET_RESOURCE_PATH = SLASH + TEMP + SLASH + YANG_RESOURCES + SLASH;
 
     private static final String SERIALIZED_FILE_EXTENSION = ".ser";
+    private static final String TEXT_FILE_EXTENSION = ".txt";
     private static final String YANG_META_DATA = "YangMetaData";
+    private static final String VERSION_META_DATA = "VersionMetaData";
+    private static final String PLUGIN_ARTIFACT = "onos-yang-maven-plugin";
 
     private YangPluginUtils() {
     }
@@ -93,8 +100,8 @@ public final class YangPluginUtils {
 
         for (File file : files) {
             Files.copy(file.toPath(),
-                    new File(path + file.getName()).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+                       new File(path + file.getName()).toPath(),
+                       StandardCopyOption.REPLACE_EXISTING);
         }
         addToProjectResource(outputDir + SLASH + TEMP + SLASH, project);
     }
@@ -148,6 +155,38 @@ public final class YangPluginUtils {
         objectOutputStream.writeObject(nodes);
         objectOutputStream.close();
         fileOutputStream.close();
+        if (operation) {
+            addVersionMetaDataFile(project, serFileDirPath);
+        }
+    }
+
+    /**
+     * Adds version meta data files for YSR to know version of YANG tools.
+     *
+     * @param project maven project
+     * @param dir     directory
+     * @throws IOException when fails to do IO operations
+     */
+    private static void addVersionMetaDataFile(MavenProject project, String dir)
+            throws IOException {
+        List<Plugin> plugins = project.getBuildPlugins();
+        Iterator<Plugin> it = plugins.iterator();
+        Plugin plugin = it.next();
+        String data = EMPTY_STRING;
+        while (it.hasNext()) {
+            if (plugin.getArtifactId().equals(PLUGIN_ARTIFACT)) {
+                data = plugin.getGroupId() + COLON + plugin.getArtifactId()
+                        + COLON + plugin.getVersion();
+            }
+            plugin = it.next();
+        }
+        if (data.equals(EMPTY_STRING)) {
+            throw new IOException("Invalid artifact for " + PLUGIN_ARTIFACT);
+        }
+        String verFileName = dir + VERSION_META_DATA + TEXT_FILE_EXTENSION;
+        PrintWriter out = new PrintWriter(verFileName);
+        out.print(data);
+        out.close();
     }
 
     /**

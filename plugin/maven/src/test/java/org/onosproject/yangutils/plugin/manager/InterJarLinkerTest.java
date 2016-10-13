@@ -79,17 +79,17 @@ public class InterJarLinkerTest {
     public void processSingleJarLinking()
             throws IOException, MojoExecutionException {
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(YANG_FILES_DIR));
-
-        int size1 = utilManager.getYangFileInfoSet().size();
+        Set<YangFileInfo> info = utilManager.getYangFileInfoSet();
+        int size1 = info.size();
         utilManager.parseYangFileInfoSet();
 
         mockJarFileProvider.provideTestJarFile(utilManager);
-        utilManager.setYangFileInfoSet(removeFileInfoFromSet(utilManager.getYangFileInfoSet()));
+        utilManager.setYangFileInfoSet(removeFileInfoFromSet(info));
         utilManager.resolveDependenciesUsingLinker();
 
-        int size2 = utilManager.getYangFileInfoSet().size();
+        int size2 = info.size();
         assertThat(true, is(size1 != size2));
-        assertThat(true, is(parseFileInfoSet(utilManager.getYangFileInfoSet().iterator())));
+        assertThat(true, is(parseFileInfoSet(info.iterator())));
 
         deleteDirectory(TARGET);
         mockJarFileProvider.deleteTestSerFile(YANG_FILES_DIR);
@@ -106,17 +106,18 @@ public class InterJarLinkerTest {
             throws IOException, MojoExecutionException {
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(YANG_FILES_DIR));
 
-        int size1 = utilManager.getYangFileInfoSet().size();
+        Set<YangFileInfo> info = utilManager.getYangFileInfoSet();
+        int size1 = info.size();
         utilManager.parseYangFileInfoSet();
 
         mockJarFileProvider.provideTestJarFile(utilManager);
-        utilManager.setYangFileInfoSet(removeFileInfoFromSet(utilManager.getYangFileInfoSet()));
+        utilManager.setYangFileInfoSet(removeFileInfoFromSet(info));
 
         utilManager.resolveDependenciesUsingLinker();
-        int size2 = utilManager.getYangFileInfoSet().size();
+        int size2 = info.size();
         assertThat(true, is(size1 != size2));
-        assertThat(true, is(parseFileInfoSet(utilManager.getYangFileInfoSet().iterator())));
-        assertThat(true, is(parseFileInfoSet(utilManager.getYangFileInfoSet().iterator())));
+        assertThat(true, is(parseFileInfoSet(info.iterator())));
+        assertThat(true, is(parseFileInfoSet(info.iterator())));
 
         /*
          * grouping flow-classifier {
@@ -134,7 +135,7 @@ public class InterJarLinkerTest {
          *
          */
 
-        Iterator<YangFileInfo> yangFileInfoIterator = utilManager.getYangFileInfoSet().iterator();
+        Iterator<YangFileInfo> yangFileInfoIterator = info.iterator();
 
         YangFileInfo yangFileInfo = yangFileInfoIterator.next();
 
@@ -268,12 +269,13 @@ public class InterJarLinkerTest {
          */
         void provideTestJarFile(YangUtilManager utilManager) throws IOException {
 
+            Set<YangFileInfo> info = utilManager.getYangFileInfoSet();
             MavenProject project = new MavenProject();
-            serializeDataModel(TARGET, utilManager.getYangFileInfoSet(), project, false);
+            serializeDataModel(TARGET, info, project, false);
             createTestJar();
 
             for (String file : getListOfTestJar(TARGET)) {
-                addInterJarRootNodes(file, utilManager);
+                addInterJarRootNodes(file, info);
             }
         }
 
@@ -281,7 +283,8 @@ public class InterJarLinkerTest {
          * Deletes serialized file.
          */
         void deleteTestSerFile(String yangFileDir) {
-            File ser = new File(System.getProperty("user.dir") + SLASH + yangFileDir + SLASH + SER_FILE_NAME);
+            File ser = new File(System.getProperty("user.dir") + SLASH + yangFileDir +
+                                        SLASH + SER_FILE_NAME);
             ser.delete();
         }
 
@@ -309,11 +312,11 @@ public class InterJarLinkerTest {
         /**
          * Adds data model nodes of jar to file info set.
          *
-         * @param jarFile     jar file name
-         * @param utilManager
+         * @param jarFile jar file name
+         * @param info    file info
          * @throws IOException when fails to do IO operations
          */
-        private void addInterJarRootNodes(String jarFile, YangUtilManager utilManager) throws IOException {
+        private void addInterJarRootNodes(String jarFile, Set<YangFileInfo> info) throws IOException {
             try {
                 List<YangNode> interJarResolvedNodes = parseJarFile(jarFile, TARGET);
 
@@ -323,7 +326,7 @@ public class InterJarLinkerTest {
                     dependentFileInfo.setRootNode(node);
                     dependentFileInfo.setForTranslator(false);
                     dependentFileInfo.setYangFileName(node.getName());
-                    utilManager.getYangFileInfoSet().add(dependentFileInfo);
+                    info.add(dependentFileInfo);
                 }
             } catch (IOException e) {
                 throw new IOException("failed to resolve in interjar scenario.");

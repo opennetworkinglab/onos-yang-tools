@@ -34,6 +34,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateCodeOfRootNode;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateInterfaceFileForNonDataNodes;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.isRootNodesCodeGenRequired;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
@@ -168,7 +169,9 @@ public class YangJavaModuleTranslator
                         GENERATE_ALL_EVENT_CLASS_MASK, this);
             }
 
-            if (isRootNodesCodeGenRequired(this)) {
+            if (!isRootNodesCodeGenRequired(this)) {
+                generateInterfaceFileForNonDataNodes(this);
+            } else {
                 getTempJavaCodeFragmentFiles()
                         .generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
                 if (getJavaFileInfo().getPluginConfig()

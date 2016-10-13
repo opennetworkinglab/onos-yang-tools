@@ -26,12 +26,12 @@ import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DECIMAL64;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypeUtils.isOfRangeRestrictedType;
 import static org.onosproject.yangutils.datamodel.utils.RestrictionResolver.processRangeRestriction;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.RANGE_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypeUtils.isOfRangeRestrictedType;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DECIMAL64;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
@@ -90,7 +90,7 @@ public final class RangeRestrictionListener {
             setRangeRestriction(listener, type, ctx);
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, RANGE_DATA,
-                    ctx.range().getText(), ENTRY));
+                                                                    ctx.range().getText(), ENTRY));
         }
     }
 
@@ -116,7 +116,7 @@ public final class RangeRestrictionListener {
 
         if (!(isOfRangeRestrictedType(type.getDataType())) && (type.getDataType() != DECIMAL64)) {
             ParserException parserException = new ParserException("YANG file error: Range restriction can't be " +
-                    "applied to a given type");
+                                                                          "applied to a given type");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -126,14 +126,20 @@ public final class RangeRestrictionListener {
         try {
             if (type.getDataType() == DECIMAL64) {
                 YangDecimal64 yangDecimal64 = (YangDecimal64) type.getDataTypeExtendedInfo();
-                rangeRestriction = processRangeRestriction(yangDecimal64.getDefaultRangeRestriction(),
-                                                           ctx.getStart().getLine(),
-                                                           ctx.getStart().getCharPositionInLine(),
-                                                           true, ctx.range().getText(), type.getDataType());
+                rangeRestriction =
+                        processRangeRestriction(yangDecimal64.getDefaultRangeRestriction(),
+                                                ctx.getStart().getLine(),
+                                                ctx.getStart().getCharPositionInLine(),
+                                                true, ctx.range().getText(),
+                                                type.getDataType(), listener.getFileName());
             } else {
-                rangeRestriction = processRangeRestriction(null, ctx.getStart().getLine(),
-                                                           ctx.getStart().getCharPositionInLine(),
-                                                           false, ctx.range().getText(), type.getDataType());
+                rangeRestriction =
+                        processRangeRestriction(null, ctx.getStart().getLine(),
+                                                ctx.getStart().getCharPositionInLine(),
+                                                false, ctx.range()
+                                                        .getText(), type
+                                                        .getDataType(),
+                                                listener.getFileName());
             }
         } catch (DataModelException e) {
             ParserException parserException = new ParserException(e.getMessage());
@@ -174,7 +180,7 @@ public final class RangeRestrictionListener {
             // TODO : need to handle in linker
         } else {
             throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, RANGE_DATA,
-                    ctx.range().getText(), EXIT));
+                                                                    ctx.range().getText(), EXIT));
         }
     }
 }

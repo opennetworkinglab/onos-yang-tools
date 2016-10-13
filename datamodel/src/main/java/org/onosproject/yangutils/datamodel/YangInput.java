@@ -80,7 +80,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.INPUT_
 public abstract class YangInput
         extends YangNode
         implements YangLeavesHolder, Parsable, CollisionDetector,
-        YangAugmentableNode, YangIsFilterContentNodes {
+        YangAugmentableNode, YangIsFilterContentNodes, InvalidOpTypeHolder {
 
     private static final long serialVersionUID = 806201608L;
 

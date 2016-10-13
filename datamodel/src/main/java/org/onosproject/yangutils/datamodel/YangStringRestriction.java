@@ -214,6 +214,9 @@ public class YangStringRestriction extends DefaultLocationInfo
         boolean isMatched = false;
         while (rangeListIterator.hasNext()) {
             YangRangeInterval rangeInterval = rangeListIterator.next();
+            rangeInterval.setCharPosition(getCharPosition());
+            rangeInterval.setLineNumber(getLineNumber());
+            rangeInterval.setFileName(getFileName());
             BigInteger startValue = ((YangUint64) rangeInterval.getStartValue()).getValue();
             BigInteger endValue = ((YangUint64) rangeInterval.getEndValue()).getValue();
             if ((valueInString.length() >= startValue.intValue()) &&

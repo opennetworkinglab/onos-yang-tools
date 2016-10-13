@@ -16,14 +16,17 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.File;
-import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.addToCompilationRoot;
 
 /**
@@ -41,9 +44,12 @@ public class YangPluginUtilsTest {
 
         MavenProject project = new MavenProject();
         BuildContext context = new DefaultBuildContext();
-        File sourceDir = new File(BASE_DIR + File.separator + "yang");
+        String dir = BASE_DIR + File.separator + "yang";
+        String path = System.getProperty("user.dir") + File.separator + dir;
+        File sourceDir = new File(dir);
         sourceDir.mkdirs();
         addToCompilationRoot(sourceDir.toString(), project, context);
+        assertThat(true, is(project.getCompileSourceRoots().contains(path)));
         FileUtils.deleteDirectory(sourceDir);
     }
 }

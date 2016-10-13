@@ -24,6 +24,7 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSortedSet;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.utils.UtilConstants.ABSTRACT_EVENT;
+import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BITSET;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
@@ -238,6 +239,15 @@ public class JavaImportData {
      */
     public String getImportForToBitSet() {
         return getImportString(JAVA_UTIL_PKG, BITSET);
+    }
+
+    /**
+     * Returns import for to bitset method.
+     *
+     * @return import for to bitset method
+     */
+    public String getImportForToBase64() {
+        return getImportString(JAVA_UTIL_PKG, BASE64);
     }
 
     /**

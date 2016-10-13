@@ -16,13 +16,13 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
@@ -40,6 +40,7 @@ public final class ChoiceCaseTranslatorTest {
     @Test
     public void processChoiceCaseTranslator() throws IOException, ParserException {
 
+        deleteDirectory("target/ChoiceCaseTestGenFile/");
         YangNode node = manager.getDataModel("src/test/resources/ChoiceCaseTranslator.yang");
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();

@@ -99,13 +99,10 @@ public final class MethodsGeneratorTest {
     private static final String SET = "setValue.set(0);\n";
     private static final String UNION = "    @Override\n" +
             "    public String toString() {\n" +
-            "        MoreObjects.ToStringHelper helper =" +
-            " MoreObjects.toStringHelper(getClass())\n" +
-            "                .omitNullValues();\n" +
             "        if (setValue.get(0)) {\n" +
-            "            helper.add(\"string\", string);\n" +
+            "            return string;\n" +
             "        }\n" +
-            "        return helper.toString();\n" +
+            "        return null;\n" +
             "    }";
 
     /**
@@ -259,7 +256,7 @@ public final class MethodsGeneratorTest {
         JavaAttributeInfo testAttr = getTestAttribute();
         List<YangType<?>> types = new ArrayList<>();
         types.add(testAttr.getAttributeType());
-        String method = getUnionToStringMethod(types);
+        String method = getUnionToStringMethod(types, CLASS_NAME);
         assertThat(true, is(method.contains(UNION)));
     }
 

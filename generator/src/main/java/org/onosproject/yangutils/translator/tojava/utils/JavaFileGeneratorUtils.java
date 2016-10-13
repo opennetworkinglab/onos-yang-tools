@@ -21,6 +21,7 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
+import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -98,11 +99,11 @@ import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_INTERFACE;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ENUM_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.EVENT;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.EVENT_LISTENER;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.EVENT_SUBJECT_CLASS;
-import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.IMPL_CLASS;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.INTERFACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.RPC_INTERFACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
@@ -452,7 +453,7 @@ public final class JavaFileGeneratorUtils {
                 break;
             case DEFAULT_CLASS_MASK:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, IMPL_CLASS, curNode, className);
+                write(file, genType, DEFAULT_CLASS, curNode, className);
                 break;
             case BUILDER_CLASS_MASK:
                 write(file, genType, BUILDER_CLASS, curNode, className);
@@ -505,11 +506,11 @@ public final class JavaFileGeneratorUtils {
         switch (genType) {
             case GENERATE_TYPEDEF_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, fileName, genType, IMPL_CLASS);
+                write(file, fileName, genType, DEFAULT_CLASS);
                 break;
             case GENERATE_UNION_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, fileName, genType, IMPL_CLASS);
+                write(file, fileName, genType, DEFAULT_CLASS);
                 break;
             case GENERATE_ENUM_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
@@ -664,6 +665,15 @@ public final class JavaFileGeneratorUtils {
      */
     public static void addResolvedAugmentedDataNodeImports(YangNode parent) {
         List<YangAtomicPath> targets = getSetOfNodeIdentifiers(parent);
+        if (targets.isEmpty()) {
+            return;
+        }
+
+        YangNode node = targets.get(0).getResolvedNode();
+        if (node instanceof YangNotification) {
+            return;
+        }
+
         TempJavaCodeFragmentFiles tempJavaCodeFragmentFiles = (
                 (JavaCodeGeneratorInfo) parent)
                 .getTempJavaCodeFragmentFiles();
@@ -795,7 +805,7 @@ public final class JavaFileGeneratorUtils {
                                            YangType<?> attributeType) {
         if (attributeName.equalsIgnoreCase(LEAFREF)) {
             YangLeafRef leafRef = (YangLeafRef) attributeType.getDataTypeExtendedInfo();
-            if (!leafRef.isInGrouping()) {
+            if (leafRef != null && !leafRef.isInGrouping()) {
                 return attributeType.getDataTypeName();
             }
         }

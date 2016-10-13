@@ -731,6 +731,10 @@ public final class UtilConstants {
      * Static attribute for of.
      */
     public static final String OF = "of";
+    /**
+     * Static attribute for of.
+     */
+    public static final String OF_CAPS = "Of";
 
     /**
      * Static attribute for other.
@@ -848,6 +852,11 @@ public final class UtilConstants {
     public static final String OPEN_CLOSE_BRACKET_STRING = "()";
 
     /**
+     * Static attribute for empty parameter function call.
+     */
+    public static final String OPEN_CLOSE_DIAMOND_STRING = "<>";
+
+    /**
      * Static attribute for open curly bracket syntax.
      */
     public static final String OPEN_CURLY_BRACKET = "{";
@@ -942,6 +951,16 @@ public final class UtilConstants {
      * Static attribute for is isLeafValueSet method prefix.
      */
     public static final String VALUE_LEAF_SET = "isLeafValueSet";
+
+    /**
+     * Static attribute for is valueLeafFlags method prefix.
+     */
+    public static final String VALUE_LEAF = "valueLeafFlags";
+
+    /**
+     * Static attribute for is selectLeafFlags method prefix.
+     */
+    public static final String SELECT_LEAF = "selectLeafFlags";
 
     /**
      * Static attribute for is isSelectLeaf method prefix.
@@ -1118,6 +1137,11 @@ public final class UtilConstants {
      * BitSet built in java type.
      */
     public static final String BIT_SET = "BitSet";
+
+    /**
+     * Augment map type.
+     */
+    public static final String AUGMENT_MAP_TYPE = "Map<Class<?>, Object>";
 
     /**
      * Byte java built in type.
@@ -1452,6 +1476,12 @@ public final class UtilConstants {
             "MoreObjects.toStringHelper(getClass())";
 
     /**
+     * Static attribute for to string method.
+     */
+    public static final String GOOGLE_MORE_OBJECT_METHOD_STATIC_STRING =
+            "MoreObjects.toStringHelper";
+
+    /**
      * Static attribute for java utilities import package.
      */
     public static final String JAVA_UTIL_PKG = "java.util";
@@ -1491,6 +1521,12 @@ public final class UtilConstants {
      */
     public static final String YANG_AUGMENTED_INFO_LOWER_CASE =
             "yangAugmentedInfo";
+
+    /**
+     * Static attribute for AugmentedInfo class.
+     */
+    public static final String YANG_AUGMENTED_INFO_MAP =
+            "yangAugmentedInfoMap";
 
     /**
      * Static attribute for augmented.
@@ -1732,7 +1768,7 @@ public final class UtilConstants {
      * Static attribute for YANG node operation type class.
      */
     public static final String OPERATION_TYPE_CLASS =
-            "OnosYangNodeOperationType";
+            "OnosYangOpType";
 
     /**
      * Static attribute for YANG node operation type attribute.
@@ -1823,6 +1859,14 @@ public final class UtilConstants {
      */
     public static final String ERROR_MSG_JAVA_IDENTITY = "Expected java " +
             "identity instance node ";
+
+    /**
+     * Static attribute for error msg.
+     */
+    public static final String ERROR_MSG_FOR_AUGMENT_LINKING = "Augment " +
+            "linking does not support linking when path contains " +
+            "notification/grouping for path: ";
+
     /**
      * Static attribute for in.
      */

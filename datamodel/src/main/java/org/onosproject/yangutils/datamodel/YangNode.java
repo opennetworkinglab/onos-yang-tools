@@ -79,6 +79,11 @@ public abstract class YangNode extends DefaultLocationInfo
     private boolean isToTranslate = true;
 
     /**
+     * Flag if the node needs to generate operation type info for translation.
+     */
+    private boolean isOpTypeReq;
+
+    /**
      * Map of YANG context information. It is to be consumed by YMS.
      */
     private Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap;
@@ -876,5 +881,22 @@ public abstract class YangNode extends DefaultLocationInfo
     @Override
     public YangSchemaNode getReferredSchema() {
         return referredSchemaNode;
+    }
+
+    /**
+     * Returns true if op type info required for node.
+     *
+     * @return true if op type info required for node
+     */
+    public boolean isOpTypeReq() {
+        if (this instanceof RpcNotificationContainer) {
+            isOpTypeReq = true;
+            return true;
+        }
+        if (this instanceof InvalidOpTypeHolder) {
+            isOpTypeReq = false;
+            return false;
+        }
+        return this.getParent().isOpTypeReq();
     }
 }

@@ -91,13 +91,18 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
             final String name = namespace.getModuleName();
             final String otherName = other.getNameSpace().getModuleName();
             if (name != null && otherName != null) {
-                return namespace.getModuleName()
-                        .equals(other.getNameSpace().getModuleName());
+                if (namespace.getModuleName()
+                        .equals(other.getNameSpace().getModuleName())) {
+                    return true;
+                }
+
             }
             final String nspace = namespace.getModuleNamespace();
             final String otherNspace = other.getNameSpace().getModuleNamespace();
             if (nspace != null && otherNspace != null) {
-                return nspace.equals(otherNspace);
+                if (nspace.equals(otherNspace)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -110,6 +115,6 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, namespace);
+        return 0;
     }
 }

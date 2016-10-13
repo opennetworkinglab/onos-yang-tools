@@ -532,7 +532,7 @@ public final class AttributesJavaDataType {
      * @param isList true if list, false otherwise
      * @return import class
      */
-    private static String getLeafRefImpClass(
+    public static String getLeafRefImpClass(
             YangType type, YangToJavaNamingConflictUtil cnfg, boolean isList) {
         YangType<?> rt = getReferredTypeFromLeafref(type);
         return rt == null ? OBJECT_STRING : getJavaImportClass(rt, isList,

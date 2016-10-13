@@ -1,0 +1,52 @@
+module types {
+
+  namespace "yang:types";
+  prefix "types";
+  yang-version 1;
+
+  revision 2016-10-08;
+  typedef ip-address {
+     type union {
+         type ipv4-address;
+         type ipv6-address;
+         type leaf;
+     }
+  }
+
+  typedef ipv4-address {
+      type int32;
+  }
+
+  typedef ipv6-address {
+      type int32;
+  }
+
+  typedef port-number {
+                       type bits {
+                           bit disable-nagle {
+                               position 0;
+                           }
+                           bit auto-sense-speed {
+                               position 1;
+                           }
+                           bit Mb-only {
+                               position 2;
+                           }
+                       }
+
+}
+
+
+ container con1 {
+     leaf abc {
+         type int32;
+     }
+ }
+
+ typedef leaf {
+     type leafref {
+         path "/con1/abc";
+     }
+ }
+
+}

@@ -148,18 +148,11 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      */
     private void addRpcString(JavaAttributeInfo inAttr, JavaAttributeInfo outAttr,
                               String rpcName) throws IOException {
-        String rpcInput = EMPTY_STRING;
-        String rpcOutput = VOID;
-        String rpcIn = EMPTY_STRING;
-        if (inAttr != null) {
-            rpcInput = getCapitalCase(inAttr.getAttributeName());
-        }
-        if (outAttr != null) {
-            rpcOutput = getCapitalCase(outAttr.getAttributeName());
-        }
-        if (!rpcInput.equals(EMPTY_STRING)) {
-            rpcIn = RPC_INPUT_VAR_NAME;
-        }
+        String rpcInput = inAttr == null ? null :
+                getCapitalCase(inAttr.getAttributeName());
+        String rpcOutput = outAttr == null ? VOID :
+                getCapitalCase(outAttr.getAttributeName());
+        String rpcIn = rpcInput == null ? EMPTY_STRING : RPC_INPUT_VAR_NAME;
         appendToFile(rpcInterfaceTempFileHandle,
                      generateJavaDocForRpc(rpcName, rpcIn, rpcOutput) +
                              getRpcServiceMethod(rpcName, rpcInput, rpcOutput));

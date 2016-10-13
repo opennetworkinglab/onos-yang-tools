@@ -53,7 +53,7 @@ submodule test2{
        }
     }
 
-     augment /group1/cont3/cont4 {
+     augment /cont5/cont6/cont3/cont4 {
         container cont8 {
           leaf leaf8 {
              type int32;

@@ -138,7 +138,7 @@ public final class YangIoUtils {
             bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode,
                                             null));
             String pkg = PACKAGE + SPACE + pack + SEMI_COLON;
-            if (pkg.length() > LINE_SIZE) {
+            if (pkg.length() >= LINE_SIZE) {
                 pkg = processModifications(pkg, LINE_SIZE);
             }
             bufferedWriter.write(pkg);
@@ -361,7 +361,7 @@ public final class YangIoUtils {
             String line = bufferReader.readLine();
 
             while (line != null) {
-                if (line.length() > LINE_SIZE) {
+                if (line.length() >= LINE_SIZE) {
                     line = processModifications(line, LINE_SIZE);
                 }
                 stringBuilder.append(line);
@@ -564,7 +564,7 @@ public final class YangIoUtils {
         String temp;
         for (String str : array) {
             if (!str.contains(OPEN_CURLY_BRACKET)) {
-                if (str.length() > SUB_LINE_SIZE) {
+                if (str.length() >= SUB_LINE_SIZE) {
                     count = getSplitString(str, newArray, count);
                 } else {
                     newArray.add(str);

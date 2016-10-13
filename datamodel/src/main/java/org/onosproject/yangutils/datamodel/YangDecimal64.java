@@ -32,7 +32,8 @@ import java.util.ListIterator;
  * Represents YANG decimal 64.
  */
 public class YangDecimal64<T> extends DefaultLocationInfo
-        implements YangBuiltInDataTypeInfo<YangDecimal64>, Parsable, Serializable, Comparable<YangDecimal64> {
+        implements YangBuiltInDataTypeInfo<YangDecimal64>, Parsable, Serializable,
+        Comparable<YangDecimal64> {
 
     private static final long serialVersionUID = 8006201668L;
 
@@ -59,7 +60,8 @@ public class YangDecimal64<T> extends DefaultLocationInfo
     /**
      * Valid minimum value of YANG's decimal64.
      */
-    public static final BigDecimal MIN_VALUE = BigDecimal.valueOf(-922337203685477580.8);
+    private static final BigDecimal MIN_VALUE = BigDecimal.valueOf
+            (-922337203685477580.8);
 
     /**
      * Valid maximum value of YANG's decimal64.
@@ -97,7 +99,7 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      *
      * @param valueInString of decimal64 in string
      */
-    public YangDecimal64(String valueInString) {
+    YangDecimal64(String valueInString) {
         if (valueInString.matches(MIN_KEYWORD)) {
             value = MIN_VALUE;
         } else if (valueInString.matches(MAX_KEYWORD)) {
@@ -234,9 +236,13 @@ public class YangDecimal64<T> extends DefaultLocationInfo
             // Check whether value is within provided range value
             ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
                     .listIterator();
+
             boolean isMatched = false;
             while (rangeListIterator.hasNext()) {
                 YangRangeInterval rangeInterval = rangeListIterator.next();
+                rangeInterval.setCharPosition(getCharPosition());
+                rangeInterval.setLineNumber(getLineNumber());
+                rangeInterval.setFileName(getFileName());
                 BigDecimal startValue = ((YangDecimal64) rangeInterval.getStartValue()).getValue();
                 BigDecimal endValue = ((YangDecimal64) rangeInterval.getEndValue()).getValue();
                 if ((this.value.doubleValue() >= startValue.doubleValue()) &&
@@ -248,19 +254,19 @@ public class YangDecimal64<T> extends DefaultLocationInfo
             // If range is not matched then throw error
             if (!isMatched) {
                 throw new DataModelException("YANG file error : decimal64 validation failed. " +
-                        " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
             }
         } else {
             // Check value is in fraction-digits decimal64 value range
             if (!FractionDigits.isValueInDecimal64Range(this.value, getFractionDigit())) {
                 throw new DataModelException("YANG file error : decimal64 validation failed. " +
-                        " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
 
             }
         }
@@ -282,22 +288,25 @@ public class YangDecimal64<T> extends DefaultLocationInfo
                 .listIterator();
         while (rangeListIterator.hasNext()) {
             YangRangeInterval rangeInterval = rangeListIterator.next();
+            rangeInterval.setCharPosition(getCharPosition());
+            rangeInterval.setLineNumber(getLineNumber());
+            rangeInterval.setFileName(getFileName());
             if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getStartValue()).getValue(),
-                    getFractionDigit()))) {
+                                                         getFractionDigit()))) {
                 throw new DataModelException("YANG file error : range validation failed. " +
-                        " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
             }
 
             if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getEndValue()).getValue(),
-                    getFractionDigit()))) {
+                                                         getFractionDigit()))) {
                 throw new DataModelException("YANG file error : range validation failed. " +
-                        " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
             }
         }
     }
@@ -317,7 +326,10 @@ public class YangDecimal64<T> extends DefaultLocationInfo
     public YangRangeRestriction getDefaultRangeRestriction() throws DataModelException {
         YangRangeRestriction refRangeRestriction = new YangRangeRestriction();
         YangRangeInterval rangeInterval = new YangRangeInterval<>();
-        FractionDigits.Range range = FractionDigits.getRange(this.fractionDigit);
+        rangeInterval.setCharPosition(getCharPosition());
+        rangeInterval.setLineNumber(getLineNumber());
+        rangeInterval.setFileName(getFileName());
+        FractionDigits.Range range = FractionDigits.getRange(fractionDigit);
         rangeInterval.setStartValue(new YangDecimal64(new BigDecimal((range.getMin()))));
         rangeInterval.setEndValue(new YangDecimal64(new BigDecimal((range.getMax()))));
         refRangeRestriction.addRangeRestrictionInterval(rangeInterval);

@@ -16,16 +16,23 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.NOTIFICATION_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+import static org.onosproject.yangutils.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.NOTIFICATION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.NOTIFICATION_DATA;
 
 /*
  * Reference RFC 6020.
@@ -79,7 +86,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 public abstract class YangNotification
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
-        YangAugmentableNode, YangIfFeatureHolder {
+        YangAugmentableNode, YangIfFeatureHolder, InvalidOpTypeHolder {
 
     private static final long serialVersionUID = 806201611L;
 
@@ -106,30 +113,31 @@ public abstract class YangNotification
     /**
      * Status of the node.
      */
-    private YangStatusType status = YangStatusType.CURRENT;
+    private YangStatusType status = CURRENT;
 
     /**
      * List of if-feature.
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private List<YangAugment> yangAugmentedInfo = new ArrayList<>();
+    private final List<YangAugment> yangAugmentedInfo;
 
     /**
      * Create a notification node.
      */
     public YangNotification() {
-        super(YangNodeType.NOTIFICATION_NODE, new HashMap<>());
+        super(NOTIFICATION_NODE, new HashMap<>());
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
+        yangAugmentedInfo = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        getYsnContextInfoMap().put(id, context);
     }
 
     @Override
@@ -138,13 +146,14 @@ public abstract class YangNotification
     }
 
     @Override
-    public void addToDefaultChildMap(YangSchemaNodeIdentifier yangSchemaNodeIdentifier, YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode yangSchemaNode) {
         // TODO
     }
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YANG_SINGLE_INSTANCE_NODE;
     }
 
     @Override
@@ -158,17 +167,15 @@ public abstract class YangNotification
     public void detectSelfCollision(String identifierName, YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as notification \""
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsgCollision(
+                    COLLISION_DETECTION, getName(), getLineNumber(),
+                    getCharPosition(), NOTIFICATION, getFileName()));
         }
     }
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.NOTIFICATION_DATA;
+        return NOTIFICATION_DATA;
     }
 
     @Override
@@ -195,7 +202,7 @@ public abstract class YangNotification
 
     @Override
     public List<YangLeaf> getListOfLeaf() {
-        return listOfLeaf;
+        return unmodifiableList(listOfLeaf);
     }
 
     @Override
@@ -205,12 +212,12 @@ public abstract class YangNotification
 
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
     }
 
     @Override
     public List<YangLeafList> getListOfLeafList() {
-        return listOfLeafList;
+        return unmodifiableList(listOfLeafList);
     }
 
     @Override
@@ -220,7 +227,7 @@ public abstract class YangNotification
 
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
     }
 
     @Override
@@ -245,15 +252,12 @@ public abstract class YangNotification
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
-        }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override
@@ -273,17 +277,17 @@ public abstract class YangNotification
 
     @Override
     public List<YangAugment> getAugmentedInfoList() {
-        return yangAugmentedInfo;
+        return unmodifiableList(yangAugmentedInfo);
     }
 
     @Override
     public void setLeafNameSpaceAndAddToParentSchemaMap() {
         // Add namespace for all leafs.
-        for (YangLeaf yangLeaf : getListOfLeaf()) {
+        for (YangLeaf yangLeaf : listOfLeaf) {
             yangLeaf.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
         // Add namespace for all leaf list.
-        for (YangLeafList yangLeafList : getListOfLeafList()) {
+        for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }

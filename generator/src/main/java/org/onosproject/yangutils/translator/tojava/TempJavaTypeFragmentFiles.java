@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
@@ -51,7 +52,9 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.INT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.LONG_TYPE_CONFLICT;
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.SHORT_TYPE_CONFLICT;
+import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -263,6 +266,15 @@ public class TempJavaTypeFragmentFiles
                                                                           config);
                 if (type.getDataType() == BITS) {
                     addBitsHandler(javaAttributeInfo, type, this);
+                }
+                if (type.getDataType() == BINARY) {
+                    JavaQualifiedTypeInfoTranslator info = new
+                            JavaQualifiedTypeInfoTranslator();
+                    info.setClassInfo(BASE64);
+                    info.setPkgInfo(JAVA_UTIL_PKG);
+                    getJavaImportData().addImportInfo(
+                            info, getGeneratedJavaClassName(), getJavaFileInfo()
+                                    .getPackage());
                 }
                 addJavaSnippetInfoToApplicableTempFiles(javaAttributeInfo,
                                                         config, types);
@@ -603,7 +615,7 @@ public class TempJavaTypeFragmentFiles
         }
 
         createPackage(curNode);
-        addImportsToStringAndHasCodeMethods(imports, true);
+        imports.add(getJavaImportData().getImportForHashAndEquals());
 
         /*
          * Creates type def class file.

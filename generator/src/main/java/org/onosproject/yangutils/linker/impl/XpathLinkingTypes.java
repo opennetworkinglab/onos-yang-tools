@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.onosproject.yangutils.translator.tojava.utils;
+package org.onosproject.yangutils.linker.impl;
 
 /**
- * Represents indentation type.
+ * Represents x path linking types.
  */
-public enum IndentationType {
+public enum XpathLinkingTypes {
 
-    //Four space indentation.
-    FOUR_SPACE,
+    // Augment path linking.
+    AUGMENT_LINKING,
 
-    //Eight space indentation.
-    EIGHT_SPACE,
+    // Leaf ref path linking.
+    LEAF_REF_LINKING,
 
-    //Twelve space indentation.
-    TWELVE_SPACE,
-
-    //Sixteen space indentation.
-    SIXTEEN_SPACE,
-
-    //Twenty space indentation.
-    TWENTY_SPACE,
-
-    //Twenty four space indentation.
-    TWENTY_FOUR_SPACE,
-
-    //Twenty eight space indentation.
-    TWENTY_EIGHT_SPACE
-
+    // Compiler annotation linking.
+    COMPILER_ANNOTATION_LINKING
 }

@@ -164,8 +164,7 @@ final class ClassDefinitionGenerator {
      * @return enum file class definition
      */
     private static String getEnumClassDefinition(String yangName) {
-        return trimAtLast(getDefaultDefinition(ENUM, yangName, PUBLIC),
-                          NEW_LINE);
+        return getDefaultDefinition(ENUM, yangName, PUBLIC);
     }
 
     /**
@@ -222,9 +221,6 @@ final class ClassDefinitionGenerator {
             if (clsDef != null) {
                 return clsDef;
             }
-        }
-        if (curNode instanceof RpcNotificationContainer) {
-            return getDefaultDefinition(CLASS, bName, mod);
         }
         return getDefaultDefinitionWithImpl(CLASS, bName, mod,
                                             getBuilderImplStringClassDef(yangName));
@@ -409,11 +405,9 @@ final class ClassDefinitionGenerator {
                             .append(SPACE).append(EXTEND).append(SPACE);
                     def = new StringBuilder(getDefinitionString(def.toString(),
                                                                 holder));
-                    if (!(curNode instanceof RpcNotificationContainer)) {
-                        def.append(SPACE).append(IMPLEMENTS).append(SPACE)
-                                .append(yangName).append(PERIOD)
-                                .append(yangName).append(BUILDER);
-                    }
+                    def.append(SPACE).append(IMPLEMENTS).append(SPACE)
+                            .append(yangName).append(PERIOD)
+                            .append(yangName).append(BUILDER);
                     break;
                 case DEFAULT_CLASS_MASK:
                     if (curNode instanceof RpcNotificationContainer) {

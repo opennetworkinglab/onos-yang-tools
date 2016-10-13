@@ -38,6 +38,7 @@ import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaOutputTrans
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,10 @@ import java.util.List;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.addCurNodeInfoInParentTempFile;
+import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
+import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerator.generateInterfaceFile;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.methodClose;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_NODE;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_PARENT_NODE;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_TRANSLATION_NODE;
@@ -54,13 +58,17 @@ import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsgForCodeGenerator;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.INPUT_KEYWORD;
 import static org.onosproject.yangutils.utils.UtilConstants.OUTPUT_KEYWORD;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.addPackageInfo;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
  * Represents utility class for YANG java model.
@@ -233,6 +241,11 @@ public final class YangJavaModelUtils {
             }
         }
         if (info instanceof YangLeavesHolder) {
+            YangLeavesHolder holder = (YangLeavesHolder) info;
+            boolean isLeafPresent = holder.getListOfLeaf() != null && !holder
+                    .getListOfLeaf().isEmpty();
+            boolean isLeafListPresent = holder.getListOfLeafList() != null &&
+                    !holder.getListOfLeafList().isEmpty();
             /*
              * Container
              * Case
@@ -242,12 +255,23 @@ public final class YangJavaModelUtils {
              * Notification
              * Output
              */
-            getBeanFiles(info).addCurNodeLeavesInfoToTempFiles((YangNode) info,
+            if (isLeafPresent || isLeafListPresent) {
+                getBeanFiles(info).addCurNodeLeavesInfoToTempFiles((YangNode) info,
+                                                                   config);
+            }
+            //Add value leaf flag attribute to temp file.
+            if (isLeafPresent) {
+                getBeanFiles(info).addValueLeafFlag(config, (YangNode) info);
+            }
+            if (((YangNode) info).isOpTypeReq()) {
+                // Add operation type as an attribute.
+                getBeanFiles(info).addOperationTypeToTempFiles((YangNode) info,
                                                                config);
-
-            // Add operation type as an attribute.
-            getBeanFiles(info).addOperationTypeToTempFiles((YangNode) info,
-                                                           config);
+                if (isLeafPresent) {
+                    //Add select leaf flag attribute to temp file.
+                    getBeanFiles(info).addSelectLeafFlag(config);
+                }
+            }
         } else if (info instanceof YangTypeHolder) {
             /*
              * Typedef
@@ -381,7 +405,7 @@ public final class YangJavaModelUtils {
      */
     private static YangSchemaNode getRefSchema(JavaCodeGeneratorInfo info) {
 
-        YangSchemaNode node = ((YangSchemaNode) info);
+        YangSchemaNode node = (YangSchemaNode) info;
         if (node.getReferredSchema() == null) {
             return null;
         }
@@ -416,7 +440,9 @@ public final class YangJavaModelUtils {
         generateCodeOfNode(info, config);
         TempJavaCodeFragmentFiles tempFiles =
                 info.getTempJavaCodeFragmentFiles();
-
+        if (!(info instanceof YangChoice)) {
+            getBeanFiles(info).addYangAugmentedMap(config);
+        }
         if (info instanceof YangCase) {
             YangNode parent = ((YangCase) info).getParent();
             JavaQualifiedTypeInfoTranslator typeInfo =
@@ -658,9 +684,9 @@ public final class YangJavaModelUtils {
         String name = getCapitalCase(getCamelCase(identifier.getName(),
                                                   config.getConflictResolver()));
         if (identifier.getPrefix() != null) {
-            return AUGMENTED + getCapitalCase(
-                    getCamelCase(identifier.getPrefix(),
-                                 config.getConflictResolver())) + name;
+            return getCapitalCase(getCamelCase(AUGMENTED + HYPHEN + identifier
+                                                       .getPrefix(),
+                                               config.getConflictResolver())) + name;
         }
         return AUGMENTED + name;
     }
@@ -672,14 +698,41 @@ public final class YangJavaModelUtils {
      * @param node current YANG node
      * @throws IOException when fails to generate java files
      */
-    public static void  generateJava(int type, YangNode node)
+    public static void generateJava(int type, YangNode node)
             throws IOException {
         /*
          * Call for file generation if node is not under uses.
          */
-        if(node.getReferredSchema() == null) {
+        if (node.getReferredSchema() == null) {
             ((TempJavaCodeFragmentFilesContainer) node)
-                .getTempJavaCodeFragmentFiles().generateJavaFile(type, node);
+                    .getTempJavaCodeFragmentFiles().generateJavaFile(type, node);
         }
+    }
+
+    /**
+     * Generates interface file for those yang file which contains only any
+     * of these grouping, typedef and identity.
+     *
+     * @param rootNode root node
+     * @throws IOException when fails to do IO operations
+     */
+    public static void generateInterfaceFileForNonDataNodes(YangNode rootNode) throws
+            IOException {
+        JavaCodeGeneratorInfo info = (JavaCodeGeneratorInfo) rootNode;
+        TempJavaCodeFragmentFiles tempFile = info
+                .getTempJavaCodeFragmentFiles();
+        JavaFileInfoTranslator fileInfo = info.getJavaFileInfo();
+        File filePath = new File(fileInfo.getBaseCodeGenPath() + fileInfo
+                .getPackageFilePath());
+        String name = getCapitalCase(fileInfo.getJavaName());
+        //Add package info file for this.
+        addPackageInfo(filePath, name, fileInfo.getPackage(), false);
+        //Generate file handle for this.
+        File interFace = tempFile.getBeanTempFiles().getJavaFileHandle(
+                name);
+        //generate java code for interface file.
+        validateLineLength(generateInterfaceFile(interFace, null, rootNode,
+                                                 false));
+        insertDataIntoJavaFile(interFace, methodClose(FOUR_SPACE));
     }
 }

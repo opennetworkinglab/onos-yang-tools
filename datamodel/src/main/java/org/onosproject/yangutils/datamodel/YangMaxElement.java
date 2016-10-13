@@ -16,10 +16,10 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
+
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.OPERATION_FAILED_ERROR_TAG;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.TOO_MANY_ELEMENTS_ERROR_APP_TAG;
-
-import java.io.Serializable;
 
 /**
  * Represents max element data represented in YANG.
@@ -36,12 +36,12 @@ public class YangMaxElement extends DefaultLocationInfo
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     *
+     * <p>
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private int maxElement = Integer.MAX_VALUE;
@@ -50,7 +50,7 @@ public class YangMaxElement extends DefaultLocationInfo
      * Creates a YANG maximum element.
      */
     public YangMaxElement() {
-        YangAppErrorInfo yangAppErrorInfo = new YangAppErrorInfo();
+        yangAppErrorInfo = new YangAppErrorInfo();
         yangAppErrorInfo.setErrorTag(OPERATION_FAILED_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(TOO_MANY_ELEMENTS_ERROR_APP_TAG);
     }

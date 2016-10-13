@@ -78,6 +78,8 @@ import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVE
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNDEFINED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATH_DATA;
+import static org.onosproject.yangutils.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
+import static org.onosproject.yangutils.linker.impl.XpathLinkingTypes.LEAF_REF_LINKING;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.detectCollisionForAugmentedNode;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getErrorInfoForLinker;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getLeafRefErrorInfo;
@@ -1026,7 +1028,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             YangNode targetNode;
             YangAugment augment = (YangAugment) entityToResolve;
             targetNode = xPathLinker
-                    .processAugmentXpathLinking(augment.getTargetNode(), (YangNode) root);
+                    .processXpathLinking(augment.getTargetNode(), (YangNode)
+                            root, AUGMENT_LINKING);
             if (targetNode != null) {
                 if (targetNode instanceof YangAugmentableNode) {
                     detectCollisionForAugmentedNode(targetNode, augment);
@@ -1053,8 +1056,9 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         } else if (entityToResolve instanceof YangCompilerAnnotation) {
             YangNode targetNode;
             YangCompilerAnnotation ca = (YangCompilerAnnotation) entityToResolve;
-            targetNode = xPathLinker.processAugmentXpathLinking(ca.getAtomicPathList(),
-                                                                (YangNode) root);
+            targetNode = xPathLinker.processXpathLinking(ca.getAtomicPathList(),
+                                                         (YangNode) root,
+                                                         AUGMENT_LINKING);
             if (targetNode != null) {
                 if (targetNode instanceof YangList) {
                     ((YangList) targetNode).setCompilerAnnotation(
@@ -1074,7 +1078,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         } else if (entityToResolve instanceof YangLeafRef) {
             YangLeafRef leafRef = (YangLeafRef) entityToResolve;
             Object target = xPathLinker.processLeafRefXpathLinking(
-                    leafRef.getAtomicPath(), (YangNode) root, leafRef);
+                    leafRef.getAtomicPath(), (YangNode) root, leafRef, LEAF_REF_LINKING);
             if (target != null) {
                 YangLeaf leaf;
                 YangLeafList leafList;
@@ -1210,13 +1214,13 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         /*
          * Obtain the referred node of top of stack entity under resolution
          */
-        T referredNode = getRefNode();
+        T refNode = getRefNode();
 
         /*
          * Check for null for scenario when it's not linked and inter-file
          * linking is required.
          */
-        if (referredNode == null) {
+        if (refNode == null) {
 
             /*
              * Check if prefix is null or not, to identify whether to search in
@@ -1247,7 +1251,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             throw ex;
         } else {
             ((Resolvable) entity).setResolvableStatus(INTER_FILE_LINKED);
-            addUnresolvedRecursiveReferenceToStack((YangNode) referredNode);
+            addUnresolvedRecursiveReferenceToStack((YangNode) refNode);
         }
     }
 

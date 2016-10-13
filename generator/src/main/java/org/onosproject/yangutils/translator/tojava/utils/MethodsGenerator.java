@@ -20,7 +20,9 @@ import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangEnum;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
+import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
@@ -39,13 +41,11 @@ import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.EIGHT_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWELVE_SPACE;
-import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getAugmentMapTypeString;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getCurNodeName;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getSetOfNodeIdentifiers;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.AUGMENTED_MAP_ADD;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.AUGMENTED_MAP_GETTER;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.AUGMENTED_MAP_GET_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.GETTER;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.MANAGER_METHODS;
@@ -62,7 +62,6 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getIfConditionBegin;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getLesserThanCondition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getListAttribute;
-import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getMoreObjectAttr;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNewInstance;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNewLineAndSpace;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOmitNullValueString;
@@ -73,6 +72,8 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getReturnOfSubString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getReturnString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getSetValueParaCondition;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getStringBuilderAttr;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getToStringCall;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getTrySubString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getValueLeafSetString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.ifAndAndCondition;
@@ -87,6 +88,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.utils.UtilConstants.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
+import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
@@ -110,6 +112,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.ENCODE_TO_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
@@ -121,11 +124,11 @@ import static org.onosproject.yangutils.utils.UtilConstants.FROM_STRING_METHOD_N
 import static org.onosproject.yangutils.utils.UtilConstants.FROM_STRING_PARAM_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.GET;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_DECODER;
+import static org.onosproject.yangutils.utils.UtilConstants.GET_ENCODER;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD_PREFIX;
 import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_METHOD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH;
 import static org.onosproject.yangutils.utils.UtilConstants.HASH_CODE_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.HELPER;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
@@ -133,7 +136,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG;
-import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
@@ -144,6 +146,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.OBJ;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OF;
+import static org.onosproject.yangutils.utils.UtilConstants.OF_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.ONE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
@@ -156,6 +159,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILTERING;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_INPUT_VAR_NAME;
@@ -170,6 +174,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.SPLIT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.SQUARE_BRACKETS;
 import static org.onosproject.yangutils.utils.UtilConstants.STATIC;
+import static org.onosproject.yangutils.utils.UtilConstants.STRING_BUILDER_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
@@ -327,16 +332,13 @@ public final class MethodsGenerator {
     /**
      * Returns build method string.
      *
-     * @param name       class name
-     * @param isRootNode if root node
+     * @param name   class name
+     * @param isRoot true if root node
      * @return build string
      */
-    public static String getBuildString(String name, boolean isRootNode) {
-        if (isRootNode) {
-            return NEW_LINE + getBuild(name, true);
-        }
+    public static String getBuildString(String name, boolean isRoot) {
         return FOUR_SPACE_INDENTATION + OVERRIDE + NEW_LINE +
-                getBuild(name, false);
+                getBuild(name, isRoot);
     }
 
     /**
@@ -679,10 +681,7 @@ public final class MethodsGenerator {
      */
     public static String getRpcServiceMethod(String rpcName, String input,
                                              String output) {
-        String inputVal = EMPTY_STRING;
-        if (!input.equals(EMPTY_STRING)) {
-            inputVal = RPC_INPUT_VAR_NAME;
-        }
+        String inputVal = input == null ? null : RPC_INPUT_VAR_NAME;
         return methodSignature(rpcName, EMPTY_STRING, null,
                                inputVal, output, input, INTERFACE_TYPE) +
                 NEW_LINE;
@@ -842,7 +841,7 @@ public final class MethodsGenerator {
     }
 
     /**
-     * Returns to string converter for binary type.
+     * Returns from string converter for binary type.
      *
      * @param var variable name
      * @return to string method body
@@ -853,6 +852,21 @@ public final class MethodsGenerator {
                 .append(GET_DECODER).append(OPEN_CLOSE_BRACKET_STRING).append(PERIOD)
                 .append(DECODE).append(brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
                                                 var, null)).toString();
+    }
+
+    /**
+     * Returns to string converter for binary type.
+     *
+     * @param var variable name
+     * @return to string method body
+     */
+    private static String getToStringForBinary(String var) {
+        StringBuilder builder = new StringBuilder();
+        return builder.append(BASE64).append(PERIOD)
+                .append(GET_ENCODER).append(OPEN_CLOSE_BRACKET_STRING)
+                .append(PERIOD).append(ENCODE_TO_STRING)
+                .append(brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, var, null))
+                .toString();
     }
 
     /**
@@ -1133,34 +1147,38 @@ public final class MethodsGenerator {
     /**
      * Returns interface of add augmentation.
      *
+     * @param className class name
      * @return interface of add augmentation
      */
-    static String getAddAugmentInfoMethodInterface() {
+    static String getAddAugmentInfoMethodInterface(String className) {
         StringBuilder builder = new StringBuilder(generateForAddAugmentation());
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put(VALUE, OBJECT_STRING);
         map.put(CLASS + OBJECT_STRING, CLASS_STRING);
         builder.append(multiAttrMethodSignature(ADD_STRING + YANG_AUGMENTED_INFO,
                                                 EMPTY_STRING, EMPTY_STRING,
-                                                VOID, map, INTERFACE_TYPE));
+                                                className, map, INTERFACE_TYPE));
         return builder.toString();
     }
 
     /**
      * Returns implementation of add augmentation.
      *
+     * @param className class name
      * @return implementation of add augmentation
      */
-    static String getAddAugmentInfoMethodImpl() {
+    static String getAddAugmentInfoMethodImpl(String className) {
         StringBuilder builder = new StringBuilder(getOverRideString());
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put(VALUE, OBJECT_STRING);
         map.put(CLASS + OBJECT_STRING, CLASS_STRING);
         builder.append(multiAttrMethodSignature(ADD_STRING + YANG_AUGMENTED_INFO,
                                                 EMPTY_STRING, PUBLIC,
-                                                VOID, map, CLASS_TYPE))
+                                                className, map, CLASS_TYPE))
                 .append(methodBody(AUGMENTED_MAP_ADD, null, null,
                                    EIGHT_SPACE_INDENTATION, null, null, false, null))
+                .append(getReturnString(THIS, EIGHT_SPACE_INDENTATION))
+                .append(signatureClose())
                 .append(methodClose(FOUR_SPACE))
                 .append(NEW_LINE);
         return builder.toString();
@@ -1189,34 +1207,6 @@ public final class MethodsGenerator {
                                 PUBLIC, CLASS + OBJECT_STRING, OBJECT_STRING,
                                 CLASS_STRING, CLASS_TYPE) +
                 methodBody(AUGMENTED_MAP_GET_VALUE, null, null,
-                           EIGHT_SPACE_INDENTATION, null, null, false, null) +
-                methodClose(FOUR_SPACE);
-    }
-
-    /**
-     * Returns implementation of get YANG augment info.
-     *
-     * @return implementation of get YANG augment info
-     */
-    static String getYangAugmentInfoMapInterface() {
-        return NEW_LINE +
-                getJavaDoc(GETTER_METHOD, YANG_AUGMENTED_INFO_LOWER_CASE + MAP,
-                           false, null) +
-                methodSignature(YANG_AUGMENTED_INFO_LOWER_CASE + MAP,
-                                EMPTY_STRING, null, null,
-                                getAugmentMapTypeString(), null, INTERFACE_TYPE);
-    }
-
-    /**
-     * Returns implementation of get YANG augment info.
-     *
-     * @return implementation of get YANG augment info
-     */
-    static String getYangAugmentInfoMapImpl() {
-        return getOverRideString() + methodSignature(
-                YANG_AUGMENTED_INFO_LOWER_CASE + MAP, EMPTY_STRING, PUBLIC, null,
-                getAugmentMapTypeString(), null, CLASS_TYPE) +
-                methodBody(AUGMENTED_MAP_GETTER, null, null,
                            EIGHT_SPACE_INDENTATION, null, null, false, null) +
                 methodClose(FOUR_SPACE);
     }
@@ -1340,6 +1330,15 @@ public final class MethodsGenerator {
      */
     static String getAugmentsDataMethodForService(YangNode parent) {
         List<YangAtomicPath> targets = getSetOfNodeIdentifiers(parent);
+        if (targets.isEmpty()) {
+            return EMPTY_STRING;
+        }
+        YangNode first = targets.get(0).getResolvedNode();
+        //If target path is for notification then no need to generate get/set
+        // for that augment in service class.
+        if (first instanceof YangNotification) {
+            return EMPTY_STRING;
+        }
         YangNode augmentedNode;
         String curNodeName;
         String method;
@@ -1472,19 +1471,14 @@ public final class MethodsGenerator {
     /**
      * Returns add to list method impl.
      *
-     * @param attr   java attribute
-     * @param name   class name
-     * @param isRoot is root
+     * @param attr java attribute
+     * @param name class name
      * @return add to list method impl
      */
     public static String getAddToListMethodImpl(JavaAttributeInfo attr,
-                                                String name,
-                                                boolean isRoot) {
+                                                String name) {
         String attrName = attr.getAttributeName();
-        String retString = EMPTY_STRING;
-        if (!isRoot) {
-            retString = getOverRideString();
-        }
+        String retString = getOverRideString();
         StringBuilder builder = new StringBuilder(retString);
         builder.append(methodSignature(ADD_STRING + TO_CAPS +
                                                getCapitalCase(attrName),
@@ -1625,20 +1619,15 @@ public final class MethodsGenerator {
     /**
      * Returns setter for select leaf.
      *
-     * @param name       name of node
-     * @param isRootNode if root node
+     * @param name name of node
      * @return setter for select leaf
      */
-    static String getSetterForSelectLeaf(String name, boolean isRootNode) {
-        String append = OVERRIDE;
-        if (isRootNode) {
-            append = EMPTY_STRING;
-        }
+    static String getSetterForSelectLeaf(String name) {
         return "\n" +
-                "    " + append + "\n" +
+                "    " + OVERRIDE + "\n" +
                 "    public " + name + BUILDER +
                 " selectLeaf(LeafIdentifier leaf) {\n" +
-                "        getSelectLeafFlags().set(leaf.getLeafIndex());\n" +
+                "        selectLeafFlags.set(leaf.getLeafIndex());\n" +
                 "        return this;\n" +
                 "    }\n";
     }
@@ -1687,30 +1676,101 @@ public final class MethodsGenerator {
         return sBuild.toString();
     }
 
+
+    /**
+     * Returns to string method for typedef.
+     *
+     * @param attr      attribute name
+     * @param className class name
+     * @return to string method for typedef
+     */
+    static String getToStringForType(String attr, YangType type,
+                                     String className) {
+        StringBuilder builder = new StringBuilder(getOverRideString())
+                .append(methodSignature(TO_STRING_METHOD, null, PUBLIC, null,
+                                        STRING_DATA_TYPE, null, CLASS_TYPE));
+        builder.append(getReturnString(
+                getToStringForSpecialType(className, type, attr), EIGHT_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        return builder.toString();
+    }
+
+    /**
+     * Returns to string method body for type class.
+     *
+     * @param className class name
+     * @param type      type of attribute
+     * @param name      @return to string method body for typedef class
+     */
+    private static String getToStringForSpecialType(String className, YangType type,
+                                                    String name) {
+        switch (type.getDataType()) {
+            case INT8:
+            case INT16:
+            case INT32:
+            case INT64:
+            case UINT8:
+            case UINT16:
+            case UINT32:
+                return STRING_DATA_TYPE + PERIOD + VALUE + OF_CAPS + brackets(
+                        OPEN_CLOSE_BRACKET_WITH_VALUE, name, null);
+
+            case BINARY:
+                return getToStringCall(getToStringForBinary(name));
+
+            case BITS:
+                return className + getCapitalCase(name) + PERIOD +
+                        TO_STRING_METHOD + brackets(
+                        OPEN_CLOSE_BRACKET_WITH_VALUE, name, null);
+
+            case BOOLEAN:
+            case EMPTY:
+                return name + SPACE + QUESTION_MARK + SPACE + getQuotedString(TRUE)
+                        + SPACE + COLON + SPACE + getQuotedString(FALSE);
+
+            case LEAFREF:
+                YangLeafRef<?> lri = (YangLeafRef<?>) type.getDataTypeExtendedInfo();
+                YangType<?> rt = lri.isInGrouping() ? null : lri
+                        .getEffectiveDataType();
+                return rt == null ? getToStringCall(name) :
+                        getToStringForSpecialType(className, rt, name);
+
+            case ENUMERATION:
+            case INSTANCE_IDENTIFIER:
+            case UINT64:
+            case DECIMAL64:
+            case DERIVED:
+            case IDENTITYREF:
+            case UNION:
+                return getToStringCall(name);
+
+            default:
+                return name;
+        }
+    }
+
     /**
      * Returns union class's to string method.
      *
      * @param types list of types
+     * @param name  class name
      * @return union class's to string method
      */
-    static String getUnionToStringMethod(List<YangType<?>> types) {
+    static String getUnionToStringMethod(List<YangType<?>> types, String name) {
 
         StringBuilder builder = new StringBuilder(getOverRideString());
         builder.append(methodSignature(TO_STRING_METHOD, null, PUBLIC, null,
-                                       STRING_DATA_TYPE, null, CLASS_TYPE))
-                .append(getMoreObjectAttr());
+                                       STRING_DATA_TYPE, null, CLASS_TYPE));
         for (YangType type : types) {
             builder.append(getIfConditionBegin(
                     EIGHT_SPACE_INDENTATION, getSetValueParaCondition(
-                            types.indexOf(type))))
-                    .append(TWELVE_SPACE_INDENTATION).append(HELPER).append(
-                    methodBody(TO_STRING, getCamelCase(type.getDataTypeName()
-                            , null), null, EMPTY_STRING, null, null, false, null))
+                            types.indexOf(type)))).append(getReturnString(
+                    getToStringForSpecialType(name, type,
+                                              getCamelCase(type.getDataTypeName(), null)),
+                    TWELVE_SPACE_INDENTATION))
                     .append(signatureClose()).append(methodClose(EIGHT_SPACE));
         }
-        builder.append(getReturnString(HELPER, EIGHT_SPACE_INDENTATION))
-                .append(PERIOD).append(TO_STRING_METHOD)
-                .append(OPEN_CLOSE_BRACKET_STRING).append(signatureClose())
+        builder.append(getReturnString(NULL, EIGHT_SPACE_INDENTATION)).append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
     }
@@ -1726,13 +1786,21 @@ public final class MethodsGenerator {
                 getFromStringForBits(className);
     }
 
+    /**
+     * Returns to string method for bits type.
+     *
+     * @param className   class name
+     * @param enumeration enumeration
+     * @return to string method
+     */
     static String getBitSetEnumClassToString(String className,
                                              YangEnumeration enumeration) {
 
         StringBuilder builder = new StringBuilder();
-        builder.append(methodSignature(TO_STRING_METHOD, null, PUBLIC, BITS,
+        builder.append(methodSignature(TO_STRING_METHOD, null,
+                                       PUBLIC + SPACE + STATIC, BITS,
                                        STRING_DATA_TYPE, BIT_SET, CLASS_TYPE))
-                .append(getMoreObjectAttr());
+                .append(getStringBuilderAttr(EMPTY_STRING, EIGHT_SPACE_INDENTATION));
         String condition;
         String name;
         for (YangEnum yangEnum : enumeration.getEnumSet()) {
@@ -1745,16 +1813,34 @@ public final class MethodsGenerator {
 
             builder.append(getIfConditionBegin(
                     EIGHT_SPACE_INDENTATION, condition))
-                    .append(TWELVE_SPACE_INDENTATION).append(HELPER).append(
-                    PERIOD).append(ADD_STRING).append(OPEN_PARENTHESIS)
-                    .append(getQuotedString(name)).append(COMMA).append(SPACE)
+                    .append(TWELVE_SPACE_INDENTATION).append(STRING_BUILDER_VAR).append(
+                    PERIOD).append(APPEND).append(OPEN_PARENTHESIS)
                     .append(getQuotedString(name)).append(CLOSE_PARENTHESIS)
+                    .append(signatureClose())
+                    .append(TWELVE_SPACE_INDENTATION).append(STRING_BUILDER_VAR).append(
+                    PERIOD).append(APPEND).append(OPEN_PARENTHESIS)
+                    .append(getQuotedString(SPACE)).append(CLOSE_PARENTHESIS)
                     .append(signatureClose()).append(methodClose(EIGHT_SPACE));
         }
-        builder.append(getReturnString(HELPER, EIGHT_SPACE_INDENTATION))
+        builder.append(getReturnString(STRING_BUILDER_VAR, EIGHT_SPACE_INDENTATION))
                 .append(PERIOD).append(TO_STRING_METHOD)
                 .append(OPEN_CLOSE_BRACKET_STRING).append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
+        return builder.toString();
+    }
+
+    /**
+     * Returns to string method for enum class.
+     *
+     * @return to string method for enum class
+     */
+    static String getToStringForEnumClass() {
+        StringBuilder builder = new StringBuilder(getOverRideString());
+        builder.append(methodSignature(TO_STRING_METHOD, EMPTY_STRING,
+                                       PUBLIC, null, STRING_DATA_TYPE, null,
+                                       CLASS_TYPE));
+        builder.append(getReturnString(SCHEMA_NAME, EIGHT_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(FOUR_SPACE));
         return builder.toString();
     }
 }

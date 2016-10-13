@@ -16,13 +16,12 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-
+import com.google.common.base.Strings;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
-import com.google.common.base.Strings;
+import java.io.Serializable;
 
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVED;
@@ -238,10 +237,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
                 } else {
                     if (!(baseType.getDataTypeExtendedInfo() instanceof YangRangeRestriction)) {
                         throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                "type." + " in " +
-                                getLineNumber() + " at " +
-                                getCharPosition()
-                                + " in " + getFileName() + "\"");
+                                                             "type." + " in " +
+                                                             getLineNumber() + " at " +
+                                                             getCharPosition()
+                                                             + " in " + getFileName() + "\"");
                     }
                     resolveRangeRestriction((YangRangeRestriction) baseType.getDataTypeExtendedInfo());
                     /*
@@ -267,10 +266,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
                 } else {
                     if (!(baseType.getDataTypeExtendedInfo() instanceof YangStringRestriction)) {
                         throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                "type." + " in " +
-                                getLineNumber() + " at " +
-                                getCharPosition()
-                                + " in " + getFileName() + "\"");
+                                                             "type." + " in " +
+                                                             getLineNumber() + " at " +
+                                                             getCharPosition()
+                                                             + " in " + getFileName() + "\"");
                     }
                     resolveStringRestriction((YangStringRestriction) baseType.getDataTypeExtendedInfo());
                     /*
@@ -292,10 +291,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
                 } else {
                     if (!(baseType.getDataTypeExtendedInfo() instanceof YangRangeRestriction)) {
                         throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                                "type." + " in " +
-                                getLineNumber() + " at " +
-                                getCharPosition()
-                                + " in " + getFileName() + "\"");
+                                                             "type." + " in " +
+                                                             getLineNumber() + " at " +
+                                                             getCharPosition()
+                                                             + " in " + getFileName() + "\"");
                     }
                     resolveBinaryRestriction((YangRangeRestriction) baseType.getDataTypeExtendedInfo());
                     /*
@@ -319,10 +318,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
                         if (!(((YangDecimal64) baseType.getDataTypeExtendedInfo())
                                 .getRangeRestrictedExtendedInfo() instanceof YangRangeRestriction)) {
                             throw new DataModelException("Linker error: Referred typedef restriction info is" +
-                                    " of invalid type." + " in " +
-                                    getLineNumber() + " at " +
-                                    getCharPosition()
-                                    + " in " + getFileName() + "\"");
+                                                                 " of invalid type." + " in " +
+                                                                 getLineNumber() + " at " +
+                                                                 getCharPosition()
+                                                                 + " in " + getFileName() + "\"");
                         }
                         resolveRangeRestriction((YangRangeRestriction) ((YangDecimal64) baseType
                                 .getDataTypeExtendedInfo()).getRangeRestrictedExtendedInfo());
@@ -336,10 +335,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
 
                 } else {
                     throw new DataModelException("Linker error: Unable to find type extended info for decimal64." +
-                            "" + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+                                                         "" + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition()
+                                                         + " in " + getFileName() + "\"");
                 }
             }
         }
@@ -355,19 +354,19 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
                 return RESOLVED;
             } else {
                 throw new DataModelException("YANG file error: Restrictions can't be applied to a given type "
-                        + " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition()
-                        + " in " + getFileName() + "\"");
+                                                     + " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition()
+                                                     + " in " + getFileName() + "\"");
             }
         }
 
         // Throw exception for unsupported types
         throw new DataModelException("Linker error: Unable to process the derived type. "
-                + " in " +
-                getLineNumber() + " at " +
-                getCharPosition()
-                + " in " + getFileName() + "\"");
+                                             + " in " +
+                                             getLineNumber() + " at " +
+                                             getCharPosition()
+                                             + " in " + getFileName() + "\"");
     }
 
     /**
@@ -384,10 +383,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
         //Check whether the referred typedef is resolved.
         if (baseType.getResolvableStatus() != INTRA_FILE_RESOLVED && baseType.getResolvableStatus() != RESOLVED) {
             throw new DataModelException("Linker Error: Referred typedef is not resolved for type."
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
 
         /*
@@ -398,7 +397,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             return INTRA_FILE_RESOLVED;
         }
         setEffectiveBuiltInType(((YangDerivedInfo<?>) baseType.getDataTypeExtendedInfo())
-                .getEffectiveBuiltInType());
+                                        .getEffectiveBuiltInType());
         YangDerivedInfo refDerivedInfo = (YangDerivedInfo<?>) baseType.getDataTypeExtendedInfo();
         /*
          * Check whether the effective built-in type can have range
@@ -416,10 +415,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                            "type." + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+                                                         "type." + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition()
+                                                         + " in " + getFileName() + "\"");
                 }
                 resolveRangeRestriction((YangRangeRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -445,10 +444,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangStringRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                            "type." + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+                                                         "type." + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition()
+                                                         + " in " + getFileName() + "\"");
                 }
                 resolveStringRestriction((YangStringRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -470,10 +469,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                            "type." + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+                                                         "type." + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition()
+                                                         + " in " + getFileName() + "\"");
                 }
                 resolveBinaryRestriction((YangRangeRestriction) refDerivedInfo.getResolvedExtendedInfo());
                 /*
@@ -495,10 +494,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             } else {
                 if (!(refDerivedInfo.getResolvedExtendedInfo() instanceof YangRangeRestriction)) {
                     throw new DataModelException("Linker error: Referred typedef restriction info is of invalid " +
-                            "type." + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+                                                         "type." + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition()
+                                                         + " in " + getFileName() + "\"");
                 }
                 resolveRangeRestriction((YangRangeRestriction) refDerivedInfo
                         .getResolvedExtendedInfo());
@@ -532,7 +531,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          */
         if (!Strings.isNullOrEmpty(getRangeRestrictionString())) {
             DataModelException dataModelException = new DataModelException("YANG file error: Range restriction " +
-                    "should't be present for string data type.");
+                                                                                   "should't be present for string data type.");
             dataModelException.setLine(getLineNumber());
             dataModelException.setCharPosition(getCharPosition());
             dataModelException.setFileName(getFileName());
@@ -566,6 +565,9 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          */
         if (lengthRestriction != null || patternRestriction != null) {
             curStringRestriction = new YangStringRestriction();
+            curStringRestriction.setCharPosition(getCharPosition());
+            curStringRestriction.setFileName(getFileName());
+            curStringRestriction.setLineNumber(getLineNumber());
             curStringRestriction.setLengthRestriction(lengthRestriction);
             curStringRestriction.setPatternRestriction(patternRestriction);
         }
@@ -584,7 +586,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
         if (rangeRestrictionString != null || patternRestriction != null) {
             DataModelException dataModelException =
                     new DataModelException("YANG file error: for binary " +
-                            "range restriction or pattern restriction is not allowed.");
+                                                   "range restriction or pattern restriction is not allowed.");
             dataModelException.setLine(getLineNumber());
             dataModelException.setCharPosition(getCharPosition());
             dataModelException.setFileName(getFileName());
@@ -669,8 +671,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * carry out self resolution.
          */
         if (refLengthRestriction == null) {
-            YangRangeRestriction curLengthRestriction = processLengthRestriction(null, getLineNumber(),
-                    getCharPosition(), false, getLengthRestrictionString());
+            YangRangeRestriction curLengthRestriction =
+                    processLengthRestriction(null, getLineNumber(),
+                                             getCharPosition(), false,
+                                             getLengthRestrictionString(), getFileName());
             return curLengthRestriction;
         }
 
@@ -678,8 +682,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * Carry out self resolution based with obtained effective built-in type
          * and MIN/MAX values as per the referred typedef's values.
          */
-        YangRangeRestriction curLengthRestriction = processLengthRestriction(refLengthRestriction, getLineNumber(),
-                getCharPosition(), true, getLengthRestrictionString());
+        YangRangeRestriction curLengthRestriction =
+                processLengthRestriction(refLengthRestriction, getLineNumber(),
+                                         getCharPosition(), true,
+                                         getLengthRestrictionString(), getFileName());
 
         // Resolve the range with referred typedef's restriction.
         resolveLengthAndRangeRestriction(refLengthRestriction, curLengthRestriction);
@@ -700,10 +706,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
         for (Object curInterval : curRestriction.getAscendingRangeIntervals()) {
             if (!(curInterval instanceof YangRangeInterval)) {
                 throw new DataModelException("Linker error: Current range intervals not processed correctly."
-                        + " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition()
-                        + " in " + getFileName() + "\"");
+                                                     + " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition()
+                                                     + " in " + getFileName() + "\"");
             }
             try {
                 refRestriction.isValidInterval((YangRangeInterval) curInterval);
@@ -732,7 +738,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          */
         if (!Strings.isNullOrEmpty(getLengthRestrictionString()) || getPatternRestriction() != null) {
             DataModelException dataModelException = new DataModelException("YANG file error: Length/Pattern " +
-                    "restriction should't be present for int/uint/decimal data type.");
+                                                                                   "restriction should't be present for int/uint/decimal data type.");
             dataModelException.setLine(getLineNumber());
             dataModelException.setCharPosition(getCharPosition());
             dataModelException.setFileName(getFileName());
@@ -761,8 +767,10 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * carry out self resolution.
          */
         if (refRangeRestriction == null) {
-            YangRangeRestriction curRangeRestriction = processRangeRestriction(null, getLineNumber(),
-                    getCharPosition(), false, getRangeRestrictionString(), getEffectiveBuiltInType());
+            YangRangeRestriction curRangeRestriction =
+                    processRangeRestriction(null, getLineNumber(),
+                                            getCharPosition(), false, getRangeRestrictionString(),
+                                            getEffectiveBuiltInType(), getFileName());
             setResolvedExtendedInfo((T) curRangeRestriction);
             return;
         }
@@ -771,8 +779,11 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * Carry out self resolution based with obtained effective built-in type
          * and MIN/MAX values as per the referred typedef's values.
          */
-        YangRangeRestriction curRangeRestriction = processRangeRestriction(refRangeRestriction, getLineNumber(),
-                getCharPosition(), true, getRangeRestrictionString(), getEffectiveBuiltInType());
+        YangRangeRestriction curRangeRestriction =
+                processRangeRestriction(refRangeRestriction, getLineNumber(),
+                                        getCharPosition(), true,
+                                        getRangeRestrictionString(),
+                                        getEffectiveBuiltInType(), getFileName());
 
         // Resolve the range with referred typedef's restriction.
         resolveLengthAndRangeRestriction(refRangeRestriction, curRangeRestriction);

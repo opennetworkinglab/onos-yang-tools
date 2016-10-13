@@ -71,7 +71,8 @@ public class YangPatternRestriction extends DefaultLocationInfo
      * Creates a YANG pattern restriction object.
      */
     public YangPatternRestriction() {
-        setPatternList(new LinkedList<String>());
+        setPatternList(new LinkedList<>());
+        yangAppErrorInfo = new YangAppErrorInfo();
     }
 
     /**

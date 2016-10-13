@@ -57,7 +57,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.CONTINUE;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
-import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_VAR;
@@ -68,8 +67,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.GET_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_LEAF_INDEX;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD;
 import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD_PREFIX;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_SELECT_LEAF_FLAGS;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_VALUE_LEAF_FLAGS;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.ILLEGAL_ACCESS_EXCEPTION;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE;
@@ -79,7 +76,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.IS_ANY_SELECT_OR_CON
 import static org.onosproject.yangutils.utils.UtilConstants.IS_EMPTY;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_ALL_SCHEMA_CHILD_FLAG;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
-import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.NOT;
@@ -87,6 +83,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.NO_SUCH_METHOD_EXCEP
 import static org.onosproject.yangutils.utils.UtilConstants.NULL;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT;
 import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.OR_OPERATION;
@@ -96,6 +93,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILT
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
+import static org.onosproject.yangutils.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
@@ -110,8 +108,10 @@ import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_EIGHT_SPACE_I
 import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
+import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_OP_PARAM_INFO;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
@@ -144,7 +144,7 @@ public final class SubtreeFilteringMethodsGenerator {
         attrQualifiedType = getIfFilterContentMatchMethodImpl(attributeName,
                                                               type);
         return EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS
-                + GET_VALUE_LEAF_FLAGS + OPEN_CLOSE_BRACKET_STRING +
+                + VALUE_LEAF +
                 PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
                 LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
                 PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS +
@@ -163,7 +163,7 @@ public final class SubtreeFilteringMethodsGenerator {
                 TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE +
                 EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + ELSE +
                 SPACE + IF + SPACE + OPEN_PARENTHESIS +
-                GET_SELECT_LEAF_FLAGS + OPEN_CLOSE_BRACKET_STRING +
+                SELECT_LEAF +
                 PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
                 LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
                 PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS + SPACE +
@@ -941,7 +941,7 @@ public final class SubtreeFilteringMethodsGenerator {
         return EIGHT_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS +
                 OBJECT_STRING + SPACE + YANG_AUGMENTED_INFO_LOWER_CASE +
                 SPACE + COLON + SPACE + THIS + PERIOD +
-                YANG_AUGMENTED_INFO_LOWER_CASE + MAP +
+                YANG_AUGMENTED_INFO_MAP +
                 OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD
                 + VALUE + "s" + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
                 CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET +

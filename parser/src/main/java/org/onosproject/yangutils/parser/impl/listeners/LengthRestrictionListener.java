@@ -27,12 +27,12 @@ import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yangutils.datamodel.utils.RestrictionResolver.processLengthRestriction;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LENGTH_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
@@ -93,7 +93,7 @@ public final class LengthRestrictionListener {
             setLengthRestriction(listener, type, ctx);
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, LENGTH_DATA,
-                    ctx.length().getText(), ENTRY));
+                                                                    ctx.length().getText(), ENTRY));
         }
     }
 
@@ -118,9 +118,13 @@ public final class LengthRestrictionListener {
         }
 
         if (type.getDataType() != STRING && type.getDataType() != BINARY) {
-            ParserException parserException = new ParserException("YANG file error : " +
-                    YangConstructType.getYangConstructType(LENGTH_DATA) + " name " + ctx.length().getText() +
-                    " can be used to restrict the built-in type string/binary or types derived from string/binary.");
+            ParserException parserException =
+                    new ParserException(
+                            "YANG file error : " +
+                                    YangConstructType.getYangConstructType(LENGTH_DATA) +
+                                    " name " + ctx.length().getText() +
+                                    " can be used to restrict the built-in type string/binary" +
+                                    " or types derived from string/binary.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -129,7 +133,8 @@ public final class LengthRestrictionListener {
         YangRangeRestriction lengthRestriction = null;
         try {
             lengthRestriction = processLengthRestriction(null, ctx.getStart().getLine(),
-                    ctx.getStart().getCharPositionInLine(), false, ctx.length().getText());
+                                                         ctx.getStart().getCharPositionInLine(), false, ctx.length
+                            ().getText(), listener.getFileName());
         } catch (DataModelException e) {
             ParserException parserException = new ParserException(e.getMessage());
             parserException.setCharPosition(e.getCharPositionInLine());
@@ -173,7 +178,7 @@ public final class LengthRestrictionListener {
             // TODO : need to handle in linker
         } else {
             throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, LENGTH_DATA,
-                    ctx.length().getText(), EXIT));
+                                                                    ctx.length().getText(), EXIT));
         }
     }
 }

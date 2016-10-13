@@ -101,7 +101,7 @@ public final class JavaDocGen {
 
         name = YangIoUtils.getSmallCase(name);
         switch (type) {
-            case IMPL_CLASS: {
+            case DEFAULT_CLASS: {
                 return generateForClass(name);
             }
             case BUILDER_CLASS: {
@@ -424,7 +424,28 @@ public final class JavaDocGen {
      * @return javaDocs
      */
     private static String generateForClass(String className) {
-        return getJavaDocForClass(className, IMPL_CLASS_JAVA_DOC, EMPTY_STRING);
+        return getJavaDocForDefaultClass(className, IMPL_CLASS_JAVA_DOC, EMPTY_STRING);
+    }
+
+    private static String addFlagJavaDoc() {
+        return " *\n" +
+                " * <p>\n" +
+                " * valueLeafFlags identify the leafs whose value are " +
+                "explicitly set\n" +
+                " * Applicable in protocol edit and query operation.\n" +
+                " * </p>\n" +
+                " *\n" +
+                " * <p>\n" +
+                " * selectLeafFlags identify the leafs to be selected, in" +
+                " a query operation.\n" +
+                " * </p>\n" +
+                " *\n" +
+                " * <p>\n" +
+                " * Operation type specify the node specific operation in" +
+                " protocols like NETCONF.\n" +
+                " * Applicable in protocol edit operation, not applicable" +
+                " in query operation.\n" +
+                " * </p>\n";
     }
 
     /**
@@ -650,6 +671,21 @@ public final class JavaDocGen {
     }
 
     /**
+     * Returns class javadoc.
+     *
+     * @param name   name of class
+     * @param type   type of javadoc
+     * @param indent indentation
+     * @return class javadoc
+     */
+    private static String getJavaDocForDefaultClass(String name, String type,
+                                                    String indent) {
+        return NEW_LINE + indent + JAVA_DOC_FIRST_LINE + indent + type +
+                getSmallCase(name) + PERIOD + NEW_LINE + indent
+                + addFlagJavaDoc() + JAVA_DOC_END_LINE;
+    }
+
+    /**
      * Returns javadoc start line.
      *
      * @param name    name of attribute
@@ -712,7 +748,7 @@ public final class JavaDocGen {
         /**
          * For class.
          */
-        IMPL_CLASS,
+        DEFAULT_CLASS,
 
         /**
          * For builder class.

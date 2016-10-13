@@ -38,6 +38,7 @@ public class RootClassGeneratorTest {
 
     @Test
     public void rootClassGenTest() throws IOException, ParserException, MojoExecutionException {
+        deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/singleChild";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -49,36 +50,20 @@ public class RootClassGeneratorTest {
         utilManager.translateToJava(yangPluginConfig);
 
         String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/rev20160704/Test5.java";
-        assertThat(true, is(!(new File(path)).exists()));
+                "org/onosproject/yang/gen/v1/single/test5/test/rev20160704" +
+                "/Test5.java";
+        assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/rev20160704/Test7.java";
+                "org/onosproject/yang/gen/v1/single/test5/test/rev20160704" +
+                "/Test7.java";
         assertThat(true, is((new File(path)).exists()));
         deleteDirectory("target/manager/");
     }
 
     @Test
-    public void rootClassNoGenTest() throws IOException, ParserException, MojoExecutionException {
-        String searchDir = "src/test/resources/manager/nogen";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
-        utilManager.parseYangFileInfoSet();
-        utilManager.createYangNodeSet();
-        utilManager.resolveDependenciesUsingLinker();
-
-        YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/manager/");
-        utilManager.translateToJava(yangPluginConfig);
-
-        String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/rev20160704/Test5.java";
-
-        assertThat(true, is(!(new File(path)).exists()));
-        deleteDirectory("target/manager/");
-    }
-
-    @Test
     public void rootClassGenwithoutRevTest() throws IOException, ParserException, MojoExecutionException {
+        deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/genwithoutrev";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -98,6 +83,7 @@ public class RootClassGeneratorTest {
 
     @Test
     public void rootClassMethodGenTest() throws IOException, ParserException, MojoExecutionException {
+        deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/MultiChild";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -109,15 +95,18 @@ public class RootClassGeneratorTest {
         utilManager.translateToJava(yangPluginConfig);
 
         String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/rev20160704/Test5.java";
-        assertThat(true, is(!(new File(path)).exists()));
+                "org/onosproject/yang/gen/v1/multi/test5/test/rev20160704" +
+                "/Test5.java";
+        assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/rev20160704/Test7.java";
-        assertThat(true, is(!(new File(path)).exists()));
+                "org/onosproject/yang/gen/v1/multi/test5/test/rev20160704" +
+                "/Test7.java";
+        assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test8/test/rev20160704/Test8.java";
+                "org/onosproject/yang/gen/v1/multi/test8/test/rev20160704" +
+                "/Test8.java";
         assertThat(true, is((new File(path)).exists()));
 
         deleteDirectory("target/manager/");

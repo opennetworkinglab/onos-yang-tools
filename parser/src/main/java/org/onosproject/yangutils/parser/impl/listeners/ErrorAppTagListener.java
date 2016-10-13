@@ -63,7 +63,7 @@ public final class ErrorAppTagListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processErrorAppTagMessageEntry(TreeWalkListener listener,
-                                                GeneratedYangParser.ErrorAppTagStatementContext ctx) {
+                                                      GeneratedYangParser.ErrorAppTagStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, ERROR_APP_TAG_DATA, ctx.string().getText(), ENTRY);
@@ -73,13 +73,12 @@ public final class ErrorAppTagListener {
         if (tmpNode instanceof YangAppErrorHolder) {
             YangAppErrorInfo yangAppErrorInfo = ((YangAppErrorHolder) tmpNode).getAppErrorInfo();
             yangAppErrorInfo.setErrorAppTag(errorMessage);
-
             yangAppErrorInfo.setLineNumber(ctx.getStart().getLine());
             yangAppErrorInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
             yangAppErrorInfo.setFileName(listener.getFileName());
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, ERROR_APP_TAG_DATA,
-                    ctx.string().getText(), ENTRY));
+                                                                    ctx.string().getText(), ENTRY));
         }
     }
 }

@@ -16,13 +16,13 @@
 
 package org.onosproject.yangutils.datamodel.utils;
 
-import java.util.regex.Pattern;
-
 import org.onosproject.yangutils.datamodel.YangRangeInterval;
 import org.onosproject.yangutils.datamodel.YangRangeRestriction;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangBuiltInDataTypeInfo;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
+
+import java.util.regex.Pattern;
 
 import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LENGTH_DATA;
@@ -58,13 +58,14 @@ public final class RestrictionResolver {
      * @param hasReferredRestriction whether has referred restriction
      * @param curRangeString         caller type's range string
      * @param effectiveType          effective type, when called from linker
+     * @param fileName               file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
     public static YangRangeRestriction processRangeRestriction(YangRangeRestriction refRangeRestriction,
                                                                int lineNumber, int charPositionInLine,
                                                                boolean hasReferredRestriction,
-                                                               String curRangeString, YangDataTypes effectiveType)
+                                                               String curRangeString, YangDataTypes effectiveType, String fileName)
             throws DataModelException {
         YangBuiltInDataTypeInfo<?> startValue;
         YangBuiltInDataTypeInfo<?> endValue;
@@ -77,12 +78,15 @@ public final class RestrictionResolver {
             String startInterval;
             String endInterval;
             YangRangeInterval rangeInterval = new YangRangeInterval();
+            rangeInterval.setCharPosition(charPositionInLine);
+            rangeInterval.setLineNumber(lineNumber);
+            rangeInterval.setFileName(fileName);
             String[] rangeBoundary = rangePart.trim().split(Pattern.quote(INTERVAL));
 
             if (rangeBoundary.length > MAX_RANGE_BOUNDARY) {
                 DataModelException dataModelException = new DataModelException("YANG file error : " +
-                        YangConstructType.getYangConstructType(RANGE_DATA) + " " + rangeArgument +
-                        " is not valid.");
+                                                                                       YangConstructType.getYangConstructType(RANGE_DATA) + " " + rangeArgument +
+                                                                                       " is not valid.");
                 dataModelException.setLine(lineNumber);
                 dataModelException.setCharPosition(charPositionInLine);
                 throw dataModelException;
@@ -144,13 +148,14 @@ public final class RestrictionResolver {
      * @param charPositionInLine     error character position in line
      * @param hasReferredRestriction whether has referred restriction
      * @param curLengthString        caller type's length string
+     * @param fileName               file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
     public static YangRangeRestriction processLengthRestriction(YangRangeRestriction refLengthRestriction,
                                                                 int lineNumber, int charPositionInLine,
                                                                 boolean hasReferredRestriction,
-                                                                String curLengthString) throws DataModelException {
+                                                                String curLengthString, String fileName) throws DataModelException {
 
         YangBuiltInDataTypeInfo<?> startValue;
         YangBuiltInDataTypeInfo<?> endValue;
@@ -163,12 +168,15 @@ public final class RestrictionResolver {
             String startInterval;
             String endInterval;
             YangRangeInterval rangeInterval = new YangRangeInterval<>();
+            rangeInterval.setCharPosition(charPositionInLine);
+            rangeInterval.setLineNumber(lineNumber);
+            rangeInterval.setFileName(fileName);
             String[] rangeBoundary = rangePart.trim().split(Pattern.quote(INTERVAL));
 
             if (rangeBoundary.length > MAX_RANGE_BOUNDARY) {
                 DataModelException dataModelException = new DataModelException("YANG file error : " +
-                        YangConstructType.getYangConstructType(LENGTH_DATA) + " " + rangeArgument +
-                        " is not valid.");
+                                                                                       YangConstructType.getYangConstructType(LENGTH_DATA) + " " + rangeArgument +
+                                                                                       " is not valid.");
                 dataModelException.setLine(lineNumber);
                 dataModelException.setCharPosition(charPositionInLine);
                 throw dataModelException;

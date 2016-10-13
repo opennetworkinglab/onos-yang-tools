@@ -16,10 +16,10 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import java.io.Serializable;
+
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.OPERATION_FAILED_ERROR_TAG;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.TOO_FEW_ELEMENTS_ERROR_APP_TAG;
-
-import java.io.Serializable;
 
 /**
  * Represents minimum element data represented in YANG.
@@ -36,20 +36,20 @@ public class YangMinElement extends DefaultLocationInfo
 
     /**
      * Reference:RFC 6020.
-     *
+     * <p>
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     *
+     * <p>
      * If no "min-elements" statement is present, it defaults to zero.
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     *
+     * <p>
      * If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * Otherwise, it is enforced if the ancestor node exists.
      */
     private int minElement = 0;
@@ -58,7 +58,7 @@ public class YangMinElement extends DefaultLocationInfo
      * Creates a YANG minimum element.
      */
     public YangMinElement() {
-        YangAppErrorInfo yangAppErrorInfo = new YangAppErrorInfo();
+        yangAppErrorInfo = new YangAppErrorInfo();
         yangAppErrorInfo.setErrorTag(OPERATION_FAILED_ERROR_TAG);
         yangAppErrorInfo.setErrorAppTag(TOO_FEW_ELEMENTS_ERROR_APP_TAG);
     }

@@ -16,15 +16,23 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.YangNodeType.RPC_NODE;
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+import static org.onosproject.yangutils.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.RPC;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.RPC_DATA;
 
 /*
  * Reference RFC 6020.
@@ -63,7 +71,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCol
 public abstract class YangRpc
         extends YangNode
         implements YangCommonInfo, Parsable,
-                   CollisionDetector, YangIfFeatureHolder {
+        CollisionDetector, YangIfFeatureHolder, InvalidOpTypeHolder {
 
     private static final long serialVersionUID = 806201613L;
 
@@ -80,7 +88,7 @@ public abstract class YangRpc
     /**
      * Status of the node.
      */
-    private YangStatusType status = YangStatusType.CURRENT;
+    private YangStatusType status = CURRENT;
 
     /**
      * List of if-feature.
@@ -91,16 +99,15 @@ public abstract class YangRpc
      * Creates a rpc node.
      */
     public YangRpc() {
-        super(YangNodeType.RPC_NODE, new HashMap<>());
+        super(RPC_NODE, new HashMap<>());
         ifFeatureList = new LinkedList<>();
     }
 
     @Override
-    public void addToChildSchemaMap(
-            YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier id,
+                                    YangSchemaNodeContextInfo context)
             throws DataModelException {
-        getYsnContextInfoMap().put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
+        getYsnContextInfoMap().put(id, context);
     }
 
     @Override
@@ -114,9 +121,8 @@ public abstract class YangRpc
     }
 
     @Override
-    public void addToDefaultChildMap(
-            YangSchemaNodeIdentifier yangSchemaNodeIdentifier,
-            YangSchemaNode yangSchemaNode) {
+    public void addToDefaultChildMap(YangSchemaNodeIdentifier id,
+                                     YangSchemaNode yangSchemaNode) {
         /*
          * This will maintain all default child which are there inside input and
          * output as input/output is non data node.
@@ -126,7 +132,7 @@ public abstract class YangRpc
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YANG_SINGLE_INSTANCE_NODE;
     }
 
     @Override
@@ -142,18 +148,15 @@ public abstract class YangRpc
                                     YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input " +
-                                                 "identifier detected, same " +
-                                                 "as rpc \"" + getName() + " " +
-                                                 "in " + getLineNumber() +
-                                                 " at " + getCharPosition() +
-                                                 " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsgCollision(
+                    COLLISION_DETECTION, getName(), getLineNumber(),
+                    getCharPosition(), RPC, getFileName()));
         }
     }
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.RPC_DATA;
+        return RPC_DATA;
     }
 
     @Override
@@ -200,15 +203,12 @@ public abstract class YangRpc
 
     @Override
     public List<YangIfFeature> getIfFeatureList() {
-        return ifFeatureList;
+        return unmodifiableList(ifFeatureList);
     }
 
     @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
-        if (getIfFeatureList() == null) {
-            setIfFeatureList(new LinkedList<>());
-        }
-        getIfFeatureList().add(ifFeature);
+        ifFeatureList.add(ifFeature);
     }
 
     @Override

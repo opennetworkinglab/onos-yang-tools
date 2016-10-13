@@ -41,6 +41,7 @@ public class AugmentTranslatorTest {
     @Test
     public void processAugmentTranslator() throws IOException, ParserException, MojoExecutionException {
 
+        deleteDirectory("target/augmentTranslator/");
         String searchDir = "src/test/resources/augmentTranslator";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();

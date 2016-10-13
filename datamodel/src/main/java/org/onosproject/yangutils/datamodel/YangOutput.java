@@ -78,7 +78,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.OUTPUT
 public abstract class YangOutput
         extends YangNode
         implements YangLeavesHolder, Parsable, CollisionDetector,
-        YangAugmentableNode, YangIsFilterContentNodes {
+        YangAugmentableNode, YangIsFilterContentNodes, InvalidOpTypeHolder {
 
     private static final long serialVersionUID = 806201612L;
 

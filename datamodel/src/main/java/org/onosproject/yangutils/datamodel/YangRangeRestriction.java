@@ -16,18 +16,18 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangBuiltInDataTypeInfo;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
-import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
 
 /*-
  * Reference RFC 6020.
@@ -89,6 +89,7 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
      * Creates YANG range restriction object.
      */
     public YangRangeRestriction() {
+        yangAppErrorInfo = new YangAppErrorInfo();
     }
 
     /**
@@ -118,17 +119,17 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
     public T getMinRestrictedvalue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
             throw new DataModelException("No range restriction info "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
         if (getAscendingRangeIntervals().isEmpty()) {
             throw new DataModelException("No range interval info "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
         return getAscendingRangeIntervals().get(0).getStartValue();
     }
@@ -142,17 +143,17 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
     public T getMaxRestrictedvalue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
             throw new DataModelException("No range restriction info "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
         if (getAscendingRangeIntervals().isEmpty()) {
             throw new DataModelException("No range interval info "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
         return getAscendingRangeIntervals()
                 .get(getAscendingRangeIntervals().size() - 1).getEndValue();
@@ -209,10 +210,10 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
             throw new DataModelException("Range interval missing in range restriction. "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
 
         }
 
@@ -244,10 +245,10 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
             throw new DataModelException("Range interval missing in range restriction. "
-                    + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
 
         for (YangRangeInterval<T> interval : getAscendingRangeIntervals()) {
@@ -259,10 +260,10 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
             }
         }
         throw new DataModelException("Range interval doesn't fall within the referred restriction ranges "
-                + " in " +
-                getLineNumber() + " at " +
-                getCharPosition()
-                + " in " + getFileName() + "\"");
+                                             + " in " +
+                                             getLineNumber() + " at " +
+                                             getCharPosition()
+                                             + " in " + getFileName() + "\"");
     }
 
     /**

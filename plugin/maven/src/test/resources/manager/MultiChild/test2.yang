@@ -1,5 +1,5 @@
 module test8 {
-    namespace "test8:test";  
+    namespace "multi:test8:test";
     prefix test ;  
 
     revision "2016-07-04" {

@@ -13,33 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.onosproject.yangutils.translator.tojava.utils;
+package org.onosproject.yangutils.datamodel;
 
 /**
- * Represents indentation type.
+ * Represents non data nodes which will not have operation api's ex: operation
+ * type, value leaf flag, select leaf flag and process sub tree filter in
+ * their generated code.
  */
-public enum IndentationType {
-
-    //Four space indentation.
-    FOUR_SPACE,
-
-    //Eight space indentation.
-    EIGHT_SPACE,
-
-    //Twelve space indentation.
-    TWELVE_SPACE,
-
-    //Sixteen space indentation.
-    SIXTEEN_SPACE,
-
-    //Twenty space indentation.
-    TWENTY_SPACE,
-
-    //Twenty four space indentation.
-    TWENTY_FOUR_SPACE,
-
-    //Twenty eight space indentation.
-    TWENTY_EIGHT_SPACE
-
+public interface InvalidOpTypeHolder {
 }
