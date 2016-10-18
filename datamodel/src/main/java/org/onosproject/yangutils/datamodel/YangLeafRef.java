@@ -108,12 +108,12 @@ public class YangLeafRef<T> extends DefaultLocationInfo
     /**
      * Parent node of the leafref's leaf.
      */
-    private YangNode parentNodeOfLeafref;
+    private YangNode parentNode;
 
     /**
      * Prefix in the nodes of the leafref path and its imported node name.
      */
-    private Map<String, String> prefixAndItsImportedModule;
+    private Map<String, String> prefixAndNode;
 
     /**
      * Flag to indicate whether the leaf ref is inside grouping.
@@ -123,19 +123,19 @@ public class YangLeafRef<T> extends DefaultLocationInfo
     /**
      * Returns the prefix in the leafref path and its imported node name.
      *
-     * @return the list of leafref prefix and imported node name
+     * @return map of prefix with node
      */
-    public Map<String, String> getPrefixAndItsImportedModule() {
-        return prefixAndItsImportedModule;
+    public Map<String, String> getPrefixAndNode() {
+        return prefixAndNode;
     }
 
     /**
-     * Sets the prefix in the leafref path and its imported node name.
+     * Sets the prefix in the leaf-ref path and its imported node name.
      *
-     * @param prefixAndItsImportedModule the list of leafref prefix and imported node name
+     * @param prefixAndNode prefix with node map
      */
-    public void setPrefixAndItsImportedModule(Map<String, String> prefixAndItsImportedModule) {
-        this.prefixAndItsImportedModule = prefixAndItsImportedModule;
+    public void setPrefixAndNode(Map<String, String> prefixAndNode) {
+        this.prefixAndNode = prefixAndNode;
     }
 
     /**
@@ -143,17 +143,17 @@ public class YangLeafRef<T> extends DefaultLocationInfo
      *
      * @return parent node of the leafref
      */
-    public YangNode getParentNodeOfLeafref() {
-        return parentNodeOfLeafref;
+    public YangNode getParentNode() {
+        return parentNode;
     }
 
     /**
      * Sets the parent node from the leafref's leaf.
      *
-     * @param parentNodeOfLeafref parent node of the leafref
+     * @param parentNode parent node
      */
-    public void setParentNodeOfLeafref(YangNode parentNodeOfLeafref) {
-        this.parentNodeOfLeafref = parentNodeOfLeafref;
+    public void setParentNode(YangNode parentNode) {
+        this.parentNode = parentNode;
     }
 
     /**
@@ -166,7 +166,7 @@ public class YangLeafRef<T> extends DefaultLocationInfo
      */
     public YangLeafRef() {
         yangAppErrorInfo = new YangAppErrorInfo();
-        prefixAndItsImportedModule = new HashMap<>();
+        prefixAndNode = new HashMap<>();
         atomicPath = new ArrayList<>();
         ifFeatureList = new ArrayList<>();
         yangAppErrorInfo.setErrorTag(DATA_MISSING_ERROR_TAG);

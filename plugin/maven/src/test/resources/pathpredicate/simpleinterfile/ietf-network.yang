@@ -1,0 +1,22 @@
+module ietf-network {
+    yang-version 1;
+    namespace "urn:ietf:params:xml:ns:yang:ietf-network";
+    prefix nd;
+    import ietf-topology {
+        prefix tp;
+    }
+    container default-address {
+        leaf ifname {
+            type leafref {
+                path "/tp:interface/tp:name";
+            }
+        }
+        leaf address {
+            type leafref {
+                path "/tp:interface[tp:name = current()/../nd:ifname]"
+                + "/tp:address/ip";
+            }
+        }
+    }
+}
+

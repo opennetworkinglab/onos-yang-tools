@@ -1,0 +1,21 @@
+   module ietf-topology {
+     yang-version 1;
+     namespace "urn:ietf:params:xml:ns:yang:ietf-topology";
+     prefix tp;
+     list interface {
+         key "name";
+         leaf name {
+             type string;
+         }
+         leaf admin-status {
+             type uint8;
+         }
+         list address {
+             key "ip";
+             leaf ip {
+                 type int8;
+             }
+         }
+     }
+   }
+

@@ -1,0 +1,21 @@
+module ietf-network {
+    yang-version 1;
+    namespace "urn:ietf:params:xml:ns:yang:ietf-network";
+    prefix nd;
+    container networks {
+        list network {
+            key "network-id";
+            leaf network-id {
+                type uint8;
+            }
+            container reference {
+                leaf network-ref {
+                    type string;
+                }
+            }
+            leaf node-id {
+                type int8;
+            }
+        }
+    }
+}

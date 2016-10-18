@@ -133,7 +133,7 @@ public final class LeafrefListener {
                 }
 
                 leafRef.setResolvableStatus(UNRESOLVED);
-                leafRef.setParentNodeOfLeafref((YangNode) parentNodeOfLeaf);
+                leafRef.setParentNode((YangNode) parentNodeOfLeaf);
                 if (listener.getGroupingDepth() == 0) {
                     // Add resolution information to the list.
                     YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangLeafRef>(leafRef,
@@ -158,7 +158,7 @@ public final class LeafrefListener {
                 }
 
                 leafRef.setResolvableStatus(UNRESOLVED);
-                leafRef.setParentNodeOfLeafref((YangNode) parentNodeOfLeafList);
+                leafRef.setParentNode((YangNode) parentNodeOfLeafList);
 
                 if (listener.getGroupingDepth() == 0) {
                     // Add resolution information to the list.
@@ -172,7 +172,7 @@ public final class LeafrefListener {
 
             case TYPEDEF_DATA:
                 Parsable parentNodeOfLeafref = listener.getParsedDataStack().peek();
-                leafRef.setParentNodeOfLeafref((YangNode) parentNodeOfLeafref);
+                leafRef.setParentNode((YangNode) parentNodeOfLeafref);
                 if (listener.getGroupingDepth() != 0) {
                     leafRef.setInGrouping(true);
                 }

@@ -1,0 +1,18 @@
+module ietf-topology {
+    yang-version 1;
+    namespace "urn:ietf:params:xml:ns:yang:ietf-te-topology";
+    // replace with IANA namespace when assigned
+    prefix "tet";
+
+    import ietf-network {
+        prefix "nw";
+    }
+    augment "/nw:networks/nw:network" {
+        leaf test {
+            type leafref {
+                path "../../nw:network[nw:network-id = current()/../" +
+                "nw:reference/nw:network-ref]/nw:node-id";
+            }
+        }
+    }
+}

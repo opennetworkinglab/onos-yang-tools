@@ -32,9 +32,12 @@ import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
+import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
+import org.onosproject.yangutils.datamodel.YangPathPredicate;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
+import org.onosproject.yangutils.datamodel.YangRelativePath;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangUses;
@@ -54,7 +57,6 @@ import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
 import static org.onosproject.yangutils.datamodel.TraversalType.ROOT;
 import static org.onosproject.yangutils.datamodel.TraversalType.SIBILING;
-import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.CASE;
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.FAILED_TO_ADD_CASE;
 import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.TARGET_NODE;
@@ -74,6 +76,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FEATURE_LINKER_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.GROUPING_LINKER_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.IDENTITYREF_LINKER_ERROR;
+import static org.onosproject.yangutils.utils.UtilConstants.INVALID_TREE;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_INVALID;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF_LINKER_ERROR;
@@ -85,9 +88,24 @@ import static org.onosproject.yangutils.utils.UtilConstants.TYPEDEF_LINKER_ERROR
 public final class YangLinkerUtils {
 
     private static final int IDENTIFIER_LENGTH = 64;
-    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_.-]*");
+    private static final Pattern IDENTIFIER_PATTERN =
+            Pattern.compile("[a-zA-Z_][a-zA-Z0-9_.-]*");
     private static final String XML = "xml";
+    private static final String INVALID_PATH_PRE =
+            "YANG file error: The path predicate of the leafref has an " +
+                    "invalid path in ";
+    private static final String EMPTY_PATH_LIST_ERR =
+            "YANG file error : The atomic path list cannot be empty of the " +
+                    "leafref in the path ";
+    private static final String TGT_LEAF_ERR =
+            "YANG file error: There is no leaf/leaf-list in YANG node as " +
+                    "mentioned in the path predicate of the leafref path ";
+    private static final String LEAF_REF_LIST_ERR =
+            "YANG file error: Path predicates are only applicable for YANG " +
+                    "list. The leafref path has path predicate for non-list " +
+                    "node in the path ";
 
+    // No instantiation.
     private YangLinkerUtils() {
     }
 
@@ -257,33 +275,6 @@ public final class YangLinkerUtils {
                         .getFileName());
     }
 
-    //Detect collision between augment and choice children.
-    private void detectCollisionForChoiceNode(YangNode choice, YangNode augment) {
-        YangNode choiceChild = choice.getChild();
-        YangNode augmentChild = augment.getChild();
-
-        List<YangNode> choiceChildren = new ArrayList<>();
-        List<YangNode> augmentChildren = new ArrayList<>();
-        while (choiceChild != null) {
-            choiceChildren.add(choiceChild);
-        }
-        while (augmentChild != null) {
-            augmentChildren.add(augmentChild);
-        }
-
-        for (YangNode cChild : choiceChildren) {
-            for (YangNode aChild : augmentChildren) {
-                if (cChild.getName().equals(aChild.getName())) {
-                    ;
-                    throw new LinkerException(getErrorMsgCollision(
-                            COLLISION_DETECTION, cChild.getName(),
-                            cChild.getLineNumber(), cChild.getCharPosition(),
-                            CASE, cChild.getFileName()));
-                }
-            }
-        }
-    }
-
     /**
      * Detects collision between target nodes and its all leaf/leaf-list or child node with augmented leaf/leaf-list or
      * child node.
@@ -328,25 +319,25 @@ public final class YangLinkerUtils {
     /**
      * Skips the invalid nodes which cannot have data from YANG.
      *
-     * @param currentParent current parent node reference
-     * @param leafref       instance of YANG leafref
+     * @param curParent current parent
+     * @param leafRef   YANG leaf-ref
      * @return parent node which can hold data
-     * @throws LinkerException a violation of linker rules
+     * @throws LinkerException if linker rules are violated
      */
-    static YangNode skipInvalidDataNodes(YangNode currentParent, YangLeafRef leafref)
+    public static YangNode skipInvalidDataNodes(YangNode curParent,
+                                                YangLeafRef leafRef)
             throws LinkerException {
-        while (currentParent instanceof YangChoice || currentParent instanceof YangCase) {
-            if (currentParent.getParent() == null) {
-                LinkerException ex = new LinkerException(
-                        LEAFREF_ERROR + leafref.getPath() + IS_INVALID);
-                ex.setCharPosition(leafref.getCharPosition());
-                ex.setLine(leafref.getLineNumber());
-                ex.setFileName(leafref.getFileName());
-                throw ex;
+
+        YangNode node = curParent;
+        while (node instanceof YangChoice ||
+                node instanceof YangCase) {
+
+            if (node.getParent() == null) {
+                throw new LinkerException(getLeafRefErrorInfo(leafRef));
             }
-            currentParent = currentParent.getParent();
+            node = node.getParent();
         }
-        return currentParent;
+        return node;
     }
 
     /**
@@ -610,4 +601,254 @@ public final class YangLinkerUtils {
         }
     }
 
+    /**
+     * Fills the path predicates of the leaf-ref with right axis node and
+     * left axis node, after linking the nodes.
+     *
+     * @param leafRef YANG leaf-ref
+     * @throws DataModelException if there is a data model error
+     */
+    public static void fillPathPredicates(YangLeafRef<?> leafRef)
+            throws DataModelException {
+
+        List<YangAtomicPath> atomics = leafRef.getAtomicPath();
+        if (atomics != null) {
+            for (YangAtomicPath atom : atomics) {
+                List<YangPathPredicate> predicates =
+                        atom.getPathPredicatesList();
+
+                if (predicates != null) {
+                    for (YangPathPredicate predicate : predicates) {
+                        setLeftAxisNode(leafRef, atom, predicate);
+                        setRightAxisNode(leafRef, predicate);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the left axis node in the YANG path predicate after finding it
+     * under the YANG list node.
+     *
+     * @param leafRef   YANG leaf-ref
+     * @param atom      atomic path content
+     * @param predicate predicate in the atomic path
+     * @throws DataModelException if there is a data model error
+     */
+    private static void setLeftAxisNode(YangLeafRef<?> leafRef,
+                                        YangAtomicPath atom,
+                                        YangPathPredicate predicate)
+            throws DataModelException {
+        YangNode resolvedNode = atom.getResolvedNode();
+        if (!(resolvedNode instanceof YangList)) {
+            throw getDataModelExc(LEAF_REF_LIST_ERR, leafRef);
+        }
+
+        YangNodeIdentifier leftAxisName = predicate.getNodeId();
+        Object target = getTarget(leftAxisName, resolvedNode, leafRef);
+        predicate.setLeftAxisNode(target);
+    }
+
+    /**
+     * Returns the target leaf/leaf-list from the provided YANG node.
+     *
+     * @param leftAxisName name of node
+     * @param node         node having target
+     * @param leafRef      YANG leaf-ref
+     * @return target leaf/leaf-list
+     * @throws DataModelException if there is a data model error
+     */
+    private static Object getTarget(YangNodeIdentifier leftAxisName,
+                                    YangNode node, YangLeafRef leafRef)
+            throws DataModelException {
+
+        YangLeaf leaf = getLeaf(leftAxisName, (YangLeavesHolder) node);
+        if (leaf != null) {
+            return leaf;
+        }
+        YangLeafList leafList = getLeafList(leftAxisName,
+                                            (YangLeavesHolder) node);
+        if (leafList == null) {
+            throw getDataModelExc(TGT_LEAF_ERR, leafRef);
+        }
+        return leafList;
+    }
+
+    /**
+     * Returns the leaf by searching it in the node by the leaf name. Returns
+     * null when the name doesn't match.
+     *
+     * @param name   leaf name
+     * @param holder holder of leaf
+     * @return YANG leaf
+     */
+    private static YangLeaf getLeaf(YangNodeIdentifier name,
+                                    YangLeavesHolder holder) {
+
+        List<YangLeaf> listOfLeaf = holder.getListOfLeaf();
+        if (listOfLeaf != null) {
+            for (YangLeaf yangLeaf : listOfLeaf) {
+                if (yangLeaf.getName().equals(name.getName())) {
+                    return yangLeaf;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the leaf-list by searching it in the node by the leaf-list name.
+     * Returns null when the name doesn't match.
+     *
+     * @param name   leaf-list name
+     * @param holder holder of leaf-list
+     * @return YANG leaf-list
+     */
+    private static YangLeafList getLeafList(YangNodeIdentifier name,
+                                            YangLeavesHolder holder) {
+
+        List<YangLeafList> listOfLeafList = holder.getListOfLeafList();
+        if (listOfLeafList != null) {
+            for (YangLeafList yangLeafList : listOfLeafList) {
+                if (yangLeafList.getName().equals(name.getName())) {
+                    return yangLeafList;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the root node from which the path with the atomic node names
+     * has to be traversed through. With the ancestor count the nodes are
+     * moved upward.
+     *
+     * @param count   ancestor count
+     * @param node    current leaf-ref parent
+     * @param leafRef YANG leaf-ref
+     * @return root node from ancestor count
+     * @throws DataModelException if there is a data model error
+     */
+    private static YangNode getRootNode(int count, YangNode node,
+                                        YangLeafRef leafRef)
+            throws DataModelException {
+
+        YangNode curParent = node;
+        int curCount = 0;
+        while (curCount < count) {
+            curCount = curCount + 1;
+            if (curCount != 1) {
+                if (curParent.getParent() == null) {
+                    throw getDataModelExc(INVALID_TREE, leafRef);
+                }
+                curParent = curParent.getParent();
+            }
+            curParent = skipInvalidDataNodes(curParent, leafRef);
+            if (curParent instanceof YangAugment) {
+                YangAugment augment = (YangAugment) curParent;
+                curParent = augment.getAugmentedNode();
+                curCount = curCount + 1;
+            }
+        }
+        return curParent;
+    }
+
+    /**
+     * Returns the last node by traversing through the atomic node id by
+     * leaving the last target leaf/leaf-list.
+     *
+     * @param curNode current node
+     * @param relPath relative path
+     * @param leafRef YANG leaf-ref
+     * @return last YANG node
+     * @throws DataModelException if there is a data model error
+     */
+    private static Object getLastNode(YangNode curNode,
+                                      YangRelativePath relPath,
+                                      YangLeafRef leafRef)
+            throws DataModelException {
+
+        YangNode node = curNode;
+        List<YangAtomicPath> atomics = new ArrayList<>();
+        atomics.addAll(relPath.getAtomicPathList());
+
+        if (atomics.isEmpty()) {
+            throw getDataModelExc(EMPTY_PATH_LIST_ERR, leafRef);
+        }
+
+        YangAtomicPath pathTgt = atomics.get(atomics.size() - 1);
+        if (atomics.size() == 1) {
+            return getTarget(pathTgt.getNodeIdentifier(), node, leafRef);
+        }
+
+        atomics.remove(atomics.size() - 1);
+        for (YangAtomicPath atomicPath : atomics) {
+            node = getNode(node.getChild(), atomicPath.getNodeIdentifier());
+            if (node == null) {
+                throw getDataModelExc(INVALID_PATH_PRE, leafRef);
+            }
+        }
+        return getTarget(pathTgt.getNodeIdentifier(), node, leafRef);
+    }
+
+    /**
+     * Returns the node from the parent node by matching it with the atomic
+     * name. If no child node matches the name then it returns null.
+     *
+     * @param curNode    current node
+     * @param identifier atomic name
+     * @return node to be traversed
+     */
+    private static YangNode getNode(YangNode curNode,
+                                    YangNodeIdentifier identifier) {
+        YangNode node = curNode;
+        while (node != null) {
+            if (node.getName().equals(identifier.getName())) {
+                return node;
+            }
+            node = node.getNextSibling();
+        }
+        return null;
+    }
+
+    /**
+     * Sets the right axis node in the YANG path predicate after finding it
+     * from the relative path.
+     *
+     * @param leafRef   YANG leaf-ref
+     * @param predicate YANG path predicate
+     * @throws DataModelException if there is a data model error
+     */
+    private static void setRightAxisNode(YangLeafRef leafRef,
+                                         YangPathPredicate predicate)
+            throws DataModelException {
+
+        YangNode parentNode = leafRef.getParentNode();
+        YangRelativePath relPath = predicate.getRelPath();
+        int ancestor = relPath.getAncestorNodeCount();
+
+        YangNode rootNode = getRootNode(ancestor, parentNode, leafRef);
+        Object target = getLastNode(rootNode, relPath, leafRef);
+        if (target == null) {
+            throw getDataModelExc(INVALID_PATH_PRE, leafRef);
+        }
+        predicate.setRightAxisNode(target);
+    }
+
+    /**
+     * Returns data model error messages for leaf-ref with the path.
+     *
+     * @param msg     error message
+     * @param leafRef YANG leaf-ref
+     * @return data model exception
+     */
+    private static DataModelException getDataModelExc(String msg,
+                                                      YangLeafRef leafRef) {
+        DataModelException exc = new DataModelException(
+                msg + leafRef.getPath());
+        exc.setCharPosition(leafRef.getCharPosition());
+        exc.setLine(leafRef.getLineNumber());
+        return exc;
+    }
 }

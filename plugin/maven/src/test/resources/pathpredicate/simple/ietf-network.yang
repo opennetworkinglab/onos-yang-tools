@@ -1,0 +1,33 @@
+module ietf-network {
+    yang-version 1;
+    namespace "urn:ietf:params:xml:ns:yang:ietf-network";
+    prefix nd;
+    list interface {
+        key "name";
+        leaf name {
+            type string;
+        }
+        leaf admin-status {
+            type uint8;
+        }
+        list address {
+            key "ip";
+            leaf ip {
+                type int8;
+            }
+        }
+    }
+    container default-address {
+        leaf ifname {
+            type leafref {
+                path "../../interface/name";
+            }
+        }
+        leaf address {
+            type leafref {
+                path "../../interface[name = current()/../ifname]"
+                    + "/address/ip";
+            }
+        }
+    }
+}

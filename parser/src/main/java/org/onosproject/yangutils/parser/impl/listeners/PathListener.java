@@ -18,17 +18,17 @@ package org.onosproject.yangutils.parser.impl.listeners;
 
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
+import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser.PathStatementContext;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.validatePathArgument;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATH_DATA;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.validatePath;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*
  * Reference: RFC6020 and YANG ANTLR Grammar
@@ -43,7 +43,8 @@ import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorTyp
  *
  * ANTLR grammar rule
  *
- * leafrefSpecification : (pathStatement (requireInstanceStatement)?) | ((requireInstanceStatement)? pathStatement);
+ * leafrefSpecification : (pathStatement (requireInstanceStatement)?) |
+ * ((requireInstanceStatement)? pathStatement);
  *
  * pathStatement : PATH_KEYWORD path STMTEND;
  */
@@ -55,9 +56,7 @@ import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorTyp
  */
 public final class PathListener {
 
-    /**
-     * Creates a new path listener.
-     */
+    // No instantiation.
     private PathListener() {
     }
 
@@ -66,24 +65,26 @@ public final class PathListener {
      * (path), performs validation and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processPathEntry(TreeWalkListener listener,
-            GeneratedYangParser.PathStatementContext ctx) {
+                                        PathStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, PATH_DATA, ctx.path().getText(), ENTRY);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, PATH_DATA,
+                             ctx.path().getText(), ENTRY);
 
         Parsable curData = listener.getParsedDataStack().peek();
 
-        // Checks the holder of path as leafref, else throws error.
+        // Checks the holder of path as leaf-ref, else throws error.
         if (curData instanceof YangLeafRef) {
-
-            // Splitting the path argument and updating it in the datamodel tree.
-            validatePathArgument(ctx.path().getText(), PATH_DATA, ctx, (YangLeafRef) curData);
+            // Parsing the path and updating in leaf-ref path.
+            validatePath(ctx.path().getText(), PATH_DATA, ctx,
+                         (YangLeafRef) curData);
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, PATH_DATA,
-                    ctx.path().getText(), ENTRY));
+            throw new ParserException(
+                    constructListenerErrorMessage(INVALID_HOLDER, PATH_DATA,
+                                                  ctx.path().getText(), ENTRY));
         }
     }
 }

@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -351,7 +352,7 @@ public final class DataModelUtils {
             throws CloneNotSupportedException, DataModelException {
 
         List<YangLeaf> leaves = clonedNode.getListOfLeaf();
-        if (isListPresent(leaves)) {
+        if (nonEmpty(leaves)) {
             List<YangLeaf> clonedLeaves = new LinkedList<>();
             for (YangLeaf leaf : leaves) {
                 YangLeaf clonedLeaf = leaf.clone();
@@ -382,20 +383,21 @@ public final class DataModelUtils {
         List<YangEntityToResolveInfoImpl> infoList;
         if (yangUses != null && yangUses.getCurrentGroupingDepth() == 0) {
             infoList = getTypesToBeResolved(clonedObj, clonedNode, yangUses);
-            if (isListPresent(infoList)) {
+            if (nonEmpty(infoList)) {
                 yangUses.addEntityToResolve(infoList);
             }
         }
     }
 
     /**
-     * Returns true if list object is non-null and non-empty; false otherwise.
+     * Returns true if collection object is non-null and non-empty; false
+     * otherwise.
      *
-     * @param listObj list object
-     * @return true if list object is non-null and non-empty; false otherwise
+     * @param c collection object
+     * @return true if object is non-null and non-empty; false otherwise
      */
-    private static boolean isListPresent(List listObj) {
-        return listObj != null && !listObj.isEmpty();
+    public static boolean nonEmpty(Collection<?> c) {
+        return c != null && !c.isEmpty();
     }
 
     /**
@@ -413,7 +415,7 @@ public final class DataModelUtils {
             throws CloneNotSupportedException, DataModelException {
 
         List<YangLeafList> listOfLeafList = clonedNode.getListOfLeafList();
-        if (isListPresent(listOfLeafList)) {
+        if (nonEmpty(listOfLeafList)) {
             List<YangLeafList> clonedList = new LinkedList<>();
             for (YangLeafList leafList : listOfLeafList) {
                 YangLeafList clonedLeafList = leafList.clone();
@@ -500,7 +502,7 @@ public final class DataModelUtils {
                 return null;
         }
         infoList.add(entity);
-        if (isListPresent(entityList)) {
+        if (nonEmpty(entityList)) {
             infoList.addAll(entityList);
         }
         return infoList;
@@ -528,7 +530,7 @@ public final class DataModelUtils {
 
         // Conversion of prefixes in absolute path while cloning them.
         convertThePrefixesDuringChange(leafRef, yangUses);
-        leafRef.setParentNodeOfLeafref(holder);
+        leafRef.setParentNode(holder);
         leafRefInfo.setEntityToResolve(leafRef);
 
         return setInformationInEntity(
@@ -632,7 +634,7 @@ public final class DataModelUtils {
         for (YangType unionType : typeList) {
             entity = getUnresolvedTypeList(unionType.getDataType(),
                                            unionType, union, null, isLeaf);
-            if (isListPresent(entity)) {
+            if (nonEmpty(entity)) {
                 unionList.addAll(entity);
             }
         }
@@ -653,7 +655,7 @@ public final class DataModelUtils {
             Iterator<YangAtomicPath> atomicPathIterator = atomicPathList.listIterator();
             while (atomicPathIterator.hasNext()) {
                 YangAtomicPath atomicPath = atomicPathIterator.next();
-                Map<String, String> prefixesAndItsImportNameNode = leafrefForCloning.getPrefixAndItsImportedModule();
+                Map<String, String> prefixesAndItsImportNameNode = leafrefForCloning.getPrefixAndNode();
                 String prefixInPath = atomicPath.getNodeIdentifier().getPrefix();
                 String importedNodeName = prefixesAndItsImportNameNode.get(prefixInPath);
                 assignCurrentLeafedWithNewPrefixes(importedNodeName, atomicPath, yangUses);

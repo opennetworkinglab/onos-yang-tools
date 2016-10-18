@@ -631,12 +631,12 @@ public final class UtilConstants {
     /**
      * Static attribute for ancestor accessor.
      */
-    public static final String ANCESTOR_ACCESSOR = "..";
+    public static final String ANCESTOR = "..";
 
     /**
      * Static attribute for ancestor accessor along with path.
      */
-    public static final String ANCESTOR_ACCESSOR_IN_PATH = "../";
+    public static final String SLASH_ANCESTOR = "../";
 
     /**
      * Static attribute for add syntax.

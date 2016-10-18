@@ -81,6 +81,7 @@ import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATH_D
 import static org.onosproject.yangutils.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
 import static org.onosproject.yangutils.linker.impl.XpathLinkingTypes.LEAF_REF_LINKING;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.detectCollisionForAugmentedNode;
+import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.fillPathPredicates;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getErrorInfoForLinker;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getLeafRefErrorInfo;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.getPathWithAugment;
@@ -294,7 +295,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             YangLeafRef leafRefInTypeDef = (YangLeafRef) extendedInfo;
             addRefTypeInfo(YangDataTypes.LEAFREF, LEAFREF, extendedInfo,
                            yangType, refNode, YANG_LEAFREF);
-            leafRefInTypeDef.setParentNodeOfLeafref(refNode);
+            leafRefInTypeDef.setParentNode(refNode);
         } else {
             addRefTypeInfo(YangDataTypes.IDENTITYREF, IDENTITYREF, extendedInfo,
                            yangType, refNode, YANG_IDENTITYREF);
@@ -379,7 +380,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                         .getEntityToResolve();
                 YangNode parentNodeOfLeafref = entityToResolveInfo
                         .getHolderOfEntityToResolve();
-                leafref.setParentNodeOfLeafref(parentNodeOfLeafref);
+                leafref.setParentNode(parentNodeOfLeafref);
                 if (leafref.getResolvableStatus() == UNRESOLVED) {
                     leafref.setResolvableStatus(INTRA_FILE_RESOLVED);
                 }
@@ -1018,9 +1019,11 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
      *
      * @param entityToResolve entity to resolve
      * @param root            root node
+     * @throws DataModelException if there is a data model error
      */
     private void processXPathLinking(T entityToResolve,
-                                     YangReferenceResolver root) {
+                                     YangReferenceResolver root)
+            throws DataModelException {
 
         YangXpathLinker<T> xPathLinker = new YangXpathLinker<T>();
 
@@ -1094,7 +1097,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                     addUnResolvedLeafRefTypeToStack(
                             (T) leafList, entityToResolveInfo.getHolderOfEntityToResolve());
                 }
-                //TODO: add logic for leaf-ref for path predicates.
+                fillPathPredicates(leafRef);
             } else {
                 LinkerException ex = new LinkerException(
                         FAILED_TO_FIND_LEAD_INFO_HOLDER + leafRef.getPath());
@@ -1266,7 +1269,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         if (resolutionInfo instanceof YangLeafRef) {
 
             YangNode leafParent = ((YangLeafRef) resolutionInfo)
-                    .getParentNodeOfLeafref();
+                    .getParentNode();
             YangLeafRef leafref = (YangLeafRef) resolutionInfo;
 
             // Checks if the leafref has relative path in it.

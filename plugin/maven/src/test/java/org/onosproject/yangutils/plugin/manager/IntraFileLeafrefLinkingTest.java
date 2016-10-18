@@ -1552,11 +1552,11 @@ public class IntraFileLeafrefLinkingTest {
         List<YangPathPredicate> pathPredicateList = abspath.getPathPredicatesList();
         Iterator<YangPathPredicate> pathPredicate = pathPredicateList.listIterator();
         YangPathPredicate pathPredicate1 = pathPredicate.next();
-        assertThat(pathPredicate1.getNodeIdentifier().getName(), is("name"));
-        assertThat(pathPredicate1.getNodeIdentifier().getPrefix(), nullValue());
-        assertThat(pathPredicate1.getRightRelativePath().getAncestorNodeCount(), is(1));
-        assertThat(pathPredicate1.getPathOperator(), is(YangPathOperator.EQUALTO));
-        assertThat(pathPredicate1.getRightRelativePath().getAtomicPathList().listIterator().next().getNodeIdentifier()
+        assertThat(pathPredicate1.getNodeId().getName(), is("name"));
+        assertThat(pathPredicate1.getNodeId().getPrefix(), nullValue());
+        assertThat(pathPredicate1.getRelPath().getAncestorNodeCount(), is(1));
+        assertThat(pathPredicate1.getPathOp(), is(YangPathOperator.EQUALTO));
+        assertThat(pathPredicate1.getRelPath().getAtomicPathList().listIterator().next().getNodeIdentifier()
                 .getName(), is("ifname"));
         //TODO : Fill the path predicates
 //        assertThat(pathPredicate1.getLeftAxisNode(), is(leafNameInList));
