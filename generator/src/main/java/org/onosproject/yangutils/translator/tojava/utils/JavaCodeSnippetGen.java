@@ -27,13 +27,11 @@ import org.onosproject.yangutils.utils.UtilConstants.Operation;
 import java.util.List;
 
 import static java.util.Collections.sort;
-import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
-import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.brackets;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultDefinition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOpenCloseParaWithValue;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.signatureClose;
-import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
@@ -168,7 +166,7 @@ public final class JavaCodeSnippetGen {
             attrDef.append(attrType);
 
             // Add ending definition.
-            addAttrEndDef(annotation, attrDef, attrName);
+            addAttrEndDef(attrDef, attrName);
         }
         return attrDef.toString();
     }
@@ -207,21 +205,12 @@ public final class JavaCodeSnippetGen {
     /**
      * Adds ending attribute definition.
      *
-     * @param annotation compiler annotation
-     * @param attrDef    JAVA attribute definition
-     * @param attrName   name of attribute
+     * @param attrDef  JAVA attribute definition
+     * @param attrName name of attribute
      */
-    private static void addAttrEndDef(YangCompilerAnnotation annotation,
-                                      StringBuilder attrDef, String attrName) {
-        if (annotation != null &&
-                annotation.getYangAppDataStructure() != null) {
-            attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE)
-                    .append(attrName).append(signatureClose());
-        } else {
-            attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE).append(attrName)
-                    .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
-                    .append(SPACE).append(ARRAY_LIST).append(signatureClose());
-        }
+    private static void addAttrEndDef(StringBuilder attrDef, String attrName) {
+        attrDef.append(DIAMOND_CLOSE_BRACKET).append(SPACE)
+                .append(attrName).append(signatureClose());
     }
 
     /**
@@ -234,9 +223,8 @@ public final class JavaCodeSnippetGen {
     public static String generateEnumAttributeString(String name, int value) {
         String enumName = getEnumJavaAttribute(name);
         return enumJavaDocForInnerClass(name) + EIGHT_SPACE_INDENTATION +
-                enumName.toUpperCase() + brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
-                                                  value + EMPTY_STRING, null) +
-                COMMA + NEW_LINE;
+                enumName.toUpperCase() + getOpenCloseParaWithValue(
+                value + EMPTY_STRING) + COMMA + NEW_LINE;
     }
 
     /**
@@ -251,8 +239,8 @@ public final class JavaCodeSnippetGen {
         String enumName = getEnumJavaAttribute(name);
         String str = value + COMMA + SPACE + QUOTES + name + QUOTES;
         return getJavaDoc(ENUM_ATTRIBUTE, name, false, null) +
-                FOUR_SPACE_INDENTATION + enumName.toUpperCase() + brackets(
-                OPEN_CLOSE_BRACKET_WITH_VALUE, str, null) + COMMA + NEW_LINE;
+                FOUR_SPACE_INDENTATION + enumName.toUpperCase() +
+                getOpenCloseParaWithValue(str) + COMMA + NEW_LINE;
     }
 
     /**

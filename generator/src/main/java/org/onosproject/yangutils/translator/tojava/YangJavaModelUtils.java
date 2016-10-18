@@ -19,16 +19,21 @@ package org.onosproject.yangutils.translator.tojava;
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
+import org.onosproject.yangutils.datamodel.YangBit;
+import org.onosproject.yangutils.datamodel.YangBits;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangEnum;
+import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
 import org.onosproject.yangutils.datamodel.YangSchemaNode;
 import org.onosproject.yangutils.datamodel.YangTranslatorOperatorNode;
+import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
-import org.onosproject.yangutils.datamodel.utils.DataModelUtils;
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaEnumerationTranslator;
@@ -37,19 +42,21 @@ import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaModuleTrans
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaOutputTranslator;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.addCurNodeInfoInParentTempFile;
-import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerator.generateInterfaceFile;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
-import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.methodClose;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_NODE;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_PARENT_NODE;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.INVALID_TRANSLATION_NODE;
@@ -57,7 +64,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsgForCodeGenerator;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
-import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yangutils.utils.UtilConstants.INPUT_KEYWORD;
 import static org.onosproject.yangutils.utils.UtilConstants.OUTPUT_KEYWORD;
@@ -69,11 +76,14 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirP
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents utility class for YANG java model.
  */
 public final class YangJavaModelUtils {
+
+    private static final Logger LOG = getLogger(YangJavaModelUtils.class);
 
     // No instantiation.
     private YangJavaModelUtils() {
@@ -207,7 +217,8 @@ public final class YangJavaModelUtils {
     private static void createTempFragmentFile(JavaCodeGeneratorInfo info)
             throws IOException {
         info.setTempJavaCodeFragmentFiles(
-                new TempJavaCodeFragmentFiles(info.getJavaFileInfo()));
+                new TempJavaCodeFragmentFiles(info.getJavaFileInfo()
+                ));
     }
 
     /**
@@ -226,21 +237,15 @@ public final class YangJavaModelUtils {
         if (info instanceof RpcNotificationContainer) {
             getBeanFiles(info).setRootNode(true);
             /*
-             * Module / sub module node code generation.
+             * event classes code generation.
              */
-            if (info instanceof YangJavaModuleTranslator) {
-                if (!((YangJavaModuleTranslator) info).getNotificationNodes()
-                        .isEmpty()) {
-                    updateNotificationNodeInfo(info, config);
-                }
-            } else if (info instanceof YangJavaSubModuleTranslator) {
-                if (!((YangJavaSubModuleTranslator) info).getNotificationNodes()
-                        .isEmpty()) {
-                    updateNotificationNodeInfo(info, config);
-                }
-            }
+            updateNotificationNodeInfo(info, config);
         }
         if (info instanceof YangLeavesHolder) {
+            if (info instanceof YangAugment) {
+                getBeanFiles(info).addIsSubTreeFilteredFlag(config);
+            }
+
             YangLeavesHolder holder = (YangLeavesHolder) info;
             boolean isLeafPresent = holder.getListOfLeaf() != null && !holder
                     .getListOfLeaf().isEmpty();
@@ -321,21 +326,11 @@ public final class YangJavaModelUtils {
     private static void updateNotificationNodeInfo(JavaCodeGeneratorInfo info,
                                                    YangPluginConfig config)
             throws IOException {
-        TempJavaCodeFragmentFiles translator =
-                info.getTempJavaCodeFragmentFiles();
-        if (info instanceof YangJavaModuleTranslator) {
-            for (YangNode notification : ((YangJavaModuleTranslator) info)
-                    .getNotificationNodes()) {
-                translator.getEventFragmentFiles()
-                        .addJavaSnippetOfEvent(notification, config);
-            }
-        }
-        if (info instanceof YangJavaSubModuleTranslator) {
-            for (YangNode notification : ((YangJavaSubModuleTranslator) info)
-                    .getNotificationNodes()) {
-                translator.getEventFragmentFiles()
-                        .addJavaSnippetOfEvent(notification, config);
-            }
+        TempJavaCodeFragmentFiles tempFile = info.getTempJavaCodeFragmentFiles();
+        for (YangNode notification :
+                ((RpcNotificationContainer) info).getNotificationNodes()) {
+            tempFile.getEventFragmentFiles()
+                    .addJavaSnippetOfEvent(notification, config);
         }
     }
 
@@ -463,9 +458,8 @@ public final class YangJavaModelUtils {
      * @param config plugin configuration
      * @return cases parent's qualified info
      */
-    public static JavaQualifiedTypeInfoTranslator
-    getQualifierInfoForCasesParent(YangNode parent,
-                                   YangPluginConfig config) {
+    private static JavaQualifiedTypeInfoTranslator getQualifierInfoForCasesParent(
+            YangNode parent, YangPluginConfig config) {
         String parentName;
         String parentPkg;
         JavaFileInfoTranslator parentInfo;
@@ -550,7 +544,7 @@ public final class YangJavaModelUtils {
             throw new TranslatorException(getErrorMsg(INVALID_NODE, curNode));
         }
 
-        YangNode parentNode = DataModelUtils.getParentNodeInGenCode(curNode);
+        YangNode parentNode = getParentNodeInGenCode(curNode);
         if (!(parentNode instanceof JavaFileInfoContainer)) {
             throw new TranslatorException(getErrorMsg(INVALID_PARENT_NODE,
                                                       curNode));
@@ -635,6 +629,14 @@ public final class YangJavaModelUtils {
                                          YangPluginConfig config) {
 
         List<String> clsInfo = new ArrayList<>();
+        String add = null;
+        if (node instanceof YangCase) {
+            YangNode parent = node.getParent();
+            if (parent instanceof YangAugment) {
+                add = getCamelCase(((YangAugment) parent)
+                                           .getAugmentedNode().getName(), null);
+            }
+        }
         while (node.getParent() != null) {
             if (node instanceof YangJavaAugmentTranslator) {
                 clsInfo.add(getAugmentClassName((YangAugment) node,
@@ -661,9 +663,13 @@ public final class YangJavaModelUtils {
                                       subModule.getRevision(),
                                       config.getConflictResolver()));
         }
-        pkg.append(EMPTY_STRING);
+        if (add != null) {
+            clsInfo.add(add);
+        }
+        clsInfo.add(getCamelCase(node.getName(), config.getConflictResolver()));
+
         int size = clsInfo.size();
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = size - 1; i > 0; i--) {
             pkg.append(PERIOD).append(clsInfo.get(i));
         }
         return pkg.toString().toLowerCase();
@@ -681,14 +687,15 @@ public final class YangJavaModelUtils {
         YangNodeIdentifier identifier =
                 augment.getTargetNode().get(augment.getTargetNode().size() - 1)
                         .getNodeIdentifier();
-        String name = getCapitalCase(getCamelCase(identifier.getName(),
-                                                  config.getConflictResolver()));
+        String prefix = identifier.getPrefix();
+        String idName = identifier.getName();
+        StringBuilder name = new StringBuilder(AUGMENTED).append(HYPHEN);
         if (identifier.getPrefix() != null) {
-            return getCapitalCase(getCamelCase(AUGMENTED + HYPHEN + identifier
-                                                       .getPrefix(),
-                                               config.getConflictResolver())) + name;
+            name.append(prefix).append(HYPHEN);
         }
-        return AUGMENTED + name;
+        name.append(idName);
+        return getCapitalCase(getCamelCase(name.toString(),
+                                           config.getConflictResolver()));
     }
 
     /**
@@ -706,6 +713,92 @@ public final class YangJavaModelUtils {
         if (node.getReferredSchema() == null) {
             ((TempJavaCodeFragmentFilesContainer) node)
                     .getTempJavaCodeFragmentFiles().generateJavaFile(type, node);
+        }
+    }
+
+    private static void createAndAddEnum(String name, int value,
+                                         YangEnumeration enumeration) {
+        YangEnum yangEnum = new YangEnum();
+        yangEnum.setNamedValue(name);
+        yangEnum.setValue(value);
+        try {
+            enumeration.addEnumInfo(yangEnum);
+        } catch (DataModelException e) {
+            LOG.error("failed to add enum in bits enum class " + e);
+        }
+    }
+
+    /**
+     * Returns bits type enum file.
+     *
+     * @param attr     attribute
+     * @param type     data type
+     * @param fileInfo file info
+     * @param tempFile temp java fragment files
+     * @throws IOException when fails to do IO operations
+     */
+    static void generateBitsFile(
+            JavaAttributeInfo attr, YangType type,
+            JavaFileInfoTranslator fileInfo, TempJavaFragmentFiles tempFile) throws IOException {
+        String className = attr.getAttributeName();
+        JavaFileInfoTranslator attrInfo = new JavaFileInfoTranslator();
+        attrInfo.setJavaName(className);
+        attrInfo.setPackage((fileInfo.getPackage() + "." + fileInfo.getJavaName()
+                            ).toLowerCase());
+        attrInfo.setBaseCodeGenPath(fileInfo.getBaseCodeGenPath());
+        attrInfo.setGeneratedFileTypes(GENERATE_ENUM_CLASS);
+        attrInfo.setPackageFilePath(fileInfo.getPackageFilePath() + File
+                .separator + fileInfo.getJavaName().toLowerCase());
+        attrInfo.setPluginConfig(fileInfo.getPluginConfig());
+        TempJavaCodeFragmentFiles codeFile = new TempJavaCodeFragmentFiles(
+                attrInfo);
+        YangJavaEnumerationTranslator enumeration = new YangJavaEnumerationTranslator() {
+            @Override
+            public String getJavaPackage() {
+                return attr.getImportInfo().getPkgInfo();
+            }
+
+            @Override
+            public String getJavaClassNameOrBuiltInType() {
+                return className;
+            }
+
+            @Override
+            public String getJavaAttributeName() {
+                return className;
+            }
+        };
+
+        enumeration.setName(getCapitalCase(className));
+        enumeration.setJavaFileInfo(attrInfo);
+        enumeration.setTempJavaCodeFragmentFiles(codeFile);
+        YangBits yangBits = (YangBits) type.getDataTypeExtendedInfo();
+        Integer key;
+        YangBit bit;
+        String bitName;
+        for (Map.Entry<Integer, YangBit> entry : yangBits.getBitPositionMap()
+                .entrySet()) {
+            key = entry.getKey();
+            bit = entry.getValue();
+            if (bit != null) {
+                bitName = bit.getBitName();
+                createAndAddEnum(bitName, key, enumeration);
+            }
+        }
+
+        codeFile.getEnumTempFiles()
+                .addEnumAttributeToTempFiles(enumeration, fileInfo.getPluginConfig());
+        codeFile.getEnumTempFiles().setEnumClass(false);
+        codeFile.generateJavaFile(GENERATE_ENUM_CLASS, enumeration);
+
+        //Add to import list.
+        JavaQualifiedTypeInfoTranslator info = new
+                JavaQualifiedTypeInfoTranslator();
+        info.setClassInfo(getCapitalCase(attrInfo.getJavaName()));
+        info.setPkgInfo(attrInfo.getPackage());
+        if (tempFile instanceof TempJavaTypeFragmentFiles) {
+            tempFile.getJavaImportData().addImportInfo(info, fileInfo
+                    .getJavaName(), fileInfo.getPackage());
         }
     }
 
@@ -733,6 +826,6 @@ public final class YangJavaModelUtils {
         //generate java code for interface file.
         validateLineLength(generateInterfaceFile(interFace, null, rootNode,
                                                  false));
-        insertDataIntoJavaFile(interFace, methodClose(FOUR_SPACE));
+        insertDataIntoJavaFile(interFace, CLOSE_CURLY_BRACKET);
     }
 }

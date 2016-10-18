@@ -182,7 +182,6 @@ public class InterJarLinkerTest {
         yangPluginConfig.setCodeGenDir(TARGET);
 
         utilManager.translateToJava(yangPluginConfig);
-
         testIfFlowClassifierFilesExists();
         testIfPortPairFileDoesNotExist();
         deleteDirectory(TARGET);

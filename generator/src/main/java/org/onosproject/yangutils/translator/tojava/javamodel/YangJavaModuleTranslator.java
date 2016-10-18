@@ -27,9 +27,7 @@ import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
@@ -58,11 +56,6 @@ public class YangJavaModuleTranslator
      * snippet types.
      */
     private transient TempJavaCodeFragmentFiles tempFileHandle;
-
-    /**
-     * List of notifications nodes.
-     */
-    private final transient List<YangNode> notificationNodes;
 
     /**
      * Creates a YANG node of module type.
@@ -191,15 +184,6 @@ public class YangJavaModuleTranslator
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
                                                       e.getLocalizedMessage()));
         }
-    }
-
-    /**
-     * Returns notifications node list.
-     *
-     * @return notification nodes
-     */
-    public List<YangNode> getNotificationNodes() {
-        return unmodifiableList(notificationNodes);
     }
 
     /**

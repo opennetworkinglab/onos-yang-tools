@@ -45,10 +45,12 @@ import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
+import org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType;
 
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.FRACTION_DIGITS_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_CONTENT;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
@@ -70,26 +72,34 @@ public final class FractionDigitsListener {
      * validations and updates the data model tree.
      *
      * @param listener listener's object
-     * @param ctx context object of the grammar rule
+     * @param ctx      context object of the grammar rule
      */
     public static void processFractionDigitsEntry(TreeWalkListener listener,
-                                        GeneratedYangParser.FractionDigitStatementContext ctx) {
+                                                  GeneratedYangParser.FractionDigitStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, FRACTION_DIGITS_DATA, ctx.fraction().getText(), ENTRY);
-
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, FRACTION_DIGITS_DATA,
+                             ctx.fraction().getText(), ENTRY);
         int value = getValidFractionDigits(ctx);
-
         Parsable tmpNode = listener.getParsedDataStack().peek();
         if (tmpNode instanceof YangType) {
             YangType<YangDecimal64<YangRangeRestriction>> typeNode =
                     (YangType<YangDecimal64<YangRangeRestriction>>) tmpNode;
             YangDecimal64 decimal64Node = typeNode.getDataTypeExtendedInfo();
             decimal64Node.setFractionDigit(value);
+            if (!decimal64Node.isValidFractionDigit()) {
+                throw new ParserException(constructErrorMsg(ctx, INVALID_CONTENT));
+            }
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, FRACTION_DIGITS_DATA,
-                                                                    ctx.fraction().getText(), ENTRY));
+            throw new ParserException(constructErrorMsg(ctx, INVALID_HOLDER));
         }
+    }
+
+    private static String constructErrorMsg(
+            GeneratedYangParser.FractionDigitStatementContext ctx,
+            ListenerErrorType type) {
+        return constructListenerErrorMessage(type, FRACTION_DIGITS_DATA,
+                                             ctx.fraction().getText(), ENTRY);
     }
 
     /**
@@ -98,17 +108,19 @@ public final class FractionDigitsListener {
      * @param ctx context object of the grammar rule
      * @return validated fraction-digits
      */
-    public static int getValidFractionDigits(GeneratedYangParser.FractionDigitStatementContext ctx) {
+    private static int getValidFractionDigits(GeneratedYangParser
+                                                      .FractionDigitStatementContext ctx) {
         String value = ctx.fraction().getText().trim();
         ParserException parserException;
 
         int fractionDigits = Integer.parseInt(value);
-        if ((fractionDigits >= YangDecimal64.MIN_FRACTION_DIGITS_VALUE) &&
-                (fractionDigits <= YangDecimal64.MAX_FRACTION_DIGITS_VALUE)) {
+        if (fractionDigits >= YangDecimal64.MIN_FRACTION_DIGITS_VALUE &&
+                fractionDigits <= YangDecimal64.MAX_FRACTION_DIGITS_VALUE) {
             return fractionDigits;
         } else {
             parserException =
-                    new ParserException("YANG file error : fraction-digits value should be between 1 and 18.");
+                    new ParserException("YANG file error : fraction-digits value" +
+                                                " should be between 1 and 18.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;

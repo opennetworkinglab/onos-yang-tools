@@ -16,17 +16,17 @@
 
 package org.onosproject.yangutils.ietfyang;
 
-import java.io.IOException;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
-import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.plugin.manager.YangUtilManager;
-import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -34,9 +34,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirector
  */
 public class IetfYangFileTest {
 
-    private final YangUtilsParserManager manager = new YangUtilsParserManager();
     private final YangUtilManager utilManager = new YangUtilManager();
-    private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
 
     /**
      * Checks hierarchical intra with inter file type linking.
@@ -46,18 +44,20 @@ public class IetfYangFileTest {
     public void l3vpnserviceyang()
             throws IOException, ParserException, MojoExecutionException {
 
+        String dir = "target/ietfyang/l3vpnservice/";
+        deleteDirectory(dir);
         String searchDir = "src/test/resources/ietfyang/l3vpnservice";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
-        String userDir = System.getProperty("user.dir");
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/ietfyang/l3vpnservice/");
+        yangPluginConfig.setCodeGenDir(dir);
 
         utilManager.translateToJava(yangPluginConfig);
-
-        deleteDirectory(userDir + "/target/ietfyang/");
+        String dir1 = System.getProperty("user.dir") + File.separator + dir;
+        compileCode(dir1);
+        deleteDirectory("target/ietfyang/");
     }
 
 }

@@ -40,6 +40,9 @@ import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerato
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getRpcServiceMethod;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.HYPHEN;
+import static org.onosproject.yangutils.utils.UtilConstants.INPUT;
+import static org.onosproject.yangutils.utils.UtilConstants.OUTPUT;
 import static org.onosproject.yangutils.utils.UtilConstants.Operation.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.RPC_INPUT_VAR_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
@@ -47,6 +50,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.VOID;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.generateJavaDocForRpc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 
 /**
@@ -148,11 +152,18 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      */
     private void addRpcString(JavaAttributeInfo inAttr, JavaAttributeInfo outAttr,
                               String rpcName) throws IOException {
-        String rpcInput = inAttr == null ? null :
-                getCapitalCase(inAttr.getAttributeName());
-        String rpcOutput = outAttr == null ? VOID :
-                getCapitalCase(outAttr.getAttributeName());
-        String rpcIn = rpcInput == null ? EMPTY_STRING : RPC_INPUT_VAR_NAME;
+        String rpcInput = null;
+        String rpcOutput = VOID;
+        String rpcIn = EMPTY_STRING;
+        if (inAttr != null) {
+            rpcInput = getCapitalCase(inAttr.getAttributeName());
+        }
+        if (outAttr != null) {
+            rpcOutput = getCapitalCase(outAttr.getAttributeName());
+        }
+        if (rpcInput != null) {
+            rpcIn = RPC_INPUT_VAR_NAME;
+        }
         appendToFile(rpcInterfaceTempFileHandle,
                      generateJavaDocForRpc(rpcName, rpcIn, rpcOutput) +
                              getRpcServiceMethod(rpcName, rpcInput, rpcOutput));
@@ -180,14 +191,24 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      * @param childNode  child data model node(input / output) for which the java code generation
      *                   is being handled
      * @param parentNode parent node (module / sub-module) in which the child node is an attribute
+     * @param rpcName    rpc name
      * @return AttributeInfo attribute details required to add in temporary
      * files
      */
     public JavaAttributeInfo getChildNodeAsAttributeInParentService(
-            YangNode childNode, YangNode parentNode) {
+            YangNode childNode, YangNode parentNode, String rpcName) {
 
-        String childNodeName = ((JavaFileInfoContainer) childNode)
-                .getJavaFileInfo().getJavaName();
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) childNode)
+                .getJavaFileInfo();
+        String childNodeName = fileInfo.getJavaName();
+        if (childNodeName == null) {
+            if (childNode instanceof YangInput) {
+                childNodeName = rpcName + HYPHEN + INPUT;
+            } else {
+                childNodeName = rpcName + HYPHEN + OUTPUT;
+            }
+            childNodeName = getCamelCase(childNodeName, null);
+        }
         /*
          * Get the import info corresponding to the attribute for import in
          * generated java files or qualified access
@@ -237,28 +258,39 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
         JavaAttributeInfo out = null;
         YangNode rpcChild;
         YangRpc rpc;
+        String rpcName;
         YangInput input;
+
         for (YangAugment info : module.getAugmentList()) {
             input = (YangInput) info.getAugmentedNode();
 
             if (input != null) {
                 rpc = (YangRpc) input.getParent();
-                rpcChild = rpc.getChild();
-                while (rpcChild != null) {
-                    if (rpcChild instanceof YangInput) {
-                        in = getChildNodeAsAttributeInParentService(
-                                rpcChild, (YangNode) module);
+                if (!validateForIntraFile(module, (RpcNotificationContainer) rpc
+                        .getParent())) {
+                    rpcChild = rpc.getChild();
+
+                    rpcName = getCamelCase(rpc.getName(), null);
+                    while (rpcChild != null) {
+                        if (rpcChild instanceof YangInput) {
+                            in = getChildNodeAsAttributeInParentService(
+                                    rpcChild, (YangNode) module, rpcName);
+                        }
+                        if (rpcChild instanceof YangOutput) {
+                            out = getChildNodeAsAttributeInParentService(
+                                    rpcChild, (YangNode) module, rpcName);
+                        }
+                        rpcChild = rpcChild.getNextSibling();
                     }
-                    if (rpcChild instanceof YangOutput) {
-                        out = getChildNodeAsAttributeInParentService(
-                                rpcChild, (YangNode) module);
-                    }
-                    rpcChild = rpcChild.getChild();
+                    addJavaSnippetInfoToApplicableTempFiles(in, out, rpcName);
                 }
-                addJavaSnippetInfoToApplicableTempFiles(in, out, rpc
-                        .getJavaClassNameOrBuiltInType());
             }
         }
+    }
+
+    private boolean validateForIntraFile(RpcNotificationContainer parent,
+                                         RpcNotificationContainer curModule) {
+        return parent.getPrefix().equals(curModule.getPrefix());
     }
 
     /**

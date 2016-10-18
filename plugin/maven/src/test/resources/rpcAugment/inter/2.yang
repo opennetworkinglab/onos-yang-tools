@@ -1,0 +1,33 @@
+module ietf-inet2 {
+
+  namespace "yang:all2";
+  prefix "inet2";
+  yang-version 1;
+
+  
+   rpc get-port {
+       input {
+           leaf port {
+              type int32;
+            }
+  
+           leaf-list port-id {
+              type string;
+           }
+       }
+       output {
+           container port {
+                leaf port-number {
+                   type enumeration {
+                       enum zero-0;
+                   }
+                 }
+                 leaf ip {
+                  type int32;
+                }
+           }
+       }
+    }           
+        
+   
+}

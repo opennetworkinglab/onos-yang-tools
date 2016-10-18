@@ -16,9 +16,6 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.ListIterator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,8 +37,12 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
-import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,6 +52,7 @@ import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.RESOLVE
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.updateFilePriority;
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -121,7 +123,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) refNode.getChild()));
+                   is((YangTypeDef) refNode.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -206,7 +208,7 @@ public class InterFileLinkingTest {
 
         // Check whether uses get resolved.
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
     }
 
     /**
@@ -268,7 +270,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) refNode.getChild()));
+                   is((YangTypeDef) refNode.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -356,7 +358,7 @@ public class InterFileLinkingTest {
 
         // Check whether uses get resolved.
         assertThat(uses.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
     }
 
     /**
@@ -415,7 +417,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) refNode.getChild()));
+                   is((YangTypeDef) refNode.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -487,7 +489,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) refNode.getChild()));
+                   is((YangTypeDef) refNode.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -558,7 +560,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) refNode1.getChild()));
+                   is((YangTypeDef) refNode1.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -626,7 +628,7 @@ public class InterFileLinkingTest {
         assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
 
         assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) selfNode.getChild()));
+                   is((YangTypeDef) selfNode.getChild()));
 
         assertThat(leafInfo.getDataType().getResolvableStatus(), is(RESOLVED));
 
@@ -679,7 +681,9 @@ public class InterFileLinkingTest {
         yangPluginConfig.setCodeGenDir("target/file1UsesFile2TypeDefFile3Type/");
 
         utilManager.translateToJava(yangPluginConfig);
-
+        String dir1 = System.getProperty("user.dir") + "/"
+                + "target/file1UsesFile2TypeDefFile3Type/";
+        compileCode(dir1);
         deleteDirectory("target/file1UsesFile2TypeDefFile3Type/");
 
     }
@@ -691,6 +695,7 @@ public class InterFileLinkingTest {
     public void interFileIetf()
             throws IOException, ParserException, MojoExecutionException {
 
+        deleteDirectory("target/interfileietf/");
         String searchDir = "src/test/resources/interfileietf";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -742,7 +747,9 @@ public class InterFileLinkingTest {
         yangPluginConfig.setCodeGenDir("target/groupingNodeSameAsModule/");
 
         utilManager.translateToJava(yangPluginConfig);
-
+        String dir1 = System.getProperty("user.dir") + "/"
+                + "target/groupingNodeSameAsModule/";
+        compileCode(dir1);
         deleteDirectory("target/groupingNodeSameAsModule/");
 
     }

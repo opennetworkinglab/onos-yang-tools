@@ -22,8 +22,10 @@ import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.File;
 import java.io.IOException;
 
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -41,16 +43,18 @@ public class IncludeReferenceWithPrefix {
     @Test
     public void processRefToIncludeWithPrefix() throws IOException, ParserException, MojoExecutionException {
 
-        deleteDirectory("target/refincludecontentwithprefix/");
+        String dir = "target/refincludecontentwithprefix/";
+        deleteDirectory(dir);
         String searchDir = "src/test/resources/refincludecontentwithprefix";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/refincludecontentwithprefix/");
+        yangPluginConfig.setCodeGenDir(dir);
         utilManager.translateToJava(yangPluginConfig);
-
-        deleteDirectory("target/refincludecontentwithprefix/");
+        String dir1 = System.getProperty("user.dir") + File.separator + dir;
+        compileCode(dir1);
+        deleteDirectory(dir);
     }
 }

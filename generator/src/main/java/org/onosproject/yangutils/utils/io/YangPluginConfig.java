@@ -16,6 +16,16 @@
 
 package org.onosproject.yangutils.utils.io;
 
+import javax.tools.JavaCompiler;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.onosproject.yangutils.utils.io.impl.YangFileScanner.getJavaFiles;
+
 /**
  * Representation of plugin configurations required for YANG utils.
  */
@@ -96,4 +106,31 @@ public final class YangPluginConfig {
         return conflictResolver;
     }
 
+    /**
+     * Compiles the generated code for unit tests.
+     *
+     * @param dir1 directory path
+     * @throws IOException when generated code has compilation errors.
+     */
+    @SuppressWarnings("unchecked")
+    public static void compileCode(String dir1) throws IOException {
+        String classpath = System.getProperty("java.class.path");
+        List<String> optionList = new ArrayList<>();
+        optionList.addAll(Arrays.asList("-classpath", classpath));
+
+        List<String> files = getJavaFiles(dir1);
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null);
+        Iterable fileObjects = manager.getJavaFileObjectsFromStrings(files);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null,
+                                                             null, optionList, null,
+                                                             fileObjects);
+
+        boolean failOnError = !task.call();
+        manager.close();
+        if (failOnError) {
+            throw new IOException("Yang Error : compilation errors in " +
+                                          "generated code.");
+        }
+    }
 }

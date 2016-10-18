@@ -17,8 +17,8 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
+import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
-import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
@@ -27,7 +27,6 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangUnion;
-import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -83,9 +82,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.TO_STRING_IMPL_MASK;
 import static org.onosproject.yangutils.translator.tojava.TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
-import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getQualifierInfoForCasesParent;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.isGetSetOfRootNodeRequired;
-import static org.onosproject.yangutils.translator.tojava.utils.BitsJavaInfoHandler.generateBitsFile;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEnumsValueAttribute;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getEventEnumTypeStart;
@@ -96,6 +93,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerato
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_INT_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_STRING_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.builderMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.generateBuildMethodInAugmentClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodImpl;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAugmentsDataMethodForService;
@@ -125,7 +123,6 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.isLeafValueSetInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.isSelectLeafSetInterface;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.processSubtreeFilteringInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.setSelectLeafSetInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getInterfaceLeafIdEnumMethods;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getIsSelectLeafSet;
@@ -233,6 +230,7 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, getOperationTypeEnum());
         }
         List<String> methods = new ArrayList<>();
+
         if (attrPresent) {
             // Add getter methods to interface file.
             try {
@@ -259,18 +257,6 @@ public final class JavaFileGenerator {
         if (curNode instanceof YangAugmentableNode &&
                 !(curNode instanceof YangChoice)) {
             methods.add(getYangAugmentInfoInterface());
-        }
-        if (curNode.isOpTypeReq()) {
-            if (curNode instanceof YangCase) {
-                YangNode caseParent = curNode.getParent();
-                JavaQualifiedTypeInfo qualifiedTypeInfo =
-                        getQualifierInfoForCasesParent(caseParent,
-                                                       fileInfo.getPluginConfig());
-                methods.add(processSubtreeFilteringInterface(
-                        qualifiedTypeInfo.getClassInfo()));
-            } else {
-                methods.add(processSubtreeFilteringInterface(className));
-            }
         }
 
         if (leavesPresent) {
@@ -449,6 +435,9 @@ public final class JavaFileGenerator {
         methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
                             .getTempJavaCodeFragmentFiles()
                             .addBuildMethodImpl());
+        if (curNode instanceof YangAugment) {
+            methods.add(generateBuildMethodInAugmentClass(className));
+        }
         methods.add(addDefaultConstructor(curNode, PUBLIC, BUILDER));
 
         //Add methods in builder class.
@@ -491,9 +480,11 @@ public final class JavaFileGenerator {
 
         String className = getCapitalCase(fileInfo.getJavaName());
         String opParamClassName = className;
+        String name = DEFAULT_CAPS + className;
         String path;
         if (curNode instanceof RpcNotificationContainer) {
             opParamClassName = className + OP_PARAM;
+            name = opParamClassName;
             rootNode = true;
             path = fileInfo.getPluginConfig().getCodeGenDir() +
                     fileInfo.getPackageFilePath();
@@ -530,10 +521,10 @@ public final class JavaFileGenerator {
                     // add is filter content match.
                     augmentableSubTreeFiltering = getAugmentableSubTreeFiltering();
                 }
-                methods.add(getProcessSubtreeFilteringStart(curNode, config) +
+                methods.add(getProcessSubtreeFilteringStart(curNode) +
                                     getProcessSubtreeFunctionBody(curNode) +
                                     augmentableSubTreeFiltering +
-                                    getProcessSubTreeFilteringEnd());
+                                    getProcessSubTreeFilteringEnd(name, curNode));
 
                 if (curNode instanceof YangLeavesHolder) {
                     if (((YangLeavesHolder) curNode).getListOfLeaf() != null &&
@@ -630,11 +621,6 @@ public final class JavaFileGenerator {
             methods.add(getToStringMethodOpen() + getDataFromTempFileHandle(
                     TO_STRING_IMPL_MASK, getBeanFiles(curNode), path) +
                                 getToStringMethodClose());
-
-            for (BitsJavaInfoHandler handler : getBeanFiles(curNode)
-                    .getBitsHandler()) {
-                generateBitsFile(handler.getAttr(), handler.getYangType(), curNode);
-            }
         } catch (IOException e) {
             throw new IOException(getErrorMsg(className, IMPL_CLASS));
         }
@@ -707,7 +693,7 @@ public final class JavaFileGenerator {
                                                       getTypeFiles(curNode), path)));
 
             // To string method.
-            addTypedefToString(curNode, methods, path);
+            addTypedefToString(curNode, methods);
 
             JavaCodeGeneratorInfo javaGenInfo = (JavaCodeGeneratorInfo) curNode;
 
@@ -748,25 +734,17 @@ public final class JavaFileGenerator {
      *
      * @param curNode current node
      * @param methods list of methods string
-     * @param path    file path
      * @throws IOException a violation in IO rule
      */
     private static void addTypedefToString(YangNode curNode,
-                                           List<String> methods, String path)
+                                           List<String> methods)
             throws IOException {
         //To string method.
 
         List<YangType<?>> types = ((YangTypeDef) curNode).getTypeList();
         YangType type = types.get(0);
-        String className = ((JavaFileInfoContainer) curNode).getJavaFileInfo()
-                .getJavaName();
         methods.add(getToStringForType(getCamelCase(type.getDataTypeName(),
-                                                    null), type, getCapitalCase(className)));
-        for (BitsJavaInfoHandler handler : getTypeFiles(curNode)
-                .getBitsHandler()) {
-            generateBitsFile(handler.getAttr(), handler.getYangType(), curNode);
-        }
-
+                                                    null), type));
     }
 
     /**
@@ -876,12 +854,7 @@ public final class JavaFileGenerator {
 
             //To string method.
             methods.add(getUnionToStringMethod(
-                    ((YangUnion) curNode).getTypeList(), getCapitalCase(className)));
-
-            for (BitsJavaInfoHandler handler : getTypeFiles(curNode)
-                    .getBitsHandler()) {
-                generateBitsFile(handler.getAttr(), handler.getYangType(), curNode);
-            }
+                    ((YangUnion) curNode).getTypeList()));
 
             //From string method.
             methods.add(getFromStringMethodSignature(className) +

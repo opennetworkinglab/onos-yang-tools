@@ -16,11 +16,6 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -34,12 +29,16 @@ import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils
-        .deleteDirectory;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
  * Test cases for testing YANG schema node.
@@ -61,6 +60,7 @@ public class SchemaNodeTest {
             throws IOException, ParserException,
             MojoExecutionException, DataModelException {
 
+        deleteDirectory("target/schemaMap/");
         String searchDir = "src/test/resources/schemaMap";
         utilManager
                 .createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
@@ -196,6 +196,7 @@ public class SchemaNodeTest {
             ParserException, MojoExecutionException,
             DataModelException {
 
+        deleteDirectory("target/schemaMap/");
         String searchDir = "src/test/resources/schemaMap";
         utilManager
                 .createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));

@@ -18,6 +18,7 @@ package org.onosproject.yangutils.datamodel;
 
 import java.io.Serializable;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.OPERATION_FAILED_ERROR_TAG;
 import static org.onosproject.yangutils.datamodel.utils.YangErrMsgConstants.TOO_MANY_ELEMENTS_ERROR_APP_TAG;
 
@@ -44,7 +45,7 @@ public class YangMaxElement extends DefaultLocationInfo
      * <p>
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
-    private int maxElement = Integer.MAX_VALUE;
+    private int maxElement = MAX_VALUE;
 
     /**
      * Creates a YANG maximum element.

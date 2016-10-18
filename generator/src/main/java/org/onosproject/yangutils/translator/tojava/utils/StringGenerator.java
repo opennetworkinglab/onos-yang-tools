@@ -16,32 +16,30 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
+import org.onosproject.yangutils.datamodel.YangAugment;
+import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
+import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
+import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BOOLEAN;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DECIMAL64;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT64;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT8;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT16;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT32;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT64;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIfConditionForAddToListMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getQualifiedInfo;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
 import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
+import static org.onosproject.yangutils.utils.UtilConstants.APP_INSTANCE;
 import static org.onosproject.yangutils.utils.UtilConstants.AT;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_DECIMAL;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
@@ -68,6 +66,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTAT
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
+import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.EXTEND;
@@ -85,6 +84,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTEGER_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MIN_RANGE;
+import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MAX_RANGE;
@@ -212,8 +212,8 @@ public final class StringGenerator {
     static String getNewInstance(String returnType, String varName,
                                  String space, String value) {
         return space + returnType + SPACE + varName + SPACE + EQUAL + SPACE +
-                NEW + SPACE + returnType + brackets(
-                OPEN_CLOSE_BRACKET_WITH_VALUE, value, null) + signatureClose();
+                NEW + SPACE + returnType + getOpenCloseParaWithValue(value) +
+                signatureClose();
     }
 
     /**
@@ -258,14 +258,16 @@ public final class StringGenerator {
                 return TWENTY_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
                         NEW_LINE;
             case TWENTY_EIGHT_SPACE:
-                return FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
-                        NEW_LINE;
+                return TWENTY_SPACE_INDENTATION + EIGHT_SPACE_INDENTATION +
+                        CLOSE_CURLY_BRACKET + NEW_LINE;
             case TWENTY_FOUR_SPACE:
+                return TWENTY_SPACE_INDENTATION + FOUR_SPACE_INDENTATION +
+                        CLOSE_CURLY_BRACKET + NEW_LINE;
+            case FOUR_SPACE:
                 return FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
                         NEW_LINE;
             default:
-                return FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
-                        NEW_LINE;
+                return CLOSE_CURLY_BRACKET + NEW_LINE;
         }
     }
 
@@ -306,9 +308,8 @@ public final class StringGenerator {
                 return builder.toString();
             case BUILD:
                 return getReturnString(
-                        NEW + SPACE + paraName + brackets(
-                                OPEN_CLOSE_BRACKET_WITH_VALUE, THIS, null) +
-                                signatureClose(), space);
+                        NEW + SPACE + paraName + getOpenCloseParaWithValue(
+                                THIS) + signatureClose(), space);
             case CONSTRUCTOR:
                 return space + THIS + PERIOD + paraName + SPACE +
                         EQUAL + SPACE + BUILDER_LOWER_CASE + OBJECT + PERIOD +
@@ -321,8 +322,7 @@ public final class StringGenerator {
                 return space + getIfConditionForAddToListMethod(paraName) +
                         space + paraName +
                         brackets(OPEN_CLOSE_BRACKET, null, null) + PERIOD +
-                        ADD_STRING +
-                        brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, VALUE, null) +
+                        ADD_STRING + getOpenCloseParaWithValue(VALUE) +
                         signatureClose() + getReturnString(
                         THIS + signatureClose(), space);
             case AUGMENTED_MAP_ADD:
@@ -332,10 +332,8 @@ public final class StringGenerator {
                         CLOSE_PARENTHESIS + signatureClose();
             case AUGMENTED_MAP_GET_VALUE:
                 return getReturnString(
-                        YANG_AUGMENTED_INFO_MAP + PERIOD + GET +
-                                brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, CLASS +
-                                        OBJECT_STRING, null) + signatureClose(),
-                        space);
+                        YANG_AUGMENTED_INFO_MAP + PERIOD + GET + getOpenCloseParaWithValue(
+                                CLASS + OBJECT_STRING) + signatureClose(), space);
             case AUGMENTED_MAP_GETTER:
                 return getReturnString(YANG_AUGMENTED_INFO_MAP +
                                                signatureClose(), space);
@@ -351,9 +349,8 @@ public final class StringGenerator {
                 return builder.toString();
             case OF_METHOD:
                 return getReturnString(
-                        NEW + SPACE + paraName + brackets(
-                                OPEN_CLOSE_BRACKET_WITH_VALUE, VALUE, null)
-                                + signatureClose(), space);
+                        NEW + SPACE + paraName + getOpenCloseParaWithValue(
+                                VALUE) + signatureClose(), space);
             case TO_STRING:
                 return getToStringMethodsAddString(space, paraName) + paraName +
                         CLOSE_PARENTHESIS;
@@ -382,6 +379,17 @@ public final class StringGenerator {
      */
     static String signatureClose() {
         return SEMI_COLON + NEW_LINE;
+    }
+
+
+    /**
+     * Returns value assignment.
+     *
+     * @return value assignment
+     */
+    static String valueAssign(String param, String value, String indentation) {
+        return indentation + param + SPACE + EQUAL + SPACE + value +
+                signatureClose();
     }
 
     /**
@@ -801,8 +809,7 @@ public final class StringGenerator {
      */
     static String getReturnOfSubString() {
         return getReturnString(OF, TWELVE_SPACE_INDENTATION) +
-                brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, TMP_VAL, null) +
-                signatureClose();
+                getOpenCloseParaWithValue(TMP_VAL) + signatureClose();
     }
 
     /**
@@ -861,29 +868,8 @@ public final class StringGenerator {
      * @return if condition's signature
      */
     static String getIfConditionBegin(String indentation, String condition) {
-        return indentation + IF + SPACE + brackets(
-                OPEN_CLOSE_BRACKET_WITH_VALUE, condition, EMPTY_STRING) +
+        return indentation + IF + SPACE + getOpenCloseParaWithValue(condition) +
                 methodSignatureClose(CLASS_TYPE);
-    }
-
-    /**
-     * Returns whether the data type is of primitive data type.
-     *
-     * @param dataType data type to be checked
-     * @return true, if data type can have primitive data type, false otherwise
-     */
-    static boolean isPrimitiveDataType(YangDataTypes dataType) {
-        return dataType == INT8 ||
-                dataType == INT16 ||
-                dataType == INT32 ||
-                dataType == INT64 ||
-                dataType == UINT8 ||
-                dataType == UINT16 ||
-                dataType == UINT32 ||
-                dataType == UINT64 ||
-                dataType == DECIMAL64 ||
-                dataType == BOOLEAN ||
-                dataType == EMPTY;
     }
 
     /**
@@ -907,12 +893,16 @@ public final class StringGenerator {
     /**
      * Returns value leaf flag setter.
      *
-     * @param name name of leaf
+     * @param name        name of leaf
+     * @param flag        flag to set values
+     * @param indentation indentation
+     * @param prefix      prefix of method
      * @return value leaf flag setter
      */
-    static String getValueLeafSetString(String name) {
-        return "        valueLeafFlags.set(LeafIdentifier." +
-                name.toUpperCase() + ".getLeafIndex());\n";
+    static String getLeafFlagSetString(String name, String flag, String indentation, String prefix) {
+        return indentation + flag + PERIOD + prefix +
+                getOpenCloseParaWithValue(LEAF_IDENTIFIER + PERIOD + name
+                        .toUpperCase() + ".getLeafIndex()");
     }
 
     /*Provides string to return for type.*/
@@ -1115,7 +1105,7 @@ public final class StringGenerator {
         builder.append(STRING_BUILDER).append(SPACE).append(STRING_BUILDER_VAR)
                 .append(SPACE).append(EQUAL).append(SPACE).append(NEW)
                 .append(SPACE).append(STRING_BUILDER).append(
-                brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, getQuotedString(init), null))
+                getOpenCloseParaWithValue(getQuotedString(init)))
                 .append(signatureClose());
         return builder.toString();
     }
@@ -1149,8 +1139,8 @@ public final class StringGenerator {
      * @return pattern quote string
      */
     static String getPatternQuoteString(String type) {
-        return PATTERN + PERIOD + QUOTE_STRING + brackets(
-                OPEN_CLOSE_BRACKET_WITH_VALUE, getQuotedString(type), null);
+        return PATTERN + PERIOD + QUOTE_STRING + getOpenCloseParaWithValue(
+                getQuotedString(type));
     }
 
     /**
@@ -1190,8 +1180,8 @@ public final class StringGenerator {
      * @return get string
      */
     static String getSetValueParaCondition(int count) {
-        return SET_VALUE_PARA + PERIOD + GET + brackets(OPEN_CLOSE_BRACKET_WITH_VALUE,
-                                                        count + EMPTY_STRING, null);
+        return SET_VALUE_PARA + PERIOD + GET + getOpenCloseParaWithValue(
+                count + EMPTY_STRING);
     }
 
     /**
@@ -1205,8 +1195,8 @@ public final class StringGenerator {
         StringBuilder attr = new StringBuilder(EIGHT_SPACE_INDENTATION);
         String[] array = {NEW_LINE};
         attr.append(MORE_OBJ_ATTR).append(GOOGLE_MORE_OBJECT_METHOD_STATIC_STRING)
-                .append(brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, cls, null))
-                .append(NEW_LINE).append(FOUR_SPACE_INDENTATION).append(trimAtLast(
+                .append(getOpenCloseParaWithValue(cls)).append(NEW_LINE)
+                .append(FOUR_SPACE_INDENTATION).append(trimAtLast(
                 getOmitNullValueString(), array)).append(signatureClose());
         return attr.toString();
     }
@@ -1220,5 +1210,102 @@ public final class StringGenerator {
     static String getToStringCall(String name) {
         return name + PERIOD +
                 TO_STRING_METHOD + OPEN_CLOSE_BRACKET_STRING;
+    }
+
+    /**
+     * Returns value in brackets.
+     *
+     * @param name value
+     * @return value in brackets
+     */
+    static String getOpenCloseParaWithValue(String name) {
+        return brackets(OPEN_CLOSE_BRACKET_WITH_VALUE, name, null);
+    }
+
+    /**
+     * Returns equals comparision.
+     *
+     * @param para1 param
+     * @param para2 param
+     * @return equals comparision
+     */
+    static String getTwoParaEqualsString(String para1, String para2) {
+        return para1 + PERIOD + EQUALS_STRING + getOpenCloseParaWithValue(para2);
+    }
+
+    /**
+     * Returns equal equal condition.
+     *
+     * @param para param
+     * @param val  value
+     * @return equal equal condition
+     */
+    static String getEqualEqualString(String para, String val) {
+        return para + SPACE + EQUAL + EQUAL + SPACE + val;
+    }
+
+    /**
+     * Returns app instance method call.
+     *
+     * @param name attr name
+     * @return app instance method call
+     */
+    static String getAppInstanceAttrString(String name) {
+        return APP_INSTANCE + PERIOD + name + OPEN_CLOSE_BRACKET_STRING;
+    }
+
+    /**
+     * Returns qualified name.
+     *
+     * @param pkg package
+     * @param cls class info
+     * @return qualified name
+     */
+    static String getQualifiedString(String pkg, String cls) {
+        return pkg + PERIOD + cls;
+    }
+
+    /**
+     * Returns import list for node list.
+     *
+     * @param nodes  node list
+     * @param config plugin config
+     * @return import list
+     */
+    public static List<JavaQualifiedTypeInfoTranslator> getNodesImports(List<YangNode> nodes,
+                                                                        YangPluginConfig config) {
+        List<JavaQualifiedTypeInfoTranslator> imports = new ArrayList<>();
+        for (YangNode node : nodes) {
+            JavaQualifiedTypeInfoTranslator qInfo = getQualifiedInfo(node,
+                                                                     config);
+            imports.add(qInfo);
+        }
+        return imports;
+    }
+
+    /**
+     * Returns list of child node for choice.
+     *
+     * @param choice choice node
+     * @return list of child nodes
+     */
+    public static List<YangNode> getChoiceChildNodes(YangChoice choice) {
+        List<YangNode> childs = new ArrayList<>();
+        YangNode child = choice.getChild();
+        while (child != null) {
+            childs.add(child);
+            child = child.getNextSibling();
+        }
+
+        List<YangAugment> augments = choice.getAugmentedInfoList();
+        YangNode augmentCase;
+        for (YangAugment augment : augments) {
+            augmentCase = augment.getChild();
+            while (augmentCase != null) {
+                childs.add(augmentCase);
+                augmentCase = augmentCase.getNextSibling();
+            }
+        }
+        return childs;
     }
 }

@@ -22,8 +22,10 @@ import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.File;
 import java.io.IOException;
 
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -32,6 +34,9 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirector
 public class AugmentTranslatorTest {
 
     private final YangUtilManager utilManager = new YangUtilManager();
+    private static final String DIR = "target/augmentTranslator/";
+    private static final String COMP = System.getProperty("user.dir") + File
+            .separator + DIR;
 
     /**
      * Checks augment translation should not result in any exception.
@@ -41,7 +46,7 @@ public class AugmentTranslatorTest {
     @Test
     public void processAugmentTranslator() throws IOException, ParserException, MojoExecutionException {
 
-        deleteDirectory("target/augmentTranslator/");
+        deleteDirectory(DIR);
         String searchDir = "src/test/resources/augmentTranslator";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -49,9 +54,57 @@ public class AugmentTranslatorTest {
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/augmentTranslator/");
+        yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-
-        deleteDirectory("target/augmentTranslator/");
+        compileCode(COMP);
+        deleteDirectory(DIR);
     }
+
+    /**
+     * Checks augment translation should not result in any exception.
+     * compiler not added because it contains a notification which depends on
+     * onos api.
+     *
+     * @throws MojoExecutionException
+     */
+    @Test
+    public void processRpcAugmentIntraTranslator() throws IOException,
+            ParserException, MojoExecutionException {
+        deleteDirectory(DIR);
+        String searchDir = "src/test/resources/rpcAugment/intra";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks augment translation should not result in any exception.
+     * compiler not added because it contains a notification which depends on
+     * onos api.
+     *
+     * @throws MojoExecutionException
+     */
+    @Test
+    public void processRpcAugmentInterTranslator() throws IOException,
+            ParserException, MojoExecutionException {
+        deleteDirectory(DIR);
+        String searchDir = "src/test/resources/rpcAugment/inter";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
 }

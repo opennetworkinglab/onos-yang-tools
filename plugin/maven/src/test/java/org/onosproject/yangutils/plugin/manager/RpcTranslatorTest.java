@@ -16,15 +16,17 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.File;
+import java.io.IOException;
+
 import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -43,12 +45,15 @@ public final class RpcTranslatorTest {
 
         YangNode node = manager.getDataModel("src/test/resources/RpcTranslator.yang");
 
+        String dir = "target/rpcTranslator/";
+        deleteDirectory(dir);
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/RpcTestGenFile/");
+        yangPluginConfig.setCodeGenDir(dir);
 
         generateJavaCode(node, yangPluginConfig);
-
-        deleteDirectory("target/RpcTestGenFile/");
+        String dir1 = System.getProperty("user.dir") + File.separator + dir;
+        compileCode(dir1);
+        deleteDirectory(dir);
     }
     // TODO enhance the test cases, after having a framework of translator test.
 }

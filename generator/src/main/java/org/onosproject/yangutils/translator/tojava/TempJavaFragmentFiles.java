@@ -20,6 +20,7 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
@@ -32,7 +33,6 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaGroupingTranslator;
-import org.onosproject.yangutils.translator.tojava.utils.BitsJavaInfoHandler;
 import org.onosproject.yangutils.translator.tojava.utils.JavaExtendsListHolder;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
@@ -68,6 +68,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
 import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedInfoOfFromString;
 import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.generateBitsFile;
 import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.updateJavaFileInfo;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.generateEnumAttributeString;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaCodeSnippetGen.getJavaAttributeDefinition;
@@ -91,7 +92,9 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.parseBuilderInterfaceBuildMethodString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getChoiceChildNodes;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNodesImports;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeaf;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeafList;
@@ -105,6 +108,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.
 import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENT_MAP_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.BIT_SET;
+import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
@@ -124,6 +128,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
+import static org.onosproject.yangutils.utils.UtilConstants.SUBTREE_FILTERED;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
@@ -266,10 +271,19 @@ public class TempJavaFragmentFiles {
     private static final String BUILDER_CLASS_FILE_NAME_SUFFIX = BUILDER;
 
     /**
-     *
+     * if type is binary.
      */
     private boolean isBinary;
 
+    /**
+     * Current attributes YANG node
+     */
+    private YangNode attrNode;
+
+    /**
+     * Sub tree filtering requires child class imports for type cast.
+     */
+    private final List<JavaQualifiedTypeInfoTranslator> subTreeImports = new ArrayList<>();
     /**
      * Information about the java files being generated.
      */
@@ -411,11 +425,6 @@ public class TempJavaFragmentFiles {
      * Is attribute added.
      */
     private boolean isAttributePresent;
-
-    /**
-     * List of bits attributes.
-     */
-    private List<BitsJavaInfoHandler> bitsHandler = new ArrayList<>();
 
     /**
      * Creates an instance of temp JAVA fragment files.
@@ -598,6 +607,14 @@ public class TempJavaFragmentFiles {
             throws IOException {
         TempJavaBeanFragmentFiles tempFiles =
                 getBeanFiles((JavaCodeGeneratorInfo) parent);
+        if (curNode instanceof YangChoice) {
+            tempFiles.setAttrNode(curNode);
+            for (JavaQualifiedTypeInfoTranslator info : getNodesImports(
+                    getChoiceChildNodes((YangChoice) curNode), config))
+                tempFiles.addToSubTreeImports(info);
+        } else {
+            tempFiles.setAttrNode(null);
+        }
         JavaAttributeInfo attr =
                 getCurNodeAsAttributeInTarget(curNode, parent, isList,
                                               tempFiles);
@@ -656,6 +673,11 @@ public class TempJavaFragmentFiles {
             }
             qualified = parentImportData.addImportInfo(typeInfo, className,
                                                        fileInfo.getPackage());
+            if (!qualified && !(curNode instanceof YangChoice)) {
+                addChildDefaultClassImportForSubTreeFilter(typeInfo.getPkgInfo(),
+                                                           typeInfo.getClassInfo(),
+                                                           tempFiles);
+            }
         }
         boolean collectionSet = false;
         if (curNode instanceof YangList) {
@@ -694,6 +716,16 @@ public class TempJavaFragmentFiles {
                                           qualified, listNode);
     }
 
+    private static void addChildDefaultClassImportForSubTreeFilter(
+            String pkg, String className, TempJavaFragmentFiles tempFile) {
+        className = DEFAULT_CAPS + getCapitalCase(className);
+        JavaQualifiedTypeInfoTranslator info = new
+                JavaQualifiedTypeInfoTranslator();
+        info.setClassInfo(className);
+        info.setPkgInfo(pkg);
+        tempFile.subTreeImports.add(info);
+    }
+
     /**
      * Returns java attribute for leaf.
      *
@@ -706,7 +738,7 @@ public class TempJavaFragmentFiles {
     private static JavaAttributeInfo
     getJavaAttributeOfLeaf(TempJavaFragmentFiles tempFiles,
                            JavaLeafInfoContainer container,
-                           YangPluginConfig config, boolean leafList) {
+                           YangPluginConfig config, boolean leafList) throws IOException {
         if (leafList) {
             tempFiles.getJavaImportData().setIfListImported(true);
             return getAttributeOfLeafInfoContainer(tempFiles, container, config,
@@ -729,7 +761,7 @@ public class TempJavaFragmentFiles {
     getAttributeOfLeafInfoContainer(TempJavaFragmentFiles tempFiles,
                                     JavaLeafInfoContainer container,
                                     YangPluginConfig config,
-                                    boolean listAttribute) {
+                                    boolean listAttribute) throws IOException {
         container.setConflictResolveConfig(config.getConflictResolver());
         container.updateJavaQualifiedInfo();
         addImportForLeafInfo(tempFiles, container);
@@ -739,7 +771,16 @@ public class TempJavaFragmentFiles {
                 container.getDataType(),
                 tempFiles.getIsQualifiedAccessOrAddToImportList(
                         container.getJavaQualifiedInfo()), listAttribute);
-        if (container.getDataType().getDataType() == YangDataTypes.BITS) {
+        boolean isInGrouping;
+        if (container.isLeafList()) {
+            isInGrouping = !(((YangLeafList) container).getContainedIn()
+                    instanceof YangGrouping);
+        } else {
+            isInGrouping = !(((YangLeaf) container).getContainedIn()
+                    instanceof YangGrouping);
+        }
+        if (container.getDataType().getDataType() == YangDataTypes.BITS &&
+                isInGrouping) {
             addBitsHandler(attr, container.getDataType(), tempFiles);
         }
         return attr;
@@ -753,10 +794,9 @@ public class TempJavaFragmentFiles {
      * @param tempFiles temp fragment file
      */
     static void addBitsHandler(JavaAttributeInfo attr, YangType type,
-                               TempJavaFragmentFiles tempFiles) {
-        BitsJavaInfoHandler handler
-                = new BitsJavaInfoHandler(attr, type);
-        tempFiles.getBitsHandler().add(handler);
+                               TempJavaFragmentFiles tempFiles)
+            throws IOException {
+        generateBitsFile(attr, type, tempFiles.getJavaFileInfo(), tempFiles);
     }
 
     /**
@@ -1012,7 +1052,7 @@ public class TempJavaFragmentFiles {
     private void addSubtreeFilteringForChildNode(JavaAttributeInfo attr)
             throws IOException {
         appendToFile(getSubtreeFilteringForChildNodeTempFileHandle,
-                     getSubtreeFilteringForNode(attr) + NEW_LINE);
+                     getSubtreeFilteringForNode(attr, attrNode) + NEW_LINE);
     }
 
     /**
@@ -1049,8 +1089,7 @@ public class TempJavaFragmentFiles {
             throws IOException {
         appendToFile(setterInterfaceTempFileHandle,
                      getSetterString(attr, getGeneratedJavaClassName(),
-                                     getGeneratedJavaFiles()) +
-                             NEW_LINE);
+                                     getGeneratedJavaFiles()) + NEW_LINE);
     }
 
     /**
@@ -1227,14 +1266,13 @@ public class TempJavaFragmentFiles {
      *
      * @param attr           type attribute info
      * @param fromStringAttr from string attribute info
-     * @param genClassName   generated class name
      * @throws IOException when fails to append to temporary file
      */
     void addFromStringMethod(JavaAttributeInfo attr,
-                             JavaAttributeInfo fromStringAttr, String genClassName)
+                             JavaAttributeInfo fromStringAttr)
             throws IOException {
         appendToFile(fromStringImplTempFileHandle,
-                     getFromStringMethod(attr, fromStringAttr, genClassName) + NEW_LINE);
+                     getFromStringMethod(attr, fromStringAttr) + NEW_LINE);
     }
 
     /**
@@ -1526,6 +1564,23 @@ public class TempJavaFragmentFiles {
     }
 
     /**
+     * Adds sub tree filtering to temp files.
+     *
+     * @param config YANG plugin config
+     * @throws IOException IO exception
+     */
+    protected void addIsSubTreeFilteredFlag(YangPluginConfig config)
+            throws IOException {
+        JavaQualifiedTypeInfoTranslator typeInfo =
+                new JavaQualifiedTypeInfoTranslator();
+        typeInfo.setClassInfo(BOOLEAN_DATA_TYPE);
+        typeInfo.setPkgInfo(null);
+        JavaAttributeInfo attributeInfo =
+                getAttributeInfoForTheData(typeInfo, SUBTREE_FILTERED, null, false, false);
+        addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
+    }
+
+    /**
      * Adds value leaf flag to temp files.
      *
      * @param config YANG plugin config
@@ -1556,9 +1611,17 @@ public class TempJavaFragmentFiles {
             throws IOException {
         isAttributePresent = true;
         String attrName = newAttrInfo.getAttributeName();
+        //Boolean flag for operation type attr info generation control.
         boolean required = !attrName.equals(VALUE_LEAF) &&
                 !attrName.equals(SELECT_LEAF) &&
                 !attrName.equals(YANG_AUGMENTED_INFO_MAP);
+        //Boolean flag for subtree for nodes info generation control.
+        boolean subTreeForChild =
+                tempFlagSet(FILTER_CONTENT_MATCH_FOR_NODES_MASK) &&
+                        newAttrInfo.getAttributeType() == null &&
+                        !attrName.contains(OPERATION_TYPE_ATTRIBUTE) &&
+                        required && !attrName.equals(SUBTREE_FILTERED);
+        ;
         if (tempFlagSet(ATTRIBUTES_MASK)) {
             addAttribute(newAttrInfo);
         }
@@ -1591,9 +1654,7 @@ public class TempJavaFragmentFiles {
             addAddToListInterface(newAttrInfo);
         }
         YangType attrType = newAttrInfo.getAttributeType();
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_NODES_MASK) &&
-                attrType == null && !attrName
-                .contains(OPERATION_TYPE_ATTRIBUTE) && required) {
+        if (subTreeForChild) {
             addSubtreeFilteringForChildNode(newAttrInfo);
         }
         if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_MASK) &&
@@ -1627,8 +1688,7 @@ public class TempJavaFragmentFiles {
                                 typeInfo, newAttrInfo.getAttributeName(),
                                 attrType, getIsQualifiedAccessOrAddToImportList(
                                         typeInfo), false);
-                addFromStringMethod(newAttrInfo, fromStringAttributeInfo,
-                                    getGeneratedJavaClassName());
+                addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
             }
         }
     }
@@ -1716,7 +1776,10 @@ public class TempJavaFragmentFiles {
             }
         }
 
-        if (!curNode.isOpTypeReq() && curNode instanceof YangCase) {
+        if (curNode.isOpTypeReq()) {
+            addSubTreeImportStrings(imports);
+        }
+        if (curNode instanceof YangCase) {
             removeCaseParentImport(curNode, imports);
         }
 
@@ -2030,15 +2093,6 @@ public class TempJavaFragmentFiles {
     }
 
     /**
-     * Returns list of bits attributes.
-     *
-     * @return list of bits attributes
-     */
-    public List<BitsJavaInfoHandler> getBitsHandler() {
-        return bitsHandler;
-    }
-
-    /**
      * Sets true if binary type is there for leaf/leaf-list.
      *
      * @param binary true if binary type is there for leaf/leaf-list
@@ -2056,4 +2110,37 @@ public class TempJavaFragmentFiles {
         return isBinary;
     }
 
+    /**
+     * Sets attribute's node.
+     *
+     * @param attrNode attribute's node
+     */
+    public void setAttrNode(YangNode attrNode) {
+        this.attrNode = attrNode;
+    }
+
+    /**
+     * Adds info to sub tree import list.
+     *
+     * @param info import info
+     */
+    public void addToSubTreeImports(JavaQualifiedTypeInfoTranslator
+                                            info) {
+        boolean isAdded = false;
+        for (JavaQualifiedTypeInfoTranslator imports : subTreeImports) {
+            if (imports.getClassInfo().equals(info.getClassInfo())) {
+                isAdded = true;
+            }
+        }
+        if (!isAdded) {
+            subTreeImports.add(info);
+        }
+    }
+
+    private void addSubTreeImportStrings(List<String> imports) {
+        for (JavaQualifiedTypeInfoTranslator impt : subTreeImports) {
+            imports.add(getImportString(impt.getPkgInfo(), impt.getClassInfo()));
+        }
+        sortImports(imports);
+    }
 }

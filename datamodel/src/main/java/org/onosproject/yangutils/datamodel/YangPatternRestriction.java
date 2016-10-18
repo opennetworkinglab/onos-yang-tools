@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+
 /*-
  *  Reference RFC 6020.
  *
@@ -60,7 +62,7 @@ public class YangPatternRestriction extends DefaultLocationInfo
     /**
      * Pattern restriction defined for the current type.
      */
-    private List<String> patternList;
+    private final List<String> patternList;
 
     /**
      * YANG application error information.
@@ -71,7 +73,7 @@ public class YangPatternRestriction extends DefaultLocationInfo
      * Creates a YANG pattern restriction object.
      */
     public YangPatternRestriction() {
-        setPatternList(new LinkedList<>());
+        patternList = new LinkedList<>();
         yangAppErrorInfo = new YangAppErrorInfo();
     }
 
@@ -81,16 +83,7 @@ public class YangPatternRestriction extends DefaultLocationInfo
      * @return pattern restriction defined for the current type.
      */
     public List<String> getPatternList() {
-        return patternList;
-    }
-
-    /**
-     * Sets the pattern restriction defined for the current type.
-     *
-     * @param pattern pattern restriction defined for the current type..
-     */
-    private void setPatternList(List<String> pattern) {
-        patternList = pattern;
+        return unmodifiableList(patternList);
     }
 
     /**
@@ -99,7 +92,7 @@ public class YangPatternRestriction extends DefaultLocationInfo
      * @param newPattern pattern restriction.
      */
     public void addPattern(String newPattern) {
-        getPatternList().add(newPattern);
+        patternList.add(newPattern);
     }
 
     @Override

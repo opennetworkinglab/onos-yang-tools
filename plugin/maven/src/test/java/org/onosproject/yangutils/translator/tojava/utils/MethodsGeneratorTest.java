@@ -256,7 +256,7 @@ public final class MethodsGeneratorTest {
         JavaAttributeInfo testAttr = getTestAttribute();
         List<YangType<?>> types = new ArrayList<>();
         types.add(testAttr.getAttributeType());
-        String method = getUnionToStringMethod(types, CLASS_NAME);
+        String method = getUnionToStringMethod(types);
         assertThat(true, is(method.contains(UNION)));
     }
 

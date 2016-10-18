@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -48,7 +49,8 @@ public class RootClassGeneratorTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir("target/manager/");
         utilManager.translateToJava(yangPluginConfig);
-
+        String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
+        compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
                 "org/onosproject/yang/gen/v1/single/test5/test/rev20160704" +
                 "/Test5.java";
@@ -73,7 +75,8 @@ public class RootClassGeneratorTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir("target/manager/");
         utilManager.translateToJava(yangPluginConfig);
-
+        String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
+        compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
                 "org/onosproject/yang/gen/v1/test5/test/Test5.java";
 
@@ -93,7 +96,8 @@ public class RootClassGeneratorTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir("target/manager/");
         utilManager.translateToJava(yangPluginConfig);
-
+        String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
+        compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
                 "org/onosproject/yang/gen/v1/multi/test5/test/rev20160704" +
                 "/Test5.java";

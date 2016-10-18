@@ -45,8 +45,6 @@ import static org.onosproject.yangutils.utils.io.impl.YangFileScanner.getYangFil
  */
 public class PathPredicateLinkingTest {
 
-    private static final String DIR = "src/test/resources/pathpredicate/";
-
     private final YangUtilManager utilMgr = new YangUtilManager();
     private final YangLinkerManager linkerMgr = new YangLinkerManager();
 
@@ -66,12 +64,13 @@ public class PathPredicateLinkingTest {
      * Processes simple path predicate which gets linked within the same file
      * using relative path.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processSimplePathPredicate() throws IOException {
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "simple"));
+        String searchDir = "src/test/resources/pathpredicate/simple";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -90,9 +89,18 @@ public class PathPredicateLinkingTest {
         // Gets the container node.
         YangContainer container = (YangContainer) yangList.getNextSibling();
 
-        leafItr = container.getListOfLeaf().listIterator();
-        ifName = leafItr.next();
-        address = leafItr.next();
+        ListIterator<YangLeaf> leafIterator;
+        YangLeaf ifName;
+        YangLeaf address;
+        YangLeaf name;
+        Iterator<YangAtomicPath> pathItr;
+        YangAtomicPath atomicPath;
+        Iterator<YangPathPredicate> predicateItr;
+        YangPathPredicate predicate;
+
+        leafIterator = container.getListOfLeaf().listIterator();
+        ifName = leafIterator.next();
+        address = leafIterator.next();
 
         // Gets the address leaf's leaf-ref type.
         YangLeafRef<?> leafRef2 = (YangLeafRef) address.getDataType()
@@ -108,8 +116,8 @@ public class PathPredicateLinkingTest {
         YangLeaf yangLeftLeaf = (YangLeaf) predicate.getLeftAxisNode();
         YangLeaf yangRightLeaf = (YangLeaf) predicate.getRightAxisNode();
 
-        leafItr = yangList.getListOfLeaf().listIterator();
-        name = leafItr.next();
+        leafIterator = yangList.getListOfLeaf().listIterator();
+        name = leafIterator.next();
 
         // Checks that right and left path-predicates are correct.
         assertThat(yangLeftLeaf, is(name));
@@ -120,12 +128,13 @@ public class PathPredicateLinkingTest {
      * Processes simple inter file path predicate which gets linked to another
      * file using absolute path.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processSimpleInterFilePathPredicate() throws IOException {
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "simpleinterfile"));
+        String searchDir = "src/test/resources/pathpredicate/simpleinterfile";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangModule selfNode;
@@ -152,6 +161,15 @@ public class PathPredicateLinkingTest {
         YangContainer container = (YangContainer) selfNode.getChild();
         // Gets the list node.
         YangList yangList = (YangList) refNode.getChild();
+
+        ListIterator<YangLeaf> leafItr;
+        YangLeaf ifName;
+        YangLeaf address;
+        YangLeaf name;
+        Iterator<YangAtomicPath> pathItr;
+        YangAtomicPath atomicPath;
+        Iterator<YangPathPredicate> predicateItr;
+        YangPathPredicate predicate;
 
         leafItr = container.getListOfLeaf().listIterator();
         ifName = leafItr.next();
@@ -183,12 +201,13 @@ public class PathPredicateLinkingTest {
      * Processes inter file path predicate, where leaf-ref is present under
      * YANG augment.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processInterFilePathPredicateFromAugment() throws IOException {
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "interfileaugment"));
+        String searchDir = "src/test/resources/pathpredicate/interfileaugment";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangModule selfNode;
@@ -217,9 +236,14 @@ public class PathPredicateLinkingTest {
         // Gets the augment node.
         YangAugment augment = (YangAugment) refNode.getChild();
 
+        ListIterator<YangLeaf> leafItr;
         YangLeaf test;
         YangLeaf networkId;
         YangLeaf networkRef;
+        Iterator<YangAtomicPath> pathItr;
+        YangAtomicPath atomicPath;
+        Iterator<YangPathPredicate> predicateItr;
+        YangPathPredicate predicate;
 
         leafItr = augment.getListOfLeaf().listIterator();
         test = leafItr.next();
@@ -253,7 +277,7 @@ public class PathPredicateLinkingTest {
      * Processes an invalid scenario where the target leaf/leaf-list in
      * path-predicate is not found.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processInvalidPathLink() throws IOException {
@@ -264,7 +288,8 @@ public class PathPredicateLinkingTest {
                         "../../interface[ifname = current()/../../ifname]" +
                         "/address/ip");
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "invalidlinking"));
+        String searchDir = "src/test/resources/pathpredicate/invalidlinking";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
 
@@ -280,7 +305,7 @@ public class PathPredicateLinkingTest {
      * Processes an invalid scenario where the right axis node doesn't come
      * under YANG list node.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processInvalidPathLinkForList() throws IOException {
@@ -291,9 +316,11 @@ public class PathPredicateLinkingTest {
                         " non-list node in the path ../../default-address" +
                         "[ifname = current()/../ifname]/ifname");
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "invalidlinking2"));
+        String searchDir = "src/test/resources/pathpredicate/invalidlinking2";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
+        YangNode selfNode;
 
         linkerMgr.createYangNodeSet(utilMgr.getYangNodeSet());
         linkerMgr.addRefToYangFilesImportList(utilMgr.getYangNodeSet());
@@ -307,7 +334,7 @@ public class PathPredicateLinkingTest {
      * Processes an invalid scenario where the node in path predicate is not
      * present in the traversal.
      *
-     * @throws IOException if violates IO operation
+     * @throws IOException IO file error
      */
     @Test
     public void processInvalidPathLinkForInvalidNode()
@@ -318,7 +345,8 @@ public class PathPredicateLinkingTest {
                         "invalid path in ../../interface[name = current()/" +
                         "../../address/ifname]/address/ip");
 
-        utilMgr.createYangFileInfoSet(getYangFiles(DIR + "invalidlinking3"));
+        String searchDir = "src/test/resources/pathpredicate/invalidlinking3";
+        utilMgr.createYangFileInfoSet(getYangFiles(searchDir));
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
 

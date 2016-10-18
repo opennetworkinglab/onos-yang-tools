@@ -16,13 +16,13 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
+import java.io.IOException;
 
 import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
@@ -33,6 +33,9 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirector
 public final class NotificationTranslatorTest {
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
+    private final static String YANG = "src/test/resources/NotificationTest" +
+            ".yang";
+    private final static String DIR = "target/notificationTranslator/";
 
     /**
      * Checks union translation should not result in any exception.
@@ -40,15 +43,14 @@ public final class NotificationTranslatorTest {
     @Test
     public void processNotificationTranslator()
             throws IOException, ParserException {
-
-        YangNode node = manager.getDataModel("src/test/resources/NotificationTest.yang");
+        deleteDirectory(DIR);
+        YangNode node = manager.getDataModel(YANG);
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/NotificationTest/");
+        yangPluginConfig.setCodeGenDir(DIR);
 
         generateJavaCode(node, yangPluginConfig);
-
-        deleteDirectory("target/NotificationTest/");
+        deleteDirectory(DIR);
     }
 
     // TODO enhance the test cases, after having a framework of translator test.

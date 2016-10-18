@@ -17,6 +17,11 @@
 package org.onosproject.yangutils.datamodel.javadatamodel;
 
 import org.onosproject.yangutils.datamodel.YangModule;
+import org.onosproject.yangutils.datamodel.YangNode;
+
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Represents YANG java module.
@@ -27,6 +32,7 @@ public class YangJavaModule
     private static final long serialVersionUID = 208201609L;
 
     protected JavaFileInfo javaFileInfo;
+    protected List<YangNode> notificationNodes;
 
     /**
      * Returns java file info.
@@ -50,5 +56,10 @@ public class YangJavaModule
     @Override
     public String getJavaAttributeName() {
         throw new RuntimeException("Attribute name is not applicable ");
+    }
+
+    @Override
+    public List<YangNode> getNotificationNodes() {
+        return unmodifiableList(notificationNodes);
     }
 }

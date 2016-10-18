@@ -16,106 +16,113 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAugment;
-import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.translator.tojava.JavaAttributeInfo;
+import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yangutils.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_NODES_MASK;
+import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.EIGHT_SPACE;
+import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.SIXTEEN_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWELVE_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWENTY_FOUR_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWENTY_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getDataFromTempFileHandle;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getAppInstanceAttrString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getChoiceChildNodes;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCollectionIteratorForLoopBegin;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getElseIfConditionBegin;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getEqualEqualString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getIfConditionBegin;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getLeafFlagSetString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOpenCloseParaWithValue;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getReturnString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getTwoParaEqualsString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.methodClose;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.signatureClose;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.valueAssign;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND_OPERATION;
 import static org.onosproject.yangutils.utils.UtilConstants.APP_INSTANCE;
 import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_DATA_TYPE;
+import static org.onosproject.yangutils.utils.UtilConstants.BOOLEAN_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.BREAK;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILD;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
-import static org.onosproject.yangutils.utils.UtilConstants.CATCH;
+import static org.onosproject.yangutils.utils.UtilConstants.BUILD_FOR_FILTER;
+import static org.onosproject.yangutils.utils.UtilConstants.CHOICE_STF_METHOD_NAME;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
-import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
-import static org.onosproject.yangutils.utils.UtilConstants.CONTINUE;
+import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.FALSE;
-import static org.onosproject.yangutils.utils.UtilConstants.FOR;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_CLASS;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_LEAF_INDEX;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD;
-import static org.onosproject.yangutils.utils.UtilConstants.GET_METHOD_PREFIX;
+import static org.onosproject.yangutils.utils.UtilConstants.GET;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
-import static org.onosproject.yangutils.utils.UtilConstants.ILLEGAL_ACCESS_EXCEPTION;
-import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE;
-import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION;
-import static org.onosproject.yangutils.utils.UtilConstants.INVOKE;
+import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_EMPTY;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_ALL_SCHEMA_CHILD_FLAG;
-import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.NOT;
-import static org.onosproject.yangutils.utils.UtilConstants.NO_SUCH_METHOD_EXCEPTION;
 import static org.onosproject.yangutils.utils.UtilConstants.NULL;
-import static org.onosproject.yangutils.utils.UtilConstants.OBJECT;
-import static org.onosproject.yangutils.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_PARENTHESIS;
+import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.OR_OPERATION;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
+import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_CHILD_NODE_STF_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILTERING;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
-import static org.onosproject.yangutils.utils.UtilConstants.QUOTES;
 import static org.onosproject.yangutils.utils.UtilConstants.RETURN;
+import static org.onosproject.yangutils.utils.UtilConstants.SELECT_ALL_CHILD_SCHEMA_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_LEAF;
+import static org.onosproject.yangutils.utils.UtilConstants.SELECT_OR_CONTAINMENT_NODE_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
+import static org.onosproject.yangutils.utils.UtilConstants.STF_BUILDER_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.SUBTREE_FILTERING_RESULT_BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.THIRTY_TWO_SPACE_INDENTATION;
-import static org.onosproject.yangutils.utils.UtilConstants.THIS;
 import static org.onosproject.yangutils.utils.UtilConstants.TO;
 import static org.onosproject.yangutils.utils.UtilConstants.TRUE;
-import static org.onosproject.yangutils.utils.UtilConstants.TRY;
 import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.TWENTY_SPACE_INDENTATION;
-import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF;
-import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
-import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
-import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
-import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_OP_PARAM_INFO;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
-import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
 
 /**
  * Represents generator for subtree filtering methods of generated files
@@ -143,43 +150,45 @@ public final class SubtreeFilteringMethodsGenerator {
         String attributeName = javaAttributeInfo.getAttributeName();
         attrQualifiedType = getIfFilterContentMatchMethodImpl(attributeName,
                                                               type);
-        return EIGHT_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS
-                + VALUE_LEAF +
-                PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
-                LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
-                PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS +
-                CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS +
-                attrQualifiedType + CLOSE_PARENTHESIS + SPACE +
-                OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION +
-                RETURN + SPACE + FALSE + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE +
-                ELSE + SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
-                SIXTEEN_SPACE_INDENTATION +
-                SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + attributeName +
-                OPEN_PARENTHESIS + APP_INSTANCE + PERIOD + attributeName +
-                OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE +
+        /* if (valueLeafFlags.get(LeafIdentifier.LEAF.getLeafIndex())) {
+         * if (appInstance.leaf() != leaf()) {
+         * return false;
+         * } else {
+         * subTreeFilteringResultBuilder.leaf(appInstance.leaf());
+         * }
+         * } else if (selectLeafFlags.get(LeafIdentifier.LEAF.getLeafIndex()) ||
+         * isSelectAllSchemaChild) {
+         * isAnySelectOrContainmentNode = true;
+         * subTreeFilteringResultBuilder.leaf(appInstance.leaf());
+         * }*/
+        return getIfConditionBegin(EIGHT_SPACE_INDENTATION, getLeafFlagSetString(
+                attributeName, VALUE_LEAF, EMPTY_STRING, GET)) +
+                getIfConditionBegin(TWELVE_SPACE_INDENTATION, attrQualifiedType) +
+                getReturnString(FALSE, SIXTEEN_SPACE_INDENTATION) +
+                signatureClose() +
+                TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + ELSE +
+                SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
+                getSubTreeBuilderCallString(SIXTEEN_SPACE_INDENTATION, attributeName,
+                                            TWELVE_SPACE) +
                 EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE + ELSE +
-                SPACE + IF + SPACE + OPEN_PARENTHESIS +
-                SELECT_LEAF +
-                PERIOD + GET_METHOD_PREFIX + OPEN_PARENTHESIS +
-                LEAF_IDENTIFIER + PERIOD + attributeName.toUpperCase() +
-                PERIOD + GET_LEAF_INDEX + CLOSE_PARENTHESIS + SPACE +
-                OR_OPERATION + SPACE + IS_SELECT_ALL_SCHEMA_CHILD_FLAG +
-                CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET + NEW_LINE +
-                TWELVE_SPACE_INDENTATION +
-                IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG + SPACE + EQUAL +
-                SPACE + TRUE + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + SUBTREE_FILTERING_RESULT_BUILDER +
-                PERIOD + attributeName + OPEN_PARENTHESIS + APP_INSTANCE +
-                PERIOD + attributeName + OPEN_CLOSE_BRACKET_STRING +
-                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
+                getIfConditionBegin(SPACE, getLeafFlagSetString(
+                        attributeName, SELECT_LEAF, EMPTY_STRING, GET) + SPACE +
+                        OR_OPERATION + SPACE + IS_SELECT_ALL_SCHEMA_CHILD_FLAG) +
+                valueAssign(IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG, TRUE,
+                            TWELVE_SPACE_INDENTATION) +
+                getSubTreeBuilderCallString(TWELVE_SPACE_INDENTATION, attributeName,
+                                            EIGHT_SPACE);
     }
 
-    private static String getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
+    private static String getSubTreeBuilderCallString(String indent, String
+            name, IndentationType type) {
+        return indent + SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + name +
+                getOpenCloseParaWithValue(APP_INSTANCE + PERIOD + name +
+                                                  OPEN_CLOSE_BRACKET_STRING) +
+                signatureClose() + methodClose(type);
+    }
+
+    private static String getAttrTypeForFcmWhenPrimitiveDataType(
             String attributeName) {
         return/* TODO: Need to check if we can expose the value leaf flag in
          interface.
@@ -194,56 +203,41 @@ public final class SubtreeFilteringMethodsGenerator {
                         CLOSE_PARENTHESIS;
     }
 
-    private static String
-    getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
-            String attributeName) {
-        return APP_INSTANCE + PERIOD + attributeName + OPEN_PARENTHESIS +
-                CLOSE_PARENTHESIS + SPACE + EQUAL + EQUAL + SPACE + NULL +
+    private static String attrTypeForFcmWhenNonPrimitiveDataTypes(String name) {
+        /*
+         * appInstance.name() == null || name().equals(appInstance.name())
+         */
+        return getEqualEqualString(StringGenerator.getAppInstanceAttrString(name), NULL) +
                 SPACE + OR_OPERATION + SPACE + NOT + OPEN_PARENTHESIS +
-                attributeName + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                PERIOD + EQUALS_STRING + OPEN_PARENTHESIS + APP_INSTANCE +
-                PERIOD + attributeName + OPEN_PARENTHESIS +
-                CLOSE_PARENTHESIS + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS;
+                getTwoParaEqualsString(name + OPEN_CLOSE_BRACKET_STRING,
+                                       StringGenerator.getAppInstanceAttrString(name))
+                + CLOSE_PARENTHESIS;
     }
 
     private static String getIfFilterContentMatchMethodImpl(
-            String attributeName,
-            YangType dataType) {
+            String name, YangType dataType) {
         String attrQualifiedType;
-
-        if (StringGenerator.isPrimitiveDataType(dataType.getDataType())) {
-            attrQualifiedType =
-                    getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
-                            attributeName);
+        if (dataType.getDataType().isPrimitiveDataType()) {
+            attrQualifiedType = getAttrTypeForFcmWhenPrimitiveDataType(name);
         } else if (dataType.getDataType() == LEAFREF) {
 
             // When leafref in grouping.
             if (((YangLeafRef) dataType.getDataTypeExtendedInfo())
                     .isInGrouping()) {
-                attrQualifiedType =
-                        getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
-                                attributeName);
+                attrQualifiedType = attrTypeForFcmWhenNonPrimitiveDataTypes(name);
             } else {
-
                 YangType type = ((YangLeafRef) dataType.getDataTypeExtendedInfo())
                         .getEffectiveDataType();
-
-                if (StringGenerator.isPrimitiveDataType(type.getDataType())) {
-                    attrQualifiedType =
-                            getAttrTypeForFilterContentMatchWhenPrimitiveDataType(
-                                    attributeName);
+                if (type.getDataType().isPrimitiveDataType()) {
+                    attrQualifiedType = getAttrTypeForFcmWhenPrimitiveDataType(name);
                 } else {
-                    attrQualifiedType =
-                            getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
-                                    attributeName);
+                    attrQualifiedType = attrTypeForFcmWhenNonPrimitiveDataTypes(
+                            name);
                 }
             }
         } else {
-            attrQualifiedType =
-                    getAttrTypeForFilterContentMatchWhenNonPrimitiveDataTypes(
-                            attributeName);
+            attrQualifiedType = attrTypeForFcmWhenNonPrimitiveDataTypes(name);
         }
-
         return attrQualifiedType;
     }
 
@@ -255,7 +249,7 @@ public final class SubtreeFilteringMethodsGenerator {
      */
     public static String getSubtreeFilteringForLeafList(
             JavaAttributeInfo javaAttributeInfo) {
-        return getSubtreeFilteringForList(javaAttributeInfo, true);
+        return getSubtreeFilteringForList(javaAttributeInfo, true, null);
     }
 
     /**
@@ -273,63 +267,47 @@ public final class SubtreeFilteringMethodsGenerator {
             throws IOException {
         JavaFileInfoTranslator javaFileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        JavaFileInfoTranslator parentInfo;
-
         String instance = APP_INSTANCE;
         String name = getCapitalCase(javaFileInfo.getJavaName());
         String builderNamePrefix = getCapitalCase(javaFileInfo.getJavaName());
-        if (curNode instanceof YangCase) {
-            instance = INSTANCE;
-            YangNode parent = curNode.getParent();
-            if (parent instanceof YangChoice) {
-                parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-                name = getCapitalCase(parentInfo.getJavaName());
-            } else if (parent instanceof YangAugment) {
-                parentInfo = ((JavaFileInfoContainer) ((YangAugment) parent)
-                        .getAugmentedNode()).getJavaFileInfo();
-                if (parentInfo != null) {
-                    name = getCapitalCase(parentInfo.getJavaName());
-                } else {
-                    name = getCapitalCase(getCamelCase(
-                            ((YangAugment) parent).getAugmentedNode().getName(),
-                            pluginConfig.getConflictResolver()));
-                }
-            }
-        }
 
-        String processSubtreeFilteringMethod =
-                FOUR_SPACE_INDENTATION + PRIVATE + SPACE + BOOLEAN_DATA_TYPE +
-                        SPACE + "processChildNodesSubTreeFiltering" +
-                        OPEN_PARENTHESIS + name + SPACE + instance + COMMA +
-                        SPACE + builderNamePrefix + BUILDER + SPACE +
-                        "subTreeFilteringResultBuilder" + COMMA + NEW_LINE +
-                        TWELVE_SPACE_INDENTATION + "Boolean " +
-                        "isAnySelectOrContainmentNode, " + "boolean " +
-                        "isSelectAllSchemaChild" + CLOSE_PARENTHESIS +
-                        SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+        Map<String, String> param = new HashMap<>();
+        param.put(PROCESS_CHILD_NODE_STF_PARAM, BOOLEAN_DATA_TYPE);
+        param.put(instance, name);
+        param.put(STF_BUILDER_PARAM, builderNamePrefix + BUILDER);
+        param.put(SELECT_OR_CONTAINMENT_NODE_PARAM, BOOLEAN_WRAPPER);
+        param.put(SELECT_ALL_CHILD_SCHEMA_PARAM, BOOLEAN_WRAPPER);
 
-        if (curNode instanceof YangCase) {
-            String caseName = getCapitalCase(javaFileInfo.getJavaName());
-            processSubtreeFilteringMethod =
-                    processSubtreeFilteringMethod + EIGHT_SPACE_INDENTATION +
-                            caseName + SPACE + APP_INSTANCE + SPACE +
-                            EQUAL + SPACE + OPEN_PARENTHESIS + caseName +
-                            CLOSE_PARENTHESIS + SPACE + instance +
-                            SEMI_COLON + NEW_LINE;
-        }
 
-        processSubtreeFilteringMethod +=
+        String method = FOUR_SPACE_INDENTATION + PRIVATE + SPACE + BOOLEAN_DATA_TYPE +
+                SPACE + PROCESS_CHILD_NODE_STF_PARAM +
+                OPEN_PARENTHESIS + name + SPACE + instance + COMMA +
+                SPACE + builderNamePrefix + BUILDER + SPACE +
+                STF_BUILDER_PARAM + COMMA +
+                " Boolean " +
+                "isAnySelectOrContainmentNode, " + "boolean " +
+                SELECT_ALL_CHILD_SCHEMA_PARAM + CLOSE_PARENTHESIS +
+                SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+
+        method +=
                 getDataFromTempFileHandle(FILTER_CONTENT_MATCH_FOR_NODES_MASK,
                                           ((TempJavaCodeFragmentFilesContainer) curNode)
                                                   .getTempJavaCodeFragmentFiles()
                                                   .getBeanTempFiles(), path);
 
-        processSubtreeFilteringMethod +=
+        method +=
                 EIGHT_SPACE_INDENTATION + RETURN + SPACE + TRUE + SEMI_COLON +
                         NEW_LINE + FOUR_SPACE_INDENTATION +
                         CLOSE_CURLY_BRACKET + NEW_LINE + NEW_LINE;
+        YangNode child = curNode.getChild();
+        while (child != null) {
+            if (child instanceof YangChoice) {
+                method += getChoiceInstanceForPstMethod(child, name);
+            }
+            child = child.getNextSibling();
+        }
 
-        return processSubtreeFilteringMethod;
+        return method;
     }
 
     /**
@@ -347,50 +325,19 @@ public final class SubtreeFilteringMethodsGenerator {
             throws IOException {
         JavaFileInfoTranslator javaFileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        JavaFileInfoTranslator parentInfo;
-
-        String instance = APP_INSTANCE;
         String name = getCapitalCase(javaFileInfo.getJavaName());
         String builderNamePrefix = getCapitalCase(javaFileInfo.getJavaName());
-        if (curNode instanceof YangCase) {
-            instance = INSTANCE;
-            YangNode parent = curNode.getParent();
-            if (parent instanceof YangChoice) {
-                parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-                name = getCapitalCase(parentInfo.getJavaName());
-            } else if (parent instanceof YangAugment) {
-                parentInfo = ((JavaFileInfoContainer) ((YangAugment) parent)
-                        .getAugmentedNode()).getJavaFileInfo();
-                if (parentInfo != null) {
-                    name = getCapitalCase(parentInfo.getJavaName());
-                } else {
-                    name = getCapitalCase(getCamelCase(
-                            ((YangAugment) parent).getAugmentedNode().getName(),
-                            pluginConfig.getConflictResolver()));
-                }
-            }
-        }
 
         String processSubtreeFilteringMethod =
                 FOUR_SPACE_INDENTATION + PRIVATE + SPACE + BOOLEAN_DATA_TYPE +
                         SPACE + "processLeafListSubTreeFiltering" +
-                        OPEN_PARENTHESIS + name + SPACE + instance + COMMA +
+                        OPEN_PARENTHESIS + name + SPACE + APP_INSTANCE + COMMA +
                         SPACE + builderNamePrefix + BUILDER + SPACE +
-                        "subTreeFilteringResultBuilder" + COMMA + NEW_LINE +
-                        TWELVE_SPACE_INDENTATION + "Boolean " +
+                        "subTreeFilteringResultBuilder" + COMMA +
+                        " Boolean " +
                         "isAnySelectOrContainmentNode, " + "boolean " +
                         "isSelectAllSchemaChild" + CLOSE_PARENTHESIS +
                         SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
-
-        if (curNode instanceof YangCase) {
-            String caseName = getCapitalCase(javaFileInfo.getJavaName());
-            processSubtreeFilteringMethod =
-                    processSubtreeFilteringMethod + EIGHT_SPACE_INDENTATION +
-                            caseName + SPACE + APP_INSTANCE + SPACE +
-                            EQUAL + SPACE + OPEN_PARENTHESIS + caseName +
-                            CLOSE_PARENTHESIS + SPACE + instance +
-                            SEMI_COLON + NEW_LINE;
-        }
 
         processSubtreeFilteringMethod += getDataFromTempFileHandle(
                 FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK,
@@ -420,50 +367,19 @@ public final class SubtreeFilteringMethodsGenerator {
             throws IOException {
         JavaFileInfoTranslator javaFileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        JavaFileInfoTranslator parentInfo;
-
-        String instance = APP_INSTANCE;
         String name = getCapitalCase(javaFileInfo.getJavaName());
         String builderNamePrefix = getCapitalCase(javaFileInfo.getJavaName());
-        if (curNode instanceof YangCase) {
-            instance = INSTANCE;
-            YangNode parent = curNode.getParent();
-            if (parent instanceof YangChoice) {
-                parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-                name = getCapitalCase(parentInfo.getJavaName());
-            } else if (parent instanceof YangAugment) {
-                parentInfo = ((JavaFileInfoContainer) ((YangAugment) parent)
-                        .getAugmentedNode()).getJavaFileInfo();
-                if (parentInfo != null) {
-                    name = getCapitalCase(parentInfo.getJavaName());
-                } else {
-                    name = getCapitalCase(getCamelCase(
-                            ((YangAugment) parent).getAugmentedNode().getName(),
-                            pluginConfig.getConflictResolver()));
-                }
-            }
-        }
 
         String processSubtreeFilteringMethod =
                 FOUR_SPACE_INDENTATION + PRIVATE + SPACE + BOOLEAN_DATA_TYPE +
                         SPACE + "processLeafSubtreeFiltering" +
-                        OPEN_PARENTHESIS + name + SPACE + instance + COMMA +
+                        OPEN_PARENTHESIS + name + SPACE + APP_INSTANCE + COMMA +
                         SPACE + builderNamePrefix + BUILDER + SPACE +
-                        "subTreeFilteringResultBuilder" + COMMA + NEW_LINE
-                        + TWELVE_SPACE_INDENTATION + "Boolean " +
+                        "subTreeFilteringResultBuilder" + COMMA +
+                        " Boolean " +
                         "isAnySelectOrContainmentNode, " + "boolean " +
                         "isSelectAllSchemaChild" + CLOSE_PARENTHESIS +
                         SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
-
-        if (curNode instanceof YangCase) {
-            String caseName = getCapitalCase(javaFileInfo.getJavaName());
-            processSubtreeFilteringMethod =
-                    processSubtreeFilteringMethod + EIGHT_SPACE_INDENTATION +
-                            caseName + SPACE + APP_INSTANCE + SPACE +
-                            EQUAL + SPACE + OPEN_PARENTHESIS + caseName +
-                            CLOSE_PARENTHESIS + SPACE + instance +
-                            SEMI_COLON + NEW_LINE;
-        }
 
         processSubtreeFilteringMethod +=
                 getDataFromTempFileHandle(FILTER_CONTENT_MATCH_FOR_LEAF_MASK,
@@ -482,40 +398,34 @@ public final class SubtreeFilteringMethodsGenerator {
     /**
      * Returns is filter content match for leaf.
      *
-     * @param curNode      current node
-     * @param pluginConfig plugin configurations
+     * @param curNode current node
      * @return is filter content match for leaf
      */
-    static String getProcessSubtreeFilteringStart(YangNode curNode,
-                                                  YangPluginConfig
-                                                          pluginConfig) {
+    static String getProcessSubtreeFilteringStart(YangNode curNode) {
         JavaFileInfoTranslator javaFileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        JavaFileInfoTranslator parentInfo;
-
         String instance = APP_INSTANCE;
         String name = getCapitalCase(javaFileInfo.getJavaName());
         String builderNamePrefix = getCapitalCase(javaFileInfo.getJavaName());
-        if (curNode instanceof YangCase) {
-            instance = INSTANCE;
-            YangNode parent = curNode.getParent();
-            if (parent instanceof YangChoice) {
-                parentInfo = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-                name = getCapitalCase(parentInfo.getJavaName());
-            } else if (parent instanceof YangAugment) {
-                parentInfo = ((JavaFileInfoContainer) ((YangAugment) parent)
-                        .getAugmentedNode()).getJavaFileInfo();
-                if (parentInfo != null) {
-                    name = getCapitalCase(parentInfo.getJavaName());
-                } else {
-                    name = getCapitalCase(getCamelCase(
-                            ((YangAugment) parent).getAugmentedNode().getName(),
-                            pluginConfig.getConflictResolver()));
-                }
-            }
+        if (curNode instanceof RpcNotificationContainer) {
+            name = getCapitalCase(javaFileInfo.getJavaName()) + OP_PARAM;
+        } else {
+            name = DEFAULT_CAPS + name;
         }
+        String javadoc = "   /**\n" +
+                "     * Checks if the passed " + name +
+                " maps the content match query condition.\n" +
+                "     *\n" +
+                "     * @param " + instance + SPACE +
+                instance + SPACE + "being passed to check" +
+                " for" +
+                " content match\n" +
+                "     * @param isSelectAllSchemaChild is select all schema child\n" +
+                "     * @return match result\n" +
+                "     */\n";
+
         String processSubtreeFilteringMethod =
-                StringGenerator.getOverRideString() + FOUR_SPACE_INDENTATION +
+                javadoc + FOUR_SPACE_INDENTATION +
                         PUBLIC + SPACE + name + SPACE +
                         PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS + name +
                         SPACE + instance + COMMA + SPACE + BOOLEAN_DATA_TYPE +
@@ -529,17 +439,6 @@ public final class SubtreeFilteringMethodsGenerator {
                         NEW_LINE + EIGHT_SPACE_INDENTATION + "Boolean" + SPACE +
                         IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG + SPACE +
                         EQUAL + SPACE + FALSE + SEMI_COLON + NEW_LINE;
-
-        if (curNode instanceof YangCase) {
-            String caseName = getCapitalCase(javaFileInfo.getJavaName());
-            processSubtreeFilteringMethod =
-                    processSubtreeFilteringMethod + EIGHT_SPACE_INDENTATION +
-                            caseName + SPACE + APP_INSTANCE + SPACE +
-                            EQUAL + SPACE + OPEN_PARENTHESIS + caseName +
-                            CLOSE_PARENTHESIS + SPACE + instance +
-                            SEMI_COLON + NEW_LINE;
-        }
-
         return processSubtreeFilteringMethod;
     }
 
@@ -557,11 +456,10 @@ public final class SubtreeFilteringMethodsGenerator {
             if (((YangLeavesHolder) curNode).getListOfLeaf() != null
                     &&
                     !((YangLeavesHolder) curNode).getListOfLeaf().isEmpty()) {
-                method += StringGenerator
-                        .getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
+                method +=
+                        getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
                                 "processLeafSubtreeFiltering(appInstance, " +
-                                "subTreeFilteringResultBuilder," + NEW_LINE +
-                                TWELVE_SPACE_INDENTATION +
+                                "subTreeFilteringResultBuilder, " +
                                 "isAnySelectOrContainmentNode, " +
                                 "isSelectAllSchemaChild)");
 
@@ -577,11 +475,10 @@ public final class SubtreeFilteringMethodsGenerator {
                     &&
                     !((YangLeavesHolder) curNode).getListOfLeafList()
                             .isEmpty()) {
-                method += StringGenerator
-                        .getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
+                method +=
+                        getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
                                 "processLeafListSubTreeFiltering(appInstance," +
-                                " subTreeFilteringResultBuilder," + NEW_LINE
-                                + TWELVE_SPACE_INDENTATION +
+                                " subTreeFilteringResultBuilder, " +
                                 "isAnySelectOrContainmentNode, " +
                                 "isSelectAllSchemaChild)");
 
@@ -594,11 +491,10 @@ public final class SubtreeFilteringMethodsGenerator {
 
         if (curNode.getChild() != null) {
 
-            method += StringGenerator
-                    .getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
+            method +=
+                    getIfConditionBegin(EIGHT_SPACE_INDENTATION, NOT +
                             "processChildNodesSubTreeFiltering(appInstance, " +
-                            "subTreeFilteringResultBuilder," + NEW_LINE +
-                            TWELVE_SPACE_INDENTATION +
+                            "subTreeFilteringResultBuilder, " +
                             "isAnySelectOrContainmentNode, " +
                             "isSelectAllSchemaChild)");
 
@@ -615,29 +511,32 @@ public final class SubtreeFilteringMethodsGenerator {
      * Returns is filter content match for node.
      *
      * @param attr attribute info
+     * @param node YANG node
      * @return is filter content match for node
      */
-    public static String getSubtreeFilteringForNode(JavaAttributeInfo attr) {
+    public static String getSubtreeFilteringForNode(JavaAttributeInfo attr,
+                                                    YangNode node) {
         boolean isList = attr.isListAttr();
         if (isList) {
-            return getSubtreeFilteringForList(attr, false);
+            return getSubtreeFilteringForList(attr, false, node);
         } else {
-            return getSubtreeFilteringForChildNode(attr);
+            return getSubtreeFilteringForChildNode(attr, node);
         }
     }
 
     /**
      * Returns is filter content match close.
      *
+     * @param name    name of class
+     * @param curNode current node
      * @return is filter content match close
      */
-    static String getProcessSubTreeFilteringEnd() {
-        String method = StringGenerator
-                .getIfConditionBegin(EIGHT_SPACE_INDENTATION,
-                                     NOT + IS_SELECT_ALL_SCHEMA_CHILD_FLAG +
-                                             SPACE + AND_OPERATION + SPACE +
-                                             NOT +
-                                             IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG);
+    static String getProcessSubTreeFilteringEnd(String name, YangNode curNode) {
+        String method = getIfConditionBegin(EIGHT_SPACE_INDENTATION,
+                                            NOT + IS_SELECT_ALL_SCHEMA_CHILD_FLAG +
+                                                    SPACE + AND_OPERATION + SPACE +
+                                                    NOT +
+                                                    IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG);
 
         method += TWELVE_SPACE_INDENTATION + RETURN + SPACE +
                 PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS + APP_INSTANCE +
@@ -645,9 +544,13 @@ public final class SubtreeFilteringMethodsGenerator {
                 NEW_LINE;
 
         method += methodClose(EIGHT_SPACE);
-
-        method += EIGHT_SPACE_INDENTATION + RETURN + SPACE +
-                SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + BUILD +
+        String build = BUILD;
+        if (curNode instanceof YangAugment) {
+            build = BUILD_FOR_FILTER;
+        }
+        method += EIGHT_SPACE_INDENTATION + RETURN + SPACE + getOpenCloseParaWithValue(
+                name) + SPACE +
+                SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + build +
                 OPEN_CLOSE_BRACKET_STRING + SEMI_COLON + NEW_LINE +
                 FOUR_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
 
@@ -658,21 +561,37 @@ public final class SubtreeFilteringMethodsGenerator {
      * Returns filter content match for child nodes.
      *
      * @param javaAttributeInfo attribute to be added
+     * @param node              YANG node
      * @return filter content match for child nodes
      */
     private static String getSubtreeFilteringForChildNode(
-            JavaAttributeInfo javaAttributeInfo) {
+            JavaAttributeInfo javaAttributeInfo, YangNode node) {
         String name = javaAttributeInfo.getAttributeName();
-        name = getSmallCase(name);
-        String type = javaAttributeInfo.getImportInfo().getClassInfo();
+        String clsInfo = javaAttributeInfo.getImportInfo()
+                .getClassInfo();
+        String type = DEFAULT_CAPS + javaAttributeInfo.getImportInfo()
+                .getClassInfo();
         if (javaAttributeInfo.isQualifiedName()) {
             type = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
                     type;
+            clsInfo = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
+                    clsInfo;
         }
+        String classCast = getOpenCloseParaWithValue(type) + SPACE;
+        String cast = getOpenCloseParaWithValue(classCast + name);
+        String resultString = cast +
+                PERIOD + PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS
+                + classCast +
+                APP_INSTANCE + PERIOD + name + OPEN_CLOSE_BRACKET_STRING
+                + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
+                NEW_LINE;
 
-        String method = StringGenerator
-                .getIfConditionBegin(EIGHT_SPACE_INDENTATION, name + "()  != " +
-                        "null");
+        if (node != null && node instanceof YangChoice) {
+            resultString = getReturnStringInCaseOfChoice(node);
+        }
+        String method =
+                getIfConditionBegin(EIGHT_SPACE_INDENTATION, name + "() != " +
+                        "null  || isSelectAllSchemaChild");
 
         method += TWELVE_SPACE_INDENTATION +
                 IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG + SPACE + EQUAL + SPACE +
@@ -684,11 +603,24 @@ public final class SubtreeFilteringMethodsGenerator {
                 + EQUAL + SPACE + NULL + CLOSE_PARENTHESIS + SPACE +
                 OPEN_CURLY_BRACKET + NEW_LINE;
 
-        method += SIXTEEN_SPACE_INDENTATION + type + SPACE + "result = " +
-                name + PERIOD + PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS +
-                APP_INSTANCE + PERIOD + name + OPEN_CLOSE_BRACKET_STRING
-                + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
-                NEW_LINE;
+        method += SIXTEEN_SPACE_INDENTATION + clsInfo + SPACE + "result" +
+                SEMI_COLON + NEW_LINE;
+
+        method +=
+                getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
+                                    "isSelectAllSchemaChild");
+
+        method += TWENTY_SPACE_INDENTATION + "result" + SPACE + EQUAL + SPACE +
+                APP_INSTANCE + PERIOD + name + OPEN_PARENTHESIS +
+                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE;
+
+        method += SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE +
+                ELSE + SPACE +
+                OPEN_CURLY_BRACKET + NEW_LINE;
+
+        method += TWENTY_SPACE_INDENTATION + "result = " + resultString;
+
+        method += SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
 
         method += SIXTEEN_SPACE_INDENTATION + "if (result != null) {" +
                 NEW_LINE;
@@ -712,32 +644,48 @@ public final class SubtreeFilteringMethodsGenerator {
      *
      * @param javaAttributeInfo attribute information
      * @param isLeafList        if for leaf list
+     * @param node              YANG node
      * @return filter content match for list types
      */
     private static String getSubtreeFilteringForList(
-            JavaAttributeInfo javaAttributeInfo, boolean isLeafList) {
+            JavaAttributeInfo javaAttributeInfo, boolean isLeafList,
+            YangNode node) {
         String capitalCaseName =
                 getCapitalCase(javaAttributeInfo.getAttributeName());
         String name = javaAttributeInfo.getAttributeName();
-        String type = javaAttributeInfo.getImportInfo().getClassInfo();
+        String type = javaAttributeInfo.getImportInfo()
+                .getClassInfo();
+        String clsInfo = DEFAULT_CAPS + type;
         if (javaAttributeInfo.isQualifiedName()) {
             type = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
                     type;
+            clsInfo = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
+                    clsInfo;
+        }
+
+        String classCast = getOpenCloseParaWithValue(clsInfo) + SPACE;
+        String cast = getOpenCloseParaWithValue(classCast + name);
+        String resultString = cast + PERIOD +
+                PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS + classCast +
+                name + "2" + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
+                NEW_LINE;
+
+        if (node != null && node instanceof YangChoice) {
+            resultString = getReturnStringInCaseOfChoice(node);
         }
 
         /*
          * If select all schema child
          */
-        String method = StringGenerator
-                .getIfConditionBegin(EIGHT_SPACE_INDENTATION,
-                                     IS_SELECT_ALL_SCHEMA_CHILD_FLAG);
+        String method =
+                getIfConditionBegin(EIGHT_SPACE_INDENTATION,
+                                    IS_SELECT_ALL_SCHEMA_CHILD_FLAG);
 
-        method = method + StringGenerator
-                .getCollectionIteratorForLoopBegin(TWELVE_SPACE_INDENTATION,
-                                                   type + SPACE + name,
-                                                   APP_INSTANCE + PERIOD +
-                                                           name +
-                                                           OPEN_CLOSE_BRACKET_STRING);
+        method = method + getCollectionIteratorForLoopBegin(TWELVE_SPACE_INDENTATION,
+                                                            type + SPACE + name,
+                                                            APP_INSTANCE + PERIOD +
+                                                                    name +
+                                                                    OPEN_CLOSE_BRACKET_STRING);
 
         method = method + SIXTEEN_SPACE_INDENTATION +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
@@ -747,11 +695,10 @@ public final class SubtreeFilteringMethodsGenerator {
         method += methodClose(TWELVE_SPACE); // Close collection Iteration loop
 
         //If need to explicitly participate in query
-        method += StringGenerator
-                .getElseIfConditionBegin(EIGHT_SPACE_INDENTATION,
-                                         name + OPEN_CLOSE_BRACKET_STRING +
-                                                 SPACE + NOT + EQUAL +
-                                                 SPACE + NULL);
+        method += getElseIfConditionBegin(EIGHT_SPACE_INDENTATION,
+                                          name + OPEN_CLOSE_BRACKET_STRING +
+                                                  SPACE + NOT + EQUAL +
+                                                  SPACE + NULL);
 
         if (!isLeafList) {
             method += TWELVE_SPACE_INDENTATION +
@@ -760,24 +707,24 @@ public final class SubtreeFilteringMethodsGenerator {
         }
 
         //If there is any parameter in the query condition
-        method += StringGenerator
-                .getIfConditionBegin(TWELVE_SPACE_INDENTATION, NOT + name +
+        method +=
+                getIfConditionBegin(TWELVE_SPACE_INDENTATION, NOT + name +
                         OPEN_CLOSE_BRACKET_STRING + PERIOD + IS_EMPTY);
 
         if (isLeafList) {
             /*
              * If there is no app instance to perform content match
              */
-            method += StringGenerator
-                    .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
-                                         APP_INSTANCE + PERIOD + name +
-                                                 OPEN_CLOSE_BRACKET_STRING +
-                                                 SPACE + EQUAL + EQUAL + SPACE +
-                                                 NULL + SPACE + OR_OPERATION
-                                                 + SPACE + APP_INSTANCE +
-                                                 PERIOD + name +
-                                                 OPEN_CLOSE_BRACKET_STRING +
-                                                 PERIOD + IS_EMPTY);
+            method +=
+                    getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
+                                        APP_INSTANCE + PERIOD + name +
+                                                OPEN_CLOSE_BRACKET_STRING +
+                                                SPACE + EQUAL + EQUAL + SPACE +
+                                                NULL + SPACE + OR_OPERATION
+                                                + SPACE + APP_INSTANCE +
+                                                PERIOD + name +
+                                                OPEN_CLOSE_BRACKET_STRING +
+                                                PERIOD + IS_EMPTY);
 
             method += TWENTY_SPACE_INDENTATION + RETURN + SPACE + FALSE +
                     SEMI_COLON + NEW_LINE;
@@ -785,7 +732,7 @@ public final class SubtreeFilteringMethodsGenerator {
             method += methodClose(SIXTEEN_SPACE);
 
             // for instance iterator
-            method += StringGenerator.getCollectionIteratorForLoopBegin(
+            method += getCollectionIteratorForLoopBegin(
                     SIXTEEN_SPACE_INDENTATION, type + SPACE + name,
                     name + OPEN_CLOSE_BRACKET_STRING);
 
@@ -794,20 +741,20 @@ public final class SubtreeFilteringMethodsGenerator {
                     NEW_LINE;
 
             // for app instance iterator
-            method += StringGenerator
-                    .getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
-                                                       type + SPACE + name +
-                                                               "2",
-                                                       APP_INSTANCE + PERIOD +
-                                                               name +
-                                                               OPEN_CLOSE_BRACKET_STRING);
+            method +=
+                    getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
+                                                      type + SPACE + name +
+                                                              "2",
+                                                      APP_INSTANCE + PERIOD +
+                                                              name +
+                                                              OPEN_CLOSE_BRACKET_STRING);
 
             //the content match leaf list attribute value matches
-            method += StringGenerator
-                    .getIfConditionBegin(TWENTY_FOUR_SPACE_INDENTATION,
-                                         name + PERIOD + EQUALS_STRING
-                                                 + OPEN_PARENTHESIS + name +
-                                                 "2" + CLOSE_PARENTHESIS);
+            method +=
+                    getIfConditionBegin(TWENTY_FOUR_SPACE_INDENTATION,
+                                        name + PERIOD + EQUALS_STRING
+                                                + OPEN_PARENTHESIS + name +
+                                                "2" + CLOSE_PARENTHESIS);
 
             method += TWENTY_EIGHT_SPACE_INDENTATION + "flag" + SPACE + EQUAL +
                     SPACE + TRUE + SEMI_COLON + NEW_LINE;
@@ -826,8 +773,8 @@ public final class SubtreeFilteringMethodsGenerator {
             method += methodClose(TWENTY_SPACE);
 
             //if the content match failed
-            method += StringGenerator
-                    .getIfConditionBegin(TWENTY_SPACE_INDENTATION, "!flag");
+            method +=
+                    getIfConditionBegin(TWENTY_SPACE_INDENTATION, "!flag");
 
             method += TWENTY_FOUR_SPACE_INDENTATION + RETURN + SPACE + FALSE +
                     SEMI_COLON + NEW_LINE;
@@ -839,37 +786,34 @@ public final class SubtreeFilteringMethodsGenerator {
         } else {
 
             /*if there is any app instance entry*/
-            method += StringGenerator
-                    .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
-                                         APP_INSTANCE + PERIOD + name +
-                                                 OPEN_CLOSE_BRACKET_STRING +
-                                                 SPACE + NOT + EQUAL + SPACE +
-                                                 NULL + SPACE + AND_OPERATION +
-                                                 SPACE + NOT + APP_INSTANCE +
-                                                 PERIOD + name +
-                                                 OPEN_CLOSE_BRACKET_STRING +
-                                                 PERIOD + IS_EMPTY);
+            method +=
+                    getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
+                                        APP_INSTANCE + PERIOD + name +
+                                                OPEN_CLOSE_BRACKET_STRING +
+                                                SPACE + NOT + EQUAL + SPACE +
+                                                NULL + SPACE + AND_OPERATION +
+                                                SPACE + NOT + APP_INSTANCE +
+                                                PERIOD + name +
+                                                OPEN_CLOSE_BRACKET_STRING +
+                                                PERIOD + IS_EMPTY);
 
             /*
              * loop all the query condition instance(s)
              */
-            method += StringGenerator
-                    .getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
-                                                       type + SPACE + name,
-                                                       name +
-                                                               OPEN_CLOSE_BRACKET_STRING);
+            method +=
+                    getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
+                                                      type + SPACE + name,
+                                                      name +
+                                                              OPEN_CLOSE_BRACKET_STRING);
 
             //loop all the app instance(s)
-            method += StringGenerator.getCollectionIteratorForLoopBegin(
+            method += getCollectionIteratorForLoopBegin(
                     TWENTY_FOUR_SPACE_INDENTATION, type + SPACE + name + "2",
                     APP_INSTANCE + PERIOD + name +
                             OPEN_CLOSE_BRACKET_STRING);
 
             method += TWENTY_EIGHT_SPACE_INDENTATION + type + SPACE +
-                    "result = " + name + PERIOD +
-                    PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS + name + "2" +
-                    COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
-                    NEW_LINE;
+                    "result = " + resultString;
 
             method += TWENTY_EIGHT_SPACE_INDENTATION + "if (result != null) {" +
                     NEW_LINE;
@@ -900,23 +844,23 @@ public final class SubtreeFilteringMethodsGenerator {
                     EQUAL + SPACE + TRUE + SEMI_COLON + NEW_LINE;
         }
 
-        method += StringGenerator
-                .getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
-                                     APP_INSTANCE + PERIOD + name
-                                             + OPEN_CLOSE_BRACKET_STRING +
-                                             SPACE + NOT + EQUAL + SPACE +
-                                             NULL + SPACE + AND_OPERATION +
-                                             SPACE + NOT + APP_INSTANCE +
-                                             PERIOD + name +
-                                             OPEN_CLOSE_BRACKET_STRING +
-                                             PERIOD + IS_EMPTY);
+        method +=
+                getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
+                                    APP_INSTANCE + PERIOD + name
+                                            + OPEN_CLOSE_BRACKET_STRING +
+                                            SPACE + NOT + EQUAL + SPACE +
+                                            NULL + SPACE + AND_OPERATION +
+                                            SPACE + NOT + APP_INSTANCE +
+                                            PERIOD + name +
+                                            OPEN_CLOSE_BRACKET_STRING +
+                                            PERIOD + IS_EMPTY);
 
-        method = method + StringGenerator
-                .getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
-                                                   type + SPACE + name,
-                                                   APP_INSTANCE + PERIOD +
-                                                           name +
-                                                           OPEN_CLOSE_BRACKET_STRING);
+        method = method +
+                getCollectionIteratorForLoopBegin(TWENTY_SPACE_INDENTATION,
+                                                  type + SPACE + name,
+                                                  APP_INSTANCE + PERIOD +
+                                                          name +
+                                                          OPEN_CLOSE_BRACKET_STRING);
 
         method = method + TWENTY_FOUR_SPACE_INDENTATION +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING
@@ -938,55 +882,132 @@ public final class SubtreeFilteringMethodsGenerator {
 
     //Returns method string for op params augmented syntax
     static String getAugmentableSubTreeFiltering() {
-        return EIGHT_SPACE_INDENTATION + FOR + SPACE + OPEN_PARENTHESIS +
-                OBJECT_STRING + SPACE + YANG_AUGMENTED_INFO_LOWER_CASE +
-                SPACE + COLON + SPACE + THIS + PERIOD +
-                YANG_AUGMENTED_INFO_MAP +
-                OPEN_PARENTHESIS + CLOSE_PARENTHESIS + PERIOD
-                + VALUE + "s" + OPEN_PARENTHESIS + CLOSE_PARENTHESIS +
-                CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET +
-                NEW_LINE + TWELVE_SPACE_INDENTATION + OBJECT_STRING + SPACE +
-                getSmallCase(YANG_AUGMENTED_OP_PARAM_INFO) + SPACE + EQUAL +
-                SPACE + APP_INSTANCE + PERIOD +
-                YANG_AUGMENTED_INFO_LOWER_CASE + OPEN_PARENTHESIS +
-                YANG_AUGMENTED_INFO_LOWER_CASE + PERIOD +
-                GET_CLASS + CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + OBJECT + SPACE +
-                PROCESS_SUBTREE_FILTERING + SEMI_COLON
-                + NEW_LINE + TWELVE_SPACE_INDENTATION + TRY + SPACE +
-                OPEN_CURLY_BRACKET + NEW_LINE +
-                SIXTEEN_SPACE_INDENTATION +
-                "Class<?>[] interfaces = " + YANG_AUGMENTED_INFO_LOWER_CASE +
-                ".getClass().getInterfaces();" +
-                NEW_LINE + SIXTEEN_SPACE_INDENTATION +
-                PROCESS_SUBTREE_FILTERING + SPACE + EQUAL + SPACE +
-                YANG_AUGMENTED_INFO_LOWER_CASE + PERIOD + GET_CLASS +
-                NEW_LINE + TWENTY_SPACE_INDENTATION + PERIOD +
-                GET_METHOD + OPEN_PARENTHESIS + QUOTES +
-                PROCESS_SUBTREE_FILTERING + QUOTES + COMMA + SPACE +
-                "interfaces[0]" + CLOSE_PARENTHESIS + PERIOD + INVOKE +
-                OPEN_PARENTHESIS + YANG_AUGMENTED_INFO_LOWER_CASE +
-                COMMA + NEW_LINE + TWENTY_FOUR_SPACE_INDENTATION +
-                getSmallCase(YANG_AUGMENTED_OP_PARAM_INFO) +
-                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                SIXTEEN_SPACE_INDENTATION + IF + SPACE + OPEN_PARENTHESIS +
-                PROCESS_SUBTREE_FILTERING + SPACE + NOT + EQUAL + SPACE +
-                NULL + CLOSE_PARENTHESIS + SPACE + OPEN_CURLY_BRACKET +
-                NEW_LINE + TWENTY_SPACE_INDENTATION +
-                SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + "add" +
-                YANG_AUGMENTED_INFO + OPEN_PARENTHESIS +
-                PROCESS_SUBTREE_FILTERING + COMMA + SPACE +
-                PROCESS_SUBTREE_FILTERING + PERIOD + GET_CLASS +
-                CLOSE_PARENTHESIS + SEMI_COLON + NEW_LINE +
-                SIXTEEN_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
-                NEW_LINE + TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
-                SPACE + CATCH + SPACE + OPEN_PARENTHESIS +
-                NO_SUCH_METHOD_EXCEPTION + " | " +
-                INVOCATION_TARGET_EXCEPTION + " | " + ILLEGAL_ACCESS_EXCEPTION +
-                SPACE + EXCEPTION_VAR + CLOSE_PARENTHESIS + SPACE +
-                OPEN_CURLY_BRACKET + NEW_LINE + SIXTEEN_SPACE_INDENTATION +
-                CONTINUE + SEMI_COLON + NEW_LINE +
-                TWELVE_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE +
-                EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + NEW_LINE;
+        return "        for (Object augmentInfo : this.yangAugmentedInfoMap()" +
+                ".values()) {\n" +
+                "            Object appInstanceInfo = appInstance.yangAugmentedInfo(" +
+                "augmentInfo.getClass());\n" +
+                "            if (appInstanceInfo == null) {\n" +
+                "                subTreeFilteringResultBuilder.addYangAugmentedInfo(" +
+                "augmentInfo, augmentInfo.getClass());\n" +
+                "            } else {\n" +
+                "                Object processSubtreeFiltering;\n" +
+                "                try {\n" +
+                "                    Class<?> augmentedClass = augmentInfo" +
+                ".getClass();\n" +
+                "                    processSubtreeFiltering = augmentInfo.getClass()" +
+                ".getMethod(\"processSubtreeFiltering\", augmentedClass).invoke(" +
+                "augmentInfo, appInstanceInfo);\n" +
+                "                    if (processSubtreeFiltering != null) {\n" +
+                "                        subTreeFilteringResultBuilder" +
+                ".addYangAugmentedInfo(processSubtreeFiltering, processSubtreeFiltering.getClass());\n" +
+                "                    }\n" +
+                "                } catch (NoSuchMethodException |" +
+                " InvocationTargetException | IllegalAccessException e) {\n" +
+                "                    continue;\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }\n";
     }
+
+    private static String getMethodBodyForChoicePstMethod(
+            YangNode node, YangPluginConfig config, YangNode choiceParent,
+            String choice) {
+        StringBuilder builder = new StringBuilder();
+        JavaCodeGeneratorInfo info = (JavaCodeGeneratorInfo) choiceParent;
+        JavaFileInfoTranslator pInfo = info.getJavaFileInfo();
+
+        JavaQualifiedTypeInfoTranslator qInfo = getQualifiedInfo(node, config);
+
+        String castVar = qInfo.getClassInfo();
+        boolean qualify = info.getTempJavaCodeFragmentFiles().getBeanTempFiles()
+                .getJavaImportData().addImportInfo(qInfo, pInfo.getJavaName(),
+                                                   pInfo.getPackage());
+        if (qualify) {
+            castVar = StringGenerator.getQualifiedString(qInfo.getPkgInfo(),
+                                                         qInfo.getClassInfo());
+        }
+        String classCast = getOpenCloseParaWithValue(castVar) + SPACE;
+        String cast = getOpenCloseParaWithValue(classCast + choice);
+        String retString = cast + PERIOD + PROCESS_SUBTREE_FILTERING +
+                getOpenCloseParaWithValue(classCast + getAppInstanceAttrString
+                        (choice) + COMMA + SPACE + FALSE);
+        String cond = choice + INSTANCE_OF + castVar;
+        builder.append(getIfConditionBegin(EIGHT_SPACE_INDENTATION, cond))
+                .append(getReturnString(retString, TWELVE_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(EIGHT_SPACE));
+        return builder.toString();
+    }
+
+    /**
+     * Returns choice instance for PST method.
+     *
+     * @param choice    choice node
+     * @param className class name
+     * @return choice instance for pst method
+     */
+    private static String getChoiceInstanceForPstMethod(YangNode choice,
+                                                        String className) {
+        /*
+         * private Choice1 getChoice1ResultOfProcessSubTree(Choice1 choice1, Test appInstance) {
+         *     if (choice1 instanceof DefaultCase1) {
+         *         return ((DefaultCase1) choice1).processSubtreeFiltering(
+         *          appInstance.choice1(), false);
+         * }
+         * return null;
+         * }
+         */
+
+        JavaFileInfoTranslator info = ((JavaFileInfoContainer) choice).getJavaFileInfo();
+        String name = info.getJavaName();
+        String caps = getCapitalCase(name);
+        StringBuilder builder = new StringBuilder();
+        String methodName = caps + CHOICE_STF_METHOD_NAME;
+        Map<String, String> param = new LinkedHashMap<>();
+        param.put(name, caps);
+        param.put(APP_INSTANCE, className);
+
+        builder.append(multiAttrMethodSignature(methodName, GET, PRIVATE, caps,
+                                                param, CLASS_TYPE));
+
+        for (YangNode cases : getChoiceChildNodes((YangChoice) choice)) {
+            builder.append(getMethodBodyForChoicePstMethod(cases, info.getPluginConfig(),
+                                                           choice.getParent(), name));
+        }
+        builder.append(getReturnString(NULL, FOUR_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        return builder.toString();
+    }
+
+    private static String getReturnStringInCaseOfChoice(YangNode choice) {
+        JavaFileInfoTranslator info = ((JavaFileInfoContainer) choice)
+                .getJavaFileInfo();
+        String name = info.getJavaName();
+        String caps = getCapitalCase(name);
+        String methodName = caps + CHOICE_STF_METHOD_NAME;
+        return GET + methodName + getOpenCloseParaWithValue(
+                name + COMMA + SPACE + APP_INSTANCE) + signatureClose();
+    }
+
+    static JavaQualifiedTypeInfoTranslator getQualifiedInfo(
+            YangNode node, YangPluginConfig config) {
+        JavaFileInfoTranslator fileInfo = ((JavaCodeGeneratorInfo) node)
+                .getJavaFileInfo();
+        String name = fileInfo.getJavaName();
+        String pkg = fileInfo.getPackage();
+        if (config == null) {
+            config = new YangPluginConfig();
+        }
+        if (name == null) {
+            name = getCamelCase(node.getName(), config.getConflictResolver());
+            pkg = getNodesPackage(node, config);
+        }
+
+        name = DEFAULT_CAPS + getCapitalCase(name);
+        JavaQualifiedTypeInfoTranslator qInfo = new
+                JavaQualifiedTypeInfoTranslator();
+        qInfo.setClassInfo(name);
+        qInfo.setPkgInfo(pkg);
+        return qInfo;
+    }
+
 }

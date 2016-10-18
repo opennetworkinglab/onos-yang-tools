@@ -22,8 +22,10 @@ import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.File;
 import java.io.IOException;
 
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -32,6 +34,9 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirector
 public class TypeDefTranslatorTest {
 
     private final YangUtilManager utilManager = new YangUtilManager();
+    private static final String DIR = "target/typedefTranslator/";
+    private static final String DIR1 = System.getProperty("user.dir") + File
+            .separator + DIR;
 
     /**
      * Checks typedef translation should not result in any exception.
@@ -39,8 +44,10 @@ public class TypeDefTranslatorTest {
      * @throws MojoExecutionException
      */
     @Test
-    public void processTypeDefTranslator() throws IOException, ParserException, MojoExecutionException {
+    public void processTypeDefTranslator() throws IOException,
+            ParserException, MojoExecutionException {
 
+        deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/without";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -48,10 +55,10 @@ public class TypeDefTranslatorTest {
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/typedefTranslator/");
+        yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-
-        deleteDirectory("target/typedefTranslator/");
+        compileCode(DIR1);
+        deleteDirectory(DIR);
     }
 
     /**
@@ -60,8 +67,10 @@ public class TypeDefTranslatorTest {
      * @throws MojoExecutionException
      */
     @Test
-    public void processTypeDefWithRestrictionsTranslator() throws IOException, ParserException, MojoExecutionException {
+    public void processTypeDefWithRestrictionsTranslator() throws IOException,
+            ParserException, MojoExecutionException {
 
+        deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/with";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -69,10 +78,10 @@ public class TypeDefTranslatorTest {
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/typedefTranslator/");
+        yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-
-        deleteDirectory("target/typedefTranslator/");
+        compileCode(DIR1);
+        deleteDirectory(DIR);
 
     }
 
@@ -85,7 +94,7 @@ public class TypeDefTranslatorTest {
     public void processTypeDefWithUnionAndBitsTranslator() throws IOException,
             ParserException, MojoExecutionException {
 
-        deleteDirectory("target/typedefTranslator/");
+        deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/union";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
@@ -93,11 +102,9 @@ public class TypeDefTranslatorTest {
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir("target/typedefTranslator/");
+        yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-
-        //deleteDirectory("target/typedefTranslator/");
-
+        compileCode(DIR1);
+        deleteDirectory(DIR);
     }
-
 }

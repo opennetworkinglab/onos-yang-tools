@@ -16,10 +16,6 @@
 
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,6 +44,11 @@ import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -125,11 +126,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -188,11 +189,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -253,11 +254,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -388,11 +389,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UNION));
+                   is(YangDataTypes.UNION));
     }
 
     /**
@@ -451,11 +452,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -511,11 +512,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -574,11 +575,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -661,11 +662,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -723,11 +724,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -786,11 +787,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -848,10 +849,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -910,10 +911,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -971,10 +972,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.DERIVED));
+                   is(YangDataTypes.DERIVED));
     }
 
     /**
@@ -1033,10 +1034,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.DERIVED));
+                   is(YangDataTypes.DERIVED));
     }
 
     /**
@@ -1096,10 +1097,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) leafInfo.getDataType().getDataTypeExtendedInfo();
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -1156,11 +1157,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -1218,11 +1219,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -1334,11 +1335,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -1397,10 +1398,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) (leafInfo.getDataType().getDataTypeExtendedInfo());
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -1460,10 +1461,10 @@ public class IntraFileLeafrefLinkingTest {
         YangLeafRef leafref = (YangLeafRef) leafInfo.getDataType().getDataTypeExtendedInfo();
 
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.ENUMERATION));
+                   is(YangDataTypes.ENUMERATION));
     }
 
     /**
@@ -1557,7 +1558,7 @@ public class IntraFileLeafrefLinkingTest {
         assertThat(pathPredicate1.getRelPath().getAncestorNodeCount(), is(1));
         assertThat(pathPredicate1.getPathOp(), is(YangPathOperator.EQUALTO));
         assertThat(pathPredicate1.getRelPath().getAtomicPathList().listIterator().next().getNodeIdentifier()
-                .getName(), is("ifname"));
+                           .getName(), is("ifname"));
         //TODO : Fill the path predicates
 //        assertThat(pathPredicate1.getLeftAxisNode(), is(leafNameInList));
 //        assertThat(pathPredicate1.getRightAxisNode(), is(leafInfo));
@@ -1624,7 +1625,7 @@ public class IntraFileLeafrefLinkingTest {
         assertThat(leafref.getResolvableStatus(), is(RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
     }
 
 
@@ -1834,11 +1835,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 
     /**
@@ -1912,11 +1913,11 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.DERIVED));
+                   is(YangDataTypes.DERIVED));
     }
 
     /**
@@ -1977,10 +1978,10 @@ public class IntraFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.UINT8));
+                   is(YangDataTypes.UINT8));
     }
 }

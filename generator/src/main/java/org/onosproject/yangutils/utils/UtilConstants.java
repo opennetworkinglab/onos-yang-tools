@@ -1139,6 +1139,11 @@ public final class UtilConstants {
     public static final String BIT_SET = "BitSet";
 
     /**
+     * Flag for subtree filtering in augment.
+     */
+    public static final String SUBTREE_FILTERED = "isSubTreeFiltered";
+
+    /**
      * Augment map type.
      */
     public static final String AUGMENT_MAP_TYPE = "Map<Class<?>, Object>";
@@ -1409,6 +1414,11 @@ public final class UtilConstants {
      * Static attribute for build method syntax.
      */
     public static final String BUILD = "build";
+
+    /**
+     * Static attribute for build for filter in augment method syntax.
+     */
+    public static final String BUILD_FOR_FILTER = "buildForFilter";
 
     /**
      * Static attribute for object.
@@ -1868,6 +1878,13 @@ public final class UtilConstants {
             "notification/grouping for path: ";
 
     /**
+     * Static attribute for error msg.
+     */
+    public static final String VERSION_ERROR = "Onos-yang-tools " +
+            "does not support maven version below \"3.3.9\" , your current " +
+            "version is ";
+
+    /**
      * Static attribute for in.
      */
     public static final String IN = " in ";
@@ -1876,6 +1893,34 @@ public final class UtilConstants {
      * Static attribute for at.
      */
     public static final String AT = " at ";
+
+    /**
+     * Static param for processChildNodesSubTreeFiltering.
+     */
+    public static final String PROCESS_CHILD_NODE_STF_PARAM =
+            "processChildNodesSubTreeFiltering";
+    /**
+     * Static param for subTreeFilteringResultBuilder.
+     */
+    public static final String STF_BUILDER_PARAM =
+            "subTreeFilteringResultBuilder";
+
+    /**
+     * Static param for isAnySelectOrContainmentNode.
+     */
+    public static final String SELECT_OR_CONTAINMENT_NODE_PARAM =
+            "isAnySelectOrContainmentNode";
+    /**
+     * Static param for isSelectAllSchemaChild.
+     */
+    public static final String SELECT_ALL_CHILD_SCHEMA_PARAM =
+            "isSelectAllSchemaChild";
+
+    /**
+     * Static param for ResultOfProcessSubTree.
+     */
+    public static final String CHOICE_STF_METHOD_NAME =
+            "ResultOfProcessSubTree";
 
     // No instantiation.
     private UtilConstants() {

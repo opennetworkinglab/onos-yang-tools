@@ -35,9 +35,7 @@ import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.addResolutionInfo;
 import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOLVED;
-import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPEDEF_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
-import static org.onosproject.yangutils.datamodel.utils.YangConstructType.UNION_DATA;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
@@ -91,7 +89,7 @@ public final class TypeListener {
 
         // Validate node identifier.
         YangNodeIdentifier nodeIdentifier = getValidNodeIdentifier(ctx.string().getText(), TYPE_DATA,
-                ctx);
+                                                                   ctx);
 
         // Obtain the YANG data type.
         YangDataTypes yangDataTypes = YangDataTypes.getType(ctx.string().getText());
@@ -132,11 +130,14 @@ public final class TypeListener {
                     // Verify parent node of leaf
                     if (!(parentNodeOfLeaf instanceof YangNode)) {
                         throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                                ctx.string().getText(), EXIT));
+                                                                                ctx.string().getText(), EXIT));
                     }
 
                     // Create empty derived info and attach it to type extended info.
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
+                    yangDerivedInfo.setLineNumber(ctx.getStart().getLine());
+                    yangDerivedInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+                    yangDerivedInfo.setFileName(listener.getFileName());
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     type.setResolvableStatus(UNRESOLVED);
@@ -144,7 +145,7 @@ public final class TypeListener {
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
                             new YangResolutionInfoImpl<YangType>(
-                                    type,(YangNode) parentNodeOfLeaf, errorLine,
+                                    type, (YangNode) parentNodeOfLeaf, errorLine,
                                     errorPosition);
                     addToResolutionList(resolutionInfo, ctx);
                 }
@@ -166,11 +167,14 @@ public final class TypeListener {
                     // Verify parent node of leaf
                     if (!(parentNodeOfLeafList instanceof YangNode)) {
                         throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                                ctx.string().getText(), EXIT));
+                                                                                ctx.string().getText(), EXIT));
                     }
 
                     // Create empty derived info and attach it to type extended info.
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
+                    yangDerivedInfo.setLineNumber(ctx.getStart().getLine());
+                    yangDerivedInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+                    yangDerivedInfo.setFileName(listener.getFileName());
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     // Add resolution information to the list
@@ -200,6 +204,9 @@ public final class TypeListener {
 
                     // Create empty derived info and attach it to type extended info.
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
+                    yangDerivedInfo.setLineNumber(ctx.getStart().getLine());
+                    yangDerivedInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+                    yangDerivedInfo.setFileName(listener.getFileName());
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     type.setResolvableStatus(UNRESOLVED);
@@ -224,6 +231,9 @@ public final class TypeListener {
                 if (yangDataTypes == YangDataTypes.DERIVED) {
                     // Create empty derived info and attach it to type extended info.
                     YangDerivedInfo<?> yangDerivedInfo = new YangDerivedInfo<>();
+                    yangDerivedInfo.setLineNumber(ctx.getStart().getLine());
+                    yangDerivedInfo.setCharPosition(ctx.getStart().getCharPositionInLine());
+                    yangDerivedInfo.setFileName(listener.getFileName());
                     ((YangType<YangDerivedInfo>) type).setDataTypeExtendedInfo(yangDerivedInfo);
 
                     type.setResolvableStatus(UNRESOLVED);
@@ -238,7 +248,7 @@ public final class TypeListener {
 
             default:
                 throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                        ctx.string().getText(), EXIT));
+                                                                        ctx.string().getText(), EXIT));
         }
 
         // Push the type to the stack.
@@ -273,7 +283,7 @@ public final class TypeListener {
         Parsable parsableType = listener.getParsedDataStack().pop();
         if (!(parsableType instanceof YangType)) {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                    ctx.string().getText(), EXIT));
+                                                                    ctx.string().getText(), EXIT));
         }
     }
 
@@ -289,7 +299,7 @@ public final class TypeListener {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
             throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                    TYPE_DATA, ctx.string().getText(), ENTRY, e.getMessage()));
+                                                                            TYPE_DATA, ctx.string().getText(), ENTRY, e.getMessage()));
         }
     }
 
@@ -306,27 +316,27 @@ public final class TypeListener {
             switch (yangDataType) {
                 case UNION:
                     parserException = new ParserException("YANG file error : a type union" +
-                            " must have atleast one type statement.");
+                                                                  " must have atleast one type statement.");
                     break;
                 case ENUMERATION:
                     parserException = new ParserException("YANG file error : a type enumeration" +
-                            " must have atleast one enum statement.");
+                                                                  " must have atleast one enum statement.");
                     break;
                 case BITS:
                     parserException = new ParserException("YANG file error : a type bits" +
-                            " must have atleast one bit statement.");
+                                                                  " must have atleast one bit statement.");
                     break;
                 case DECIMAL64:
                     parserException = new ParserException("YANG file error : a type decimal64" +
-                            " must have fraction-digits statement.");
+                                                                  " must have fraction-digits statement.");
                     break;
                 case LEAFREF:
                     parserException = new ParserException("YANG file error : a type leafref" +
-                            " must have one path statement.");
+                                                                  " must have one path statement.");
                     break;
                 case IDENTITYREF:
                     parserException = new ParserException("YANG file error : a type identityref" +
-                            " must have base statement.");
+                                                                  " must have base statement.");
                     break;
                 default:
                     return;

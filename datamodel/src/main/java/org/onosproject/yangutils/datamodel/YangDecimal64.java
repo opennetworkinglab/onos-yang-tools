@@ -28,6 +28,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ListIterator;
 
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.DECIMAL64_DATA;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DECIMAL64;
+
 /**
  * Represents YANG decimal 64.
  */
@@ -60,13 +64,19 @@ public class YangDecimal64<T> extends DefaultLocationInfo
     /**
      * Valid minimum value of YANG's decimal64.
      */
-    private static final BigDecimal MIN_VALUE = BigDecimal.valueOf
-            (-922337203685477580.8);
+    private static final BigDecimal MIN_VALUE =
+            BigDecimal.valueOf(-922337203685477580.8);
 
     /**
      * Valid maximum value of YANG's decimal64.
      */
-    public static final BigDecimal MAX_VALUE = BigDecimal.valueOf(922337203685477580.7);
+    private static final BigDecimal MAX_VALUE =
+            BigDecimal.valueOf(922337203685477580.7);
+
+    private static final int MIN_FRACTION_DIGIT_RANGE = 1;
+    private static final int MAX_FRACTION_DIGIT_RANGE = 18;
+    private static final int ZERO = 0;
+
 
     // Decimal64 value
     private BigDecimal value;
@@ -108,16 +118,19 @@ public class YangDecimal64<T> extends DefaultLocationInfo
             try {
                 value = new BigDecimal(valueInString);
             } catch (Exception e) {
-                throw new DataTypeException("YANG file error : Input value \"" + valueInString + "\" is not a valid " +
-                                                    "decimal64.");
+                throw new DataTypeException(
+                        "YANG file error : Input value \"" + valueInString + "\"" +
+                                " is not a valid decimal64.");
             }
         }
 
         if (value.doubleValue() < MIN_VALUE.doubleValue()) {
-            throw new DataTypeException("YANG file error : " + valueInString + " is lesser than minimum value "
+            throw new DataTypeException("YANG file error : " + valueInString +
+                                                " is less than minimum value "
                                                 + MIN_VALUE + ".");
         } else if (value.doubleValue() > MAX_VALUE.doubleValue()) {
-            throw new DataTypeException("YANG file error : " + valueInString + " is greater than maximum value "
+            throw new DataTypeException("YANG file error : " + valueInString +
+                                                " is greater than maximum value "
                                                 + MAX_VALUE + ".");
         }
     }
@@ -173,7 +186,7 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      * @param resolvedExtendedInfo resolved range restricted extended information
      */
     public void setRangeRestrictedExtendedInfo(T resolvedExtendedInfo) {
-        this.rangeRestrictedExtendedInfo = resolvedExtendedInfo;
+        rangeRestrictedExtendedInfo = resolvedExtendedInfo;
     }
 
     /**
@@ -188,12 +201,12 @@ public class YangDecimal64<T> extends DefaultLocationInfo
 
     @Override
     public YangDataTypes getYangType() {
-        return YangDataTypes.DECIMAL64;
+        return DECIMAL64;
     }
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.DECIMAL64_DATA;
+        return DECIMAL64_DATA;
     }
 
     @Override
@@ -206,9 +219,8 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      *
      * @param valInString input String
      * @return Object of YANG decimal64
-     * @throws DataModelException a violation of data model rules
      */
-    public static YangDecimal64 fromString(String valInString) throws DataModelException {
+    static YangDecimal64 fromString(String valInString) {
         return new YangDecimal64(valInString);
     }
 
@@ -218,10 +230,8 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      * @return true if fraction-digit is in its range otherwise false
      */
     public boolean isValidFractionDigit() {
-        if ((fractionDigit >= 1) && (fractionDigit <= 18)) {
-            return true;
-        }
-        return false;
+        return fractionDigit >= MIN_FRACTION_DIGIT_RANGE &&
+                fractionDigit <= MAX_FRACTION_DIGIT_RANGE;
     }
 
 
@@ -231,11 +241,12 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      * @throws DataModelException a violation of data model rules
      */
     public void validateDecimal64() throws DataModelException {
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) getRangeRestrictedExtendedInfo();
+        YangRangeRestriction rangeRestriction =
+                (YangRangeRestriction) getRangeRestrictedExtendedInfo();
         if (rangeRestriction != null) {
             // Check whether value is within provided range value
-            ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                    .listIterator();
+            ListIterator<YangRangeInterval> rangeListIterator =
+                    rangeRestriction.getAscendingRangeIntervals().listIterator();
 
             boolean isMatched = false;
             while (rangeListIterator.hasNext()) {
@@ -245,28 +256,24 @@ public class YangDecimal64<T> extends DefaultLocationInfo
                 rangeInterval.setFileName(getFileName());
                 BigDecimal startValue = ((YangDecimal64) rangeInterval.getStartValue()).getValue();
                 BigDecimal endValue = ((YangDecimal64) rangeInterval.getEndValue()).getValue();
-                if ((this.value.doubleValue() >= startValue.doubleValue()) &&
-                        (this.value.doubleValue() <= endValue.doubleValue())) {
+                if (value.compareTo(startValue) >= ZERO &&
+                        value.compareTo(endValue) <= ZERO) {
                     isMatched = true;
                     break;
                 }
             }
             // If range is not matched then throw error
             if (!isMatched) {
-                throw new DataModelException("YANG file error : decimal64 validation failed. " +
-                                                     " in " +
-                                                     getLineNumber() + " at " +
-                                                     getCharPosition() +
-                                                     " in " + getFileName() + "\"");
+                throw new DataModelException(getErrorMsg(
+                        "YANG file error : decimal64 validation failed.", "decimal64",
+                        getLineNumber(), getCharPosition(), getFileName() + "\""));
             }
         } else {
             // Check value is in fraction-digits decimal64 value range
-            if (!FractionDigits.isValueInDecimal64Range(this.value, getFractionDigit())) {
-                throw new DataModelException("YANG file error : decimal64 validation failed. " +
-                                                     " in " +
-                                                     getLineNumber() + " at " +
-                                                     getCharPosition() +
-                                                     " in " + getFileName() + "\"");
+            if (!FractionDigits.isValueInDecimal64Range(value, getFractionDigit())) {
+                throw new DataModelException(getErrorMsg(
+                        "YANG file error : decimal64 validation failed.", "decimal64",
+                        getLineNumber(), getCharPosition(), getFileName() + "\""));
 
             }
         }
@@ -278,35 +285,32 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      * @throws DataModelException a violation of data model rules
      */
     public void validateRange() throws DataModelException {
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) getRangeRestrictedExtendedInfo();
+        YangRangeRestriction rangeRestriction =
+                (YangRangeRestriction) getRangeRestrictedExtendedInfo();
         if (rangeRestriction == null) {
             // No need to validate. Range is optional.
             return;
         }
-
-        ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> rangeListIterator =
+                rangeRestriction.getAscendingRangeIntervals().listIterator();
         while (rangeListIterator.hasNext()) {
             YangRangeInterval rangeInterval = rangeListIterator.next();
             rangeInterval.setCharPosition(getCharPosition());
             rangeInterval.setLineNumber(getLineNumber());
             rangeInterval.setFileName(getFileName());
-            if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getStartValue()).getValue(),
-                                                         getFractionDigit()))) {
-                throw new DataModelException("YANG file error : range validation failed. " +
-                                                     " in " +
-                                                     getLineNumber() + " at " +
-                                                     getCharPosition() +
-                                                     " in " + getFileName() + "\"");
+            if (!FractionDigits.isValueInDecimal64Range(
+                    ((YangDecimal64) rangeInterval.getStartValue()).getValue(),
+                    getFractionDigit())) {
+                throw new DataModelException(getErrorMsg(
+                        "YANG file error : decimal64 validation failed.", "decimal64",
+                        getLineNumber(), getCharPosition(), getFileName() + "\""));
             }
-
-            if (!(FractionDigits.isValueInDecimal64Range(((YangDecimal64) rangeInterval.getEndValue()).getValue(),
-                                                         getFractionDigit()))) {
-                throw new DataModelException("YANG file error : range validation failed. " +
-                                                     " in " +
-                                                     getLineNumber() + " at " +
-                                                     getCharPosition() +
-                                                     " in " + getFileName() + "\"");
+            if (!FractionDigits.isValueInDecimal64Range(
+                    ((YangDecimal64) rangeInterval.getEndValue()).getValue(),
+                    getFractionDigit())) {
+                throw new DataModelException(getErrorMsg(
+                        "YANG file error : decimal64 validation failed.", "decimal64",
+                        getLineNumber(), getCharPosition(), getFileName() + "\""));
             }
         }
     }

@@ -16,28 +16,30 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangPatternRestriction;
 import org.onosproject.yangutils.datamodel.YangStringRestriction;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATTERN_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*
@@ -92,7 +94,7 @@ public final class PatternRestrictionListener {
             setPatternRestriction(listener, type, ctx);
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, PATTERN_DATA,
-                    ctx.string().getText(), ENTRY));
+                                                                    ctx.string().getText(), ENTRY));
         }
     }
 
@@ -109,8 +111,8 @@ public final class PatternRestrictionListener {
         if (type.getDataType() != YangDataTypes.STRING && type.getDataType() != YangDataTypes.DERIVED) {
 
             ParserException parserException = new ParserException("YANG file error : " +
-                    YangConstructType.getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
-                    " can be used to restrict the built-in type string or types derived from string.");
+                                                                          YangConstructType.getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
+                                                                          " can be used to restrict the built-in type string or types derived from string.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -123,6 +125,9 @@ public final class PatternRestrictionListener {
             YangStringRestriction stringRestriction = (YangStringRestriction) type.getDataTypeExtendedInfo();
             if (stringRestriction == null) {
                 stringRestriction = new YangStringRestriction();
+                stringRestriction.setFileName(listener.getFileName());
+                stringRestriction.setCharPosition(ctx.getStart().getCharPositionInLine());
+                stringRestriction.setLineNumber(ctx.getStart().getLine());
                 type.setDataTypeExtendedInfo(stringRestriction);
                 stringRestriction.addPattern(patternArgument);
             } else {
@@ -130,7 +135,7 @@ public final class PatternRestrictionListener {
             }
             listener.getParsedDataStack().push(stringRestriction);
         } else {
-            YangPatternRestriction patternRestriction = (YangPatternRestriction) ((YangDerivedInfo<?>) type
+            YangPatternRestriction patternRestriction = ((YangDerivedInfo<?>) type
                     .getDataTypeExtendedInfo()).getPatternRestriction();
             if (patternRestriction == null) {
                 patternRestriction = new YangPatternRestriction();
@@ -151,7 +156,7 @@ public final class PatternRestrictionListener {
      * @param ctx      context object of the grammar rule
      */
     public static void processPatternRestrictionExit(TreeWalkListener listener,
-                                                    GeneratedYangParser.PatternStatementContext ctx) {
+                                                     GeneratedYangParser.PatternStatementContext ctx) {
 
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, PATTERN_DATA, ctx.string().getText(), EXIT);
@@ -164,7 +169,7 @@ public final class PatternRestrictionListener {
             // TODO : need to handle in linker
         } else {
             throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, PATTERN_DATA,
-                    ctx.string().getText(), EXIT));
+                                                                    ctx.string().getText(), EXIT));
         }
     }
 
@@ -175,13 +180,14 @@ public final class PatternRestrictionListener {
      * @return validated string
      */
     private static String getValidPattern(GeneratedYangParser.PatternStatementContext ctx) {
-        String userInputPattern = ctx.string().getText().replace("\"", EMPTY_STRING);
+        String userInputPattern = removeQuotesAndHandleConcat(ctx.string().getText());
+        userInputPattern = userInputPattern.replaceAll("[\'\"]", EMPTY_STRING);
         try {
             Pattern.compile(userInputPattern);
         } catch (PatternSyntaxException exception) {
             ParserException parserException = new ParserException("YANG file error : " +
-                    YangConstructType.getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
-                    " is not a valid regular expression");
+                                                                          YangConstructType.getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
+                                                                          " is not a valid regular expression");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;

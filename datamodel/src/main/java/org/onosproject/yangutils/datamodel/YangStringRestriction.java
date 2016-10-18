@@ -16,14 +16,16 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.ListIterator;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.ListIterator;
+
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATTERN_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -114,10 +116,10 @@ public class YangStringRestriction extends DefaultLocationInfo
     /**
      * Sets the length restriction on the string data.
      *
-     * @param lengthRestriction length restriction on the string data
+     * @param rest length restriction on the string data
      */
-    public void setLengthRestriction(YangRangeRestriction<YangUint64> lengthRestriction) {
-        this.lengthRestriction = lengthRestriction;
+    public void setLengthRestriction(YangRangeRestriction<YangUint64> rest) {
+        lengthRestriction = rest;
     }
 
     /**
@@ -132,10 +134,10 @@ public class YangStringRestriction extends DefaultLocationInfo
     /**
      * Sets the pattern restriction for the type.
      *
-     * @param patternRestriction pattern restriction for the type
+     * @param rest pattern restriction for the type
      */
-    public void setPatternRestriction(YangPatternRestriction patternRestriction) {
-        this.patternRestriction = patternRestriction;
+    void setPatternRestriction(YangPatternRestriction rest) {
+        patternRestriction = rest;
     }
 
     /**
@@ -144,10 +146,10 @@ public class YangStringRestriction extends DefaultLocationInfo
      * @param newPattern new pattern restriction for the type
      */
     public void addPattern(String newPattern) {
-        if (getPatternRestriction() == null) {
-            setPatternRestriction(new YangPatternRestriction());
+        if (patternRestriction == null) {
+            patternRestriction = new YangPatternRestriction();
         }
-        getPatternRestriction().addPattern(newPattern);
+        patternRestriction.addPattern(newPattern);
     }
 
     /**
@@ -193,7 +195,7 @@ public class YangStringRestriction extends DefaultLocationInfo
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.PATTERN_DATA;
+        return PATTERN_DATA;
     }
 
     /**
@@ -202,15 +204,15 @@ public class YangStringRestriction extends DefaultLocationInfo
      * @param valueInString value
      * @return true, if the value is confirming to length restriction, false otherwise
      */
-    public boolean isValidStringOnLengthRestriction(String valueInString) {
+    boolean isValidStringOnLengthRestriction(String valueInString) {
         if (lengthRestriction == null || lengthRestriction.getAscendingRangeIntervals() == null
                 || lengthRestriction.getAscendingRangeIntervals().isEmpty()) {
             // Length restriction is optional
             return true;
         }
 
-        ListIterator<YangRangeInterval<YangUint64>> rangeListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval<YangUint64>> rangeListIterator =
+                lengthRestriction.getAscendingRangeIntervals().listIterator();
         boolean isMatched = false;
         while (rangeListIterator.hasNext()) {
             YangRangeInterval rangeInterval = rangeListIterator.next();
@@ -219,8 +221,8 @@ public class YangStringRestriction extends DefaultLocationInfo
             rangeInterval.setFileName(getFileName());
             BigInteger startValue = ((YangUint64) rangeInterval.getStartValue()).getValue();
             BigInteger endValue = ((YangUint64) rangeInterval.getEndValue()).getValue();
-            if ((valueInString.length() >= startValue.intValue()) &&
-                    (valueInString.length() <= endValue.intValue())) {
+            if (valueInString.length() >= startValue.intValue() &&
+                    valueInString.length() <= endValue.intValue()) {
                 isMatched = true;
                 break;
             }
@@ -235,14 +237,15 @@ public class YangStringRestriction extends DefaultLocationInfo
      * @param valueInString value
      * @return true, if the value is confirming to pattern restriction, false otherwise
      */
-    public boolean isValidStringOnPatternRestriction(String valueInString) {
+    boolean isValidStringOnPatternRestriction(String valueInString) {
         if (patternRestriction == null
                 || patternRestriction.getPatternList().isEmpty()) {
             // Pattern restriction is optional
             return true;
         }
 
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
+        ListIterator<String> patternListIterator =
+                patternRestriction.getPatternList().listIterator();
         boolean isMatched = false;
         while (patternListIterator.hasNext()) {
             if (valueInString.matches(patternListIterator.next())) {
@@ -250,7 +253,6 @@ public class YangStringRestriction extends DefaultLocationInfo
                 break;
             }
         }
-
         return isMatched;
     }
 

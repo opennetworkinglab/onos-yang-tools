@@ -114,4 +114,5 @@ public class TempJavaBeanFragmentFiles
         closeFile(constructorImplTempFileHandle, true);
         super.freeTemporaryResources(isErrorOccurred);
     }
+
 }

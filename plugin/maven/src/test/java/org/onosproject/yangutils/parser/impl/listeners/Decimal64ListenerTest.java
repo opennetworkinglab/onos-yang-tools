@@ -16,9 +16,6 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,19 +25,22 @@ import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeType;
-import org.onosproject.yangutils.datamodel.YangRangeRestriction;
 import org.onosproject.yangutils.datamodel.YangRangeInterval;
+import org.onosproject.yangutils.datamodel.YangRangeRestriction;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
-import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ListIterator;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Test cases for decimal64 listener.
@@ -76,7 +76,7 @@ public class Decimal64ListenerTest {
         assertThat(leafInfo.getDataType().getDataTypeName(), is("decimal64"));
         assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.DECIMAL64));
         assertThat(((YangDecimal64) leafInfo.getDataType().getDataTypeExtendedInfo()).getFractionDigit(),
-                is(2));
+                   is(2));
     }
 
     /**
@@ -271,7 +271,9 @@ public class Decimal64ListenerTest {
     @Test
     public void processDecimal64InvalidRange() throws IOException, ParserException, DataModelException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("YANG file error : range validation failed.");
+        thrown.expectMessage(
+                "YANG file error : decimal64 validation failed.decimal64 in 7 at 12" +
+                        " in src/test/resources/decimal64/Decimal64TypeInvalidRangeStmnt.yang\"");
 
         manager.getDataModel("src/test/resources/decimal64/Decimal64TypeInvalidRangeStmnt.yang");
     }
@@ -559,7 +561,12 @@ public class Decimal64ListenerTest {
     @Test
     public void processDecimal64MultiTypedefMultiInvalidRangeStatement() throws IOException, LinkerException {
         thrown.expect(LinkerException.class);
-        thrown.expectMessage(" Range interval doesn't fall within the referred restriction ranges");
+        thrown.expectMessage(
+                "Range interval doesn't fall within the referred restriction ranges" +
+                        " restriction ranges. in 0 at 0 in src/test/resources/decimal64/" +
+                        "Decimal64MultiTypedefMultiInvalidRangeStatement.yang\"type." +
+                        " in 19 at 12 in src/test/resources/decimal64/Decimal64MultiTypedef" +
+                        "MultiInvalidRangeStatement.yang");
 
         manager.getDataModel("src/test/resources/decimal64/Decimal64MultiTypedefMultiInvalidRangeStatement.yang");
     }

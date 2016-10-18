@@ -24,6 +24,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
@@ -62,10 +63,12 @@ import static org.onosproject.yangutils.utils.UtilConstants.IN;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
+import static org.onosproject.yangutils.utils.UtilConstants.VERSION_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getVersionValue;
 
 /**
  * Represents ONOS YANG utility maven plugin.
@@ -80,14 +83,15 @@ public class YangUtilManager
 
     private static final String DEFAULT_PKG =
             getPackageDirPathFromJavaJPackage(DEFAULT_BASE_PKG);
-    private YangPluginConfig yangPlugin = new YangPluginConfig();
+    private static final int SUPPORTED_VERSION = 339;
+    private final YangPluginConfig yangPlugin = new YangPluginConfig();
     private YangNode rootNode;
     // YANG file information set.
     private Set<YangFileInfo> yangFileInfoSet = new HashSet<>();
-    private YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
-    private YangLinker yangLinker = new YangLinkerManager();
+    private final YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
+    private final YangLinker yangLinker = new YangLinkerManager();
     private YangFileInfo curYangFileInfo = new YangFileInfo();
-    private Set<YangNode> yangNodeSet = new HashSet<>();
+    private final Set<YangNode> yangNodeSet = new HashSet<>();
 
     /**
      * Source directory for YANG files.
@@ -169,6 +173,18 @@ public class YangUtilManager
     @Parameter(property = "generateJavaFileForSbi", defaultValue = "nbi")
     private String generateJavaFileForSbi;
 
+    /**
+     * The Runtime information for the current instance of Maven.
+     */
+    @Component
+    private RuntimeInformation runtime;
+
+    /**
+     * The name of the property in which to store the version of Maven.
+     */
+    @Parameter(defaultValue = "maven.version")
+    private String versionProperty;
+
     private String outputDir;
     private String codeGenDir;
 
@@ -177,6 +193,7 @@ public class YangUtilManager
             throws MojoExecutionException, MojoFailureException {
 
         try {
+            validateMavenVersion();
             /*
              * For deleting the generated code in previous build.
              */
@@ -241,6 +258,18 @@ public class YangUtilManager
             throw new MojoExecutionException(
                     "Exception occurred due to " + e.getLocalizedMessage() +
                             IN + fileName + " YANG file.");
+        }
+    }
+
+    /**
+     * Validates current maven version of system.
+     *
+     * @throws MojoExecutionException when maven version is below 3.3.9
+     */
+    private void validateMavenVersion() throws MojoExecutionException {
+        String version = runtime.getMavenVersion();
+        if (getVersionValue(version) < SUPPORTED_VERSION) {
+            throw new MojoExecutionException(VERSION_ERROR + version);
         }
     }
 
@@ -410,4 +439,5 @@ public class YangUtilManager
         }
         getLog().info(logInfo);
     }
+
 }

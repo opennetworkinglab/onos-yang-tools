@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
+import static java.lang.Integer.parseInt;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COLON;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
@@ -880,5 +881,20 @@ public final class YangIoUtils {
             }
         }
         return isDeleted;
+    }
+
+    /**
+     * Converts string to integer number for maven version.
+     *
+     * @param ver version
+     * @return int value of version
+     */
+    public static int getVersionValue(String ver) {
+        String[] array = ver.split(Pattern.quote(PERIOD));
+        StringBuilder builder = new StringBuilder();
+        for (String str : array) {
+            builder.append(str);
+        }
+        return parseInt(builder.toString());
     }
 }

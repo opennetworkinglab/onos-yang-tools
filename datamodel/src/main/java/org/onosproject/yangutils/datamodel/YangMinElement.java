@@ -52,7 +52,7 @@ public class YangMinElement extends DefaultLocationInfo
      * <p>
      * Otherwise, it is enforced if the ancestor node exists.
      */
-    private int minElement = 0;
+    private int minElement;
 
     /**
      * Creates a YANG minimum element.

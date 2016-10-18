@@ -22,11 +22,12 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangBuiltInDataTypeInfo;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 
-import java.util.regex.Pattern;
-
+import static java.util.regex.Pattern.quote;
 import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.LENGTH_DATA;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.RANGE_DATA;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.getYangConstructType;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT64;
 
 /**
  * Represents restriction resolver which provide common utility used by parser
@@ -42,6 +43,8 @@ public final class RestrictionResolver {
     private static final int MIN_RANGE_BOUNDARY = 1;
     private static final String MIN_KEYWORD = "min";
     private static final String MAX_KEYWORD = "max";
+    private static final String SPACE = " ";
+    private static final String QUOTE = "\"";
 
     /**
      * Creates a restriction resolver.
@@ -52,134 +55,86 @@ public final class RestrictionResolver {
     /**
      * Processes the range restriction for parser and linker.
      *
-     * @param refRangeRestriction    range restriction of referred typedef
-     * @param lineNumber             error line number
-     * @param charPositionInLine     error character position in line
-     * @param hasReferredRestriction whether has referred restriction
-     * @param curRangeString         caller type's range string
-     * @param effectiveType          effective type, when called from linker
-     * @param fileName               file name
+     * @param refRr    range restriction of referred typedef
+     * @param line     error line number
+     * @param position error character position in line
+     * @param hasRefR  whether has referred restriction
+     * @param curRange caller type's range string
+     * @param type     effective type, when called from linker
+     * @param fileName file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
-    public static YangRangeRestriction processRangeRestriction(YangRangeRestriction refRangeRestriction,
-                                                               int lineNumber, int charPositionInLine,
-                                                               boolean hasReferredRestriction,
-                                                               String curRangeString, YangDataTypes effectiveType, String fileName)
+    public static YangRangeRestriction processRangeRestriction(
+            YangRangeRestriction refRr, int line, int position,
+            boolean hasRefR, String curRange, YangDataTypes type, String fileName)
             throws DataModelException {
-        YangBuiltInDataTypeInfo<?> startValue;
-        YangBuiltInDataTypeInfo<?> endValue;
-        YangRangeRestriction rangeRestriction = new YangRangeRestriction();
-
-        String rangeArgument = removeQuotesAndHandleConcat(curRangeString);
-        String[] rangeArguments = rangeArgument.trim().split(Pattern.quote(PIPE));
-
-        for (String rangePart : rangeArguments) {
-            String startInterval;
-            String endInterval;
-            YangRangeInterval rangeInterval = new YangRangeInterval();
-            rangeInterval.setCharPosition(charPositionInLine);
-            rangeInterval.setLineNumber(lineNumber);
-            rangeInterval.setFileName(fileName);
-            String[] rangeBoundary = rangePart.trim().split(Pattern.quote(INTERVAL));
-
-            if (rangeBoundary.length > MAX_RANGE_BOUNDARY) {
-                DataModelException dataModelException = new DataModelException("YANG file error : " +
-                                                                                       YangConstructType.getYangConstructType(RANGE_DATA) + " " + rangeArgument +
-                                                                                       " is not valid.");
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
-            }
-
-            if (rangeBoundary.length == MIN_RANGE_BOUNDARY) {
-                startInterval = rangeBoundary[0].trim();
-                endInterval = rangeBoundary[0].trim();
-            } else {
-                startInterval = rangeBoundary[0].trim();
-                endInterval = rangeBoundary[1].trim();
-            }
-
-            try {
-                if (hasReferredRestriction && startInterval.equals(MIN_KEYWORD)
-                        && refRangeRestriction.getMinRestrictedvalue() != null) {
-                    startValue = refRangeRestriction.getMinRestrictedvalue();
-                } else if (hasReferredRestriction && startInterval.equals(MAX_KEYWORD)
-                        && refRangeRestriction.getMaxRestrictedvalue() != null) {
-                    startValue = refRangeRestriction.getMaxRestrictedvalue();
-                } else {
-                    startValue = getDataObjectFromString(startInterval, effectiveType);
-                }
-                if (hasReferredRestriction && endInterval.equals(MIN_KEYWORD)
-                        && refRangeRestriction.getMinRestrictedvalue() != null) {
-                    endValue = refRangeRestriction.getMinRestrictedvalue();
-                } else if (hasReferredRestriction && endInterval.equals(MAX_KEYWORD)
-                        && refRangeRestriction.getMaxRestrictedvalue() != null) {
-                    endValue = refRangeRestriction.getMaxRestrictedvalue();
-                } else {
-                    endValue = getDataObjectFromString(endInterval, effectiveType);
-                }
-            } catch (Exception e) {
-                DataModelException dataModelException = new DataModelException(e.getMessage());
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
-            }
-
-            rangeInterval.setStartValue(startValue);
-            rangeInterval.setEndValue(endValue);
-
-            try {
-                rangeRestriction.addRangeRestrictionInterval(rangeInterval);
-            } catch (DataModelException dataModelException) {
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
-            }
-        }
-        return rangeRestriction;
+        return getRestriction(refRr, line, position, hasRefR, curRange, fileName,
+                              type, RANGE_DATA);
     }
 
     /**
      * Processes the length restriction for parser and linker.
      *
-     * @param refLengthRestriction   length restriction of referred typedef
-     * @param lineNumber             error line number
-     * @param charPositionInLine     error character position in line
-     * @param hasReferredRestriction whether has referred restriction
-     * @param curLengthString        caller type's length string
-     * @param fileName               file name
+     * @param refLr     length restriction of referred typedef
+     * @param line      error line number
+     * @param position  error character position in line
+     * @param hasRefR   whether has referred restriction
+     * @param curLenStr caller type's length string
+     * @param fileName  file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
-    public static YangRangeRestriction processLengthRestriction(YangRangeRestriction refLengthRestriction,
-                                                                int lineNumber, int charPositionInLine,
-                                                                boolean hasReferredRestriction,
-                                                                String curLengthString, String fileName) throws DataModelException {
+    public static YangRangeRestriction processLengthRestriction(
+            YangRangeRestriction refLr, int line, int position, boolean hasRefR,
+            String curLenStr, String fileName) throws DataModelException {
+        return getRestriction(refLr, line, position, hasRefR, curLenStr, fileName,
+                              UINT64, LENGTH_DATA);
+    }
 
+    /**
+     * Processes the range/length restriction for parser and linker.
+     *
+     * @param refR     range/length restriction of referred typedef
+     * @param line     error line number
+     * @param position error character position in line
+     * @param hasRefR  whether has referred restriction
+     * @param curRange caller type's range string
+     * @param type     effective type, when called from linker
+     * @param fileName file name
+     * @param conType  construct type
+     * @return YANG range restriction
+     * @throws DataModelException a violation in data model rule
+     */
+    private static YangRangeRestriction getRestriction(
+            YangRangeRestriction refR, int line, int position, boolean hasRefR,
+            String curRange, String fileName, YangDataTypes type,
+            YangConstructType conType) throws
+            DataModelException {
         YangBuiltInDataTypeInfo<?> startValue;
         YangBuiltInDataTypeInfo<?> endValue;
-        YangRangeRestriction lengthRestriction = new YangRangeRestriction<>();
+        YangRangeRestriction rr = new YangRangeRestriction();
 
-        String rangeArgument = removeQuotesAndHandleConcat(curLengthString);
-        String[] rangeArguments = rangeArgument.trim().split(Pattern.quote(PIPE));
+        String rangeArg = removeQuotesAndHandleConcat(curRange);
+        String[] rangeArguments = rangeArg.trim().split(quote(PIPE));
 
         for (String rangePart : rangeArguments) {
             String startInterval;
             String endInterval;
-            YangRangeInterval rangeInterval = new YangRangeInterval<>();
-            rangeInterval.setCharPosition(charPositionInLine);
-            rangeInterval.setLineNumber(lineNumber);
+            YangRangeInterval rangeInterval = new YangRangeInterval();
+            rangeInterval.setCharPosition(position);
+            rangeInterval.setLineNumber(line);
             rangeInterval.setFileName(fileName);
-            String[] rangeBoundary = rangePart.trim().split(Pattern.quote(INTERVAL));
+            String[] rangeBoundary = rangePart.trim().split(quote(INTERVAL));
 
             if (rangeBoundary.length > MAX_RANGE_BOUNDARY) {
-                DataModelException dataModelException = new DataModelException("YANG file error : " +
-                                                                                       YangConstructType.getYangConstructType(LENGTH_DATA) + " " + rangeArgument +
-                                                                                       " is not valid.");
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
+                DataModelException ex = new DataModelException(
+                        "YANG file error : " + getYangConstructType(conType) +
+                                SPACE + rangeArg + " is not valid.");
+                ex.setLine(line);
+                ex.setCharPosition(position);
+                ex.setFileName(fileName);
+                throw ex;
             }
 
             if (rangeBoundary.length == MIN_RANGE_BOUNDARY) {
@@ -191,43 +146,43 @@ public final class RestrictionResolver {
             }
 
             try {
-                if (hasReferredRestriction && startInterval.equals(MIN_KEYWORD)
-                        && refLengthRestriction.getMinRestrictedvalue() != null) {
-                    startValue = refLengthRestriction.getMinRestrictedvalue();
-                } else if (hasReferredRestriction && startInterval.equals(MAX_KEYWORD)
-                        && refLengthRestriction.getMaxRestrictedvalue() != null) {
-                    startValue = refLengthRestriction.getMaxRestrictedvalue();
+                if (hasRefR && startInterval.equals(MIN_KEYWORD) &&
+                        refR.getMinRestrictedValue() != null) {
+                    startValue = refR.getMinRestrictedValue();
+                } else if (hasRefR && startInterval.equals(MAX_KEYWORD) &&
+                        refR.getMaxRestrictedValue() != null) {
+                    startValue = refR.getMaxRestrictedValue();
                 } else {
-                    startValue = getDataObjectFromString(startInterval, YangDataTypes.UINT64);
+                    startValue = getDataObjectFromString(startInterval, type);
                 }
-                if (hasReferredRestriction && endInterval.equals(MIN_KEYWORD)
-                        && refLengthRestriction.getMinRestrictedvalue() != null) {
-                    endValue = refLengthRestriction.getMinRestrictedvalue();
-                } else if (hasReferredRestriction && endInterval.equals(MAX_KEYWORD)
-                        && refLengthRestriction.getMaxRestrictedvalue() != null) {
-                    endValue = refLengthRestriction.getMaxRestrictedvalue();
+                if (hasRefR && endInterval.equals(MIN_KEYWORD) &&
+                        refR.getMinRestrictedValue() != null) {
+                    endValue = refR.getMinRestrictedValue();
+                } else if (hasRefR && endInterval.equals(MAX_KEYWORD) &&
+                        refR.getMaxRestrictedValue() != null) {
+                    endValue = refR.getMaxRestrictedValue();
                 } else {
-                    endValue = getDataObjectFromString(endInterval, YangDataTypes.UINT64);
+                    endValue = getDataObjectFromString(endInterval, type);
                 }
             } catch (Exception e) {
-                DataModelException dataModelException = new DataModelException(e.getMessage());
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
+                DataModelException ex = new DataModelException(e.getMessage());
+                ex.setLine(line);
+                ex.setCharPosition(position);
+                ex.setFileName(fileName);
+                throw ex;
             }
-
             rangeInterval.setStartValue(startValue);
             rangeInterval.setEndValue(endValue);
-
             try {
-                lengthRestriction.addRangeRestrictionInterval(rangeInterval);
-            } catch (DataModelException dataModelException) {
-                dataModelException.setLine(lineNumber);
-                dataModelException.setCharPosition(charPositionInLine);
-                throw dataModelException;
+                rr.addRangeRestrictionInterval(rangeInterval);
+            } catch (DataModelException ex) {
+                ex.setLine(line);
+                ex.setCharPosition(position);
+                ex.setFileName(fileName);
+                throw ex;
             }
         }
-        return lengthRestriction;
+        return rr;
     }
 
     /**
@@ -237,9 +192,8 @@ public final class RestrictionResolver {
      * @return concatenated string after removing double quotes
      */
     private static String removeQuotesAndHandleConcat(String yangStringData) {
-
-        yangStringData = yangStringData.replace("\"", EMPTY_STRING);
-        String[] tmpData = yangStringData.split(Pattern.quote(ADD));
+        yangStringData = yangStringData.replace(QUOTE, EMPTY_STRING);
+        String[] tmpData = yangStringData.split(quote(ADD));
         StringBuilder builder = new StringBuilder();
         for (String yangString : tmpData) {
             builder.append(yangString);

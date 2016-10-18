@@ -27,6 +27,7 @@ import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.linker.impl.YangXpathLinker;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yangutils.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.updateFilePriority;
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
@@ -654,6 +656,7 @@ public class YangXpathLinkerTest {
     @Test
     public void processInterFileLinkingInMultipleUses() throws IOException {
 
+        deleteDirectory("target/xpath/");
         utilManager.createYangFileInfoSet(getYangFiles(CASE_FILE_PATH + "uses/"));
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
@@ -680,6 +683,9 @@ public class YangXpathLinkerTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir("target/xpath/");
         utilManager.translateToJava(yangPluginConfig);
+        String dir = System.getProperty("user.dir") + File.separator + "target/xpath/";
+        compileCode(dir);
+        deleteDirectory("target/xpath/");
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
 
         deleteDirectory("target/xpath/");

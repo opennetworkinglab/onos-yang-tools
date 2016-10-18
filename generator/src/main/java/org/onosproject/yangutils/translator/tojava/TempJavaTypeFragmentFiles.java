@@ -474,7 +474,7 @@ public class TempJavaTypeFragmentFiles
                                                                                newAttrInfo.getAttributeType(),
                                                                                getIsQualifiedAccessOrAddToImportList(qualifiedInfoOfFromString), false);
 
-        addFromStringMethod(newAttrInfo, fromStringAttributeInfo, getGeneratedJavaClassName());
+        addFromStringMethod(newAttrInfo, fromStringAttributeInfo);
     }
 
     /**

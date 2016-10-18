@@ -16,28 +16,21 @@
 
 package org.onosproject.yangutils.translator.tojava;
 
-import java.io.Serializable;
-import java.util.Objects;
-
+import com.google.common.base.MoreObjects;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.javamodel
-        .AttributesJavaDataType;
-import org.onosproject.yangutils.translator.tojava.javamodel
-        .JavaLeafInfoContainer;
+import org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType;
+import org.onosproject.yangutils.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 
-import com.google.common.base.MoreObjects;
+import java.io.Serializable;
+import java.util.Objects;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
+import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportClass;
+import static org.onosproject.yangutils.translator.tojava.javamodel.AttributesJavaDataType.getJavaImportPackage;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype
-        .YangDataTypes.BINARY;
-import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
-import static org.onosproject.yangutils.translator.tojava.javamodel
-        .AttributesJavaDataType.getJavaImportClass;
-import static org.onosproject.yangutils.translator.tojava.javamodel
-        .AttributesJavaDataType.getJavaImportPackage;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
 
 /**
@@ -47,6 +40,7 @@ public class JavaQualifiedTypeInfoTranslator
         extends JavaQualifiedTypeInfo
         implements Comparable<JavaQualifiedTypeInfoTranslator>, Serializable {
     private static final long serialVersionUID = 806201634L;
+    private boolean isQualified;
 
     /**
      * Creates a java qualified type info object.
@@ -275,5 +269,23 @@ public class JavaQualifiedTypeInfoTranslator
     @Override
     public int compareTo(JavaQualifiedTypeInfoTranslator other) {
         return getClassInfo().compareTo(other.getClassInfo());
+    }
+
+    /**
+     * Returns true if import is qualified.
+     *
+     * @return true if import is qualified
+     */
+    public boolean isQualified() {
+        return isQualified;
+    }
+
+    /**
+     * Sets true if import is qualified.
+     *
+     * @param qualified true if import is qualified
+     */
+    public void setQualified(boolean qualified) {
+        isQualified = qualified;
     }
 }

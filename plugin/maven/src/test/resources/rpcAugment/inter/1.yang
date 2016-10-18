@@ -1,0 +1,17 @@
+module ietf-inet1 {
+
+  namespace "yang:all1";
+  prefix "inet1";
+  yang-version 1;
+
+  import ietf-inet2 {
+    prefix inet2;
+  }
+  
+    augment /inet2:get-port/inet2:input {
+       leaf port {
+           type int32;
+        }
+    }      
+   
+}

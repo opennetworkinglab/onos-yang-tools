@@ -16,12 +16,12 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
+import org.onosproject.yangutils.datamodel.InvalidOpTypeHolder;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangNodeIdentifier;
-import org.onosproject.yangutils.datamodel.YangNotification;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -670,7 +670,7 @@ public final class JavaFileGeneratorUtils {
         }
 
         YangNode node = targets.get(0).getResolvedNode();
-        if (node instanceof YangNotification) {
+        if (node instanceof InvalidOpTypeHolder) {
             return;
         }
 
@@ -829,4 +829,5 @@ public final class JavaFileGeneratorUtils {
         }
         return attributeType;
     }
+
 }

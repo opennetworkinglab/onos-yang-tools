@@ -146,11 +146,13 @@ public class YangJavaRpcTranslator
             if (yangNode instanceof YangInput) {
                 javaAttributeInfoOfInput = tempJavaFragmentFiles
                         .getChildNodeAsAttributeInParentService(yangNode,
-                                                                getParent());
+                                                                getParent(),
+                                                                getJavaClassNameOrBuiltInType());
             } else if (yangNode instanceof YangOutput) {
                 javaAttributeInfoOfOutput = tempJavaFragmentFiles
                         .getChildNodeAsAttributeInParentService(yangNode,
-                                                                getParent());
+                                                                getParent(),
+                                                                getJavaClassNameOrBuiltInType());
             } else {
                 throw new TranslatorException(getErrorMsg(INVALID_CHILD_NODE,
                                                           this));

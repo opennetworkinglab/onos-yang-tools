@@ -88,8 +88,8 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
             if (!Objects.equals(name, other.name)) {
                 return false;
             }
-            final String name = namespace.getModuleName();
-            final String otherName = other.getNameSpace().getModuleName();
+            String name = namespace.getModuleName();
+            String otherName = other.getNameSpace().getModuleName();
             if (name != null && otherName != null) {
                 if (namespace.getModuleName()
                         .equals(other.getNameSpace().getModuleName())) {
@@ -97,10 +97,10 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
                 }
 
             }
-            final String nspace = namespace.getModuleNamespace();
-            final String otherNspace = other.getNameSpace().getModuleNamespace();
-            if (nspace != null && otherNspace != null) {
-                if (nspace.equals(otherNspace)) {
+            String nSpace = namespace.getModuleNamespace();
+            String otherNspace = other.getNameSpace().getModuleNamespace();
+            if (nSpace != null && otherNspace != null) {
+                if (nSpace.equals(otherNspace)) {
                     return true;
                 }
             }

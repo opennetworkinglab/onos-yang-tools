@@ -146,6 +146,9 @@ public final class LengthRestrictionListener {
             YangStringRestriction stringRestriction = (YangStringRestriction) type.getDataTypeExtendedInfo();
             if (stringRestriction == null) {
                 stringRestriction = new YangStringRestriction();
+                stringRestriction.setFileName(listener.getFileName());
+                stringRestriction.setCharPosition(ctx.getStart().getCharPositionInLine());
+                stringRestriction.setLineNumber(ctx.getStart().getLine());
                 type.setDataTypeExtendedInfo(stringRestriction);
             }
 

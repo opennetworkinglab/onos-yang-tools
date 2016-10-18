@@ -28,6 +28,8 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.RANGE_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -59,7 +61,8 @@ import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDa
  *
  * @param <T> range type (data type)
  */
-public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends DefaultLocationInfo
+public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
+        extends DefaultLocationInfo
         implements YangDesc, YangReference, Parsable, Serializable, YangAppErrorHolder {
 
     private static final long serialVersionUID = 8062016051L;
@@ -102,34 +105,21 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
     }
 
     /**
-     * Sets the list of range interval restriction in ascending order.
-     *
-     * @param rangeList list of range interval restriction in ascending order
-     */
-    private void setAscendingRangeIntervals(List<YangRangeInterval<T>> rangeList) {
-        ascendingRangeIntervals = rangeList;
-    }
-
-    /**
      * Returns the minimum valid value as per the restriction.
      *
      * @return minimum restricted value
      * @throws DataModelException data model exception for minimum restriction
      */
-    public T getMinRestrictedvalue() throws DataModelException {
+    public T getMinRestrictedValue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
-            throw new DataModelException("No range restriction info "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "No range restriction info ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
         if (getAscendingRangeIntervals().isEmpty()) {
-            throw new DataModelException("No range interval info "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "No range interval info ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
         return getAscendingRangeIntervals().get(0).getStartValue();
     }
@@ -140,20 +130,16 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
      * @return minimum maximum value
      * @throws DataModelException data model exception for maximum restriction
      */
-    public T getMaxRestrictedvalue() throws DataModelException {
+    public T getMaxRestrictedValue() throws DataModelException {
         if (getAscendingRangeIntervals() == null) {
-            throw new DataModelException("No range restriction info "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "No range restriction info ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
         if (getAscendingRangeIntervals().isEmpty()) {
-            throw new DataModelException("No range interval info "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "No range interval info ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
         return getAscendingRangeIntervals()
                 .get(getAscendingRangeIntervals().size() - 1).getEndValue();
@@ -166,34 +152,27 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
      * @param newInterval restricted length interval
      * @throws DataModelException data model exception for range restriction
      */
-    public void addRangeRestrictionInterval(YangRangeInterval<T> newInterval) throws DataModelException {
-
+    public void addRangeRestrictionInterval(YangRangeInterval<T> newInterval)
+            throws DataModelException {
         checkNotNull(newInterval);
         checkNotNull(newInterval.getStartValue());
-
-        if (getAscendingRangeIntervals() == null) {
+        if (ascendingRangeIntervals == null) {
             /*
              * First interval that is being added, and it must be the smallest
              * interval.
              */
-            setAscendingRangeIntervals(new LinkedList<YangRangeInterval<T>>());
-            getAscendingRangeIntervals().add(newInterval);
+            ascendingRangeIntervals = new LinkedList<>();
+            ascendingRangeIntervals.add(newInterval);
             return;
         }
 
-        T curMaxvalue = getMaxRestrictedvalue();
-
+        T curMaxvalue = getMaxRestrictedValue();
         if (newInterval.getStartValue().compareTo(curMaxvalue) < 1) {
-            throw new DataModelException(
-                    "New added range interval is lesser than the old interval(s) "
-                            + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "New added range interval is lesser than the old interval(s) ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
-
-        getAscendingRangeIntervals()
-                .add(getAscendingRangeIntervals().size(), newInterval);
+        getAscendingRangeIntervals().add(getAscendingRangeIntervals().size(), newInterval);
     }
 
     /**
@@ -203,18 +182,15 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
      * @return true, if the value is confirming to restriction, false otherwise
      * @throws DataModelException data model error
      */
-    public boolean isValidValueString(String valueInString) throws DataModelException {
+    boolean isValidValueString(String valueInString) throws DataModelException {
 
         if (getAscendingRangeIntervals() == null
                 || getAscendingRangeIntervals().isEmpty()) {
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
-            throw new DataModelException("Range interval missing in range restriction. "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
-
+            throw new DataModelException(getErrorMsg(
+                    "Range interval missing in range restriction. ",
+                    "", getLineNumber(), getCharPosition(), getFileName() + "\""));
         }
 
         YangDataTypes type = getAscendingRangeIntervals().get(0).getStartValue().getYangType();
@@ -235,20 +211,20 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
      * Validates if the given interval is correct as per the restriction.
      *
      * @param rangeInterval range interval
+     * @param fileName      file name
      * @return true, if the interval is confirming to restriction, false otherwise
      * @throws DataModelException data model error
      */
-    public boolean isValidInterval(YangRangeInterval rangeInterval) throws DataModelException {
+    boolean isValidInterval(YangRangeInterval rangeInterval, String fileName)
+            throws DataModelException {
 
         if (getAscendingRangeIntervals() == null
                 || getAscendingRangeIntervals().isEmpty()) {
             // Throw exception, At least one default range needs to be set in
             // constructor or in linker.
-            throw new DataModelException("Range interval missing in range restriction. "
-                                                 + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition()
-                                                 + " in " + getFileName() + "\"");
+            throw new DataModelException(getErrorMsg(
+                    "Range interval missing in range restriction. ",
+                    "restriction ranges.", getLineNumber(), getCharPosition(), fileName + "\""));
         }
 
         for (YangRangeInterval<T> interval : getAscendingRangeIntervals()) {
@@ -259,11 +235,9 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
                 return true;
             }
         }
-        throw new DataModelException("Range interval doesn't fall within the referred restriction ranges "
-                                             + " in " +
-                                             getLineNumber() + " at " +
-                                             getCharPosition()
-                                             + " in " + getFileName() + "\"");
+        throw new DataModelException(getErrorMsg(
+                "Range interval doesn't fall within the referred restriction ranges ",
+                "restriction ranges.", getLineNumber(), getCharPosition(), fileName + "\""));
     }
 
     /**
@@ -309,7 +283,7 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>> extends 
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.RANGE_DATA;
+        return RANGE_DATA;
     }
 
     @Override

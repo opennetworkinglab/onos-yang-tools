@@ -51,4 +51,18 @@ public interface RpcNotificationContainer {
      * @return augment list
      */
     List<YangAugment> getAugmentList();
+
+    /**
+     * Returns prefix.
+     *
+     * @return prefix
+     */
+    String getPrefix();
+
+    /**
+     * Returns list of notification nodes.
+     *
+     * @return list of notification nodes
+     */
+    List<YangNode> getNotificationNodes();
 }

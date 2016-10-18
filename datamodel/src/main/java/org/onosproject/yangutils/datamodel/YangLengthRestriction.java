@@ -23,6 +23,8 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangUint64;
 
 import java.io.Serializable;
 
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.PATTERN_DATA;
+
 /*-
  * Reference RFC 6020.
  *
@@ -163,7 +165,7 @@ public class YangLengthRestriction extends DefaultLocationInfo
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.PATTERN_DATA;
+        return PATTERN_DATA;
     }
 
     @Override
