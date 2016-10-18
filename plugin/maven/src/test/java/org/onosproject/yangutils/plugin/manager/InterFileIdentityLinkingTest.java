@@ -15,12 +15,11 @@
  */
 package org.onosproject.yangutils.plugin.manager;
 
-import java.io.IOException;
-import java.util.ListIterator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangIdentity;
 import org.onosproject.yangutils.datamodel.YangIdentityRef;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -36,20 +35,25 @@ import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.IOException;
+import java.util.ListIterator;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yangutils.datamodel.YangNodeType.MODULE_NODE;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.updateFilePriority;
 
 /**
  * Test cases for testing inter file linking for identity.
  */
 public class InterFileIdentityLinkingTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private final YangUtilManager utilManager = new YangUtilManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Checks inter file feature linking with imported file.
@@ -556,7 +560,8 @@ public class InterFileIdentityLinkingTest {
         YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
         assertThat(identityRef.getName(), is("ref-address-family"));
         assertThat(identityRef.getBaseIdentity().getName(), is("ref-address-family"));
-        assertThat(identityRef.getResolvableStatus(), is(ResolvableStatus.UNRESOLVED));
+        assertThat(identityRef.getResolvableStatus(),
+                   is(ResolvableStatus.RESOLVED));
     }
 
     /**
@@ -633,23 +638,26 @@ public class InterFileIdentityLinkingTest {
         YangLeaf leafInfo = leafIterator.next();
 
         assertThat(leafInfo.getName(), is("tunnel"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("identityref"));
-        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.IDENTITYREF));
-        YangIdentityRef yangIdentityRef = (YangIdentityRef) leafInfo.getDataType().getDataTypeExtendedInfo();
-        assertThat(yangIdentityRef.getName(), is("ref-address-family"));
-        assertThat(yangIdentityRef.getBaseIdentity().getName(), is("ref-address-family"));
-        assertThat(yangIdentityRef.getReferredIdentity().getName(), is("ref-address-family"));
-        assertThat(yangIdentityRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
+        YangDerivedInfo info = (YangDerivedInfo) leafInfo.getDataType()
+                .getDataTypeExtendedInfo();
+        assertThat(info.getEffectiveBuiltInType(), is(IDENTITYREF));
+        YangType type1 = info.getReferredTypeDef().getTypeList().get(0);
+        YangIdentityRef idRef1 =
+                (YangIdentityRef) type1.getDataTypeExtendedInfo();
+        assertThat(idRef1.getResolvableStatus(),
+                   is(ResolvableStatus.RESOLVED));
 
-        ListIterator<YangLeafList> leafListIterator = yangNode.getListOfLeafList().listIterator();
-        YangLeafList leafListInfo = leafListIterator.next();
+        ListIterator<YangLeafList> itr =
+                yangNode.getListOfLeafList().listIterator();
+        YangLeafList leafListInfo = itr.next();
 
         // Check whether the information in the leaf is correct.
         assertThat(leafListInfo.getName(), is("network-ref"));
-        assertThat(leafListInfo.getDataType().getDataTypeName(), is("identityref"));
-        assertThat(leafListInfo.getDataType().getDataType(), is(YangDataTypes.IDENTITYREF));
-        yangIdentityRef = (YangIdentityRef) (leafListInfo.getDataType().getDataTypeExtendedInfo());
-        // Check whether leafref type got resolved.
-        assertThat(yangIdentityRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
+        info = (YangDerivedInfo) leafListInfo.getDataType()
+                .getDataTypeExtendedInfo();
+        assertThat(info.getEffectiveBuiltInType(), is(IDENTITYREF));
+        type1 = info.getReferredTypeDef().getTypeList().get(0);
+        idRef1 = (YangIdentityRef) type1.getDataTypeExtendedInfo();
+        assertThat(idRef1.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
     }
 }

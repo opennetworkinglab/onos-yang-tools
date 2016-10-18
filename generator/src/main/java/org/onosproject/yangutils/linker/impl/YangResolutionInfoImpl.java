@@ -18,7 +18,6 @@ package org.onosproject.yangutils.linker.impl;
 
 import org.onosproject.yangutils.datamodel.DefaultLocationInfo;
 import org.onosproject.yangutils.datamodel.Resolvable;
-import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.TraversalType;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
@@ -61,7 +60,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
 import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yangutils.datamodel.TraversalType.CHILD;
 import static org.onosproject.yangutils.datamodel.TraversalType.PARENT;
@@ -91,7 +89,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_FIND_ANNOTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_FIND_LEAD_INFO_HOLDER;
 import static org.onosproject.yangutils.utils.UtilConstants.FAILED_TO_LINK;
-import static org.onosproject.yangutils.utils.UtilConstants.IDENTITYREF;
 import static org.onosproject.yangutils.utils.UtilConstants.INVALID_ENTITY;
 import static org.onosproject.yangutils.utils.UtilConstants.INVALID_LINKER_STATE;
 import static org.onosproject.yangutils.utils.UtilConstants.INVALID_RESOLVED_ENTITY;
@@ -253,96 +250,89 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     }
 
     /**
-     * Adds the leafref/identityref type to the type, which has derived type referring to
-     * typedef with leafref/identityref type.
+     * Adds leaf-ref to the resolution list, with different context if
+     * leaf-ref is defined under derived type. Leaf-ref must be resolved from
+     * where the typedef is referenced.
      */
     private void addDerivedRefTypeToRefTypeResolutionList()
             throws DataModelException {
 
         YangNode refNode = entityToResolveInfo.getHolderOfEntityToResolve();
-        YangType yangType = getValidateResolvableType();
+        YangDerivedInfo info = getValidResolvableType();
 
-        if (yangType == null) {
+        if (info == null) {
             return;
         }
 
-        YangDerivedInfo derivedInfo = (YangDerivedInfo) yangType
+        YangType<T> type =
+                (YangType<T>) entityToResolveInfo.getEntityToResolve();
+
+        T extType = (T) info.getReferredTypeDef().getTypeDefBaseType()
                 .getDataTypeExtendedInfo();
 
-        YangDataTypes dataType = derivedInfo.getEffectiveBuiltInType();
-        // If the derived types referred type is not leafref/identityref return
-        if (dataType != YangDataTypes.LEAFREF &&
-                dataType != YangDataTypes.IDENTITYREF) {
-            return;
+        while (extType instanceof YangDerivedInfo) {
+            info = (YangDerivedInfo) extType;
+            extType = (T) info.getReferredTypeDef().getTypeDefBaseType()
+                    .getDataTypeExtendedInfo();
         }
-
-        T extendedInfo = (T) derivedInfo.getReferredTypeDef()
-                .getTypeDefBaseType().getDataTypeExtendedInfo();
-
-        while (extendedInfo instanceof YangDerivedInfo) {
-            YangDerivedInfo derivedInfoFromTypedef = (YangDerivedInfo) extendedInfo;
-            extendedInfo = (T) derivedInfoFromTypedef.getReferredTypeDef()
-                    .getTypeDefBaseType().getDataTypeExtendedInfo();
-        }
-
         /*
-         * Backup the derived types leafref/identityref info, delete all the info in current type,
-         * but for resolution status as resolved. Copy the backed up leafref/identityref to types extended info,
-         * create a leafref/identityref resolution info using the current resolution info and
-         * add to leafref/identityref resolution list.
+         * Backup the leaf-ref info from derived type and deletes the derived
+         * type info. Copies the backed up leaf-ref data to the actual type in
+         * replacement of derived type. Adds to the resolution list in this
+         * context.
          */
-        if (dataType == YangDataTypes.LEAFREF) {
-            YangLeafRef leafRefInTypeDef = (YangLeafRef) extendedInfo;
-            addRefTypeInfo(YangDataTypes.LEAFREF, LEAFREF, extendedInfo,
-                           yangType, refNode, YANG_LEAFREF);
-            leafRefInTypeDef.setParentNode(refNode);
-        } else {
-            addRefTypeInfo(YangDataTypes.IDENTITYREF, IDENTITYREF, extendedInfo,
-                           yangType, refNode, YANG_IDENTITYREF);
-        }
+        addRefTypeInfo(extType, type, refNode);
     }
 
-    //Validates entity to resolve for YANG type and returns type
-    private YangType getValidateResolvableType() {
+    /**
+     * Returns the derived info if the holder is typedef, the entity is type
+     * and the effective type is leaf-ref; null otherwise.
+     *
+     * @return derived info
+     */
+    private YangDerivedInfo<?> getValidResolvableType() {
+
         YangNode refNode = entityToResolveInfo.getHolderOfEntityToResolve();
         T entity = entityToResolveInfo.getEntityToResolve();
-        // If holder is typedef return.
-        if (!(refNode instanceof YangTypeDef) && entity instanceof YangType) {
-            YangType yangType = (YangType) entity;
 
-            // If type is not resolved return.
-            if (yangType.getResolvableStatus() == RESOLVED) {
-                return (YangType) entity;
+        if (!(refNode instanceof YangTypeDef) && entity instanceof YangType) {
+            YangType<?> type = (YangType) entity;
+            YangDerivedInfo<?> info =
+                    (YangDerivedInfo) type.getDataTypeExtendedInfo();
+            YangDataTypes dataType = info.getEffectiveBuiltInType();
+            if ((type.getResolvableStatus() == RESOLVED) &&
+                    (dataType == YangDataTypes.LEAFREF)) {
+                return info;
             }
         }
         return null;
     }
 
     /**
-     * Adds referred type(leafref/identityref) info to resolution list.
+     * Adds resolvable type (leaf-ref) info to resolution list.
      *
-     * @param type     data type
-     * @param typeName type name
-     * @param info     extended info
-     * @param yangType YANG type
-     * @param refNode  referred node
-     * @param resType  resolution type
-     * @throws DataModelException when fails to do data model operations
+     * @param extType resolvable type
+     * @param type    YANG type
+     * @param holder  holder node
+     * @throws DataModelException if there is a data model error
      */
-    private void addRefTypeInfo(YangDataTypes type, String typeName, T info,
-                                YangType yangType, YangNode refNode,
-                                ResolvableType resType) throws DataModelException {
-        yangType.resetYangType();
-        yangType.setResolvableStatus(RESOLVED);
-        yangType.setDataType(type);
-        yangType.setDataTypeName(typeName);
-        yangType.setDataTypeExtendedInfo(info);
-        ((Resolvable) info).setResolvableStatus(UNRESOLVED);
-        YangResolutionInfoImpl resolutionInfoImpl
-                = new YangResolutionInfoImpl<>(info, refNode,
-                                               getLineNumber(), getCharPosition());
-        curRefResolver.addToResolutionList(resolutionInfoImpl, resType);
-        curRefResolver.resolveSelfFileLinking(resType);
+    private void addRefTypeInfo(T extType, YangType<T> type, YangNode holder)
+            throws DataModelException {
+
+        type.resetYangType();
+        type.setResolvableStatus(RESOLVED);
+        type.setDataType(YangDataTypes.LEAFREF);
+        type.setDataTypeName(LEAFREF);
+        type.setDataTypeExtendedInfo(extType);
+
+        YangLeafRef leafRef = (YangLeafRef) extType;
+        (leafRef).setResolvableStatus(UNRESOLVED);
+        leafRef.setParentNode(holder);
+
+        YangResolutionInfoImpl info = new YangResolutionInfoImpl<>(
+                leafRef, holder, getLineNumber(), getCharPosition());
+        curRefResolver.addToResolutionList(info, YANG_LEAFREF);
+        curRefResolver.resolveSelfFileLinking(YANG_LEAFREF);
     }
 
     /**

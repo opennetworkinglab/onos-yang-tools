@@ -1,0 +1,37 @@
+module IdRefInGrouping1 {
+    namespace "http://org/IdRefInGrouping1";
+    prefix id-ref-in-grouping-1;
+
+    identity id1 {
+        description "base identity";
+    }
+
+    identity id2 {
+        base id1;
+    }
+
+    typedef id {
+        type identityref {
+            base id1;
+        }
+    }
+
+    grouping value {
+        leaf leaf {
+            type identityref {
+                base id2;
+            }
+        }
+        leaf-list leaf-list {
+            type id;
+        }
+        container a {
+            leaf leaf {
+                type identityref {
+                    base id1;
+                }
+            }
+        }
+    }
+
+}

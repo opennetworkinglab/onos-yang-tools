@@ -54,7 +54,7 @@ import org.onosproject.yangutils.parser.impl.listeners.FeatureListener;
 import org.onosproject.yangutils.parser.impl.listeners.FractionDigitsListener;
 import org.onosproject.yangutils.parser.impl.listeners.GroupingListener;
 import org.onosproject.yangutils.parser.impl.listeners.IdentityListener;
-import org.onosproject.yangutils.parser.impl.listeners.IdentityrefListener;
+import org.onosproject.yangutils.parser.impl.listeners.IdentityRefListener;
 import org.onosproject.yangutils.parser.impl.listeners.IfFeatureListener;
 import org.onosproject.yangutils.parser.impl.listeners.ImportListener;
 import org.onosproject.yangutils.parser.impl.listeners.IncludeListener;
@@ -862,14 +862,14 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void enterIdentityrefSpecification(GeneratedYangParser.IdentityrefSpecificationContext ctx) {
         if (getUnsupportedYangConstructDepth() == 0) {
-            IdentityrefListener.processIdentityrefEntry(this, ctx);
+            IdentityRefListener.processIdentityRefEntry(this, ctx);
         }
     }
 
     @Override
     public void exitIdentityrefSpecification(GeneratedYangParser.IdentityrefSpecificationContext ctx) {
         if (getUnsupportedYangConstructDepth() == 0) {
-            IdentityrefListener.processIdentityrefExit(this, ctx);
+            IdentityRefListener.processIdentityRefExit(this, ctx);
         }
     }
 

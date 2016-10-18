@@ -18,6 +18,7 @@ package org.onosproject.yangutils.parser.impl.listeners;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangIdentity;
 import org.onosproject.yangutils.datamodel.YangIdentityRef;
 import org.onosproject.yangutils.datamodel.YangLeaf;
@@ -37,15 +38,17 @@ import java.util.ListIterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 
 /**
  * Test case for identity listener.
  */
 public class IdentityListenerTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Checks for updating datamodel for identity/identityref.
@@ -174,14 +177,20 @@ public class IdentityListenerTest {
         YangLeaf leafInfo = leafIterator.next();
 
         assertThat(leafInfo.getName(), is("tunnel-value"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("identityref"));
-        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.IDENTITYREF));
-        YangIdentityRef yangIdentityRef = (YangIdentityRef) leafInfo.getDataType().getDataTypeExtendedInfo();
-        assertThat(yangIdentityRef.getName(), is("tunnel"));
-        assertThat(yangIdentityRef.getBaseIdentity().getName(), is("tunnel"));
-        assertThat(yangIdentityRef.getReferredIdentity().getName(), is("tunnel"));
-        assertThat(yangIdentityRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
-   }
+        assertThat(leafInfo.getDataType().getDataTypeName(), is("type15"));
+        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.DERIVED));
+
+        YangDerivedInfo info = (YangDerivedInfo) leafInfo.getDataType()
+                .getDataTypeExtendedInfo();
+        assertThat(info.getEffectiveBuiltInType(), is(IDENTITYREF));
+        YangType type1 = info.getReferredTypeDef().getTypeList().get(0);
+        YangIdentityRef idRef1 =
+                (YangIdentityRef) type1.getDataTypeExtendedInfo();
+        assertThat(idRef1.getName(), is("tunnel"));
+        assertThat(idRef1.getBaseIdentity().getName(), is("tunnel"));
+        assertThat(idRef1.getReferredIdentity().getName(), is("tunnel"));
+        assertThat(idRef1.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
+    }
 
     /**
      * Checks for updating datamodel for unresolved status of identityref used in tydedef.
@@ -211,10 +220,11 @@ public class IdentityListenerTest {
         assertThat(type.getDataType(), is(YangDataTypes.IDENTITYREF));
         assertThat(type.getDataTypeName(), is("identityref"));
 
-        YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
-        assertThat(identityRef.getName(), is("tunnel"));
-        assertThat(identityRef.getBaseIdentity().getName(), is("tunnel"));
-        assertThat(identityRef.getResolvableStatus(), is(ResolvableStatus.UNRESOLVED));
+        YangIdentityRef idRef =
+                (YangIdentityRef) type.getDataTypeExtendedInfo();
+        assertThat(idRef.getName(), is("tunnel"));
+        assertThat(idRef.getBaseIdentity().getName(), is("tunnel"));
+        assertThat(idRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
 
     }
 }

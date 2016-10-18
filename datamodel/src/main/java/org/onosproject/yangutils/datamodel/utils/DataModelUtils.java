@@ -459,11 +459,11 @@ public final class DataModelUtils {
 
     /**
      * Returns list of resolvable entities from the type of leaf/leaf-list.
-     * If the type is leaf-ref, identity-ref, derived or union with type
-     * resolution required, it has to be resolved from the place where it is
-     * cloned. So, the resolution list added with these entities. When a type
-     * require no resolution then null is returned, so it will never be added
-     * to resolution list.
+     * If the type is leaf-ref, derived or union with type resolution
+     * required, it has to be resolved from the place where it is cloned. So,
+     * the resolution list added with these entities. When a type require no
+     * resolution then null is returned, so it will never be added to
+     * resolution list.
      *
      * @param dataTypes data type of type
      * @param type      type of leaf/leaf-list
@@ -484,10 +484,6 @@ public final class DataModelUtils {
         switch (dataTypes) {
             case LEAFREF:
                 entity = getLeafRefResolvableEntity(type, yangUses, holder);
-                break;
-
-            case IDENTITYREF:
-                entity = getIdentityRefResolvableEntity(type, holder);
                 break;
 
             case DERIVED:
@@ -536,33 +532,6 @@ public final class DataModelUtils {
         return setInformationInEntity(
                 leafRefInfo, holder, leafRef.getCharPosition(),
                 leafRef.getLineNumber());
-    }
-
-    /**
-     * Returns resolvable entity when the type is identity-ref. It sets needed
-     * information to entity such as line number,position number and holder.
-     * Returns null when identity is for inter grouping.
-     *
-     * @param type   YANG type for identity-ref
-     * @param holder holder node
-     * @return entity to resolve for identity-ref
-     */
-    private static YangEntityToResolveInfoImpl getIdentityRefResolvableEntity(
-            YangType type, YangNode holder) {
-
-        YangEntityToResolveInfoImpl<YangIdentityRef> identityRefInfo =
-                new YangEntityToResolveInfoImpl<>();
-        YangIdentityRef identityRef =
-                (YangIdentityRef) type.getDataTypeExtendedInfo();
-
-        if (identityRef.isIdentityForInterFileGroupingResolution()) {
-            return null;
-        }
-
-        identityRefInfo.setEntityToResolve(identityRef);
-        return setInformationInEntity(
-                identityRefInfo, holder, identityRef.getCharPosition(),
-                identityRef.getLineNumber());
     }
 
     /**

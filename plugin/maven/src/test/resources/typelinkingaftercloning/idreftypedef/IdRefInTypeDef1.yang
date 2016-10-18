@@ -1,0 +1,57 @@
+module IdRefInTypeDef1 {
+    namespace "http://org/IdRefInTypeDef1";
+    prefix id-ref-in-type-1;
+
+    import IdRefInTypeDef2 {
+        prefix id;
+    }
+
+    identity id1 {
+        description "base identity";
+    }
+
+    identity id2 {
+        base id1;
+    }
+
+    typedef forleaf3 {
+        type identityref {
+            base id2;
+        }
+    }
+
+    typedef forleaf2 {
+        type forleaf3;
+    }
+
+    typedef forleaf1 {
+        type forleaf2;
+    }
+
+    leaf leaf {
+        type forleaf1;
+    }
+
+    leaf-list leaf-list {
+        type forleaf2;
+    }
+
+    container cont {
+        leaf leaf {
+            type forleaf1;
+        }
+
+        leaf leaf-list {
+            type forleaf2;
+        }
+    }
+
+    leaf with-uni {
+        type union {
+            type identityref {
+                base id2;
+            }
+            type id:value;
+        }
+    }
+}

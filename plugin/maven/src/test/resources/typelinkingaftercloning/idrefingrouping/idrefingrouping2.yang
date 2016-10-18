@@ -1,0 +1,12 @@
+module IdRefInGrouping2 {
+    namespace "http://org/IdRefInGrouping2";
+    prefix id-ref-in-grouping-2;
+
+    import IdRefInGrouping1 {
+        prefix idref1;
+    }
+
+    container content {
+        uses idref1:value;
+    }
+}

@@ -1,0 +1,18 @@
+module IdRefInTypeDef2 {
+    namespace "http://org/IdRefInTypeDef2";
+    prefix id-ref-in-type-2;
+
+    identity id4 {
+        description "base identity";
+    }
+
+    identity id3 {
+        base id4;
+    }
+
+    typedef value {
+        type identityref {
+            base id3;
+        }
+    }
+}

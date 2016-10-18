@@ -27,9 +27,23 @@ import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslat
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BOOLEAN;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DECIMAL64;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT32;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT64;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT8;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT16;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT32;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT64;
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
@@ -148,6 +162,12 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
  */
 public final class StringGenerator {
 
+    private static final Set<YangDataTypes> PRIMITIVE_TYPES =
+            new HashSet<>(Arrays.asList(INT8, INT16, INT32, INT64, UINT8,
+                                        UINT16, UINT32, UINT64, DECIMAL64,
+                                        BOOLEAN, EMPTY));
+
+    // No instantiation.
     private StringGenerator() {
     }
 
@@ -746,48 +766,59 @@ public final class StringGenerator {
      */
     static String getParseFromStringMethod(String targetDataType,
                                            YangType<?> yangType) {
-        YangDataTypes type = yangType.getDataType();
 
+        YangDataTypes type = yangType.getDataType();
         switch (type) {
             case INT8:
                 return BYTE_WRAPPER + PERIOD + PARSE_BYTE;
+
             case INT16:
                 return SHORT_WRAPPER + PERIOD + PARSE_SHORT;
+
             case INT32:
                 return INTEGER_WRAPPER + PERIOD + PARSE_INT;
+
             case INT64:
                 return LONG_WRAPPER + PERIOD + PARSE_LONG;
+
             case UINT8:
                 return SHORT_WRAPPER + PERIOD + PARSE_SHORT;
+
             case UINT16:
                 return INTEGER_WRAPPER + PERIOD + PARSE_INT;
+
             case UINT32:
                 return LONG_WRAPPER + PERIOD + PARSE_LONG;
+
             case UINT64:
                 return NEW + SPACE + BIG_INTEGER;
+
             case DECIMAL64:
                 return NEW + SPACE + BIG_DECIMAL;
+
+            case INSTANCE_IDENTIFIER:
             case STRING:
             case IDENTITYREF:
                 return EMPTY_STRING;
+
             case EMPTY:
             case BOOLEAN:
                 return BOOLEAN_WRAPPER + PERIOD + PARSE_BOOLEAN;
+
             case ENUMERATION:
                 return targetDataType + PERIOD + OF;
+
             case DERIVED:
             case UNION:
                 return targetDataType + PERIOD + FROM_STRING_METHOD_NAME;
+
             default:
-                throw new TranslatorException("given data type is not " +
-                                                      "supported. " +
-                                                      yangType.getDataTypeName() +
-                                                      " in " +
-                                                      yangType.getLineNumber() +
-                                                      " at " +
-                                                      yangType.getCharPosition() +
-                                                      " in " +
-                                                      yangType.getFileName());
+                throw new TranslatorException(
+                        "Given data type is not supported. " +
+                                yangType.getDataTypeName() + " in " +
+                                yangType.getLineNumber() + " at " +
+                                yangType.getCharPosition() + " in " +
+                                yangType.getFileName());
         }
     }
 
@@ -870,6 +901,16 @@ public final class StringGenerator {
     static String getIfConditionBegin(String indentation, String condition) {
         return indentation + IF + SPACE + getOpenCloseParaWithValue(condition) +
                 methodSignatureClose(CLASS_TYPE);
+    }
+
+    /**
+     * Returns true, if the data type is primitive; false otherwise.
+     *
+     * @param dataType data type
+     * @return true if the data type is primitive; false otherwise
+     */
+    public static boolean isPrimitiveDataType(YangDataTypes dataType) {
+        return PRIMITIVE_TYPES.contains(dataType);
     }
 
     /**
