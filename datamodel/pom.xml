@@ -21,11 +21,11 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-utils</artifactId>
-        <version>1.9</version>
+        <version>1.10-SNAPSHOT</version>
     </parent>
 
     <artifactId>onos-yang-datamodel</artifactId>
-    <version>1.9</version>
+    <version>1.10-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>
