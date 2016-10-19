@@ -48,7 +48,7 @@ public class YangXpathLinkerTest {
     private static final String INTER_FILE_PATH = "src/test/resources/xPathLinker/InterFile/";
     private static final String CASE_FILE_PATH = "src/test/resources/xPathLinker/Case/";
     private YangUtilManager utilManager = new YangUtilManager();
-    private YangXpathLinker linker = new YangXpathLinker();
+    private YangXpathLinker<?> linker = new YangXpathLinker();
     private YangLinkerManager linkerManager = new YangLinkerManager();
 
     /**
@@ -139,13 +139,16 @@ public class YangXpathLinkerTest {
     }
 
     /**
-     * Unit test case for intra file linking for multiple level augment.
+     * Unit test case for intra file linking for multiple level augment
+     * without prefix.
      *
-     * @throws IOException when fails to do IO operations
+     * @throws IOException if fails to do IO operations
      */
     @Test
-    public void processIntraFileLinkingInAugmentMultiLevel() throws IOException {
-        utilManager.createYangFileInfoSet(getYangFiles(INTRA_FILE_PATH + "IntraMultiAugment/"));
+    public void processIntraFileMultiLevelWithoutPrefix() throws IOException {
+
+        utilManager.createYangFileInfoSet(getYangFiles(
+                INTRA_FILE_PATH + "IntraMultiAugment/withoutprefix"));
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -153,21 +156,89 @@ public class YangXpathLinkerTest {
         linkerManager.addRefToYangFilesIncludeList(utilManager.getYangNodeSet());
         linkerManager.processInterFileLinking(utilManager.getYangNodeSet());
 
-        YangNode targetNode = null;
-        String targetNodeName = null;
+        YangNode target = null;
+        String name = null;
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
-
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
-                        .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, AUGMENT_LINKING);
+                name = augment.getTargetNode()
+                        .get(augment.getTargetNode().size() - 1)
+                        .getNodeIdentifier().getName();
+                target = linker.processXpathLinking(augment.getTargetNode(),
+                                                    node, AUGMENT_LINKING);
             }
         }
+        assertThat(true, is(target.getName().equals(name)));
+    }
 
-        assertThat(true, is(targetNode.getName().equals(targetNodeName)));
+    /**
+     * Unit test case for intra file linking for multiple level augment with
+     * prefix.
+     *
+     * @throws IOException if fails to do IO operations
+     */
+    @Test
+    public void processIntraFileWithPrefix() throws IOException {
 
+        utilManager.createYangFileInfoSet(getYangFiles(
+                INTRA_FILE_PATH + "IntraMultiAugment/withprefix"));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
+        linkerManager.addRefToYangFilesImportList(utilManager.getYangNodeSet());
+        linkerManager.addRefToYangFilesIncludeList(utilManager.getYangNodeSet());
+        linkerManager.processInterFileLinking(utilManager.getYangNodeSet());
+
+        YangNode target = null;
+        String name = null;
+
+        for (YangNode node : utilManager.getYangNodeSet()) {
+            List<YangAugment> augments = linker.getListOfYangAugment(node);
+            for (YangAugment augment : augments) {
+                name = augment.getTargetNode()
+                        .get(augment.getTargetNode().size() - 1)
+                        .getNodeIdentifier().getName();
+                target = linker.processXpathLinking(augment.getTargetNode(),
+                                                    node, AUGMENT_LINKING);
+            }
+        }
+        assertThat(true, is(target.getName().equals(name)));
+
+    }
+
+    /**
+     * Unit test case for intra file linking for multiple level augment with
+     * partial prefix.
+     *
+     * @throws IOException if fails to do IO operations
+     */
+    @Test
+    public void processIntraFileWithPartialPrefix() throws IOException {
+
+        utilManager.createYangFileInfoSet(getYangFiles(
+                INTRA_FILE_PATH + "IntraMultiAugment/withpartialprefix"));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
+        linkerManager.addRefToYangFilesImportList(utilManager.getYangNodeSet());
+        linkerManager.addRefToYangFilesIncludeList(utilManager.getYangNodeSet());
+        linkerManager.processInterFileLinking(utilManager.getYangNodeSet());
+
+        YangNode target = null;
+        String name = null;
+
+        for (YangNode node : utilManager.getYangNodeSet()) {
+            List<YangAugment> augments = linker.getListOfYangAugment(node);
+            for (YangAugment augment : augments) {
+                name = augment.getTargetNode()
+                        .get(augment.getTargetNode().size() - 1)
+                        .getNodeIdentifier().getName();
+                target = linker.processXpathLinking(augment.getTargetNode(),
+                                                    node, AUGMENT_LINKING);
+            }
+        }
+        assertThat(true, is(target.getName().equals(name)));
     }
 
     /**

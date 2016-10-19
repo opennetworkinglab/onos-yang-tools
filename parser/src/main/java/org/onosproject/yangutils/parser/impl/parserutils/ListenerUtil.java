@@ -405,7 +405,7 @@ public final class ListenerUtil {
     /**
      * Returns the root node from the current node.
      *
-     * @param node current node
+     * @param node YANG node
      * @return root node
      */
     private static YangNode getRootNode(YangNode node) {
@@ -458,7 +458,7 @@ public final class ListenerUtil {
     public static void validateUniqueInList(YangList yangList, ParserRuleContext ctx) {
         YangLeaf leaf;
         // Returns the prefix for the file where unique is present.
-        String prefixOfTheFile = getPrefixInFileOfTheCurrentNode(yangList);
+        String prefixOfTheFile = getRootPrefix(yangList);
         List<String> uniques = yangList.getUniqueList();
         if (uniques != null && !uniques.isEmpty()) {
             Iterator<String> uniqueList = uniques.listIterator();
@@ -554,27 +554,23 @@ public final class ListenerUtil {
     }
 
     /**
-     * Returns the prefix of the current file.
+     * Returns the prefix of the root node from any node inside it.
      *
-     * @param node node where it needs to find the root node
-     * @return prefix of root node
+     * @param curNode YANG node
+     * @return prefix of the root node
      */
-    public static String getPrefixInFileOfTheCurrentNode(YangNode node) {
-        String prefixInFile;
-        while (!(node instanceof YangReferenceResolver)) {
-            node = node.getParent();
-            if (node == null) {
-                throw new ParserException("Internal datamodel error: Datamodel tree is not correct");
-            }
-        }
+    public static String getRootPrefix(YangNode curNode) {
+
+        String prefix;
+        YangNode node = getRootNode(curNode);
         if (node instanceof YangModule) {
             YangModule yangModule = (YangModule) node;
-            prefixInFile = yangModule.getPrefix();
+            prefix = yangModule.getPrefix();
         } else {
             YangSubModule yangSubModule = (YangSubModule) node;
-            prefixInFile = yangSubModule.getPrefix();
+            prefix = yangSubModule.getPrefix();
         }
-        return prefixInFile;
+        return prefix;
     }
 
     /**
@@ -971,5 +967,32 @@ public final class ListenerUtil {
         exception.setLine(pathCtx.getStart().getLine());
         exception.setCharPosition(pathCtx.getStart().getCharPositionInLine());
         return exception;
+    }
+
+    /**
+     * Returns the augment name, after removing the prefix, in each atomic
+     * content, which is equal to the root prefix.
+     *
+     * @param atomics atomic content list
+     * @param root    root node
+     * @return prefix removed augment name
+     */
+    public static String getPrefixRemovedName(List<YangAtomicPath> atomics,
+                                              YangNode root) {
+
+        String rootPrefix = getRootPrefix(root);
+        StringBuilder builder = new StringBuilder();
+        for (YangAtomicPath atomic : atomics) {
+            String id;
+            String prefix = atomic.getNodeIdentifier().getPrefix();
+            String name = atomic.getNodeIdentifier().getName();
+            if (rootPrefix.equals(prefix) || prefix == null) {
+                id = SLASH_FOR_STRING + name;
+            } else {
+                id = SLASH_FOR_STRING + prefix + COLON + name;
+            }
+            builder.append(id);
+        }
+        return builder.toString();
     }
 }

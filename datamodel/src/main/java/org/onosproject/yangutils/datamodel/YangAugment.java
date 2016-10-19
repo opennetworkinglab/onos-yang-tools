@@ -15,17 +15,16 @@
  */
 package org.onosproject.yangutils.datamodel;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
-import static org.onosproject.yangutils.datamodel.utils.DataModelUtils
-        .detectCollidingChildUtil;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 
 /*-
  * Reference RFC 6020.
@@ -146,6 +145,13 @@ public abstract class YangAugment
     private List<YangIfFeature> ifFeatureList;
 
     /**
+     * Name of augment when prefix is removed if it is in the same file. For
+     * linking purpose the name with same prefix of the file is removed and
+     * maintained.
+     */
+    private String prefixRemovedName;
+
+    /**
      * Create a YANG augment node.
      */
     public YangAugment() {
@@ -220,6 +226,26 @@ public abstract class YangAugment
      */
     public void setTargetNode(List<YangAtomicPath> nodeIdentifiers) {
         targetNode = nodeIdentifiers;
+    }
+
+    /**
+     * Returns the name of augment after removing the prefix, in each atomic
+     * content, which is equal to the root prefix.
+     *
+     * @return prefix removed augment name
+     */
+    public String getPrefixRemovedName() {
+        return prefixRemovedName;
+    }
+
+    /**
+     * Sets the name of augment after removing the prefix, in each atomic
+     * content, which is equal to the root prefix.
+     *
+     * @param prefixRemovedName augment name
+     */
+    public void setPrefixRemovedName(String prefixRemovedName) {
+        this.prefixRemovedName = prefixRemovedName;
     }
 
     /**

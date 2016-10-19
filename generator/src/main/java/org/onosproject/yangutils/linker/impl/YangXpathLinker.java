@@ -639,18 +639,20 @@ public class YangXpathLinker<T> {
     }
 
     /**
-     * Searches augment node in root node.
+     * Searches augment node in root node by name of the augment. For intra
+     * file augment, target augment name without prefix is taken and checked.
      *
-     * @param node       root node
-     * @param tempNodeId node identifier
+     * @param root    root node
+     * @param augName current augment name
      * @return target augment node
      */
-
-    private YangNode searchAugmentNode(YangNode node, String tempNodeId) {
+    private YangNode searchAugmentNode(YangNode root, String augName) {
+        YangNode node = root;
         node = node.getChild();
         while (node != null) {
             if (node instanceof YangAugment) {
-                if (node.getName().equals(tempNodeId)) {
+                String name = ((YangAugment) node).getPrefixRemovedName();
+                if (node.getName().equals(augName) || name.equals(augName)) {
                     return node;
                 }
             }

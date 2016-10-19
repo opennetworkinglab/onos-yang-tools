@@ -1,0 +1,46 @@
+module agument {
+    namespace "http://example.com/augment1";
+    prefix "au";
+    container interfaces {
+        list ifEntry {
+            key "ifIndex";
+            leaf ifIndex {
+                type uint32;
+            }
+            leaf ifDescr {
+                type string;
+            }
+            leaf ifType {
+                type int32;
+            }
+            leaf ifMtu {
+                type int32;
+            }
+        }
+    }
+    augment "/au:interfaces/au:ifEntry" {
+        when "au:ifType='ds0'";
+        leaf ifType1 {
+            type int8;
+        }
+        leaf uid {
+            type uint16 {
+                range "1000 .. 30000";
+            }
+        }
+        container sub_interfaces {
+            list ifEntry1 {
+                key "ifIndex1";
+                leaf ifIndex1 {
+                    type uint32;
+                }
+            }
+        }
+    }
+
+    augment "/au:interfaces/au:ifEntry/au:sub_interfaces/au:ifEntry1" {
+        leaf ifType2{
+            type int8;
+        }
+    }
+}
