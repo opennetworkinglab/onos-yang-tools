@@ -316,6 +316,18 @@ public final class UtilConstants {
      * Static attribute for space.
      */
     public static final String SPACE = " ";
+    /**
+     * Static attribute for space.
+     */
+    public static final String TWO = "2";
+    /**
+     * Static attribute for space.
+     */
+    public static final String FLAG = "flag";
+    /**
+     * Static attribute for result.
+     */
+    public static final String RESULT = "result";
 
     /**
      * Static attribute for isSelectAllSchemaChild.
@@ -834,7 +846,7 @@ public final class UtilConstants {
     /**
      * Static attribute for close curly bracket syntax.
      */
-    public static final String ELSE = "else";
+    public static final String ELSE = " else ";
 
     /**
      * From string parameter name.
@@ -943,9 +955,19 @@ public final class UtilConstants {
     public static final String BREAK = "break";
 
     /**
-     * Static attribute for break prefix.
+     * Static attribute for isEmpty.
      */
     public static final String IS_EMPTY = "isEmpty()";
+    /**
+     * Static attribute for exception string in bits enum class.
+     */
+    public static final String EXCEPTION_STRING = "IllegalArgumentException(\"no" +
+            " such element found in bits\");\n";
+
+    /**
+     * Static attribute for "throw new ".
+     */
+    public static final String THROW_NEW = "throw new ";
 
     /**
      * Static attribute for is isLeafValueSet method prefix.
@@ -1222,7 +1244,9 @@ public final class UtilConstants {
                           "package", "private", "protected", "public", "return",
                           "short", "static", "strictfp", "super", "switch",
                           "synchronized", "this", "throw", "throws", "transient",
-                          "true", "try", "void", "volatile", "while");
+                          "true", "try", "void", "volatile", "while", "list",
+                          "map", "arrayList", "hashMap", "linkedList",
+                          "collections");
 
     /**
      * Static attribute for regex for all the special characters.
@@ -1899,6 +1923,17 @@ public final class UtilConstants {
      */
     public static final String PROCESS_CHILD_NODE_STF_PARAM =
             "processChildNodesSubTreeFiltering";
+
+    /**
+     * Static param for processLeafListSubTreeFiltering.
+     */
+    public static final String PROCESS_LEAF_LIST_STF_PARAM =
+            "processLeafListSubTreeFiltering";
+    /**
+     * Static param for processLeafListSubTreeFiltering.
+     */
+    public static final String PROCESS_LEAF_STF_PARAM =
+            "processLeafSubtreeFiltering";
     /**
      * Static param for subTreeFilteringResultBuilder.
      */
@@ -1921,6 +1956,8 @@ public final class UtilConstants {
      */
     public static final String CHOICE_STF_METHOD_NAME =
             "ResultOfProcessSubTree";
+    //File type extension for java classes.
+    public static final String JAVA_FILE_EXTENSION = ".java";
 
     // No instantiation.
     private UtilConstants() {

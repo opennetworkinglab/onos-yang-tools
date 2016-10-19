@@ -1,0 +1,78 @@
+module test {
+    namespace "test:test";
+        prefix test ;
+
+    import test1{
+       prefix test1;
+    }
+    organization "";
+    contact "";
+
+    description
+       "Defines basic service types for L3VPN service.";
+
+    revision "2015-12-16" {
+       reference "";
+    }
+
+    augment /test1:rpc-input-output/test1:output/ {
+        choice choice1 {
+            container case1 {
+                leaf int-leaf {
+                    type int32;
+                }
+            }
+        }
+    }
+
+    list node {
+        key "node-id";
+        leaf node-id{
+           type string;
+        }
+        leaf-list node-prop{
+           type string;
+        }
+        container termination-points{
+           leaf number-of-tp {
+               type int16;
+            }
+            list termination-point {
+                key "tp-id";
+                leaf tp-id {
+                    type string;
+                }
+            }
+        }
+        choice choice1{
+           case case1a{
+               leaf leaf1a1{
+                   type string;
+               }
+               leaf leaf1a2{
+                  type string;
+               }
+           }
+           case case1b{
+               choice choice1b{
+                    case case1bi{
+                         leaf leaf1bia{
+                              type string;
+                          }
+                          leaf leaf1bib{
+                              type string;
+                          }
+                     }
+                    case case1bii{
+                         leaf leaf1biia{
+                               type string;
+                         }
+                         leaf leaf1biib{
+                               type string;
+                          }
+                    }
+               }
+           }
+        }
+    }
+}

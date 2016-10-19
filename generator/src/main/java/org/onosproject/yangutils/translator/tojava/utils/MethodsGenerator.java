@@ -117,6 +117,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.ENCODE_TO_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FALSE;
 import static org.onosproject.yangutils.utils.UtilConstants.FOR;
 import static org.onosproject.yangutils.utils.UtilConstants.FOR_TYPE_STRING;
@@ -133,6 +134,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.HASH_CODE_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.IF;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
+import static org.onosproject.yangutils.utils.UtilConstants.IS_EMPTY;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
@@ -181,6 +183,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SUBTREE_FILTERED;
 import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
+import static org.onosproject.yangutils.utils.UtilConstants.THROW_NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_STRING_METHOD;
@@ -1135,8 +1138,8 @@ public final class MethodsGenerator {
                 .append(methodBody(SETTER, attr1, null,
                                    TWELVE_SPACE_INDENTATION, EMPTY_STRING,
                                    null, false, attr1));
-        String str = EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET + SPACE +
-                ELSE + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+        String str = EIGHT_SPACE_INDENTATION + CLOSE_CURLY_BRACKET +
+                ELSE + OPEN_CURLY_BRACKET + NEW_LINE;
         constructor.append(str)
                 .append(methodBody(SETTER, attr2, null,
                                    TWELVE_SPACE_INDENTATION, EMPTY_STRING,
@@ -1612,6 +1615,21 @@ public final class MethodsGenerator {
      * @return generated fromString code for bits.
      */
     private static String getFromStringForBits(String bitClassName) {
+     /* generate code will look like this.
+       public static BitSet fromString(String valInString) {
+            BitSet tmpVal = new BitSet();
+            String[] bitNames = valInString.trim().split(Pattern.quote(" "));
+            for (String bitName : bitNames) {
+                Bits bits = of(bitName);
+                if (bits != null) {
+                    tmpVal.set(bits.bits());
+                }
+            }
+            if (tmpVal.isEmpty()) {
+                throw new NoSuchElementException("no such element found in bits");
+            }
+            return tmpVal;
+        }*/
         StringBuilder sBuild = new StringBuilder();
         sBuild.append(methodSignature(FROM_STRING_METHOD_NAME, null,
                                       PUBLIC + SPACE + STATIC,
@@ -1632,18 +1650,23 @@ public final class MethodsGenerator {
         String small = getSmallCase(bitClassName);
         sBuild.append(TWELVE_SPACE_INDENTATION).append(bitClassName).append(
                 SPACE).append(small).append(SPACE).append(EQUAL).append(
-                SPACE).append(bitClassName).append(PERIOD).append(OF).append(
+                SPACE).append(OF).append(
                 getOpenCloseParaWithValue(BIT_NAME_VAR)).append(signatureClose());
         String condition = small + SPACE + NOT + EQUAL + SPACE + NULL;
         sBuild.append(getIfConditionBegin(TWELVE_SPACE_INDENTATION, condition))
-                .append(TWELVE_SPACE_INDENTATION)
+                .append(SIXTEEN_SPACE_INDENTATION)
                 .append(TMP_VAL).append(PERIOD).append(SET_METHOD_PREFIX)
                 .append(OPEN_PARENTHESIS)
                 .append(small).append(PERIOD).append(small).append(
                 OPEN_CLOSE_BRACKET_STRING).append(CLOSE_PARENTHESIS)
                 .append(signatureClose()).append(methodClose(TWELVE_SPACE))
                 .append(methodClose(EIGHT_SPACE));
-        sBuild.append(getReturnString(TMP_VAL, EIGHT_SPACE_INDENTATION))
+
+        condition = TMP_VAL + PERIOD + IS_EMPTY;
+        sBuild.append(getIfConditionBegin(EIGHT_SPACE_INDENTATION, condition));
+        sBuild.append(TWELVE_SPACE_INDENTATION).append(THROW_NEW)
+                .append(EXCEPTION_STRING).append(methodClose(EIGHT_SPACE))
+                .append(getReturnString(TMP_VAL, EIGHT_SPACE_INDENTATION))
                 .append(signatureClose()).append(methodClose(FOUR_SPACE));
         return sBuild.toString();
     }

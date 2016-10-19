@@ -1,0 +1,128 @@
+module ietf-inet {
+
+  namespace "yang:all";
+  prefix "inet";
+  yang-version 1;
+
+  choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+           }
+       }
+   }
+
+
+   container c {
+       choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+   }
+
+   list l {
+   config false;
+choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+   }
+
+
+   grouping g {
+    choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+   }
+
+   notification n {
+    choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+    }
+    rpc r {
+        input {
+           choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+       }
+      output {
+        choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+        }
+     }
+
+     augment /name {
+        choice name {
+             case a {
+                 leaf udp {
+                     type empty;
+                 }
+             }
+             case b {
+                 leaf tcp {
+                    type empty;
+                 }
+             }
+         }
+     }
+
+}

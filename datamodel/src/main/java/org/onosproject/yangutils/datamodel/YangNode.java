@@ -307,7 +307,7 @@ public abstract class YangNode extends DefaultLocationInfo
             throw new DataModelException("Child to be added is not atomic, " +
                                                  "it already has a previous " +
                                                  "sibling " + getName() +
-                                                 " in " +    getLineNumber() +
+                                                 " in " + getLineNumber() +
                                                  " at " + getCharPosition() +
                                                  " in " + getFileName() + "\"");
         }
@@ -607,10 +607,10 @@ public abstract class YangNode extends DefaultLocationInfo
         if (newSibling.getNodeType() == null) {
             throw new DataModelException("Cloned abstract node cannot be " +
                                                  "inserted into a tree "
-                    + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+                                                 + getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition()
+                                                 + " in " + getFileName() + "\"");
         }
 
         if (newSibling.getParent() == null) {
@@ -788,7 +788,7 @@ public abstract class YangNode extends DefaultLocationInfo
      */
     public void addToYsnContextInfoMap(YangSchemaNodeIdentifier
                                                yangSchemaNodeIdentifier, YangSchemaNodeContextInfo
-            yangSchemaNodeContextInfo) {
+                                               yangSchemaNodeContextInfo) {
         getYsnContextInfoMap().put(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
     }
 
@@ -796,10 +796,10 @@ public abstract class YangNode extends DefaultLocationInfo
     public void isValueValid(String value)
             throws DataModelException {
         throw new DataModelException("Value validation asked for YANG node. "
-                + getName() + " in " +
-                getLineNumber() + " at " +
-                getCharPosition()
-                + " in " + getFileName() + "\"");
+                                             + getName() + " in " +
+                                             getLineNumber() + " at " +
+                                             getCharPosition()
+                                             + " in " + getFileName() + "\"");
     }
 
     @Override

@@ -147,7 +147,7 @@ public final class YangJavaModelUtils {
 
         translator.setJavaName(getAugmentClassName(
                 (YangJavaAugmentTranslator) info, config));
-        translator.setPackage(getAugmentsNodePackage((YangNode) info, config));
+        translator.setPackage(getAugmentsNodePackage((YangNode) info));
         updateCommonPackageInfo(translator, info, config);
     }
 
@@ -155,24 +155,24 @@ public final class YangJavaModelUtils {
      * Returns package for augment node.
      *
      * @param yangNode augment node
-     * @param config   plugin configurations
      * @return package for augment node
      */
-    private static String getAugmentsNodePackage(YangNode yangNode,
-                                                 YangPluginConfig config) {
+    private static String getAugmentsNodePackage(YangNode yangNode) {
         YangAugment augment = (YangAugment) yangNode;
         StringBuilder augmentPkg = new StringBuilder();
-        augmentPkg.append(getCurNodePackage(augment));
+        augmentPkg.append(getCurNodePackage(augment)).append(PERIOD)
+                .append(getPkgFromAugment(augment));
+        return augmentPkg.toString();
+    }
 
+    private static String getPkgFromAugment(YangAugment augment) {
         StringBuilder pkg = new StringBuilder();
-        pkg.append(PERIOD);
         for (YangAtomicPath atomicPath : augment.getTargetNode()) {
             pkg.append(getCamelCase(atomicPath.getNodeIdentifier().getName(),
-                                    config.getConflictResolver()))
+                                    null))
                     .append(PERIOD);
         }
-        augmentPkg.append(trimAtLast(pkg.toString(), PERIOD).toLowerCase());
-        return augmentPkg.toString();
+        return trimAtLast(pkg.toString(), PERIOD).toLowerCase();
     }
 
     /**
@@ -630,17 +630,12 @@ public final class YangJavaModelUtils {
 
         List<String> clsInfo = new ArrayList<>();
         String add = null;
-        if (node instanceof YangCase) {
-            YangNode parent = node.getParent();
-            if (parent instanceof YangAugment) {
-                add = getCamelCase(((YangAugment) parent)
-                                           .getAugmentedNode().getName(), null);
-            }
-        }
         while (node.getParent() != null) {
             if (node instanceof YangJavaAugmentTranslator) {
-                clsInfo.add(getAugmentClassName((YangAugment) node,
-                                                config));
+                YangJavaAugmentTranslator augment =
+                        (YangJavaAugmentTranslator) node;
+                clsInfo.add(getAugmentClassName(augment, config));
+                clsInfo.add(getPkgFromAugment(augment));
             } else {
                 clsInfo.add(getCamelCase(node.getName(), config
                         .getConflictResolver()));

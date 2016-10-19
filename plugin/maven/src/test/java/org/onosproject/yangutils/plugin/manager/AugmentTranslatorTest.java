@@ -57,7 +57,7 @@ public class AugmentTranslatorTest {
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
         compileCode(COMP);
-        deleteDirectory(DIR);
+        //deleteDirectory(DIR);
     }
 
     /**
@@ -85,8 +85,6 @@ public class AugmentTranslatorTest {
 
     /**
      * Checks augment translation should not result in any exception.
-     * compiler not added because it contains a notification which depends on
-     * onos api.
      *
      * @throws MojoExecutionException
      */
@@ -105,6 +103,31 @@ public class AugmentTranslatorTest {
         utilManager.translateToJava(yangPluginConfig);
         compileCode(COMP);
         deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks augment translation should not result in any exception.
+     *
+     * @throws MojoExecutionException
+     */
+    @Test
+    public void processChoiceAugmentInterTranslator() throws IOException,
+            ParserException, MojoExecutionException {
+        //FIXME: for augment having node with child nodes.
+        /*
+        deleteDirectory(DIR);
+        String searchDir = "src/test/resources/choiceAugment";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        compileCode(COMP);
+        deleteDirectory(DIR);
+        */
     }
 
 }

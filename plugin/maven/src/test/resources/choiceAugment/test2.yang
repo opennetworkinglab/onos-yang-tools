@@ -1,0 +1,26 @@
+module test1 {
+    namespace "test1:test1";
+    prefix test1 ;
+
+    organization "";
+    contact "";
+
+    description
+       "Defines basic service types for L3VPN service.";
+    revision "2015-12-16" {
+       reference "";
+    }
+
+    rpc rpc-input-output {
+       input {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+       output {
+            leaf leaf1 {
+                 type int32;
+             }
+       }
+    }
+}

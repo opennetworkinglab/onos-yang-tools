@@ -134,6 +134,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFiltering
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessLeafListSubtreeFiltering;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessLeafSubtreeFiltering;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubTreeFilteringEnd;
+import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubTreeForChoiceInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubtreeFilteringStart;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubtreeFunctionBody;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.addDefaultConstructor;
@@ -230,6 +231,12 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, getOperationTypeEnum());
         }
         List<String> methods = new ArrayList<>();
+
+        //Add only for choice class
+        if (curNode instanceof YangChoice) {
+            insertDataIntoJavaFile(file, getProcessSubTreeForChoiceInterface(
+                    curNode));
+        }
 
         if (attrPresent) {
             // Add getter methods to interface file.
@@ -529,18 +536,18 @@ public final class JavaFileGenerator {
                 if (curNode instanceof YangLeavesHolder) {
                     if (((YangLeavesHolder) curNode).getListOfLeaf() != null &&
                             !((YangLeavesHolder) curNode).getListOfLeaf().isEmpty()) {
-                        methods.add(getProcessLeafSubtreeFiltering(curNode, config,
+                        methods.add(getProcessLeafSubtreeFiltering(curNode,
                                                                    path));
                     }
                     if (((YangLeavesHolder) curNode).getListOfLeafList() != null &&
                             !((YangLeavesHolder) curNode).getListOfLeafList().isEmpty()) {
-                        methods.add(getProcessLeafListSubtreeFiltering(curNode, config,
+                        methods.add(getProcessLeafListSubtreeFiltering(curNode,
                                                                        path));
                     }
                 }
 
                 if (curNode.getChild() != null) {
-                    methods.add(getProcessChildNodeSubtreeFiltering(curNode, config,
+                    methods.add(getProcessChildNodeSubtreeFiltering(curNode,
                                                                     path));
                 }
             }

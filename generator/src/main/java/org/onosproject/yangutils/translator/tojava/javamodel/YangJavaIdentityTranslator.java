@@ -15,10 +15,6 @@
  */
 package org.onosproject.yangutils.translator.tojava.javamodel;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.javadatamodel.YangJavaIdentity;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGenerator;
@@ -29,12 +25,21 @@ import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslat
 import org.onosproject.yangutils.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.updatePackageInfo;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
+import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
+import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_FILE_EXTENSION;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
@@ -44,9 +49,6 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLe
  */
 public class YangJavaIdentityTranslator extends YangJavaIdentity
         implements JavaCodeGeneratorInfo, JavaCodeGenerator {
-
-    //File type extension for java classes.
-    private static final String JAVA_FILE_EXTENSION = ".java";
 
     //Contains the information of the imported.
     private transient JavaImportData importData;
@@ -74,11 +76,8 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
     @Override
     public JavaFileInfoTranslator getJavaFileInfo() {
         if (javaFileInfo == null) {
-            throw new TranslatorException("Missing java info in java datamodel node " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName());
+            throw new TranslatorException("Missing java info in java identity" +
+                                                  " node " + getName());
         }
         return (JavaFileInfoTranslator) javaFileInfo;
     }
@@ -125,46 +124,51 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
         try {
 
             updatePackageInfo(this, yangPlugin);
-            JavaQualifiedTypeInfoTranslator basePkgInfo = new JavaQualifiedTypeInfoTranslator();
-            String className = getCapitalCase(getJavaFileInfo().getJavaName());
-            String path = getJavaFileInfo().getPackageFilePath();
+            JavaQualifiedTypeInfoTranslator basePkgInfo =
+                    new JavaQualifiedTypeInfoTranslator();
+            JavaFileInfoTranslator itsInfo = getJavaFileInfo();
+            String className = getCapitalCase(itsInfo.getJavaName());
+            String path = itsInfo.getPackageFilePath();
             createPackage(this);
             List<String> imports = null;
             boolean isQualified;
 
             if (getBaseNode() != null && getBaseNode().getReferredIdentity() != null) {
                 if (!(getBaseNode().getReferredIdentity() instanceof YangJavaIdentityTranslator)) {
-                    throw new TranslatorException("Failed to prepare generate code entry for base node "
-                            + getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName());
+                    throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
+                                                              EMPTY_STRING));
+
                 }
-                YangJavaIdentityTranslator baseIdentity = (YangJavaIdentityTranslator) getBaseNode()
-                        .getReferredIdentity();
-                String baseClassName = getCapitalCase(baseIdentity.getJavaFileInfo().getJavaName());
-                String basePkg = baseIdentity.getJavaFileInfo().getPackage();
+                YangJavaIdentityTranslator base =
+                        (YangJavaIdentityTranslator) getBaseNode().getReferredIdentity();
+                JavaFileInfoTranslator info = base.getJavaFileInfo();
+                String baseClassName = getCapitalCase(info.getJavaName());
+                String basePkg = info.getPackage();
                 basePkgInfo.setClassInfo(baseClassName);
                 basePkgInfo.setPkgInfo(basePkg);
-                isQualified = importData.addImportInfo(basePkgInfo, className, getJavaFileInfo().getPackage());
+                isQualified = importData.addImportInfo(basePkgInfo, className,
+                                                       javaFileInfo.getPackage());
                 if (!isQualified) {
                     imports = importData.getImports();
                 }
             }
 
-            File file = getFileObject(path, className, JAVA_FILE_EXTENSION, getJavaFileInfo());
+            File file = getFileObject(path, className, JAVA_FILE_EXTENSION, itsInfo);
 
             initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
             file = validateLineLength(file);
+            //Add to string and from string method to class
+            addStringMethodsToClass(file);
+
             closeFile(file, false);
         } catch (IOException e) {
-            throw new TranslatorException(
-                    "Failed to prepare generate code entry for identity node " +
-                            getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName());
+            throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
+                                                      e.getLocalizedMessage()));
         }
+    }
+
+    private void addStringMethodsToClass(File file) {
+        //TODO: add implementation.
     }
 
     /**

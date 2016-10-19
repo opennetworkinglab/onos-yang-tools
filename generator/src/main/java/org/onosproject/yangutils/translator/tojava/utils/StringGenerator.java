@@ -16,20 +16,13 @@
 
 package org.onosproject.yangutils.translator.tojava.utils;
 
-import org.onosproject.yangutils.datamodel.YangAugment;
-import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
-import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
-import org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,7 +42,6 @@ import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIfConditionForAddToListMethod;
-import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getQualifiedInfo;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
 import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
@@ -887,7 +879,7 @@ public final class StringGenerator {
      */
     static String getElseIfConditionBegin(String indentation,
                                           String condition) {
-        return indentation + CLOSE_CURLY_BRACKET + SPACE + ELSE + SPACE +
+        return indentation + CLOSE_CURLY_BRACKET + ELSE +
                 getIfConditionBegin(EMPTY_STRING, condition);
     }
 
@@ -1304,49 +1296,5 @@ public final class StringGenerator {
      */
     static String getQualifiedString(String pkg, String cls) {
         return pkg + PERIOD + cls;
-    }
-
-    /**
-     * Returns import list for node list.
-     *
-     * @param nodes  node list
-     * @param config plugin config
-     * @return import list
-     */
-    public static List<JavaQualifiedTypeInfoTranslator> getNodesImports(List<YangNode> nodes,
-                                                                        YangPluginConfig config) {
-        List<JavaQualifiedTypeInfoTranslator> imports = new ArrayList<>();
-        for (YangNode node : nodes) {
-            JavaQualifiedTypeInfoTranslator qInfo = getQualifiedInfo(node,
-                                                                     config);
-            imports.add(qInfo);
-        }
-        return imports;
-    }
-
-    /**
-     * Returns list of child node for choice.
-     *
-     * @param choice choice node
-     * @return list of child nodes
-     */
-    public static List<YangNode> getChoiceChildNodes(YangChoice choice) {
-        List<YangNode> childs = new ArrayList<>();
-        YangNode child = choice.getChild();
-        while (child != null) {
-            childs.add(child);
-            child = child.getNextSibling();
-        }
-
-        List<YangAugment> augments = choice.getAugmentedInfoList();
-        YangNode augmentCase;
-        for (YangAugment augment : augments) {
-            augmentCase = augment.getChild();
-            while (augmentCase != null) {
-                childs.add(augmentCase);
-                augmentCase = augmentCase.getNextSibling();
-            }
-        }
-        return childs;
     }
 }

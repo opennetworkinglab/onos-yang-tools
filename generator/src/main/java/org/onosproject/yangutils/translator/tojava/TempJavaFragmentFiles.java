@@ -92,9 +92,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.parseBuilderInterfaceBuildMethodString;
-import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getChoiceChildNodes;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
-import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getNodesImports;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeaf;
 import static org.onosproject.yangutils.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeafList;
@@ -607,14 +605,8 @@ public class TempJavaFragmentFiles {
             throws IOException {
         TempJavaBeanFragmentFiles tempFiles =
                 getBeanFiles((JavaCodeGeneratorInfo) parent);
-        if (curNode instanceof YangChoice) {
-            tempFiles.setAttrNode(curNode);
-            for (JavaQualifiedTypeInfoTranslator info : getNodesImports(
-                    getChoiceChildNodes((YangChoice) curNode), config))
-                tempFiles.addToSubTreeImports(info);
-        } else {
-            tempFiles.setAttrNode(null);
-        }
+        tempFiles.setAttrNode(curNode);
+
         JavaAttributeInfo attr =
                 getCurNodeAsAttributeInTarget(curNode, parent, isList,
                                               tempFiles);
@@ -1779,9 +1771,6 @@ public class TempJavaFragmentFiles {
         if (curNode.isOpTypeReq()) {
             addSubTreeImportStrings(imports);
         }
-        if (curNode instanceof YangCase) {
-            removeCaseParentImport(curNode, imports);
-        }
 
         if ((fileType & BUILDER_CLASS_MASK) != 0 ||
                 (fileType & DEFAULT_CLASS_MASK) != 0) {
@@ -1826,15 +1815,6 @@ public class TempJavaFragmentFiles {
         }
         //Close all the file handles.
         freeTemporaryResources(false);
-    }
-
-    //Removes case's parent import.
-    private void removeCaseParentImport(YangNode node, List<String> imports) {
-        YangNode parent = node.getParent();
-        JavaFileInfo info = ((JavaFileInfoContainer) parent).getJavaFileInfo();
-        String impt = getImportString(info.getPackage(),
-                                      getCapitalCase(info.getJavaName()));
-        imports.remove(impt);
     }
 
     //Adds import for array list.
@@ -2143,4 +2123,5 @@ public class TempJavaFragmentFiles {
         }
         sortImports(imports);
     }
+
 }

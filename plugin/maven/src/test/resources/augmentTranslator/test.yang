@@ -43,7 +43,21 @@ module test {
               }  
          }
      }
-                    
+
+     leaf leaf-a {
+       type int32;
+     }
+
+      leaf-list leaf-list-a {
+          type int32;
+      }
+
+      list list-a {
+         key "name";
+         leaf name {
+            type string;
+         }
+      }
 
     augment /cont3 {
         leaf leaf1 {
