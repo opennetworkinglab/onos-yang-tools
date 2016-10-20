@@ -49,7 +49,9 @@ import org.onosproject.yangutils.translator.exception.TranslatorException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -201,13 +203,19 @@ public final class YangLinkerUtils {
             augment.setChild(null);
 
             for (YangNode node : childNodes) {
-                YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
-                javaCase.setName(node.getName());
-                augment.addChild(javaCase);
-                node.setParent(javaCase);
+                Map<YangNode, List<YangNode>> map = new LinkedHashMap<>();
                 node.setNextSibling(null);
                 node.setPreviousSibling(null);
+                node.setParent(null);
+                YangCase javaCase = getYangCaseNode(JAVA_GENERATION);
+                javaCase.setName(node.getName());
+                //Break the tree to from a new tree.
+                traverseAndBreak(node, map);
+                augment.addChild(javaCase);
+                node.setParent(javaCase);
                 javaCase.addChild(node);
+                //Connect each node to its correct parent again.
+                connectTree(map);
             }
             if (augment.getListOfLeaf() != null) {
                 for (YangLeaf leaf : augment.getListOfLeaf()) {
@@ -234,6 +242,63 @@ public final class YangLinkerUtils {
                     getErrorMsg(FAILED_TO_ADD_CASE, augment.getName(),
                                 augment.getLineNumber(), augment.getCharPosition(),
                                 augment.getFileName()));
+        }
+    }
+
+    private static void connectTree(Map<YangNode, List<YangNode>> map)
+            throws DataModelException {
+        ArrayList<YangNode> keys = new ArrayList<>(map.keySet());
+        int size = keys.size();
+        for (int i = size - 1; i >= 0; i--) {
+            YangNode curNode = keys.get(i);
+            List<YangNode> nodes = map.get(curNode);
+            if (nodes != null) {
+                for (YangNode node : nodes) {
+                    curNode.addChild(node);
+                }
+            }
+        }
+        map.clear();
+    }
+
+    private static void processHierarchyChild(YangNode node,
+                                              Map<YangNode, List<YangNode>> map) {
+        YangNode child = node.getChild();
+        if (child != null) {
+            List<YangNode> nodes = new ArrayList<>();
+            while (child != null) {
+                nodes.add(child);
+                child.setParent(null);
+                child = child.getNextSibling();
+                if (child != null) {
+                    child.getPreviousSibling().setNextSibling(null);
+                    child.setPreviousSibling(null);
+                }
+            }
+            map.put(node, nodes);
+        }
+        node.setChild(null);
+    }
+
+    private static void traverseAndBreak(YangNode rootNode,
+                                         Map<YangNode, List<YangNode>> map) {
+
+        YangNode curNode = rootNode;
+        TraversalType curTraversal = ROOT;
+        while (curNode != null) {
+            if (curTraversal != PARENT && curNode.getChild() != null) {
+                curTraversal = CHILD;
+                curNode = curNode.getChild();
+            } else if (curNode.getNextSibling() != null) {
+                curTraversal = SIBILING;
+                curNode = curNode.getNextSibling();
+            } else {
+                curTraversal = PARENT;
+                curNode = curNode.getParent();
+                if (curNode != null) {
+                    processHierarchyChild(curNode, map);
+                }
+            }
         }
     }
 

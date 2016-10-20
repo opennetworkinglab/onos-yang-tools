@@ -17,7 +17,6 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
-import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangChoice;
 import org.onosproject.yangutils.datamodel.YangDerivedInfo;
@@ -38,7 +37,6 @@ import org.onosproject.yangutils.translator.tojava.TempJavaEnumerationFragmentFi
 import org.onosproject.yangutils.translator.tojava.TempJavaEventFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yangutils.translator.tojava.TempJavaTypeFragmentFiles;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +91,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGenerato
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_INT_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_STRING_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.builderMethod;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.generateBuildMethodInAugmentClass;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.generateBuildMethodForSubTree;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodImpl;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodInterface;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getAugmentsDataMethodForService;
@@ -442,8 +440,8 @@ public final class JavaFileGenerator {
         methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
                             .getTempJavaCodeFragmentFiles()
                             .addBuildMethodImpl());
-        if (curNode instanceof YangAugment) {
-            methods.add(generateBuildMethodInAugmentClass(className));
+        if (curNode.isOpTypeReq()) {
+            methods.add(generateBuildMethodForSubTree(curNode));
         }
         methods.add(addDefaultConstructor(curNode, PUBLIC, BUILDER));
 
@@ -472,8 +470,6 @@ public final class JavaFileGenerator {
 
         JavaFileInfoTranslator fileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        YangPluginConfig config = fileInfo.getPluginConfig();
-
         boolean leavesPresent;
         YangLeavesHolder leavesHolder;
         if (curNode instanceof YangLeavesHolder) {
@@ -531,7 +527,7 @@ public final class JavaFileGenerator {
                 methods.add(getProcessSubtreeFilteringStart(curNode) +
                                     getProcessSubtreeFunctionBody(curNode) +
                                     augmentableSubTreeFiltering +
-                                    getProcessSubTreeFilteringEnd(name, curNode));
+                                    getProcessSubTreeFilteringEnd(name));
 
                 if (curNode instanceof YangLeavesHolder) {
                     if (((YangLeavesHolder) curNode).getListOfLeaf() != null &&
@@ -741,11 +737,9 @@ public final class JavaFileGenerator {
      *
      * @param curNode current node
      * @param methods list of methods string
-     * @throws IOException a violation in IO rule
      */
     private static void addTypedefToString(YangNode curNode,
-                                           List<String> methods)
-            throws IOException {
+                                           List<String> methods) {
         //To string method.
 
         List<YangType<?>> types = ((YangTypeDef) curNode).getTypeList();

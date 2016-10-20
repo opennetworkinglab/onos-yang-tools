@@ -55,9 +55,10 @@ public final class ListenerCollisionDetector {
             String identifierName, YangConstructType constructType)
             throws ParserException {
 
-        if (listener.getParsedDataStack().peek() instanceof CollisionDetector) {
+        Object obj = listener.getParsedDataStack().peek();
+        if (obj instanceof CollisionDetector) {
             try {
-                ((CollisionDetector) listener.getParsedDataStack().peek()).detectCollidingChild(
+                ((CollisionDetector) obj).detectCollidingChild(
                         identifierName, constructType);
             } catch (DataModelException e) {
                 ParserException parserException = new ParserException(e.getMessage());

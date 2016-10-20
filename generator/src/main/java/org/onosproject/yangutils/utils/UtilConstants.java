@@ -167,11 +167,6 @@ public final class UtilConstants {
     public static final String JAVA_DOC_BUILD = " * Builds object of ";
 
     /**
-     * JavaDocs's return statement for build method.
-     */
-    public static final String JAVA_DOC_BUILD_RETURN = "object of ";
-
-    /**
      * JavaDocs's statement for builder object.
      */
     public static final String BUILDER_OBJECT = "builder object of ";
@@ -236,11 +231,6 @@ public final class UtilConstants {
      * Static attribute for compare to.
      */
     public static final String COMPARE_TO = "compareTo";
-
-    /**
-     * Static attribute for period.
-     */
-    public static final String INVOKE = "invoke";
 
     /**
      * Static attribute for parse byte.
@@ -338,11 +328,6 @@ public final class UtilConstants {
      * Static attribute for schema name.
      */
     public static final String SCHEMA_NAME = "schemaName";
-
-    /**
-     * Static attribute for schema name value.
-     */
-    public static final String STR_VAL = "stringValue";
 
     /**
      * Static attribute for validateRange.
@@ -506,11 +491,6 @@ public final class UtilConstants {
     public static final String SUBJECT = "Subject";
 
     /**
-     * Static attribute for ListenerRegistry.
-     */
-    public static final String LISTENER_REG = "ListenerRegistry";
-
-    /**
      * Static attribute for ListenerService.
      */
     public static final String LISTENER_SERVICE = "ListenerService";
@@ -551,11 +531,6 @@ public final class UtilConstants {
     public static final String LEAFREF = "leafref";
 
     /**
-     * Static attribute for identityref string.
-     */
-    public static final String IDENTITYREF = "identityref";
-
-    /**
      * Static attribute for output variable of rpc.
      */
     public static final String RPC_INPUT_VAR_NAME = "inputVar";
@@ -574,11 +549,6 @@ public final class UtilConstants {
      * Static attribute for add syntax.
      */
     public static final String ADD = "+";
-
-    /**
-     * Static attribute for single quote.
-     */
-    public static final String SINGLE_QUOTE = "\'";
 
     /**
      * Static attribute for quotes.
@@ -626,11 +596,6 @@ public final class UtilConstants {
     public static final char CHAR_OF_OPEN_SQUARE_BRACKET = '[';
 
     /**
-     * Static attribute for close square bracket character.
-     */
-    public static final char CHAR_OF_CLOSE_SQUARE_BRACKET = ']';
-
-    /**
      * Static attribute for slash string.
      */
     public static final String SLASH_FOR_STRING = "/";
@@ -654,11 +619,6 @@ public final class UtilConstants {
      * Static attribute for add syntax.
      */
     public static final String ADD_STRING = "add";
-
-    /**
-     * Static attribute for string replace syntax.
-     */
-    public static final String REPLACE_STRING = "replace";
 
     /**
      * Static attribute for string trim syntax.
@@ -733,11 +693,6 @@ public final class UtilConstants {
      * Static attribute for if.
      */
     public static final String IF = "if";
-
-    /**
-     * Static attribute for else-if.
-     */
-    public static final String ELSE_IF = "else if";
 
     /**
      * Static attribute for of.
@@ -889,35 +844,9 @@ public final class UtilConstants {
     public static final String GET_METHOD_PREFIX = "get";
 
     /**
-     * Static attribute for getter method prefix.
-     */
-    public static final String GET_METHOD = "getMethod";
-
-    /**
-     * Static attribute for getter method prefix.
-     */
-    public static final String GET_CLASS = "getClass()";
-
-    /**
      * Static attribute for setter method prefix.
      */
     public static final String SET_METHOD_PREFIX = "set";
-
-    /**
-     * Static attribute for get filter leaf flags.
-     */
-    public static final String GET_VALUE_LEAF_FLAGS = "getValueLeafFlags";
-
-    /**
-     * Static attribute for get select filter leaf flags.
-     */
-    public static final String GET_SELECT_LEAF_FLAGS = "getSelectLeafFlags";
-
-
-    /**
-     * Static attribute for getLeafIndex.
-     */
-    public static final String GET_LEAF_INDEX = "getLeafIndex()";
 
     /**
      * Static attribute for op param.
@@ -1064,11 +993,6 @@ public final class UtilConstants {
      */
     public static final String THIRTY_TWO_SPACE_INDENTATION =
             TWENTY_EIGHT_SPACE_INDENTATION + FOUR_SPACE_INDENTATION;
-
-    /**
-     * continue.
-     */
-    public static final String CONTINUE = "continue";
 
     /**
      * Static attribute for generated code path.
@@ -1335,11 +1259,6 @@ public final class UtilConstants {
     public static final String BUILDER_LOWER_CASE = "builder";
 
     /**
-     * Static attribute for manager syntax.
-     */
-    public static final String MANAGER = "Manager";
-
-    /**
      * Static attribute for service syntax.
      */
     public static final String SERVICE = "Service";
@@ -1470,9 +1389,9 @@ public final class UtilConstants {
     public static final String COLLECTION_IMPORTS = "java.util";
 
     /**
-     * Static attribute for regex.
+     * Static attribute for reflect.
      */
-    public static final String REGEX_IMPORTS = "java.util.regex";
+    public static final String REFLECT_IMPORTS = "java.lang.reflect";
 
     /**
      * Static attribute for map.
@@ -1531,9 +1450,9 @@ public final class UtilConstants {
     public static final String SET_VALUE_PARA = "setValue";
 
     /**
-     * Static attribute for java utilities import package.
+     * Static attribute for Method.
      */
-    public static final String HELPER = "helper";
+    public static final String METHOD = "Method";
 
     /**
      * Static attribute for bitset.
@@ -1583,7 +1502,7 @@ public final class UtilConstants {
     public static final String SET = "Set";
 
     /**
-     * Comment to be added for autogenerated impl methods.
+     * Comment to be added for auto generated impl methods.
      */
     public static final String YANG_UTILS_TODO =
             "//TODO: YANG utils generated code";
@@ -1749,18 +1668,6 @@ public final class UtilConstants {
     public static final String FOR = "for";
 
     /**
-     * Static attribute for YangAugmentedOpParamInfo.
-     */
-    public static final String YANG_AUGMENTED_OP_PARAM_INFO =
-            "YangAugmentedOpParamInfo";
-
-    /**
-     * Static attribute for NoSuchMethodException.
-     */
-    public static final String NO_SUCH_METHOD_EXCEPTION =
-            "NoSuchMethodException";
-
-    /**
      * Static attribute for InvocationTargetException.
      */
     public static final String INVOCATION_TARGET_EXCEPTION =
@@ -1771,11 +1678,6 @@ public final class UtilConstants {
      */
     public static final String INVOCATION_TARGET_EXCEPTION_IMPORT = "import" +
             " java.lang.reflect.InvocationTargetException;\n";
-    /**
-     * Static attribute for IllegalAccessException.
-     */
-    public static final String ILLEGAL_ACCESS_EXCEPTION =
-            "IllegalAccessException";
 
     /**
      * Static attribute for arrayList.
@@ -1861,19 +1763,9 @@ public final class UtilConstants {
     public static final String BUILDER_INTERFACE = "builder interface";
 
     /**
-     * Static attribute for binary.
-     */
-    public static final String BINARY = "binary";
-
-    /**
      * Static attribute for bits.
      */
     public static final String BITS = "bits";
-
-    /**
-     * Static attribute for bits.
-     */
-    public static final String BITS_CAPS = "Bits";
 
     /**
      * Static attribute for YANG.
@@ -1951,11 +1843,6 @@ public final class UtilConstants {
     public static final String SELECT_ALL_CHILD_SCHEMA_PARAM =
             "isSelectAllSchemaChild";
 
-    /**
-     * Static param for ResultOfProcessSubTree.
-     */
-    public static final String CHOICE_STF_METHOD_NAME =
-            "ResultOfProcessSubTree";
     //File type extension for java classes.
     public static final String JAVA_FILE_EXTENSION = ".java";
 

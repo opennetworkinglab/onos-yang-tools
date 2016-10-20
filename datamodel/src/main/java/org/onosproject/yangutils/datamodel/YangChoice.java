@@ -410,8 +410,7 @@ public abstract class YangChoice
     public void detectCollidingChild(String idName, YangConstructType type)
             throws DataModelException {
 
-        if (getParent() instanceof YangCase &&
-                type != CASE_DATA) {
+        if (getParent() instanceof YangCase && type != CASE_DATA) {
             ((CollisionDetector) getParent()).detectCollidingChild(idName, type);
         }
         YangNode node = getChild();

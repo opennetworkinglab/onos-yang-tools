@@ -49,6 +49,7 @@ import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.serialize
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
+import static org.onosproject.yangutils.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
@@ -78,7 +79,7 @@ public class InterJarLinkerTest {
     @Test
     public void processSingleJarLinking()
             throws IOException, MojoExecutionException {
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(YANG_FILES_DIR));
+        utilManager.createYangFileInfoSet(getYangFiles(YANG_FILES_DIR));
         Set<YangFileInfo> info = utilManager.getYangFileInfoSet();
         int size1 = info.size();
         utilManager.parseYangFileInfoSet();
@@ -104,7 +105,7 @@ public class InterJarLinkerTest {
     @Test
     public void processMultipleJarLinking()
             throws IOException, MojoExecutionException {
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(YANG_FILES_DIR));
+        utilManager.createYangFileInfoSet(getYangFiles(YANG_FILES_DIR));
 
         Set<YangFileInfo> info = utilManager.getYangFileInfoSet();
         int size1 = info.size();

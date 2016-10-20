@@ -57,6 +57,6 @@ public class IdentityTranslatorTest {
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
         compileCode(COMP);
-        //deleteDirectory(DIR);
+        deleteDirectory(DIR);
     }
 }

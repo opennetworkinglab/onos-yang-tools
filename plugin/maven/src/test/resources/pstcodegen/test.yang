@@ -1,0 +1,83 @@
+module test {
+    namespace "test:test";
+    prefix test;
+
+    container cont1 {
+        leaf leaf1 {
+            type int32;
+        }
+        leaf-list leaf-list1 {
+            type int32;
+        }
+        list list1 {
+            key "name";
+            leaf name {
+                type string;
+            }
+        }
+        container cont2 {
+            leaf leaf2 {
+                type int32;
+            }
+        }
+    }
+    leaf leaf2 {
+        type int32;
+    }
+    leaf-list leaf-list2 {
+        type int32;
+    }
+    list list2 {
+        key "name";
+        leaf name {
+            type string;
+        }
+    }
+    choice choice1 {
+         case case1 {
+             leaf leaf3 {
+                 type int32;
+             }
+             leaf-list leaf-list3 {
+                 type int32;
+             }
+             list list3 {
+                 key "name";
+                 leaf name {
+                     type string;
+                 }
+             }
+         }
+    }
+    grouping group1 {
+        container cont1 {
+            leaf leaf1 {
+                type int32;
+            }
+            leaf-list leaf-list1 {
+                type int32;
+            }
+            list list1 {
+                key "name";
+                leaf name {
+                    type string;
+                }
+            }
+            container cont2 {
+                leaf leaf2 {
+                    type int32;
+                }
+            }
+        }
+    }
+    rpc rpc1 {
+        input {
+            uses group1;
+        }
+    }
+    augment /cont1/list1 {
+        leaf leaf2 {
+            type int64;
+        }
+    }
+}

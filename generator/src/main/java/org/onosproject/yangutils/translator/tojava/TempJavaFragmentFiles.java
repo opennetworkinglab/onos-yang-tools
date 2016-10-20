@@ -20,12 +20,12 @@ import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangAugmentableNode;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
-import org.onosproject.yangutils.datamodel.YangGrouping;
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeafList;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.YangNode;
+import org.onosproject.yangutils.datamodel.YangSchemaNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaFileInfo;
 import org.onosproject.yangutils.datamodel.javadatamodel.JavaQualifiedTypeInfo;
@@ -114,8 +114,10 @@ import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
+import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION;
 import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
+import static org.onosproject.yangutils.utils.UtilConstants.METHOD;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_CLASS;
@@ -123,6 +125,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
+import static org.onosproject.yangutils.utils.UtilConstants.REFLECT_IMPORTS;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
@@ -134,6 +137,7 @@ import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.readAppendFile;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.ADD_TO_LIST;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
+import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -606,10 +610,20 @@ public class TempJavaFragmentFiles {
         TempJavaBeanFragmentFiles tempFiles =
                 getBeanFiles((JavaCodeGeneratorInfo) parent);
         tempFiles.setAttrNode(curNode);
-
-        JavaAttributeInfo attr =
-                getCurNodeAsAttributeInTarget(curNode, parent, isList,
-                                              tempFiles);
+        if (curNode instanceof YangChoice) {
+            JavaQualifiedTypeInfoTranslator info = new
+                    JavaQualifiedTypeInfoTranslator();
+            info.setClassInfo(INVOCATION_TARGET_EXCEPTION);
+            info.setPkgInfo(REFLECT_IMPORTS);
+            tempFiles.addToSubTreeImports(info);
+            info = new
+                    JavaQualifiedTypeInfoTranslator();
+            info.setClassInfo(METHOD);
+            info.setPkgInfo(REFLECT_IMPORTS);
+            tempFiles.addToSubTreeImports(info);
+        }
+        JavaAttributeInfo attr = getCurNodeAsAttributeInTarget(
+                curNode, parent, isList, tempFiles);
         tempFiles.addJavaSnippetInfoToApplicableTempFiles(attr, config);
     }
 
@@ -763,16 +777,10 @@ public class TempJavaFragmentFiles {
                 container.getDataType(),
                 tempFiles.getIsQualifiedAccessOrAddToImportList(
                         container.getJavaQualifiedInfo()), listAttribute);
-        boolean isInGrouping;
-        if (container.isLeafList()) {
-            isInGrouping = !(((YangLeafList) container).getContainedIn()
-                    instanceof YangGrouping);
-        } else {
-            isInGrouping = !(((YangLeaf) container).getContainedIn()
-                    instanceof YangGrouping);
-        }
-        if (container.getDataType().getDataType() == YangDataTypes.BITS &&
-                isInGrouping) {
+        boolean condition =
+                ((YangSchemaNode) container).getReferredSchema() == null &&
+                        container.getDataType().getDataType() == YangDataTypes.BITS;
+        if (condition) {
             addBitsHandler(attr, container.getDataType(), tempFiles);
         }
         return attr;
@@ -1094,7 +1102,12 @@ public class TempJavaFragmentFiles {
             throws IOException {
         String setter = getSetterForClass(attr, getGeneratedJavaClassName(),
                                           getGeneratedJavaFiles());
-        appendToFile(setterImplTempFileHandle, getOverRideString() + setter);
+        String javadoc = getOverRideString();
+        if (attr.getAttributeName().equals(SUBTREE_FILTERED)) {
+            javadoc = getJavaDoc(SETTER_METHOD, attr.getAttributeName(),
+                                 false, null);
+        }
+        appendToFile(setterImplTempFileHandle, javadoc + setter);
     }
 
     /**
@@ -1106,9 +1119,13 @@ public class TempJavaFragmentFiles {
     protected void addGetterImpl(JavaAttributeInfo attr)
             throws IOException {
         String getter = getGetterForClass(attr, getGeneratedJavaFiles());
+        String javadoc = getOverRideString();
+        if (attr.getAttributeName().equals(SUBTREE_FILTERED)) {
+            javadoc = getJavaDoc(GETTER_METHOD, attr.getAttributeName(),
+                                 false, null);
+        }
         if (javaFlagSet(BUILDER_CLASS_MASK)) {
-            appendToFile(getterImplTempFileHandle, getOverRideString() +
-                    getter);
+            appendToFile(getterImplTempFileHandle, javadoc + getter);
         } else {
             String appDataStructure = null;
             if (attr.getCompilerAnnotation() != null) {
@@ -1531,8 +1548,8 @@ public class TempJavaFragmentFiles {
                 new JavaQualifiedTypeInfoTranslator();
         typeInfo.setClassInfo(BIT_SET);
         typeInfo.setPkgInfo(JAVA_UTIL_PKG);
-        this.getJavaImportData().addImportInfo(typeInfo, info.getJavaName(),
-                                               info.getPackage());
+        getJavaImportData().addImportInfo(typeInfo, info.getJavaName(),
+                                          info.getPackage());
         JavaAttributeInfo attributeInfo =
                 getAttributeInfoForTheData(typeInfo, VALUE_LEAF, null, false, false);
         addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
@@ -1617,10 +1634,12 @@ public class TempJavaFragmentFiles {
         if (tempFlagSet(ATTRIBUTES_MASK)) {
             addAttribute(newAttrInfo);
         }
-        if (tempFlagSet(GETTER_FOR_INTERFACE_MASK)) {
+        if (tempFlagSet(GETTER_FOR_INTERFACE_MASK) &&
+                !attrName.equals(SUBTREE_FILTERED)) {
             addGetterForInterface(newAttrInfo);
         }
-        if (tempFlagSet(SETTER_FOR_INTERFACE_MASK) && required) {
+        if (tempFlagSet(SETTER_FOR_INTERFACE_MASK) && required &&
+                !attrName.equals(SUBTREE_FILTERED)) {
             addSetterForInterface(newAttrInfo);
         }
         if (tempFlagSet(SETTER_FOR_CLASS_MASK) && required) {
@@ -1826,13 +1845,10 @@ public class TempJavaFragmentFiles {
 
     //Adds import for bitset and base64 list.
     private void addBitsAndBase64Imports(YangNode curNode, List<String> imports) {
-        if (curNode instanceof YangLeavesHolder) {
-            YangLeavesHolder holder = (YangLeavesHolder) curNode;
-            String impt = getJavaImportData()
-                    .getImportForToBitSet();
-            if (!holder.getListOfLeaf().isEmpty() &&
-                    !imports.contains(impt)) {
-                imports.add(impt);
+        if (curNode.isOpTypeReq()) {
+            String impt = getJavaImportData().getImportForToBitSet();
+            if (!imports.contains(impt)) {
+                imports.add(getJavaImportData().getImportForToBitSet());
             }
         }
     }
@@ -1890,7 +1906,9 @@ public class TempJavaFragmentFiles {
      * @param imports list of imports
      */
     private void addInvocationExceptionImport(List<String> imports) {
-        imports.add(INVOCATION_TARGET_EXCEPTION_IMPORT);
+        if (!imports.contains(INVOCATION_TARGET_EXCEPTION_IMPORT)) {
+            imports.add(INVOCATION_TARGET_EXCEPTION_IMPORT);
+        }
     }
 
     /**

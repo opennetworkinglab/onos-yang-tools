@@ -302,7 +302,6 @@ public final class StringGenerator {
                              String paramType, boolean isBuilderSetter, String setterVal) {
         StringBuilder builder = new StringBuilder();
         String body;
-        String cond;
         switch (type) {
             case GETTER:
                 return getReturnString(paraName, space);
@@ -323,7 +322,7 @@ public final class StringGenerator {
                         NEW + SPACE + paraName + getOpenCloseParaWithValue(
                                 THIS) + signatureClose(), space);
             case CONSTRUCTOR:
-                return space + THIS + PERIOD + paraName + SPACE +
+                return space + paraName + SPACE +
                         EQUAL + SPACE + BUILDER_LOWER_CASE + OBJECT + PERIOD +
                         prefix + methodName +
                         brackets(OPEN_CLOSE_BRACKET, null, null) +

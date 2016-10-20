@@ -18,58 +18,36 @@ package org.onosproject.yangutils.plugin.manager;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
-import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
 import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
- * Unit tests for choice-case translator.
+ * Unit test case for grouping translator.
  */
-public final class ChoiceCaseTranslatorTest {
+public class GroupingTranslatorTest {
+
     private final YangUtilManager utilManager = new YangUtilManager();
-    private static final String DIR = "target/ChoiceCaseTestGenFile/";
+    private static final String DIR = "target/groupingTranslator/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
-    private final YangUtilsParserManager manager = new YangUtilsParserManager();
 
     /**
-     * Checks choice-case translation should not result in any exception.
-     */
-    @Test
-    public void processChoiceCaseTranslator() throws IOException, ParserException {
-
-        String dir = "target/ChoiceCaseTestGenFile/";
-        deleteDirectory(dir);
-        YangNode node = manager.getDataModel("src/test/resources/ChoiceCaseTranslator.yang");
-
-        YangPluginConfig yangPluginConfig = new YangPluginConfig();
-        yangPluginConfig.setCodeGenDir(dir);
-
-        generateJavaCode(node, yangPluginConfig);
-        String dir1 = System.getProperty("user.dir") + File.separator + dir;
-        compileCode(dir1);
-        deleteDirectory(dir);
-    }
-
-    /**
-     * Checks augment translation should not result in any exception.
+     * Checks grouping translation should not result in any exception.
      *
      * @throws MojoExecutionException
      */
     @Test
-    public void processChoiceAllTranslator() throws IOException,
-            ParserException, MojoExecutionException {
+    public void processTranslator() throws IOException, ParserException, MojoExecutionException {
+
         deleteDirectory(DIR);
-        String searchDir = "src/test/resources/choiceTranslator";
+        String searchDir = "src/test/resources/grouping";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
@@ -81,4 +59,5 @@ public final class ChoiceCaseTranslatorTest {
         compileCode(COMP);
         deleteDirectory(DIR);
     }
+
 }

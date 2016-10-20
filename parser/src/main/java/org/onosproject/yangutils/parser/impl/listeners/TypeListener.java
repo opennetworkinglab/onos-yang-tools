@@ -99,7 +99,7 @@ public final class TypeListener {
 
         // Create YANG type object and fill the values.
         YangType<?> type = getYangType(JAVA_GENERATION);
-        type.setNodeIdentifier(nodeIdentifier);
+        type.setNodeId(nodeIdentifier);
         type.setDataType(yangDataTypes);
 
         type.setLineNumber(ctx.getStart().getLine());

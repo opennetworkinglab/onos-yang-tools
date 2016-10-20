@@ -78,8 +78,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getVersionValu
  */
 @Mojo(name = "yang2java", defaultPhase = PROCESS_SOURCES,
         requiresDependencyResolution = COMPILE)
-public class YangUtilManager
-        extends AbstractMojo {
+public class YangUtilManager extends AbstractMojo {
 
     private static final String DEFAULT_PKG =
             getPackageDirPathFromJavaJPackage(DEFAULT_BASE_PKG);
@@ -278,7 +277,7 @@ public class YangUtilManager
      *
      * @return YANG node set
      */
-    Set<YangNode> getYangNodeSet() {
+    public Set<YangNode> getYangNodeSet() {
         return yangNodeSet;
     }
 

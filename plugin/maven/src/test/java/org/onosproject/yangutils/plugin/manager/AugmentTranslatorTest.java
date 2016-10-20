@@ -57,7 +57,7 @@ public class AugmentTranslatorTest {
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
         compileCode(COMP);
-        //deleteDirectory(DIR);
+        deleteDirectory(DIR);
     }
 
     /**
@@ -113,8 +113,6 @@ public class AugmentTranslatorTest {
     @Test
     public void processChoiceAugmentInterTranslator() throws IOException,
             ParserException, MojoExecutionException {
-        //FIXME: for augment having node with child nodes.
-        /*
         deleteDirectory(DIR);
         String searchDir = "src/test/resources/choiceAugment";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
@@ -127,7 +125,6 @@ public class AugmentTranslatorTest {
         utilManager.translateToJava(yangPluginConfig);
         compileCode(COMP);
         deleteDirectory(DIR);
-        */
     }
 
 }

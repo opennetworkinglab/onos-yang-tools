@@ -322,7 +322,8 @@ public final class DataModelUtils {
      * @return de-serializes YANG data-model nodes
      * @throws IOException when fails do IO operations
      */
-    private static Set<YangNode> deSerializeDataModel(String serializedFileInfo) throws IOException {
+    public static Set<YangNode> deSerializeDataModel(String serializedFileInfo)
+            throws IOException {
 
         Set<YangNode> nodes;
         try {

@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.InvalidOpTypeHolder;
+import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
 import org.onosproject.yangutils.datamodel.YangEnum;
@@ -1224,7 +1225,8 @@ public final class MethodsGenerator {
      * @return enum's constructor
      */
     static String getEnumsConstructor(String className) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(
+                getJavaDoc(TYPE_CONSTRUCTOR, className, false, null));
         String clsName = getSmallCase(className);
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put(clsName, INT);
@@ -1861,15 +1863,19 @@ public final class MethodsGenerator {
     }
 
     /**
-     * Returns build method for augment class.
+     * Returns build method for subtree filtering in class.
      *
-     * @param name class name
-     * @return build method for augment class
+     * @param node YANG node
+     * @return build method for subtree filtering in class
      */
-    static String generateBuildMethodInAugmentClass(String name) {
+    static String generateBuildMethodForSubTree(YangNode node) {
+        String name = getCapitalCase(node.getJavaClassNameOrBuiltInType());
         StringBuilder builder = new StringBuilder(getJavaDoc(BUILD_METHOD,
                                                              name, false, null));
         String def = DEFAULT_CAPS + name;
+        if (node instanceof RpcNotificationContainer) {
+            def = name + OP_PARAM;
+        }
         builder.append(methodSignature(BUILD_FOR_FILTER, null, PUBLIC, null,
                                        name, null, CLASS_TYPE))
                 .append(EIGHT_SPACE_INDENTATION).append(SUBTREE_FILTERED)

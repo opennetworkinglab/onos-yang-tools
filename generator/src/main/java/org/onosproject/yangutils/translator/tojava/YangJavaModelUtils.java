@@ -233,18 +233,15 @@ public final class YangJavaModelUtils {
 
         TempJavaCodeFragmentFiles translator =
                 info.getTempJavaCodeFragmentFiles();
-
+        TempJavaBeanFragmentFiles bean = getBeanFiles(info);
         if (info instanceof RpcNotificationContainer) {
-            getBeanFiles(info).setRootNode(true);
+            bean.setRootNode(true);
             /*
              * event classes code generation.
              */
             updateNotificationNodeInfo(info, config);
         }
         if (info instanceof YangLeavesHolder) {
-            if (info instanceof YangAugment) {
-                getBeanFiles(info).addIsSubTreeFilteredFlag(config);
-            }
 
             YangLeavesHolder holder = (YangLeavesHolder) info;
             boolean isLeafPresent = holder.getListOfLeaf() != null && !holder
@@ -261,20 +258,21 @@ public final class YangJavaModelUtils {
              * Output
              */
             if (isLeafPresent || isLeafListPresent) {
-                getBeanFiles(info).addCurNodeLeavesInfoToTempFiles((YangNode) info,
-                                                                   config);
+                bean.addCurNodeLeavesInfoToTempFiles((YangNode) info,
+                                                     config);
             }
             //Add value leaf flag attribute to temp file.
             if (isLeafPresent) {
-                getBeanFiles(info).addValueLeafFlag(config, (YangNode) info);
+                bean.addValueLeafFlag(config, (YangNode) info);
             }
             if (((YangNode) info).isOpTypeReq()) {
                 // Add operation type as an attribute.
-                getBeanFiles(info).addOperationTypeToTempFiles((YangNode) info,
-                                                               config);
+                bean.addOperationTypeToTempFiles((YangNode) info,
+                                                 config);
+                bean.addIsSubTreeFilteredFlag(config);
                 if (isLeafPresent) {
                     //Add select leaf flag attribute to temp file.
-                    getBeanFiles(info).addSelectLeafFlag(config);
+                    bean.addSelectLeafFlag(config);
                 }
             }
         } else if (info instanceof YangTypeHolder) {
@@ -433,21 +431,18 @@ public final class YangJavaModelUtils {
         }
 
         generateCodeOfNode(info, config);
-        TempJavaCodeFragmentFiles tempFiles =
-                info.getTempJavaCodeFragmentFiles();
+        TempJavaBeanFragmentFiles tempFiles = getBeanFiles(info);
         if (!(info instanceof YangChoice)) {
-            getBeanFiles(info).addYangAugmentedMap(config);
+            tempFiles.addYangAugmentedMap(config);
         }
         if (info instanceof YangCase) {
             YangNode parent = ((YangCase) info).getParent();
             JavaQualifiedTypeInfoTranslator typeInfo =
                     getQualifierInfoForCasesParent(parent, config);
-            getBeanFiles(info).getJavaExtendsListHolder()
-                    .addToExtendsList(typeInfo, (YangNode) info,
-                                      tempFiles.getBeanTempFiles());
+            tempFiles.getJavaExtendsListHolder()
+                    .addToExtendsList(typeInfo, (YangNode) info, tempFiles);
 
-            getBeanFiles(info).addParentInfoInCurNodeTempFile((YangNode) info,
-                                                              config);
+            tempFiles.addParentInfoInCurNodeTempFile((YangNode) info, config);
         }
     }
 
@@ -629,7 +624,6 @@ public final class YangJavaModelUtils {
                                          YangPluginConfig config) {
 
         List<String> clsInfo = new ArrayList<>();
-        String add = null;
         while (node.getParent() != null) {
             if (node instanceof YangJavaAugmentTranslator) {
                 YangJavaAugmentTranslator augment =
@@ -657,9 +651,6 @@ public final class YangJavaModelUtils {
                                       subModule.getNameSpaceFromModule(),
                                       subModule.getRevision(),
                                       config.getConflictResolver()));
-        }
-        if (add != null) {
-            clsInfo.add(add);
         }
         clsInfo.add(getCamelCase(node.getName(), config.getConflictResolver()));
 

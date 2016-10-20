@@ -16,22 +16,31 @@
 
 package org.onosproject.yangutils.parser.impl.listeners;
 
-import org.onosproject.yangutils.datamodel.ResolvableType;
 import org.onosproject.yangutils.datamodel.YangModule;
 import org.onosproject.yangutils.datamodel.YangReferenceResolver;
+import org.onosproject.yangutils.datamodel.YangResolutionInfo;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
-import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.TreeWalkListener;
+import org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType;
 
+import java.util.List;
+
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_BASE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_COMPILER_ANNOTATION;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IDENTITYREF;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_IF_FEATURE;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_LEAFREF;
+import static org.onosproject.yangutils.datamodel.ResolvableType.YANG_USES;
 import static org.onosproject.yangutils.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yangutils.datamodel.utils.YangConstructType.MODULE_DATA;
+import static org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser.ModuleStatementContext;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorLocation.EXIT;
-import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction
-        .constructListenerErrorMessage;
+import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_CHILD;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yangutils.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
@@ -78,13 +87,14 @@ public final class ModuleListener {
      * @param listener Listener's object
      * @param ctx      context object of the grammar rule
      */
-    public static void processModuleEntry(TreeWalkListener listener, GeneratedYangParser.ModuleStatementContext ctx) {
+    public static void processModuleEntry(TreeWalkListener listener,
+                                          ModuleStatementContext ctx) {
 
         // Check if stack is empty.
-        checkStackIsEmpty(listener, INVALID_HOLDER, MODULE_DATA, ctx.identifier().getText(), ENTRY);
-
-        String identifier = getValidIdentifier(ctx.identifier().getText(), MODULE_DATA, ctx);
-
+        checkStackIsEmpty(listener, INVALID_HOLDER, MODULE_DATA,
+                          ctx.identifier().getText(), ENTRY);
+        String identifier = getValidIdentifier(ctx.identifier().getText(),
+                                               MODULE_DATA, ctx);
         YangModule yangModule = getYangModuleNode(JAVA_GENERATION);
         yangModule.setName(identifier);
         yangModule.setLineNumber(ctx.getStart().getLine());
@@ -105,38 +115,32 @@ public final class ModuleListener {
      * @param listener Listener's object
      * @param ctx      context object of the grammar rule
      */
-    public static void processModuleExit(TreeWalkListener listener, GeneratedYangParser.ModuleStatementContext ctx) {
+    public static void processModuleExit(TreeWalkListener listener,
+                                         ModuleStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, MODULE_DATA, ctx.identifier().getText(), EXIT);
-
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, MODULE_DATA,
+                             ctx.identifier().getText(), EXIT);
         Parsable tmpNode = listener.getParsedDataStack().peek();
         if (!(tmpNode instanceof YangModule)) {
-            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, MODULE_DATA,
-                                                                    ctx.identifier().getText(), EXIT));
+            throwError(MISSING_CURRENT_HOLDER, ctx);
         }
 
         YangModule module = (YangModule) tmpNode;
-        if (module.getUnresolvedResolutionList(ResolvableType.YANG_COMPILER_ANNOTATION) != null
-                && module.getUnresolvedResolutionList(ResolvableType.YANG_COMPILER_ANNOTATION).size() != 0
-                && module.getChild() != null) {
-            throw new ParserException(constructListenerErrorMessage(INVALID_CHILD, MODULE_DATA,
-                                                                    ctx.identifier().getText(), EXIT));
+        List<YangResolutionInfo> info = module.getUnresolvedResolutionList(
+                YANG_COMPILER_ANNOTATION);
+        if (info != null && !info.isEmpty() && module.getChild() != null) {
+            throwError(INVALID_CHILD, ctx);
         }
-
+        YangReferenceResolver resolver = (YangReferenceResolver) listener
+                .getParsedDataStack().peek();
         try {
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_IF_FEATURE);
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_USES);
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_DERIVED_DATA_TYPE);
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_LEAFREF);
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_BASE);
-            ((YangReferenceResolver) listener.getParsedDataStack()
-                    .peek()).resolveSelfFileLinking(ResolvableType.YANG_IDENTITYREF);
+            resolver.resolveSelfFileLinking(YANG_IF_FEATURE);
+            resolver.resolveSelfFileLinking(YANG_USES);
+            resolver.resolveSelfFileLinking(YANG_DERIVED_DATA_TYPE);
+            resolver.resolveSelfFileLinking(YANG_LEAFREF);
+            resolver.resolveSelfFileLinking(YANG_BASE);
+            resolver.resolveSelfFileLinking(YANG_IDENTITYREF);
         } catch (DataModelException e) {
             LinkerException linkerException = new LinkerException(e.getMessage());
             linkerException.setLine(e.getLineNumber());
@@ -144,5 +148,11 @@ public final class ModuleListener {
             linkerException.setFileName(listener.getFileName());
             throw linkerException;
         }
+    }
+
+    private static void throwError(ListenerErrorType type,
+                                   ModuleStatementContext ctx) {
+        throw new ParserException(constructListenerErrorMessage(
+                type, MODULE_DATA, ctx.identifier().getText(), EXIT));
     }
 }

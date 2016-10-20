@@ -1,7 +1,7 @@
-module ietf-inet {
+module all {
 
   namespace "yang:all";
-  prefix "inet";
+  prefix "all";
   yang-version 1;
 
   choice name {
@@ -64,21 +64,6 @@ choice name {
              }
          }
    }
-
-   notification n {
-    choice name {
-             case a {
-                 leaf udp {
-                     type empty;
-                 }
-             }
-             case b {
-                 leaf tcp {
-                    type empty;
-                 }
-             }
-         }
-    }
     rpc r {
         input {
            choice name {
@@ -116,13 +101,57 @@ choice name {
                  leaf udp {
                      type empty;
                  }
+                 container cont1 {
+                     container cont2 {
+                     choice name {
+                                  case a {
+                                      leaf udp {
+                                          type empty;
+                                      }
+                                      container cont1 {
+                                          container cont2 {
+                                               leaf udp1 {
+                                                  type empty;
+                                                   }
+                                           }
+                                          leaf udp2 {
+                                              type empty;
+                                          }
+                                      }
+                                  }
+                                  case b {
+                                      leaf tcp3 {
+                                         type empty;
+                                      }
+                                  }
+                              }
+                          leaf udp4 {
+                             type empty;
+                              }
+                      }
+                     leaf udp5 {
+                         type empty;
+                     }
+                 }
              }
              case b {
-                 leaf tcp {
+                 leaf tcp2 {
                     type empty;
                  }
              }
          }
+         choice name1 {
+                      case a {
+                          leaf udp {
+                              type empty;
+                          }
+                      }
+                      case b {
+                          leaf tcp {
+                             type empty;
+                          }
+                      }
+                  }
      }
 
 }

@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import static org.onosproject.yangutils.datamodel.BuiltInTypeObjectFactory.getDataObjectFromString;
+import static org.onosproject.yangutils.datamodel.utils.ResolvableStatus.UNRESOLVED;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.TYPE_DATA;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypeUtils.isOfRangeRestrictedType;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 
@@ -71,7 +73,7 @@ public class YangType<T> extends DefaultLocationInfo
     /**
      * YANG node identifier.
      */
-    private YangNodeIdentifier nodeIdentifier;
+    private YangNodeIdentifier nodeId;
 
     /**
      * YANG data type.
@@ -109,8 +111,8 @@ public class YangType<T> extends DefaultLocationInfo
      */
     public YangType() {
 
-        nodeIdentifier = new YangNodeIdentifier();
-        resolvableStatus = ResolvableStatus.UNRESOLVED;
+        nodeId = new YangNodeIdentifier();
+        resolvableStatus = UNRESOLVED;
     }
 
     /**
@@ -119,7 +121,7 @@ public class YangType<T> extends DefaultLocationInfo
      * @return prefix associated with data type name
      */
     public String getPrefix() {
-        return nodeIdentifier.getPrefix();
+        return nodeId.getPrefix();
     }
 
     /**
@@ -128,7 +130,7 @@ public class YangType<T> extends DefaultLocationInfo
      * @param prefix prefix associated with data type name
      */
     public void setPrefix(String prefix) {
-        nodeIdentifier.setPrefix(prefix);
+        nodeId.setPrefix(prefix);
     }
 
     /**
@@ -137,7 +139,7 @@ public class YangType<T> extends DefaultLocationInfo
      * @return the name of data type
      */
     public String getDataTypeName() {
-        return nodeIdentifier.getName();
+        return nodeId.getName();
     }
 
     /**
@@ -146,7 +148,7 @@ public class YangType<T> extends DefaultLocationInfo
      * @param typeName the name to set
      */
     public void setDataTypeName(String typeName) {
-        nodeIdentifier.setName(typeName);
+        nodeId.setName(typeName);
     }
 
     /**
@@ -190,25 +192,25 @@ public class YangType<T> extends DefaultLocationInfo
      *
      * @return node identifier
      */
-    public YangNodeIdentifier getNodeIdentifier() {
-        return nodeIdentifier;
+    public YangNodeIdentifier getNodeId() {
+        return nodeId;
     }
 
     /**
      * Sets node identifier.
      *
-     * @param nodeIdentifier the node identifier
+     * @param nodeId the node identifier
      */
-    public void setNodeIdentifier(YangNodeIdentifier nodeIdentifier) {
-        this.nodeIdentifier = nodeIdentifier;
+    public void setNodeId(YangNodeIdentifier nodeId) {
+        this.nodeId = nodeId;
     }
 
     /**
      * Resets the class attributes to its default value.
      */
     public void resetYangType() {
-        nodeIdentifier = new YangNodeIdentifier();
-        resolvableStatus = ResolvableStatus.UNRESOLVED;
+        nodeId = new YangNodeIdentifier();
+        resolvableStatus = UNRESOLVED;
         dataType = null;
         dataTypeExtendedInfo = null;
     }
@@ -220,7 +222,7 @@ public class YangType<T> extends DefaultLocationInfo
      */
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.TYPE_DATA;
+        return TYPE_DATA;
     }
 
     /**
@@ -429,18 +431,24 @@ public class YangType<T> extends DefaultLocationInfo
                         }
                     }
                 } else if (dataType == YangDataTypes.STRING) {
-                    if (((YangDerivedInfo) getDataTypeExtendedInfo()).getResolvedExtendedInfo() != null) {
-                        YangStringRestriction stringRestriction =
-                                ((YangStringRestriction) ((YangDerivedInfo) getDataTypeExtendedInfo())
-                                        .getResolvedExtendedInfo());
-                        if (!(stringRestriction.isValidStringOnLengthRestriction(value) &&
-                                stringRestriction.isValidStringOnPatternRestriction(value))) {
-                            throw new DataTypeException("YANG file error : Input value \"" + value
-                                                                + "\" is not a valid " + dataType);
+                    Object info = ((YangDerivedInfo) getDataTypeExtendedInfo())
+                            .getResolvedExtendedInfo();
+                    if (info != null) {
+                        if (info instanceof YangStringRestriction) {
+                            YangStringRestriction stringRestriction =
+                                    (YangStringRestriction) info;
+                            if (!(stringRestriction.isValidStringOnLengthRestriction(value) &&
+                                    stringRestriction.isValidStringOnPatternRestriction(value))) {
+                                throw new DataTypeException("YANG file error : Input value \"" + value
+                                                                    + "\" is not a valid " + dataType);
+                            }
                         }
                     }
                 } else if (dataType == YangDataTypes.BITS) {
-                    YangBits bits = (YangBits) getDataTypeExtendedInfo();
+                    YangTypeDef prevTypedef = ((YangDerivedInfo) getDataTypeExtendedInfo())
+                            .getReferredTypeDef();
+                    YangType type = prevTypedef.getTypeList().iterator().next();
+                    YangBits bits = (YangBits) type.getDataTypeExtendedInfo();
                     if (bits.fromString(value) == null) {
                         throw new DataTypeException("YANG file error : Input value \"" + value + "\" is not a valid " +
                                                             dataType);

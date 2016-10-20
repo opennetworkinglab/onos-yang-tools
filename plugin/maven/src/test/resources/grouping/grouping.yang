@@ -1,0 +1,58 @@
+module grouping {
+
+  namespace "yang:grouping";
+  prefix "grouping";
+  yang-version 1;
+  revision 2016-10-08;
+
+  grouping link-details {
+      leaf link-id {
+          type union {
+              type int32;
+              type uint16;
+              type enumeration {
+                   enum one;
+                   enum two;
+                   enum five {
+                      value 5;
+                   }
+                   enum six-square {
+                      value 36;
+                   }
+              }
+          }
+      }
+      typedef group {
+          type bits {
+              bit disable-nagle {
+                  position 0;
+                           }
+              bit auto-sense-speed {
+                  position 1;
+              }
+              bit Mb-only {
+                  position 2;
+              }
+          }
+      }
+      container link {
+          leaf port {
+            type int32;
+          }
+  
+          leaf-list port-id {
+              type string;
+          }
+          list areas {
+             key "name1";
+             leaf name1 {
+              type string;
+             }
+          }
+      }
+  }
+
+  container cont2 {
+       uses link-details;
+  }
+}

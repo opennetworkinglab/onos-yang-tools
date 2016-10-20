@@ -203,7 +203,7 @@ public final class MethodsGeneratorTest {
         String method = getConstructor(testAttr, GENERATE_SERVICE_AND_MANAGER
         );
         assertThat(true, is(method.contains(
-                THIS + PERIOD + ATTRIBUTE_NAME + SPACE + EQUAL + SPACE +
+                ATTRIBUTE_NAME + SPACE + EQUAL + SPACE +
                         BUILDER_LOWER_CASE + OBJECT + PERIOD +
                         GET_METHOD_PREFIX + CLASS_NAME + OPEN_PARENTHESIS +
                         CLOSE_PARENTHESIS + SEMI_COLON)));

@@ -32,7 +32,7 @@ import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.updateClo
 /**
  * Represents base class of a node in data model tree.
  */
-public abstract class YangNode extends DefaultLocationInfo
+public abstract class YangNode
         implements Cloneable, Serializable, YangSchemaNode,
         Comparable<YangNode> {
 
@@ -78,10 +78,9 @@ public abstract class YangNode extends DefaultLocationInfo
      */
     private boolean isToTranslate = true;
 
-    /**
-     * Flag if the node needs to generate operation type info for translation.
-     */
-    private boolean isOpTypeReq;
+    private transient int lineNumber;
+    private transient int charPosition;
+    private String fileName;
 
     /**
      * Map of YANG context information. It is to be consumed by YMS.
@@ -146,7 +145,7 @@ public abstract class YangNode extends DefaultLocationInfo
      */
     protected YangNode(YangNodeType type,
                        Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
-        setNodeType(type);
+        nodeType = type;
         this.ysnContextInfoMap = ysnContextInfoMap;
     }
 
@@ -889,14 +888,38 @@ public abstract class YangNode extends DefaultLocationInfo
      * @return true if op type info required for node
      */
     public boolean isOpTypeReq() {
-        if (this instanceof RpcNotificationContainer) {
-            isOpTypeReq = true;
-            return true;
-        }
-        if (this instanceof InvalidOpTypeHolder) {
-            isOpTypeReq = false;
-            return false;
-        }
-        return this.getParent().isOpTypeReq();
+        return this instanceof RpcNotificationContainer ||
+                !(this instanceof InvalidOpTypeHolder) &&
+                        getParent().isOpTypeReq();
+    }
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public int getCharPosition() {
+        return charPosition;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+    @Override
+    public void setCharPosition(int charPositionInLine) {
+        charPosition = charPositionInLine;
+    }
+
+    @Override
+    public String getFileName() {
+        return fileName;
+    }
+
+    @Override
+    public void setFileName(String name) {
+        fileName = name;
     }
 }
