@@ -932,34 +932,103 @@ public final class SubtreeFilteringMethodsGenerator {
         return builder.toString();
     }
 
-    //Returns method string for op params augmented syntax
-    static String getAugmentableSubTreeFiltering() {
-        return "        for (Object augmentInfo : yangAugmentedInfoMap()" +
-                ".values()) {\n" +
-                "            Object appInstanceInfo = appInstance.yangAugmentedInfo(" +
-                "augmentInfo.getClass());\n" +
-                "            if (appInstanceInfo == null) {\n" +
-                "                subTreeFilteringResultBuilder.addYangAugmentedInfo(" +
-                "augmentInfo, augmentInfo.getClass());\n" +
-                "            } else {\n" +
-                "                Object processSubtreeFiltering;\n" +
-                "                try {\n" +
-                "                    Class<?> augmentedClass = augmentInfo" +
-                ".getClass();\n" +
-                "                    processSubtreeFiltering = augmentInfo.getClass()" +
-                ".getMethod(\"processSubtreeFiltering\", augmentedClass).invoke(" +
-                "augmentInfo, appInstanceInfo);\n" +
-                "                    if (processSubtreeFiltering != null) {\n" +
-                "                        subTreeFilteringResultBuilder" +
-                ".addYangAugmentedInfo(processSubtreeFiltering, processSubtreeFiltering.getClass());\n" +
+    public static String getAugmentableSubTreeFiltering() {
+        return "        if (yangAugmentedInfoMap.isEmpty()) {\n            " +
+                "Set<Map.Entry<Class<?>, Object>> augment = appInstance" +
+                ".yangAugmentedInfoMap().entrySet();\n            " +
+                "if (augment != null && !augment.isEmpty()) {\n" +
+                "                " +
+                "Iterator<Map.Entry<Class<?>, Object>> augItr = " +
+                "augment.iterator();\n                " +
+                "while (augItr.hasNext()) {\n                    " +
+                "Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
+                "                    " +
+                "Class<?> augClass = aug.getKey();\n                    " +
+                "String augClassName = augClass.getName();\n" +
+                "                    " +
+                "int index = augClassName.lastIndexOf('.');\n" +
+                "                    " +
+                "String classPackage = augClassName.substring(0, index) +\n" +
+                "                            " +
+                "\".\" + \"Default\" + augClass.getSimpleName() + \"$\"\n" +
+                "                            " +
+                "+ augClass.getSimpleName() + \"Builder\";\n" +
+                "                    " +
+                "ClassLoader classLoader = augClass.getClassLoader();\n" +
+                "                    " +
+                "try {\n                        " +
+                "Class<?> builderClass;\n                        " +
+                "builderClass = classLoader.loadClass(classPackage);\n" +
+                "                        " +
+                "Object builderObj = builderClass.newInstance();\n" +
+                "                        " +
+                "Method method = builderClass.getMethod(\"build\");\n" +
+                "                        " +
+                "Object defaultObj = method.invoke(builderObj);\n" +
+                "                        " +
+                "Class<?> defaultClass = defaultObj.getClass();\n" +
+                "                        " +
+                "method = defaultClass.getMethod\n" +
+                "                                " +
+                "(\"processSubtreeFiltering\", augClass,\n" +
+                "                                 " +
+                "boolean.class);\n                        " +
+                "Object result = method.invoke(defaultObj, aug.getValue(),\n" +
+                "                                                      " +
+                "true);\n                        " +
+                "subTreeFilteringResultBuilder\n" +
+                "                                " +
+                ".addYangAugmentedInfo(result, augClass);\n" +
+                "                    " +
+                "} catch (ClassNotFoundException | InstantiationException\n" +
+                "                            | NoSuchMethodException |\n" +
+                "                            " +
+                "InvocationTargetException | IllegalAccessException e) {\n" +
+                "                        e.printStackTrace();\n" +
                 "                    }\n" +
-                "                } catch (NoSuchMethodException |" +
-                " InvocationTargetException | IllegalAccessException e) {\n" +
-                "                    continue;\n" +
+                "                }\n" +
+                "            }\n" +
+                "        } else {\n            " +
+                "Set<Map.Entry<Class<?>, Object>> augment = " +
+                "yangAugmentedInfoMap\n                    .entrySet();\n" +
+                "            " +
+                "Iterator<Map.Entry<Class<?>, Object>> augItr = " +
+                "augment.iterator();\n            " +
+                "while (augItr.hasNext()) {\n                " +
+                "Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
+                "                Class<?> augClass = aug.getKey();\n" +
+                "                " +
+                "Object appInstanceInfo = appInstance.yangAugmentedInfo(" +
+                "augClass);\n                if (appInstanceInfo == null) {\n" +
+                "                    " +
+                "subTreeFilteringResultBuilder.addYangAugmentedInfo\n" +
+                "                            " +
+                "(aug.getValue(), aug.getKey());\n" +
+                "                } else {\n                    " +
+                "Object processSubtreeFiltering;\n                    try {\n" +
+                "                        " +
+                "processSubtreeFiltering = aug.getValue().getClass()\n" +
+                "                                " +
+                ".getMethod(\"processSubtreeFiltering\",\n" +
+                "                                           " +
+                "aug.getKey(), boolean.class)\n" +
+                "                                .invoke(aug.getValue(),\n" +
+                "                                        " +
+                "appInstanceInfo, true);\n                        " +
+                "if (processSubtreeFiltering != null) {\n" +
+                "                            " +
+                "subTreeFilteringResultBuilder\n                            " +
+                "        .addYangAugmentedInfo(processSubtreeFiltering, " +
+                "aug.getKey());\n                        }\n" +
+                "                    } catch (NoSuchMethodException | " +
+                "InvocationTargetException | IllegalAccessException e) {\n" +
+                "                        e.printStackTrace();\n" +
+                "                    }\n" +
                 "                }\n" +
                 "            }\n" +
                 "        }\n";
     }
+
 
     private static String getSubTreeFilteredCondition(String name) {
         StringBuilder builder = new StringBuilder();

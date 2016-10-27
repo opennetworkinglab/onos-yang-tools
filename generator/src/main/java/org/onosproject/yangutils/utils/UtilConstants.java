@@ -1691,6 +1691,23 @@ public final class UtilConstants {
             IMPORT + COLLECTION_IMPORTS + ".ArrayList;\n";
 
     /**
+     * Static attribute for set collection import.
+     */
+    public static final String SET_IMPORT = IMPORT + COLLECTION_IMPORTS +
+            PERIOD + SET + SEMI_COLON + NEW_LINE;
+
+    /**
+     * Static attribute for reflect method import.
+     */
+    public static final String METHOD_IMPORT = IMPORT + REFLECT_IMPORTS +
+            PERIOD + METHOD + SEMI_COLON + NEW_LINE;
+
+    /**
+     * Static attribute for collection iterator import.
+     */
+    public static final String ITR_IMPORT = IMPORT + COLLECTION_IMPORTS +
+            PERIOD + "Iterator;\n";
+    /**
      * Static attribute for unused keyword.
      */
     public static final String UNUSED = "UNUSED";

@@ -116,8 +116,10 @@ import static org.onosproject.yangutils.utils.UtilConstants.FOUR_SPACE_INDENTATI
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION;
 import static org.onosproject.yangutils.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION_IMPORT;
+import static org.onosproject.yangutils.utils.UtilConstants.ITR_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.METHOD;
+import static org.onosproject.yangutils.utils.UtilConstants.METHOD_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_ATTRIBUTE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPERATION_TYPE_CLASS;
@@ -128,6 +130,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yangutils.utils.UtilConstants.REFLECT_IMPORTS;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yangutils.utils.UtilConstants.SERVICE;
+import static org.onosproject.yangutils.utils.UtilConstants.SET_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SUBTREE_FILTERED;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE_LEAF;
@@ -1788,6 +1791,9 @@ public class TempJavaFragmentFiles {
         }
 
         if (curNode.isOpTypeReq()) {
+            if (curNode instanceof YangAugmentableNode) {
+                addImportsForSubTreeFilterAug(imports);
+            }
             addSubTreeImportStrings(imports);
         }
 
@@ -1834,6 +1840,18 @@ public class TempJavaFragmentFiles {
         }
         //Close all the file handles.
         freeTemporaryResources(false);
+    }
+
+    private void addImportsForSubTreeFilterAug(List<String> imports) {
+        if (!imports.contains(SET_IMPORT)) {
+            imports.add(SET_IMPORT);
+        }
+        if (!imports.contains(METHOD_IMPORT)) {
+            imports.add(METHOD_IMPORT);
+        }
+        if (!imports.contains(ITR_IMPORT)) {
+            imports.add(ITR_IMPORT);
+        }
     }
 
     //Adds import for array list.
