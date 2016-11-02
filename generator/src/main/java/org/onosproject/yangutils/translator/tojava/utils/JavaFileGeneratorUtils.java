@@ -87,6 +87,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.
 import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.ClassDefinitionGenerator.generateClassDefinition;
+import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.ERROR_MSG_FOR_GEN_CODE;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF;
@@ -95,6 +96,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PACKAGE;
 import static org.onosproject.yangutils.utils.UtilConstants.PERIOD;
 import static org.onosproject.yangutils.utils.UtilConstants.SEMI_COLON;
+import static org.onosproject.yangutils.utils.UtilConstants.SET_METHOD_PREFIX;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_CLASS;
@@ -620,7 +622,7 @@ public final class JavaFileGeneratorUtils {
         List<YangAugment> augments = getListOfAugments(parent);
         for (YangAugment augment : augments) {
             nodeId = augment.getTargetNode().get(0).getNodeIdentifier();
-
+            augment.setSetterMethodName(getAugmentSetterName(augment));
             if (validateNodeIdentifierInSet(nodeId, targets)) {
                 targets.add(augment.getTargetNode().get(0));
             }
@@ -639,6 +641,18 @@ public final class JavaFileGeneratorUtils {
             child = child.getNextSibling();
         }
         return augments;
+    }
+
+    /* Returns setter method name for augment.*/
+    private static String getAugmentSetterName(YangAugment augment) {
+        YangAtomicPath atomicPath = augment.getTargetNode().get(0);
+        YangNode augmentedNode = atomicPath.getResolvedNode();
+        String setterName = SET_METHOD_PREFIX + AUGMENTED
+                + getCapitalCase(((JavaFileInfoContainer) augmentedNode.getParent())
+                                         .getJavaFileInfo().getJavaName())
+                + getCapitalCase(((JavaFileInfoContainer) augmentedNode)
+                                         .getJavaFileInfo().getJavaName());
+        return setterName;
     }
 
     /*Validates the set for duplicate names of node identifiers.*/

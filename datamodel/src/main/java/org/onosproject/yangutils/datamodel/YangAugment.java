@@ -152,6 +152,11 @@ public abstract class YangAugment
     private String prefixRemovedName;
 
     /**
+     * Name of augment's setter method.
+     */
+    private String setterMethodName;
+
+    /**
      * Create a YANG augment node.
      */
     public YangAugment() {
@@ -510,4 +515,21 @@ public abstract class YangAugment
         return null;
     }
 
+    /**
+     * Returns setter method name for augment in application.
+     *
+     * @return setter method name for augment in application
+     */
+    public String getSetterMethodName() {
+        return setterMethodName;
+    }
+
+    /**
+     * Sets setter method name for augment in application.
+     *
+     * @param name setter method name for augment in application
+     */
+    public void setSetterMethodName(String name) {
+        setterMethodName = name;
+    }
 }
