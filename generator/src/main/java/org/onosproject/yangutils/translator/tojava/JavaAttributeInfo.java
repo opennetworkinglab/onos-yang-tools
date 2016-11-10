@@ -172,7 +172,7 @@ public final class JavaAttributeInfo {
      * @param isQualified if the added attribute has to be accessed in a fully
      *                    qualified manner
      */
-    private void setIsQualifiedAccess(boolean isQualified) {
+    public void setIsQualifiedAccess(boolean isQualified) {
         isQualifiedName = isQualified;
     }
 
@@ -307,12 +307,12 @@ public final class JavaAttributeInfo {
      * @param compilerAnnotation compiler annotation
      * @return java attribute info.
      */
-    public static JavaAttributeInfo getAttributeInfoForTheData(JavaQualifiedTypeInfoTranslator importInfo,
-                                                               String attributeName, YangType<?> attributeType,
-                                                               boolean isQualifiedAccess, boolean isListAttribute,
-                                                               YangCompilerAnnotation compilerAnnotation) {
+    static JavaAttributeInfo getAttributeInfoForTheData(JavaQualifiedTypeInfoTranslator importInfo,
+                                                        String attributeName, YangType<?> attributeType,
+                                                        boolean isQualifiedAccess, boolean isListAttribute,
+                                                        YangCompilerAnnotation compilerAnnotation) {
         JavaAttributeInfo newAttr = getAttributeInfoForTheData(importInfo, attributeName, attributeType,
-                isQualifiedAccess, isListAttribute);
+                                                               isQualifiedAccess, isListAttribute);
 
         newAttr.setCompilerAnnotation(compilerAnnotation);
 

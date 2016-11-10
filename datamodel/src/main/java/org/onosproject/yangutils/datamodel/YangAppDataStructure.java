@@ -73,7 +73,7 @@ public class YangAppDataStructure extends DefaultLocationInfo
      *
      * @return the list of key field names
      */
-    private List<String> getKeyList() {
+    public List<String> getKeyList() {
         return unmodifiableList(keyList);
     }
 

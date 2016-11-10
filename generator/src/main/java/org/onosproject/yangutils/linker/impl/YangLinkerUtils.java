@@ -196,8 +196,13 @@ public final class YangLinkerUtils {
         try {
             YangNode child = augment.getChild();
             List<YangNode> childNodes = new ArrayList<>();
+            List<YangNode> caseNodes = new ArrayList<>();
             while (child != null) {
-                childNodes.add(child);
+                if (!(child instanceof YangCase)) {
+                    childNodes.add(child);
+                } else {
+                    caseNodes.add(child);
+                }
                 child = child.getNextSibling();
             }
             augment.setChild(null);
@@ -214,6 +219,19 @@ public final class YangLinkerUtils {
                 augment.addChild(javaCase);
                 node.setParent(javaCase);
                 javaCase.addChild(node);
+                //Connect each node to its correct parent again.
+                connectTree(map);
+            }
+
+            for (YangNode node : caseNodes) {
+                Map<YangNode, List<YangNode>> map = new LinkedHashMap<>();
+                node.setNextSibling(null);
+                node.setPreviousSibling(null);
+                node.setParent(null);
+                //Break the tree to from a new tree.
+                traverseAndBreak(node, map);
+                augment.addChild(node);
+                node.setParent(augment);
                 //Connect each node to its correct parent again.
                 connectTree(map);
             }

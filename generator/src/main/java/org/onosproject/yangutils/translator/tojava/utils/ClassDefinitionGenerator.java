@@ -36,6 +36,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_LISTENER_INTERFACE;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_KEY_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
@@ -47,6 +48,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithExtends;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithImpl;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultName;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefinitionWithImplements;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getErrorMsg;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getEventExtendsString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getSpecificModifier;
@@ -56,6 +58,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.ABSTRACT_EVENT;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
+import static org.onosproject.yangutils.utils.UtilConstants.COMPARABLE;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
@@ -148,6 +151,8 @@ final class ClassDefinitionGenerator {
                 return getEventDefinition(yangName, eventName);
             case GENERATE_EVENT_LISTENER_INTERFACE:
                 return getEventListenerDefinition(yangName);
+            case GENERATE_KEY_CLASS:
+                return getKeyClassDefinition(yangName);
             case GENERATE_EVENT_SUBJECT_CLASS:
                 return getClassDefinition(yangName);
             case GENERATE_IDENTITY_CLASS:
@@ -257,6 +262,18 @@ final class ClassDefinitionGenerator {
      */
     private static String getClassDefinition(String yangName) {
         return getDefaultDefinition(CLASS, yangName, PUBLIC);
+    }
+
+    /**
+     * Returns impl file class definition.
+     *
+     * @param yangName file name
+     * @return definition
+     */
+    private static String getKeyClassDefinition(String yangName) {
+        String compareName = COMPARABLE + brackets(
+                OPEN_CLOSE_DIAMOND_WITH_VALUE, yangName, null);
+        return getDefinitionWithImplements(CLASS, yangName, PUBLIC, compareName);
     }
 
     /**

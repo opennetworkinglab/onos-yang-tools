@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package org.onosproject.yangutils.plugin.manager;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,17 +30,17 @@ import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
- * Translator test case for identity.
+ * Unit test case for compiler annotation.
  */
-public class IdentityTranslatorTest {
-
+public class CompilerAnnotationTest {
     private final YangUtilManager utilManager = new YangUtilManager();
-    private static final String DIR = "target/identity/";
+    private static final String DIR = "target/compiler/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
 
+
     /**
-     * Checks translation should not result in any exception.
+     * Checks compiler annotation translation should not result in any exception.
      *
      * @throws MojoExecutionException
      */
@@ -47,7 +48,7 @@ public class IdentityTranslatorTest {
     public void processTranslator() throws IOException,
             ParserException, MojoExecutionException {
         deleteDirectory(DIR);
-        String searchDir = "src/test/resources/identityTranslator";
+        String searchDir = "src/test/resources/compilerAnnotation";
         utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();

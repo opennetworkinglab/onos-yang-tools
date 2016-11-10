@@ -99,6 +99,11 @@ public final class GeneratedJavaFileType {
     public static final int GENERATE_IDENTITY_CLASS = 2048;
 
     /**
+     * Identity key class.
+     */
+    public static final int GENERATE_KEY_CLASS = 4096;
+
+    /**
      * Creates an instance of generate java file type.
      */
     private GeneratedJavaFileType() {

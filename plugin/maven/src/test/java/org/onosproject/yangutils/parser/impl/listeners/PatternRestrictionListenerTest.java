@@ -66,6 +66,20 @@ public class PatternRestrictionListenerTest {
         ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
                 .getPatternList().listIterator();
         assertThat(patternListIterator.next(), is("[a-zA-Z]"));
+
+        leafInfo = leafIterator.next();
+
+        assertThat(leafInfo.getName(), is("ipv4-address"));
+        assertThat(leafInfo.getDataType().getDataTypeName(), is("string"));
+        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
+        stringRestriction = (YangStringRestriction) leafInfo
+                .getDataType().getDataTypeExtendedInfo();
+        patternListIterator = stringRestriction.getPatternRestriction()
+                .getPatternList().listIterator();
+        assertThat(patternListIterator.next(), is(
+                "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}" +
+                        "([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" +
+                        "(%[\\p{N}\\p{L}]+)?"));
     }
 
     /**

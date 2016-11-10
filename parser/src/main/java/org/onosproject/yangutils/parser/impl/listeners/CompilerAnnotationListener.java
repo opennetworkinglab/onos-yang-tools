@@ -110,7 +110,7 @@ public final class CompilerAnnotationListener {
         }
 
         // Add resolution information to the list
-        YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangCompilerAnnotation>(
+        YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<>(
                 compilerAnnotation, (YangNode) curData, line, charPositionInLine);
         addToResolutionList(resolutionInfo, ctx);
 

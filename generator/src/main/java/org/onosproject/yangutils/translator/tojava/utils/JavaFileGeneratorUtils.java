@@ -54,6 +54,7 @@ import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_LISTENER_INTERFACE;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
+import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_KEY_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yangutils.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
@@ -88,7 +89,6 @@ import static org.onosproject.yangutils.translator.tojava.JavaQualifiedTypeInfoT
 import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yangutils.translator.tojava.utils.ClassDefinitionGenerator.generateClassDefinition;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
-import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.ERROR_MSG_FOR_GEN_CODE;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAFREF;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
@@ -451,38 +451,41 @@ public final class JavaFileGeneratorUtils {
         switch (genType) {
             case INTERFACE_MASK:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, INTERFACE, curNode, className);
+                write(file, genType, INTERFACE, curNode, className, false);
+                break;
+            case GENERATE_KEY_CLASS:
+                appendHeaderContents(file, pkgString, importsList);
+                write(file, genType, DEFAULT_CLASS, curNode, className, false);
                 break;
             case DEFAULT_CLASS_MASK:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, DEFAULT_CLASS, curNode, className);
+                write(file, genType, DEFAULT_CLASS, curNode, className, true);
                 break;
             case BUILDER_CLASS_MASK:
-                write(file, genType, BUILDER_CLASS, curNode, className);
+                write(file, genType, BUILDER_CLASS, curNode, className, false);
                 break;
             case BUILDER_INTERFACE_MASK:
-                write(file, genType, BUILDER_INTERFACE, curNode, className);
+                write(file, genType, BUILDER_INTERFACE, curNode, className, false);
                 break;
             case GENERATE_SERVICE_AND_MANAGER:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, RPC_INTERFACE, curNode, className);
+                write(file, genType, RPC_INTERFACE, curNode, className, false);
                 break;
             case GENERATE_EVENT_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, EVENT, curNode, className);
+                write(file, genType, EVENT, curNode, className, false);
                 break;
             case GENERATE_EVENT_LISTENER_INTERFACE:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, EVENT_LISTENER, curNode, className);
+                write(file, genType, EVENT_LISTENER, curNode, className, false);
                 break;
             case GENERATE_EVENT_SUBJECT_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, EVENT_SUBJECT_CLASS, curNode, className);
+                write(file, genType, EVENT_SUBJECT_CLASS, curNode, className, false);
                 break;
             case GENERATE_IDENTITY_CLASS:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, EVENT_SUBJECT_CLASS, curNode, className);
-                insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
+                write(file, genType, EVENT_SUBJECT_CLASS, curNode, className, false);
                 break;
             default:
                 break;
@@ -582,13 +585,14 @@ public final class JavaFileGeneratorUtils {
      * @param javaDocType java doc type
      * @param curNode     current YANG node
      * @param fileName    file name
+     * @param isForClass  is for default class
      * @throws IOException when fails to write into a file
      */
     private static void write(File file, int genType, JavaDocType javaDocType,
-                              YangNode curNode, String fileName)
+                              YangNode curNode, String fileName, boolean isForClass)
             throws IOException {
         insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName,
-                                                false, null));
+                                                isForClass, null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType,
                                                              fileName, curNode));
     }

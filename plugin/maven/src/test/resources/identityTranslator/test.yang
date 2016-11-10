@@ -1,14 +1,70 @@
-module IdentityInModule{
+module IdentityTest{
     yang-version 1;
     namespace http://huawei.com;
-    prefix IdentityInModule;
+    prefix IdentityTest;
 
     identity ref-address-family {
-        reference "http://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml#address-family-numbers-2";
+        description "ref-address-family";
     }
-    leaf tunnel {
+
+    identity ipv4-address-family {
+        base ref-address-family;
+    }
+
+    identity ipv6-address-family {
+        base ipv4-address-family;
+    }
+
+    typedef tunnel-type {
         type identityref {
             base ref-address-family;
         }
     }
+    leaf tunnel1 {
+        type identityref {
+            base ipv4-address-family;
+        }
+    }
+
+    typedef type2 {
+       type identityref {
+            base ipv4-address-family;
+        }
+    }
+    typedef type3 {
+    type union {
+                type type2;
+                type identityref {
+                     base ipv4-address-family;
+                }
+            }
+    }
+    leaf tunnel {
+        type union {
+            type type2;
+            type identityref {
+                 base ipv6-address-family;
+            }
+        }
+    }
+ typedef ipv4-address {
+      type string {
+        pattern
+          '(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\p{N}\p{L}]+)?';
+      }
+      description
+        "The ipv4-address type represents an IPv4 address in
+       dotted-quad notation.  The IPv4 address may include a zone
+       index, separated by a % sign.
+
+       The zone index is used to disambiguate identical address
+       values.  For link-local addresses, the zone index will
+       typically be the interface index number or the name of an
+       interface.  If the zone index is not present, the default
+       zone of the device will be used.
+
+       The canonical format for the zone index is the numerical
+       format";
+    }
+
 }

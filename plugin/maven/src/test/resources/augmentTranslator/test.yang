@@ -71,6 +71,20 @@ module test {
         }
     }
     augment /choice1 {
+        case case2 {
+            container con1 {
+                leaf in1 {
+                   type int32;
+                }
+            }
+        }
+        case case3 {
+            container con2 {
+                leaf in2 {
+                   type int32;
+                }
+            }
+        }
         leaf-list leaf2 {
            type int32;
         }

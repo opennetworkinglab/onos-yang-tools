@@ -16,14 +16,14 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
 /*
  * Reference:RFC 6020.
@@ -140,6 +140,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     private YangLeaf referredLeaf;
 
+    private  boolean isKeyLeaf;
     /**
      * Creates a YANG leaf.
      */
@@ -547,5 +548,22 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     public void setReferredLeaf(YangLeaf leaf) {
         referredLeaf = leaf;
+    }
+    /**
+     * Returns true if its a key leaf.
+     *
+     * @return true if its a key leaf
+     */
+    public boolean isKeyLeaf() {
+        return isKeyLeaf;
+    }
+
+    /**
+     * Sets true if its a key leaf.
+     *
+     * @param keyLeaf true if its a key leaf
+     */	
+    public void setKeyLeaf(boolean keyLeaf) {
+        isKeyLeaf = keyLeaf;
     }
 }

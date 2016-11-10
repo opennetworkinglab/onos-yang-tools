@@ -50,7 +50,9 @@ import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_RETURN;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_RPC;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_SETTERS;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_DOC_SETTERS_COMMON;
+import static org.onosproject.yangutils.utils.UtilConstants.KEYS;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
+import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
@@ -71,9 +73,11 @@ import static org.onosproject.yangutils.utils.UtilConstants.STRING_DATA_TYPE;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
+import static org.onosproject.yangutils.utils.UtilConstants.VALUE_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.VOID;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_LOWER_CASE;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getSmallCase;
 
 /**
@@ -102,7 +106,7 @@ public final class JavaDocGen {
         name = YangIoUtils.getSmallCase(name);
         switch (type) {
             case DEFAULT_CLASS: {
-                return generateForClass(name);
+                return generateForClass(name, isList);
             }
             case BUILDER_CLASS: {
                 return generateForBuilderClass(name);
@@ -159,7 +163,7 @@ public final class JavaDocGen {
                 return generateForRpcService(name);
             }
             case RPC_MANAGER: {
-                return generateForClass(name);
+                return generateForClass(name, false);
             }
             case EVENT: {
                 return generateForEvent(name);
@@ -168,10 +172,10 @@ public final class JavaDocGen {
                 return generateForEventListener(name);
             }
             case EVENT_SUBJECT_CLASS: {
-                return generateForClass(name);
+                return generateForClass(name, false);
             }
             case ADD_TO_LIST: {
-                return generateForAddToList(name);
+                return generateForAddToList(name, compilerAnnotation);
             }
             default: {
                 return generateForConstructors(name);
@@ -344,6 +348,8 @@ public final class JavaDocGen {
             String setter, String compilerAnnotation, boolean isList) {
         String attributeParam;
         if (compilerAnnotation != null) {
+            compilerAnnotation = compilerAnnotation.toLowerCase();
+            compilerAnnotation = getCapitalCase(compilerAnnotation);
             switch (compilerAnnotation) {
                 case QUEUE: {
                     attributeParam = QUEUE.toLowerCase() + SPACE + OF + SPACE;
@@ -360,6 +366,10 @@ public final class JavaDocGen {
                     setter = setter + attributeParam;
                     break;
                 }
+                case MAP:
+                    attributeParam = MAP.toLowerCase() + SPACE + OF + SPACE;
+                    setter = setter + attributeParam;
+                    break;
                 default: {
 
                 }
@@ -420,11 +430,13 @@ public final class JavaDocGen {
     /**
      * Generates javaDocs for the impl class.
      *
-     * @param className class name
+     * @param className         class name
+     * @param isForDefaultClass if javadoc is for default class
      * @return javaDocs
      */
-    private static String generateForClass(String className) {
-        return getJavaDocForDefaultClass(className, IMPL_CLASS_JAVA_DOC, EMPTY_STRING);
+    private static String generateForClass(String className, boolean isForDefaultClass) {
+        return getJavaDocForDefaultClass(className, IMPL_CLASS_JAVA_DOC,
+                                         EMPTY_STRING, isForDefaultClass);
     }
 
     private static String addFlagJavaDoc() {
@@ -632,15 +644,32 @@ public final class JavaDocGen {
     /**
      * Returns javaDocs for add to list method.
      *
-     * @param attribute attribute
+     * @param attribute  attribute
+     * @param annotation compile annotation
      * @return javaDocs
      */
-    private static String generateForAddToList(String attribute) {
-        return getJavaDocStartLine(attribute, JAVA_DOC_ADD_TO_LIST) +
-                getJavaDocEmptyAsteriskLine() +
-                getJavaDocParamLine(attribute, ADD_STRING + TO_CAPS) +
-                getJavaDocReturnLine(BUILDER_OBJECT + attribute) +
-                getJavaDocEndLine();
+    private static String generateForAddToList(String attribute, String annotation) {
+        StringBuilder javadoc = new StringBuilder();
+        javadoc.append(getJavaDocStartLine(attribute, JAVA_DOC_ADD_TO_LIST))
+                .append(getJavaDocEmptyAsteriskLine());
+        if (annotation != null) {
+            annotation = annotation.toLowerCase();
+            annotation = getCapitalCase(annotation);
+            switch (annotation) {
+                case MAP:
+                    javadoc.append(getJavaDocParamLine(
+                            attribute, attribute + KEYS)).append(getJavaDocParamLine(
+                            attribute, attribute + VALUE_CAPS));
+                    break;
+                default:
+                    javadoc.append(getJavaDocParamLine(
+                            attribute, ADD_STRING + TO_CAPS));
+                    break;
+            }
+        }
+        javadoc.append(getJavaDocReturnLine(BUILDER_OBJECT + attribute))
+                .append(getJavaDocEndLine());
+        return javadoc.toString();
     }
 
     /**
@@ -673,16 +702,21 @@ public final class JavaDocGen {
     /**
      * Returns class javadoc.
      *
-     * @param name   name of class
-     * @param type   type of javadoc
-     * @param indent indentation
+     * @param name              name of class
+     * @param type              type of javadoc
+     * @param indent            indentation
+     * @param isForDefaultClass if javadoc is generated for default class
      * @return class javadoc
      */
     private static String getJavaDocForDefaultClass(String name, String type,
-                                                    String indent) {
+                                                    String indent, boolean isForDefaultClass) {
+        String append = addFlagJavaDoc();
+        if (!isForDefaultClass) {
+            append = EMPTY_STRING;
+        }
         return NEW_LINE + indent + JAVA_DOC_FIRST_LINE + indent + type +
-                getSmallCase(name) + PERIOD + NEW_LINE + indent
-                + addFlagJavaDoc() + JAVA_DOC_END_LINE;
+                getSmallCase(name) + PERIOD + NEW_LINE + indent + append +
+                JAVA_DOC_END_LINE;
     }
 
     /**

@@ -24,7 +24,6 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSortedSet;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.utils.UtilConstants.ABSTRACT_EVENT;
-import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BITSET;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
@@ -67,6 +66,11 @@ public class JavaImportData {
     private boolean isSetToImport;
 
     /**
+     * Flag to denote if any map is imported due to compiler annotation.
+     */
+    private boolean isMapToImport;
+
+    /**
      * Sorted set of import info, to be used to maintain the set of classes to
      * be imported in the generated class.
      */
@@ -106,6 +110,15 @@ public class JavaImportData {
      */
     void setSetToImport(boolean setToImport) {
         isSetToImport = setToImport;
+    }
+
+    /**
+     * Sets true if map is imported due to compiler annotations.
+     *
+     * @param mapToImport true if map is imported due to compiler annotations
+     */
+    void setMapToImport(boolean mapToImport) {
+        isMapToImport = mapToImport;
     }
 
     /**
@@ -207,6 +220,9 @@ public class JavaImportData {
         if (isSetToImport) {
             imports.add(getImportForSet());
         }
+        if (isMapToImport) {
+            imports.add(getImportForMap());
+        }
 
         sort(imports);
         return imports;
@@ -227,7 +243,7 @@ public class JavaImportData {
      *
      * @return import for to string method
      */
-    public String getImportForToString() {
+    String getImportForToString() {
         return getImportString(GOOGLE_MORE_OBJECT_IMPORT_PKG,
                                GOOGLE_MORE_OBJECT_IMPORT_CLASS);
     }
@@ -246,15 +262,6 @@ public class JavaImportData {
      *
      * @return import for to bitset method
      */
-    public String getImportForToBase64() {
-        return getImportString(JAVA_UTIL_PKG, BASE64);
-    }
-
-    /**
-     * Returns import for to bitset method.
-     *
-     * @return import for to bitset method
-     */
     public String getImportForPattern() {
         return getImportString(JAVA_UTIL_REGEX_PKG, PATTERN);
     }
@@ -266,6 +273,15 @@ public class JavaImportData {
      */
     String getImportForList() {
         return getImportString(COLLECTION_IMPORTS, LIST);
+    }
+
+    /**
+     * Returns import for map attribute.
+     *
+     * @return import for map attribute
+     */
+    private String getImportForMap() {
+        return getImportString(COLLECTION_IMPORTS, MAP);
     }
 
     /**

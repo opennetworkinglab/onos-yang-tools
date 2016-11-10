@@ -22,6 +22,7 @@ package org.onosproject.yangutils.parser.impl.listeners;
 
 import org.onosproject.yangutils.datamodel.YangLeaf;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
+import org.onosproject.yangutils.datamodel.YangList;
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.parser.antlrgencode.GeneratedYangParser;
@@ -135,6 +136,16 @@ public final class LeafListener {
             leavesHolder = (YangLeavesHolder) tmpData;
             leavesHolder.addLeaf(leaf);
             leaf.setContainedIn(leavesHolder);
+            if (tmpData instanceof YangList) {
+                YangList list = (YangList) tmpData;
+                if (list.isConfig()) {
+                    for (String key : list.getKeyList()) {
+                        if (key.equals(leaf.getName())) {
+                            leaf.setKeyLeaf(true);
+                        }
+                    }
+                }
+            }
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, LEAF_DATA,
                     ctx.identifier().getText(), ENTRY));

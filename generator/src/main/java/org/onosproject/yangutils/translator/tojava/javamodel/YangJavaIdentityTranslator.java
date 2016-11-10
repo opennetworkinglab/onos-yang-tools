@@ -35,13 +35,17 @@ import static org.onosproject.yangutils.translator.tojava.YangJavaModelUtils.upd
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getFromStringMethodForIdentity;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getToStringMethodForIdentity;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
 import static org.onosproject.yangutils.translator.tojava.utils.TranslatorUtils.getErrorMsg;
+import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_FILE_EXTENSION;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
@@ -127,7 +131,8 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             JavaQualifiedTypeInfoTranslator basePkgInfo =
                     new JavaQualifiedTypeInfoTranslator();
             JavaFileInfoTranslator itsInfo = getJavaFileInfo();
-            String className = getCapitalCase(itsInfo.getJavaName());
+            String name = itsInfo.getJavaName();
+            String className = getCapitalCase(name);
             String path = itsInfo.getPackageFilePath();
             createPackage(this);
             List<String> imports = null;
@@ -158,7 +163,8 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
             file = validateLineLength(file);
             //Add to string and from string method to class
-            addStringMethodsToClass(file);
+            addStringMethodsToClass(file, name);
+            insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
 
             closeFile(file, false);
         } catch (IOException e) {
@@ -167,8 +173,10 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
         }
     }
 
-    private void addStringMethodsToClass(File file) {
-        //TODO: add implementation.
+    private void addStringMethodsToClass(File file, String className) throws IOException {
+        insertDataIntoJavaFile(file, getToStringMethodForIdentity(getName()));
+        insertDataIntoJavaFile(file, getFromStringMethodForIdentity(
+                className, getName()));
     }
 
     /**

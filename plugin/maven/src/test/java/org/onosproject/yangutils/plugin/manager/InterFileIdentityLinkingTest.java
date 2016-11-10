@@ -33,8 +33,10 @@ import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.linker.exceptions.LinkerException;
 import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 
@@ -43,6 +45,8 @@ import static org.hamcrest.core.Is.is;
 import static org.onosproject.yangutils.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yangutils.linker.impl.YangLinkerUtils.updateFilePriority;
+import static org.onosproject.yangutils.utils.io.YangPluginConfig.compileCode;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
  * Test cases for testing inter file linking for identity.
@@ -138,6 +142,23 @@ public class InterFileIdentityLinkingTest {
         assertThat(yangIdentityRef.getReferredIdentity().getName(), is("ref-address-family"));
         assertThat(yangIdentityRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
 
+    }
+
+    @Test
+    public void processTranslator() throws IOException, ParserException, MojoExecutionException {
+
+        deleteDirectory("target/identityTranslator/");
+        String searchDir = "src/test/resources/interfileidentityimport";
+        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir("target/identityTranslator/");
+        utilManager.translateToJava(yangPluginConfig);
+        compileCode(System.getProperty("user.dir") + File
+                .separator + "target/identityTranslator/");
     }
 
     /**

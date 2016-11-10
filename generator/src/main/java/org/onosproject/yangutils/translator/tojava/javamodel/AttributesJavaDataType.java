@@ -546,7 +546,7 @@ public final class AttributesJavaDataType {
      * @param cnfg YANG to java naming conflict util
      * @return import class
      */
-    private static String getIdentityRefImpClass(
+    public static String getIdentityRefImpClass(
             YangType type, YangToJavaNamingConflictUtil cnfg) {
         YangIdentityRef ir = (YangIdentityRef) type.getDataTypeExtendedInfo();
         if (ir.isInGrouping()) {

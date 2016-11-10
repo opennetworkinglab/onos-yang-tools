@@ -25,6 +25,8 @@ public enum YangDataStructure {
 
     LIST,
 
+    MAP,
+
     SET;
 
     /**
@@ -36,7 +38,7 @@ public enum YangDataStructure {
     public static YangDataStructure getDataStructureType(String name) {
         name = name.replace("\"", "");
         for (YangDataStructure dataStructure : values()) {
-            if (dataStructure.name().toLowerCase().equals(name)) {
+            if (dataStructure.name().toLowerCase().equals(name.toLowerCase())) {
                 return dataStructure;
             }
         }

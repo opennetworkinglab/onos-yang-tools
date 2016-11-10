@@ -17,6 +17,9 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
+import org.onosproject.yangutils.datamodel.YangDataStructure;
+import org.onosproject.yangutils.datamodel.YangIdentity;
+import org.onosproject.yangutils.datamodel.YangIdentityRef;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -41,7 +44,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yangutils.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
-import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getIfConditionForAddToListMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
 import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
@@ -90,12 +93,14 @@ import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTEGER_WRAPPER;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MIN_RANGE;
+import static org.onosproject.yangutils.utils.UtilConstants.KEYS;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MAX_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MIN_RANGE;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_WRAPPER;
+import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.MORE_OBJ_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
@@ -147,6 +152,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_UTILS_TODO;
 import static org.onosproject.yangutils.utils.UtilConstants.ZERO;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
+import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.trimAtLast;
 
 /**
@@ -329,13 +336,6 @@ public final class StringGenerator {
                         signatureClose();
             case DEFAULT_CONSTRUCTOR:
                 return EMPTY_STRING;
-            case ADD_TO_LIST:
-                return space + getIfConditionForAddToListMethod(paraName) +
-                        space + paraName +
-                        brackets(OPEN_CLOSE_BRACKET, null, null) + PERIOD +
-                        ADD_STRING + getOpenCloseParaWithValue(VALUE) +
-                        signatureClose() + getReturnString(
-                        THIS + signatureClose(), space);
             case AUGMENTED_MAP_ADD:
                 return space + YANG_AUGMENTED_INFO_MAP +
                         PERIOD + PUT + OPEN_PARENTHESIS + CLASS +
@@ -589,10 +589,9 @@ public final class StringGenerator {
     static String getListAttribute(String attrType,
                                    YangCompilerAnnotation compilerAnnotation) {
         String listAttr;
-        if (compilerAnnotation != null &&
-                compilerAnnotation.getYangAppDataStructure() != null) {
-            switch (compilerAnnotation.getYangAppDataStructure()
-                    .getDataStructure()) {
+        YangDataStructure ds = getYangDataStructure(compilerAnnotation);
+        if (ds != null) {
+            switch (ds) {
                 case QUEUE: {
                     listAttr = QUEUE + DIAMOND_OPEN_BRACKET + attrType +
                             DIAMOND_CLOSE_BRACKET;
@@ -608,6 +607,10 @@ public final class StringGenerator {
                             DIAMOND_CLOSE_BRACKET;
                     break;
                 }
+                case MAP:
+                    listAttr = MAP + DIAMOND_OPEN_BRACKET + attrType + KEYS +
+                            COMMA + attrType + DIAMOND_CLOSE_BRACKET;
+                    break;
                 default: {
                     listAttr = getListString() + attrType +
                             DIAMOND_CLOSE_BRACKET;
@@ -789,9 +792,7 @@ public final class StringGenerator {
 
             case INSTANCE_IDENTIFIER:
             case STRING:
-            case IDENTITYREF:
                 return EMPTY_STRING;
-
             case EMPTY:
             case BOOLEAN:
                 return BOOLEAN_WRAPPER + PERIOD + PARSE_BOOLEAN;
@@ -799,6 +800,12 @@ public final class StringGenerator {
             case ENUMERATION:
                 return targetDataType + PERIOD + OF;
 
+            case IDENTITYREF:
+                YangIdentityRef ir = (YangIdentityRef) yangType
+                        .getDataTypeExtendedInfo();
+                YangIdentity identity = ir.getReferredIdentity();
+                return getCapitalCase(getCamelCase(identity.getName(), null))
+                        + PERIOD + FROM_STRING_METHOD_NAME;
             case DERIVED:
             case UNION:
                 return targetDataType + PERIOD + FROM_STRING_METHOD_NAME;
@@ -1033,6 +1040,26 @@ public final class StringGenerator {
             mod = modifier + SPACE;
         }
         return mod + classType + SPACE + name + defCloseString();
+    }
+
+    /**
+     * Returns class definition for implements.
+     *
+     * @param classType class type
+     * @param name      name of class
+     * @param modifier  modifier
+     * @param implClass implements class
+     * @return class definition
+     */
+    static String getDefinitionWithImplements(String classType, String name,
+                                              String modifier, String
+                                                      implClass) {
+        String mod = EMPTY_STRING;
+        if (modifier != null) {
+            mod = modifier + SPACE;
+        }
+        return mod + classType + SPACE + name + SPACE + IMPLEMENTS + SPACE +
+                implClass + defCloseString();
     }
 
     /**

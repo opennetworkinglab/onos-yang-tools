@@ -228,6 +228,16 @@ public final class UtilConstants {
     public static final String PERIOD = ".";
 
     /**
+     * Static attribute for period.
+     */
+    public static final String ENTRY = "Entry";
+
+    /**
+     * Static attribute for period.
+     */
+    public static final String ENTRY_SET = "entrySet()";
+
+    /**
      * Static attribute for compare to.
      */
     public static final String COMPARE_TO = "compareTo";
@@ -621,6 +631,31 @@ public final class UtilConstants {
     public static final String ADD_STRING = "add";
 
     /**
+     * Static attribute for key syntax.
+     */
+    public static final String KEYS = "Keys";
+
+    /**
+     * Static attribute for key syntax.
+     */
+    public static final String GET_KEY = "getKey()";
+
+    /**
+     * Static attribute for key syntax.
+     */
+    public static final String GET_VALUE = "getValue()";
+
+    /**
+     * Static attribute for -1 to syntax.
+     */
+    public static final String NEG_ONE = "-1";
+
+    /**
+     * Static attribute for Comparable to syntax.
+     */
+    public static final String COMPARABLE = "Comparable";
+
+    /**
      * Static attribute for string trim syntax.
      */
     public static final String TRIM_STRING = "trim";
@@ -674,6 +709,11 @@ public final class UtilConstants {
      * Static attribute for value syntax.
      */
     public static final String VALUE = "value";
+
+    /**
+     * Static attribute for value syntax.
+     */
+    public static final String VALUE_CAPS = "Value";
 
     /**
      * Static attribute for suffix s.
@@ -890,8 +930,23 @@ public final class UtilConstants {
     /**
      * Static attribute for exception string in bits enum class.
      */
-    public static final String EXCEPTION_STRING = "IllegalArgumentException(\"no" +
-            " such element found in bits\");\n";
+    public static final String EXCEPTION_STRING = "IllegalArgumentException" +
+            "(\"not a valid input element\");\n";
+
+    /**
+     * Static attribute for priority queue.
+     */
+    public static final String PRIORITY_QUEUE = "java.util.PriorityQueue<>()";
+
+    /**
+     * Static attribute for linked hash set.
+     */
+    public static final String LINKED_HASH_SET = "java.util.LinkedHashSet<>()";
+
+    /**
+     * Static attribute for priority queue.
+     */
+    public static final String LINKED_HASH_MAP = "java.util.LinkedHashMap<>()";
 
     /**
      * Static attribute for "throw new ".

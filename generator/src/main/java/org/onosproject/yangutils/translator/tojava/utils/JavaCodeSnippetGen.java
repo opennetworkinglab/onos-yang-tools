@@ -17,6 +17,7 @@
 package org.onosproject.yangutils.translator.tojava.utils;
 
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
+import org.onosproject.yangutils.datamodel.YangDataStructure;
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorInfo;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import static java.util.Collections.sort;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getDefaultDefinition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getOpenCloseParaWithValue;
@@ -45,9 +47,11 @@ import static org.onosproject.yangutils.utils.UtilConstants.HASH_MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.INT_MIN_RANGE_ATTR;
+import static org.onosproject.yangutils.utils.UtilConstants.KEYS;
 import static org.onosproject.yangutils.utils.UtilConstants.LIST;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MAX_RANGE_ATTR;
 import static org.onosproject.yangutils.utils.UtilConstants.LONG_MIN_RANGE_ATTR;
+import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
@@ -156,14 +160,16 @@ public final class JavaCodeSnippetGen {
 
             attrDef.append(signatureClose());
         } else {
-            // Add starting definition.
-            addAttrStartDef(annotation, attrDef);
-
+            StringBuilder type = new StringBuilder();
             if (typePkg != null) {
-                attrDef.append(typePkg).append(PERIOD);
+                type.append(typePkg).append(PERIOD);
             }
 
-            attrDef.append(attrType);
+            type.append(attrType);
+
+            // Add starting definition.
+            addAttrStartDef(annotation, attrDef, type.toString());
+
 
             // Add ending definition.
             addAttrEndDef(attrDef, attrName);
@@ -176,12 +182,13 @@ public final class JavaCodeSnippetGen {
      *
      * @param annotation compiler annotation
      * @param attrDef    JAVA attribute definition
+     * @param type       attr type
      */
     private static void addAttrStartDef(YangCompilerAnnotation annotation,
-                                        StringBuilder attrDef) {
-        if (annotation != null &&
-                annotation.getYangAppDataStructure() != null) {
-            switch (annotation.getYangAppDataStructure().getDataStructure()) {
+                                        StringBuilder attrDef, String type) {
+        YangDataStructure ds = getYangDataStructure(annotation);
+        if (ds != null) {
+            switch (ds) {
                 case QUEUE: {
                     attrDef.append(QUEUE)
                             .append(DIAMOND_OPEN_BRACKET);
@@ -192,6 +199,10 @@ public final class JavaCodeSnippetGen {
                             .append(DIAMOND_OPEN_BRACKET);
                     break;
                 }
+                case MAP:
+                    attrDef.append(MAP).append(DIAMOND_OPEN_BRACKET)
+                            .append(type).append(KEYS).append(COMMA);
+                    break;
                 default: {
                     attrDef.append(LIST)
                             .append(DIAMOND_OPEN_BRACKET);
@@ -200,6 +211,7 @@ public final class JavaCodeSnippetGen {
         } else {
             attrDef.append(LIST).append(DIAMOND_OPEN_BRACKET);
         }
+        attrDef.append(type);
     }
 
     /**

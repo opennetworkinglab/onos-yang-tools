@@ -20,6 +20,7 @@ import org.onosproject.yangutils.datamodel.RpcNotificationContainer;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangCase;
 import org.onosproject.yangutils.datamodel.YangChoice;
+import org.onosproject.yangutils.datamodel.YangDataStructure;
 import org.onosproject.yangutils.datamodel.YangLeafRef;
 import org.onosproject.yangutils.datamodel.YangLeavesHolder;
 import org.onosproject.yangutils.datamodel.YangNode;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
 import static org.onosproject.yangutils.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
@@ -47,6 +49,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.
 import static org.onosproject.yangutils.translator.tojava.utils.IndentationType.TWENTY_SPACE;
 import static org.onosproject.yangutils.translator.tojava.utils.JavaFileGeneratorUtils.getDataFromTempFileHandle;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getAppInstanceAttrString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getElseIfConditionBegin;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getEqualEqualString;
@@ -70,24 +73,34 @@ import static org.onosproject.yangutils.utils.UtilConstants.BREAK;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILDER_LOWER_CASE;
 import static org.onosproject.yangutils.utils.UtilConstants.BUILD_FOR_FILTER;
+import static org.onosproject.yangutils.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yangutils.utils.UtilConstants.COMMA;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_CAPS;
+import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
+import static org.onosproject.yangutils.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yangutils.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yangutils.utils.UtilConstants.ELSE;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.ENTRY;
+import static org.onosproject.yangutils.utils.UtilConstants.ENTRY_SET;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.EXTEND;
 import static org.onosproject.yangutils.utils.UtilConstants.FALSE;
 import static org.onosproject.yangutils.utils.UtilConstants.FLAG;
 import static org.onosproject.yangutils.utils.UtilConstants.GET;
+import static org.onosproject.yangutils.utils.UtilConstants.GET_KEY;
+import static org.onosproject.yangutils.utils.UtilConstants.GET_VALUE;
 import static org.onosproject.yangutils.utils.UtilConstants.INSTANCE;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_EMPTY;
 import static org.onosproject.yangutils.utils.UtilConstants.IS_SELECT_ALL_SCHEMA_CHILD_FLAG;
+import static org.onosproject.yangutils.utils.UtilConstants.KEYS;
 import static org.onosproject.yangutils.utils.UtilConstants.LEAF_IDENTIFIER;
+import static org.onosproject.yangutils.utils.UtilConstants.MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.NOT;
 import static org.onosproject.yangutils.utils.UtilConstants.NULL;
@@ -103,6 +116,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_LEAF_LIST_ST
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_LEAF_STF_PARAM;
 import static org.onosproject.yangutils.utils.UtilConstants.PROCESS_SUBTREE_FILTERING;
 import static org.onosproject.yangutils.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yangutils.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yangutils.utils.UtilConstants.RESULT;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_ALL_CHILD;
 import static org.onosproject.yangutils.utils.UtilConstants.SELECT_ALL_CHILD_SCHEMA_PARAM;
@@ -706,7 +720,8 @@ public final class SubtreeFilteringMethodsGenerator {
                 .build())).processSubtreeFiltering(appInstance.interfaces(),
                                                    true);*/
 
-        assignment = getDummyObjectCreation(node, name, clsInfo, type, classCast, false);
+        assignment = getDummyObjectCreation(node, name, clsInfo, type,
+                                            classCast, false, false);
         builder.append(assignment).append(SIXTEEN_SPACE_INDENTATION).append(
                 CLOSE_CURLY_BRACKET).append(ELSE).append(OPEN_CURLY_BRACKET)
                 .append(NEW_LINE);
@@ -753,10 +768,33 @@ public final class SubtreeFilteringMethodsGenerator {
         String caps = getCapitalCase(javaAttributeInfo.getAttributeName());
         String name = javaAttributeInfo.getAttributeName();
         String type = javaAttributeInfo.getImportInfo().getClassInfo();
+        if (javaAttributeInfo.getAttributeType() != null && javaAttributeInfo
+                .getAttributeType().getDataType() == IDENTITYREF) {
+            type = CLASS_STRING + DIAMOND_OPEN_BRACKET +
+                    QUESTION_MARK + SPACE + EXTEND + SPACE +
+                    type + DIAMOND_CLOSE_BRACKET;
+        }
+
+        YangDataStructure struct = getYangDataStructure
+                (javaAttributeInfo.getCompilerAnnotation());
+
+        boolean isMap = false;
+        if (struct != null && struct == YangDataStructure.MAP) {
+            isMap = true;
+        }
+
         String clsInfo = DEFAULT_CAPS + type;
         if (javaAttributeInfo.isQualifiedName()) {
-            type = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
-                    type;
+            if (javaAttributeInfo.getAttributeType() != null && javaAttributeInfo
+                    .getAttributeType().getDataType() == IDENTITYREF) {
+                type = CLASS_STRING + DIAMOND_OPEN_BRACKET +
+                        QUESTION_MARK + SPACE + EXTEND + SPACE +
+                        javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
+                        type + DIAMOND_CLOSE_BRACKET;
+            } else {
+                type = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
+                        type;
+            }
             clsInfo = javaAttributeInfo.getImportInfo().getPkgInfo() + PERIOD +
                     clsInfo;
         }
@@ -767,29 +805,60 @@ public final class SubtreeFilteringMethodsGenerator {
         if (node != null && node instanceof YangChoice) {
             cast = name;
         }
+        String validPass;
+        //If map is in DS then need to pass name.getValue() to processSubTree.
+        if (isMap) {
+            validPass = name + TWO + PERIOD + GET_VALUE;
+        } else {
+            validPass = name + TWO;
+        }
         String resultString = cast + NEW_LINE + TWENTY_EIGHT_SPACE_INDENTATION +
                 PERIOD + PROCESS_SUBTREE_FILTERING + OPEN_PARENTHESIS +
-                name + "2" + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
+                validPass + COMMA + SPACE + FALSE + CLOSE_PARENTHESIS + SEMI_COLON +
                 NEW_LINE;
         /*
          * If select all schema child
          */
+        String forCondition;
+        String mapEntry;
+        String para;
+        //If map is there in DS the for loop should run for map entry.
+        if (!isMap) {
+            forCondition = getForLoopString(SIXTEEN_SPACE_INDENTATION, type, name,
+                                            getAppInstanceAttrString(name));
+        } else {
+            mapEntry = MAP + PERIOD + ENTRY + DIAMOND_OPEN_BRACKET + type +
+                    KEYS + COMMA + SPACE + type + DIAMOND_CLOSE_BRACKET + SPACE;
+            para = getAppInstanceAttrString(name) + PERIOD + ENTRY_SET;
+            forCondition = getForLoopString(SIXTEEN_SPACE_INDENTATION,
+                                            mapEntry, name, para);
+        }
         builder.append(getIfConditionBegin(EIGHT_SPACE_INDENTATION,
                                            IS_SELECT_ALL_SCHEMA_CHILD_FLAG))
                 .append(getIfConditionBegin(TWELVE_SPACE_INDENTATION,
                                             getAppInstanceCondition(name, NOT)))
-                .append(getForLoopString(SIXTEEN_SPACE_INDENTATION, type, name,
-                                         getAppInstanceAttrString(name)));
+                .append(forCondition);
         String assignment;
+        String result;
+        //If map is added then while creating dummy object need to used name
+        // .getValue() and to add the result in subTreeBuilder need to pass
+        // using key and value, key will be name.getKey() and value will be
+        // result.
+        if (isMap) {
+            result = getOpenCloseParaWithValue(name + PERIOD + GET_KEY + COMMA +
+                                                       SPACE + RESULT);
+        } else {
+            result = getOpenCloseParaWithValue(RESULT);
+        }
         if (!isLeafList) {
             builder.append(TWENTY_SPACE_INDENTATION).append(type).append(SPACE)
                     .append(RESULT).append(signatureClose());
             assignment = getDummyObjectCreation(node, name, type, clsInfo,
-                                                classCast, true);
+                                                classCast, true, isMap);
             builder.append(assignment);
             assignment = TWENTY_SPACE_INDENTATION +
                     SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
-                    getCapitalCase(TO) + caps + getOpenCloseParaWithValue(RESULT) +
+                    getCapitalCase(TO) + caps + result +
                     signatureClose();
             builder.append(assignment);
         } else {
@@ -857,8 +926,8 @@ public final class SubtreeFilteringMethodsGenerator {
             builder.append(assignment);
             assignment = TWENTY_EIGHT_SPACE_INDENTATION +
                     SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
-                    getCapitalCase(TO) + caps + getOpenCloseParaWithValue(
-                    name + TWO) + signatureClose();
+                    getCapitalCase(TO) + caps + getOpenCloseParaWithValue(name + TWO) +
+                    signatureClose();
             builder.append(assignment).append(TWENTY_EIGHT_SPACE_INDENTATION)
                     .append(BREAK).append(signatureClose())
                     //the content match leaf list attribute value matches
@@ -876,15 +945,36 @@ public final class SubtreeFilteringMethodsGenerator {
             cond = getAppInstanceCondition(name, NOT) + SPACE + AND_OPERATION +
                     SPACE + NOT + getAppInstanceAttrString(name) +
                     PERIOD + IS_EMPTY;
+            //Same here for loop for map entry.
+            if (!isMap) {
+                forCondition = getForLoopString(TWENTY_SPACE_INDENTATION, type,
+                                                name + TWO,
+                                                getAppInstanceAttrString(name));
+            } else {
+                mapEntry = MAP + PERIOD + ENTRY + DIAMOND_OPEN_BRACKET + type +
+                        KEYS + COMMA + SPACE + type + DIAMOND_CLOSE_BRACKET + SPACE;
+                para = getAppInstanceAttrString(name) + PERIOD + ENTRY_SET;
+                forCondition = getForLoopString(TWENTY_SPACE_INDENTATION,
+                                                mapEntry, name + TWO, para);
+            }
+            String forCondition2;
+            //Same here for loop for map entry.
+            if (!isMap) {
+                forCondition2 = getForLoopString(SIXTEEN_SPACE_INDENTATION, type, name,
+                                                 name + OPEN_CLOSE_BRACKET_STRING);
+            } else {
+                mapEntry = MAP + PERIOD + ENTRY + DIAMOND_OPEN_BRACKET + type +
+                        KEYS + COMMA + SPACE + type + DIAMOND_CLOSE_BRACKET + SPACE;
+                para = name + OPEN_CLOSE_BRACKET_STRING + PERIOD + ENTRY_SET;
+                forCondition2 = getForLoopString(SIXTEEN_SPACE_INDENTATION,
+                                                 mapEntry, name, para);
+            }
             /*if there is any app instance entry*/
             builder.append(getIfConditionBegin(SIXTEEN_SPACE_INDENTATION,
                                                cond))
                     //loop all the app instance(s)
-                    .append(getForLoopString(SIXTEEN_SPACE_INDENTATION, type, name,
-                                             name + OPEN_CLOSE_BRACKET_STRING))
-                    .append(getForLoopString(TWENTY_SPACE_INDENTATION, type,
-                                             name + TWO,
-                                             getAppInstanceAttrString(name)));
+                    .append(forCondition2)
+                    .append(forCondition);
 
 
             assignment = TWENTY_EIGHT_SPACE_INDENTATION + type + SPACE +
@@ -893,10 +983,20 @@ public final class SubtreeFilteringMethodsGenerator {
             cond = RESULT + SPACE + NOT + EQUAL + SPACE + NULL;
             builder.append(getIfConditionBegin(TWENTY_EIGHT_SPACE_INDENTATION, cond));
 
+            //If map is added then while creating dummy object need to used name
+            // .getValue() and to add the result in subTreeBuilder need to pass
+            // using key and value, key will be name.getKey() and value will be
+            // result.
+            if (isMap) {
+                result = getOpenCloseParaWithValue(name + TWO + PERIOD + GET_KEY +
+                                                           COMMA +
+                                                           SPACE + RESULT);
+            } else {
+                result = getOpenCloseParaWithValue(RESULT);
+            }
             assignment = THIRTY_TWO_SPACE_INDENTATION +
                     SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
-                    getCapitalCase(TO) + caps + getOpenCloseParaWithValue(
-                    RESULT) + signatureClose();
+                    getCapitalCase(TO) + caps + result + signatureClose();
             builder.append(assignment).append(methodClose(TWENTY_EIGHT_SPACE))
                     //loop all the app instance(s)
                     .append(methodClose(TWENTY_FOUR_SPACE))
@@ -914,15 +1014,33 @@ public final class SubtreeFilteringMethodsGenerator {
         if (isLeafList) {
             builder.append(getSelectOrContainmentAssignString());
         }
+
+        //need to pass name.getKey() and name.getValue() while adding to
+        // subtree builder.
+        if (!isMap) {
+            forCondition = getForLoopString(SIXTEEN_SPACE_INDENTATION, type,
+                                            name, getAppInstanceAttrString(name));
+        } else {
+            mapEntry = MAP + PERIOD + ENTRY + DIAMOND_OPEN_BRACKET + type +
+                    KEYS + COMMA + SPACE + type + DIAMOND_CLOSE_BRACKET + SPACE;
+            para = getAppInstanceAttrString(name) + PERIOD + ENTRY_SET;
+            forCondition = getForLoopString(SIXTEEN_SPACE_INDENTATION,
+                                            mapEntry, name, para);
+        }
         cond = getAppInstanceCondition(name, NOT) + SPACE + AND_OPERATION +
                 SPACE + NOT + getAppInstanceAttrString(name) + PERIOD + IS_EMPTY;
         builder.append(getIfConditionBegin(SIXTEEN_SPACE_INDENTATION, cond))
-                .append(getForLoopString(SIXTEEN_SPACE_INDENTATION, type,
-                                         name, getAppInstanceAttrString(name)));
+                .append(forCondition);
+        if (isMap) {
+            result = getOpenCloseParaWithValue(name + PERIOD + GET_KEY + COMMA +
+                                                       SPACE + name + PERIOD +
+                                                       GET_VALUE);
+        } else {
+            result = getOpenCloseParaWithValue(name);
+        }
         assignment = TWENTY_FOUR_SPACE_INDENTATION +
                 SUBTREE_FILTERING_RESULT_BUILDER + PERIOD + ADD_STRING +
-                getCapitalCase(TO) + caps + getOpenCloseParaWithValue(
-                name) + signatureClose();
+                getCapitalCase(TO) + caps + result + signatureClose();
         builder.append(assignment).append(methodClose(TWENTY_SPACE))// Close collection Iteration loop
                 // close  if condition
                 .append(methodClose(SIXTEEN_SPACE))
@@ -933,102 +1051,73 @@ public final class SubtreeFilteringMethodsGenerator {
     }
 
     public static String getAugmentableSubTreeFiltering() {
-        return "        if (yangAugmentedInfoMap.isEmpty()) {\n            " +
-                "Set<Map.Entry<Class<?>, Object>> augment = appInstance" +
-                ".yangAugmentedInfoMap().entrySet();\n            " +
-                "if (augment != null && !augment.isEmpty()) {\n" +
-                "                " +
-                "Iterator<Map.Entry<Class<?>, Object>> augItr = " +
-                "augment.iterator();\n                " +
-                "while (augItr.hasNext()) {\n                    " +
-                "Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
-                "                    " +
-                "Class<?> augClass = aug.getKey();\n                    " +
-                "String augClassName = augClass.getName();\n" +
-                "                    " +
-                "int index = augClassName.lastIndexOf('.');\n" +
-                "                    " +
-                "String classPackage = augClassName.substring(0, index) +\n" +
-                "                            " +
-                "\".\" + \"Default\" + augClass.getSimpleName() + \"$\"\n" +
-                "                            " +
-                "+ augClass.getSimpleName() + \"Builder\";\n" +
-                "                    " +
-                "ClassLoader classLoader = augClass.getClassLoader();\n" +
-                "                    " +
-                "try {\n                        " +
-                "Class<?> builderClass;\n                        " +
-                "builderClass = classLoader.loadClass(classPackage);\n" +
-                "                        " +
-                "Object builderObj = builderClass.newInstance();\n" +
-                "                        " +
-                "Method method = builderClass.getMethod(\"build\");\n" +
-                "                        " +
-                "Object defaultObj = method.invoke(builderObj);\n" +
-                "                        " +
-                "Class<?> defaultClass = defaultObj.getClass();\n" +
-                "                        " +
-                "method = defaultClass.getMethod\n" +
-                "                                " +
-                "(\"processSubtreeFiltering\", augClass,\n" +
-                "                                 " +
-                "boolean.class);\n                        " +
-                "Object result = method.invoke(defaultObj, aug.getValue(),\n" +
-                "                                                      " +
-                "true);\n                        " +
-                "subTreeFilteringResultBuilder\n" +
-                "                                " +
-                ".addYangAugmentedInfo(result, augClass);\n" +
-                "                    " +
-                "} catch (ClassNotFoundException | InstantiationException\n" +
+        return "        if (yangAugmentedInfoMap.isEmpty()) {\n" +
+                "            Set<Map.Entry<Class<?>, Object>> augment =" +
+                " appInstance.yangAugmentedInfoMap().entrySet();\n" +
+                "            if (augment != null && !augment.isEmpty()) {\n" +
+                "                Iterator<Map.Entry<Class<?>, Object>> augItr =" +
+                " augment.iterator();\n" +
+                "                while (augItr.hasNext()) {\n" +
+                "                    Map.Entry<Class<?>, Object> aug =" +
+                " augItr.next();\n" +
+                "                    Class<?> augClass = aug.getKey();\n" +
+                "                    String augClassName = augClass.getName();\n" +
+                "                    int index = augClassName.lastIndexOf('.');\n" +
+                "                    String classPackage = augClassName.substring(0, index) +\n" +
+                "                            \".\" + \"Default\" + augClass.getSimpleName() + \"$\"\n" +
+                "                            + augClass.getSimpleName() + \"Builder\";\n" +
+                "                    ClassLoader classLoader = augClass.getClassLoader();\n" +
+                "                    try {\n" +
+                "                        Class<?> builderClass;\n" +
+                "                        builderClass = classLoader.loadClass(classPackage);\n" +
+                "                        Object builderObj = builderClass.newInstance();\n" +
+                "                        Method method = builderClass.getMethod(\"build\");\n" +
+                "                        Object defaultObj = method.invoke(builderObj);\n" +
+                "                        Class<?> defaultClass = defaultObj.getClass();\n" +
+                "                        method = defaultClass.getMethod(" +
+                "\"processSubtreeFiltering\", augClass, boolean.class);\n" +
+                "                        Object result = method.invoke(" +
+                "defaultObj, aug.getValue(), true);\n" +
+                "                        subTreeFilteringResultBuilder." +
+                "addYangAugmentedInfo(result, augClass);\n" +
+                "                    } catch (ClassNotFoundException | InstantiationException\n" +
                 "                            | NoSuchMethodException |\n" +
-                "                            " +
-                "InvocationTargetException | IllegalAccessException e) {\n" +
-                "                        e.printStackTrace();\n" +
+                "                            InvocationTargetException | IllegalAccessException e) {\n" +
                 "                    }\n" +
                 "                }\n" +
                 "            }\n" +
-                "        } else {\n            " +
-                "Set<Map.Entry<Class<?>, Object>> augment = " +
-                "yangAugmentedInfoMap\n                    .entrySet();\n" +
-                "            " +
-                "Iterator<Map.Entry<Class<?>, Object>> augItr = " +
-                "augment.iterator();\n            " +
-                "while (augItr.hasNext()) {\n                " +
-                "Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
+                "        } else {\n" +
+                "            Set<Map.Entry<Class<?>, Object>> augment = yangAugmentedInfoMap\n" +
+                "                    .entrySet();\n" +
+                "            Iterator<Map.Entry<Class<?>, Object>> augItr = augment.iterator();\n" +
+                "            while (augItr.hasNext()) {\n" +
+                "                Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
                 "                Class<?> augClass = aug.getKey();\n" +
-                "                " +
-                "Object appInstanceInfo = appInstance.yangAugmentedInfo(" +
-                "augClass);\n                if (appInstanceInfo == null) {\n" +
-                "                    " +
-                "subTreeFilteringResultBuilder.addYangAugmentedInfo\n" +
-                "                            " +
-                "(aug.getValue(), aug.getKey());\n" +
-                "                } else {\n                    " +
-                "Object processSubtreeFiltering;\n                    try {\n" +
-                "                        " +
-                "processSubtreeFiltering = aug.getValue().getClass()\n" +
-                "                                " +
-                ".getMethod(\"processSubtreeFiltering\",\n" +
-                "                                           " +
-                "aug.getKey(), boolean.class)\n" +
-                "                                .invoke(aug.getValue(),\n" +
-                "                                        " +
-                "appInstanceInfo, true);\n                        " +
-                "if (processSubtreeFiltering != null) {\n" +
-                "                            " +
-                "subTreeFilteringResultBuilder\n                            " +
-                "        .addYangAugmentedInfo(processSubtreeFiltering, " +
-                "aug.getKey());\n                        }\n" +
-                "                    } catch (NoSuchMethodException | " +
-                "InvocationTargetException | IllegalAccessException e) {\n" +
-                "                        e.printStackTrace();\n" +
+                "                Object appInstanceInfo = appInstance." +
+                "yangAugmentedInfo(augClass);\n" +
+                "                if (appInstanceInfo == null) {\n" +
+                "                    subTreeFilteringResultBuilder." +
+                "addYangAugmentedInfo(aug.getValue(), aug.getKey());\n" +
+                "                } else {\n" +
+                "                    Object processSubtreeFiltering;\n" +
+                "                    try {\n" +
+                "                        processSubtreeFiltering = " +
+                "aug.getValue().getClass()\n" +
+                "                                .getMethod(\"processSubtreeFiltering\"," +
+                " aug.getKey(), boolean.class)\n" +
+                "                                .invoke(aug.getValue(), appInstanceInfo, true);\n" +
+                "                        if (processSubtreeFiltering != null) {\n" +
+                "                            subTreeFilteringResultBuilder\n" +
+                "                                    .addYangAugmentedInfo(" +
+                "processSubtreeFiltering, aug.getKey());\n" +
+                "                        }\n" +
+                "                    } catch (NoSuchMethodException | InvocationTargetException |\n" +
+                "                            IllegalAccessException e) {\n" +
                 "                    }\n" +
                 "                }\n" +
                 "            }\n" +
                 "        }\n";
     }
-
 
     private static String getSubTreeFilteredCondition(String name) {
         StringBuilder builder = new StringBuilder();
@@ -1083,10 +1172,15 @@ public final class SubtreeFilteringMethodsGenerator {
 
     private static String getDummyObjectCreation(YangNode node, String name,
                                                  String clsInfo, String type,
-                                                 String classCast, boolean isList) {
+                                                 String classCast, boolean isList,
+                                                 boolean isMap) {
         String para = getAppInstanceAttrString(name);
         if (isList) {
-            para = name;
+            if (isMap) {
+                para = name + PERIOD + GET_VALUE;
+            } else {
+                para = name;
+            }
         }
         if (node != null && node instanceof YangChoice) {
             return getChoiceReflectionResult(name, clsInfo);
