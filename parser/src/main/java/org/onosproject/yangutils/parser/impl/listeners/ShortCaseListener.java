@@ -101,6 +101,9 @@ public final class ShortCaseListener {
         } else if (ctx.leafStatement() != null) {
             caseNode.setName(getValidIdentifier(ctx.leafStatement().identifier().getText(), CASE_DATA, ctx));
             errorConstructContext = ctx.leafStatement();
+        } else if (ctx.anyxmlStatement() != null) {
+            // Anyxml statement is not supported
+            return;
         } else {
             throw new ParserException(constructListenerErrorMessage(INVALID_CHILD, SHORT_CASE_DATA, "", ENTRY));
         }
@@ -141,6 +144,9 @@ public final class ShortCaseListener {
 
         if (listener.getParsedDataStack().peek() instanceof YangCase) {
             listener.getParsedDataStack().pop();
+        } else if (ctx.anyxmlStatement() != null) {
+            // Anyxml statement is not supported
+            return;
         } else {
             throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, SHORT_CASE_DATA,
                     "", EXIT));

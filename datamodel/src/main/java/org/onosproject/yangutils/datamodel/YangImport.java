@@ -246,7 +246,9 @@ public class YangImport extends DefaultLocationInfo
                     return;
                 }
                 // Match revision if import is with revision.
-                if (((YangModule) moduleNode).getRevision().getRevDate().equals(importedModuleRevision)) {
+                if (moduleNode.getRevision() != null && (moduleNode
+                        .getRevision().getRevDate()
+                        .equals(importedModuleRevision))) {
                     setImportedNode(moduleNode);
                     return;
                 }

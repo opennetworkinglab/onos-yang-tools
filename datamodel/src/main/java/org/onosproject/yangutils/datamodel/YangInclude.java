@@ -183,8 +183,11 @@ public class YangInclude extends DefaultLocationInfo
                     setIncludedNode(subModuleNode);
                     return (YangSubModule) subModuleNode;
                 }
+
                 // Match revision if inclusion is with revision.
-                if (((YangSubModule) subModuleNode).getRevision().getRevDate().equals(includedSubModuleRevision)) {
+                if (subModuleNode.getRevision() != null && subModuleNode
+                        .getRevision().getRevDate()
+                        .equals(includedSubModuleRevision)) {
                     setIncludedNode(subModuleNode);
                     return (YangSubModule) subModuleNode;
                 }
