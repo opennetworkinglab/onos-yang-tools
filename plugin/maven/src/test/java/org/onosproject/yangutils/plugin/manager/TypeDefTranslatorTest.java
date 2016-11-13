@@ -105,6 +105,6 @@ public class TypeDefTranslatorTest {
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
         compileCode(DIR1);
-        deleteDirectory(DIR);
+        //deleteDirectory(DIR);
     }
 }

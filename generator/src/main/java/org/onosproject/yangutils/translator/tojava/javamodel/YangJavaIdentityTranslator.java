@@ -154,7 +154,7 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
                 isQualified = importData.addImportInfo(basePkgInfo, className,
                                                        javaFileInfo.getPackage());
                 if (!isQualified) {
-                    imports = importData.getImports();
+                    imports = importData.getImports(true);
                 }
             }
 

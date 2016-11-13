@@ -116,7 +116,7 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
         addResolvedAugmentedDataNodeImports(curNode);
         List<String> imports = ((JavaCodeGeneratorInfo) curNode)
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles()
-                .getJavaImportData().getImports();
+                .getJavaImportData().getImports(true);
         createPackage(curNode);
         boolean notification = false;
         if (curNode instanceof YangJavaModuleTranslator) {

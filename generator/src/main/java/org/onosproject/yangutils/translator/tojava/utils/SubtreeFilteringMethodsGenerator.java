@@ -1052,10 +1052,12 @@ public final class SubtreeFilteringMethodsGenerator {
 
     public static String getAugmentableSubTreeFiltering() {
         return "        if (yangAugmentedInfoMap.isEmpty()) {\n" +
-                "            Set<Map.Entry<Class<?>, Object>> augment =" +
+                "            java.util.Set<Map.Entry<Class<?>, Object>> " +
+                "augment =" +
                 " appInstance.yangAugmentedInfoMap().entrySet();\n" +
                 "            if (augment != null && !augment.isEmpty()) {\n" +
-                "                Iterator<Map.Entry<Class<?>, Object>> augItr =" +
+                "                java.util.Iterator<Map.Entry<Class<?>, " +
+                "Object>> augItr =" +
                 " augment.iterator();\n" +
                 "                while (augItr.hasNext()) {\n" +
                 "                    Map.Entry<Class<?>, Object> aug =" +
@@ -1071,7 +1073,8 @@ public final class SubtreeFilteringMethodsGenerator {
                 "                        Class<?> builderClass;\n" +
                 "                        builderClass = classLoader.loadClass(classPackage);\n" +
                 "                        Object builderObj = builderClass.newInstance();\n" +
-                "                        Method method = builderClass.getMethod(\"build\");\n" +
+                "                        java.lang.reflect.Method method = " +
+                "builderClass.getMethod(\"build\");\n" +
                 "                        Object defaultObj = method.invoke(builderObj);\n" +
                 "                        Class<?> defaultClass = defaultObj.getClass();\n" +
                 "                        method = defaultClass.getMethod(" +
@@ -1087,9 +1090,9 @@ public final class SubtreeFilteringMethodsGenerator {
                 "                }\n" +
                 "            }\n" +
                 "        } else {\n" +
-                "            Set<Map.Entry<Class<?>, Object>> augment = yangAugmentedInfoMap\n" +
+                "            java.util.Set<Map.Entry<Class<?>, Object>> augment = yangAugmentedInfoMap\n" +
                 "                    .entrySet();\n" +
-                "            Iterator<Map.Entry<Class<?>, Object>> augItr = augment.iterator();\n" +
+                "            java.util.Iterator<Map.Entry<Class<?>, Object>> augItr = augment.iterator();\n" +
                 "            while (augItr.hasNext()) {\n" +
                 "                Map.Entry<Class<?>, Object> aug = augItr.next();\n" +
                 "                Class<?> augClass = aug.getKey();\n" +
@@ -1204,7 +1207,8 @@ public final class SubtreeFilteringMethodsGenerator {
                 "                    Class<?> caseClass = classArray[0];\n" +
                 "                    try {\n" +
                 "                        Object obj1 = caseClass.newInstance();\n" +
-                "                        Method method = caseClass.getMethod(\"builder\", caseClass);\n" +
+                "                        java.lang.reflect.Method method =" +
+                " caseClass.getMethod(\"builder\", caseClass);\n" +
                 "                        Object obj = method.invoke(obj1," +
                 " (Object) null);\n" +
                 "                        method = caseClass.getMethod(\"build\", caseClass);\n" +

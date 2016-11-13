@@ -1224,7 +1224,8 @@ public final class UtilConstants {
                           "short", "static", "strictfp", "super", "switch",
                           "synchronized", "this", "throw", "throws", "transient",
                           "true", "try", "void", "volatile", "while", "list",
-                          "map", "arrayList", "hashMap", "linkedList",
+                          "map", "arrayList", "hashMap", "linkedList", "notify",
+                          "notifyAll", "Method",
                           "collections");
 
     /**
@@ -1727,17 +1728,10 @@ public final class UtilConstants {
      */
     public static final String INVOCATION_TARGET_EXCEPTION =
             "InvocationTargetException";
-
-    /**
-     * Static attribute for InvocationTargetException.
-     */
-    public static final String INVOCATION_TARGET_EXCEPTION_IMPORT = "import" +
-            " java.lang.reflect.InvocationTargetException;\n";
-
     /**
      * Static attribute for arrayList.
      */
-    public static final String ARRAY_LIST = "ArrayList<>()";
+    public static final String ARRAY_LIST_INIT = "ArrayList<>()";
 
     /**
      * Static attribute for arrayList import.
@@ -1745,23 +1739,6 @@ public final class UtilConstants {
     public static final String ARRAY_LIST_IMPORT =
             IMPORT + COLLECTION_IMPORTS + ".ArrayList;\n";
 
-    /**
-     * Static attribute for set collection import.
-     */
-    public static final String SET_IMPORT = IMPORT + COLLECTION_IMPORTS +
-            PERIOD + SET + SEMI_COLON + NEW_LINE;
-
-    /**
-     * Static attribute for reflect method import.
-     */
-    public static final String METHOD_IMPORT = IMPORT + REFLECT_IMPORTS +
-            PERIOD + METHOD + SEMI_COLON + NEW_LINE;
-
-    /**
-     * Static attribute for collection iterator import.
-     */
-    public static final String ITR_IMPORT = IMPORT + COLLECTION_IMPORTS +
-            PERIOD + "Iterator;\n";
     /**
      * Static attribute for unused keyword.
      */
@@ -1917,6 +1894,16 @@ public final class UtilConstants {
 
     //File type extension for java classes.
     public static final String JAVA_FILE_EXTENSION = ".java";
+
+    /**
+     * Static param for typedef.
+     */
+    public static final String HOLDER_TYPE_DEF = "typedef";
+
+    /**
+     * Static param for last.
+     */
+    public static final String LAST = "last";
 
     // No instantiation.
     private UtilConstants() {

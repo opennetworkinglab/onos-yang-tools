@@ -31,6 +31,17 @@ module IdentityTest{
             base ipv4-address-family;
         }
     }
+
+    container ip {
+    container ipv4-address-family {
+    leaf tunnel1 {
+            type identityref {
+                base ipv4-address-family;
+            }
+        }
+    }
+    }
+
     typedef type3 {
     type union {
                 type type2;

@@ -24,14 +24,12 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSortedSet;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yangutils.utils.UtilConstants.ABSTRACT_EVENT;
+import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST_IMPORT;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yangutils.utils.UtilConstants.BITSET;
 import static org.onosproject.yangutils.utils.UtilConstants.COLLECTION_IMPORTS;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EVENT_LISTENER;
-import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
-import static org.onosproject.yangutils.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
-import static org.onosproject.yangutils.utils.UtilConstants.HASH_MAP;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_MATH;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
@@ -195,17 +193,23 @@ public class JavaImportData {
     /**
      * Returns import for class.
      *
+     * @param isForInterface if needs to check for interface
      * @return imports for class
      */
-    public List<String> getImports() {
+    public List<String> getImports(boolean isForInterface) {
 
         String importString;
         List<String> imports = new ArrayList<>();
-
+        boolean check;
         for (JavaQualifiedTypeInfoTranslator importInfo : getImportSet()) {
+            check = importInfo.isForInterface();
+            if (!isForInterface) {
+                check = true;
+            }
             if (!importInfo.getPkgInfo().equals(EMPTY_STRING) &&
                     importInfo.getClassInfo() != null &&
-                    !importInfo.getPkgInfo().equals(JAVA_LANG)) {
+                    !importInfo.getPkgInfo().equals(JAVA_LANG) &&
+                    check) {
                 importString = getImportString(importInfo.getPkgInfo(), importInfo
                         .getClassInfo());
                 imports.add(importString);
@@ -213,6 +217,9 @@ public class JavaImportData {
         }
         if (isListToImport) {
             imports.add(getImportForList());
+            if (!isForInterface) {
+                imports.add(ARRAY_LIST_IMPORT);
+            }
         }
         if (isQueueToImport) {
             imports.add(getImportForQueue());
@@ -239,16 +246,6 @@ public class JavaImportData {
     }
 
     /**
-     * Returns import for to string method.
-     *
-     * @return import for to string method
-     */
-    String getImportForToString() {
-        return getImportString(GOOGLE_MORE_OBJECT_IMPORT_PKG,
-                               GOOGLE_MORE_OBJECT_IMPORT_CLASS);
-    }
-
-    /**
      * Returns import for to bitset method.
      *
      * @return import for to bitset method
@@ -271,7 +268,7 @@ public class JavaImportData {
      *
      * @return import for list attribute
      */
-    String getImportForList() {
+    private String getImportForList() {
         return getImportString(COLLECTION_IMPORTS, LIST);
     }
 
@@ -327,24 +324,6 @@ public class JavaImportData {
      */
     String getEventListenerImport() {
         return getImportString(ONOS_EVENT_PKG, EVENT_LISTENER);
-    }
-
-    /**
-     * Returns import string for map class.
-     *
-     * @return import string for map class
-     */
-    String getMapImport() {
-        return getImportString(COLLECTION_IMPORTS, MAP);
-    }
-
-    /**
-     * Returns import string for hash map class.
-     *
-     * @return import string for hash map class
-     */
-    String getHashMapImport() {
-        return getImportString(COLLECTION_IMPORTS, HASH_MAP);
     }
 
     /**

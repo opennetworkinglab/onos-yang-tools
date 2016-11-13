@@ -18,6 +18,7 @@ package org.onosproject.yangutils.translator.tojava;
 
 import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
+import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
@@ -54,7 +55,9 @@ import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeFor
 import static org.onosproject.yangutils.translator.tojava.utils.ValidatorTypeForUnionTypes.SHORT_TYPE_CONFLICT;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yangutils.utils.UtilConstants.HOLDER_TYPE_DEF;
 import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
+import static org.onosproject.yangutils.utils.UtilConstants.LAST;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getCamelCase;
@@ -158,6 +161,8 @@ public class TempJavaTypeFragmentFiles
     private JavaAttributeInfo uLongAttribute;
 
     private List<YangType<?>> local = new ArrayList<>();
+
+    private List<JavaAttributeInfo> attrs = new ArrayList<>();
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -264,6 +269,11 @@ public class TempJavaTypeFragmentFiles
                 }
                 JavaAttributeInfo javaAttributeInfo = getAttributeForType(type,
                                                                           config);
+                if (yangTypeHolder instanceof YangTypeDef) {
+                    javaAttributeInfo.setCurHolderOrCount(HOLDER_TYPE_DEF);
+                } else if (types.indexOf(type) == types.size() - 1) {
+                    javaAttributeInfo.setCurHolderOrCount(LAST);
+                }
                 if (type.getDataType() == BITS) {
                     addBitsHandler(javaAttributeInfo, type, this);
                 }
@@ -281,6 +291,9 @@ public class TempJavaTypeFragmentFiles
             }
             addTypeConstructor();
             addMethodsInConflictCase(config);
+            for (JavaAttributeInfo attr : attrs) {
+                super.addJavaSnippetInfoToApplicableTempFiles(attr, config);
+            }
         }
     }
 
@@ -341,7 +354,12 @@ public class TempJavaTypeFragmentFiles
         } else {
             addMethodsWhenNoConflictingTypes(attr, config, types);
         }
-        super.addJavaSnippetInfoToApplicableTempFiles(attr, config);
+        String attrHolder = attr.getCurHolderOrCount();
+        if (attrHolder != null && !attrHolder.equals(HOLDER_TYPE_DEF)) {
+            attrs.add(attr);
+        } else {
+            super.addJavaSnippetInfoToApplicableTempFiles(attr, config);
+        }
 
     }
 
@@ -394,12 +412,17 @@ public class TempJavaTypeFragmentFiles
         if (attr != null) {
             if (attr.isIntConflict()) {
                 if (getIntIndex() < getUIntIndex()) {
+                    getIntAttribute().setCurHolderOrCount(
+                            getUIntAttribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getIntAttribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
                     addGetterImpl(getIntAttribute());
+
                     addFromStringMethod(getIntAttribute(), pluginConfig);
                 } else {
+                    getUIntAttribute().setCurHolderOrCount(
+                            getIntAttribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getUIntAttribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
@@ -415,12 +438,16 @@ public class TempJavaTypeFragmentFiles
         if (attr != null) {
             if (attr.isLongConflict()) {
                 if (getLongIndex() < getULongIndex()) {
+                    getLongAttribute().setCurHolderOrCount(
+                            getULongAttribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getLongAttribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
                     addGetterImpl(getLongAttribute());
                     addFromStringMethod(getLongAttribute(), pluginConfig);
                 } else {
+                    getULongAttribute().setCurHolderOrCount(
+                            getLongAttribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getULongAttribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
@@ -437,12 +464,16 @@ public class TempJavaTypeFragmentFiles
         if (attr != null) {
             if (attr.isShortConflict()) {
                 if (getShortIndex() < getUInt8Index()) {
+                    getShortAttribute().setCurHolderOrCount(
+                            getUInt8Attribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getShortAttribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
                     addGetterImpl(getShortAttribute());
                     addFromStringMethod(getShortAttribute(), pluginConfig);
                 } else {
+                    getUInt8Attribute().setCurHolderOrCount(
+                            getShortAttribute().getCurHolderOrCount());
                     appendToFile(getOfStringImplTempFileHandle(), getOfMethodStringAndJavaDoc(getUInt8Attribute(),
                                                                                               getGeneratedJavaClassName())
                             + NEW_LINE);
@@ -611,7 +642,7 @@ public class TempJavaTypeFragmentFiles
             throws IOException {
         List<String> imports = new ArrayList<>();
         if (isAttributePresent()) {
-            imports = getJavaImportData().getImports();
+            imports = getJavaImportData().getImports(true);
         }
 
         createPackage(curNode);

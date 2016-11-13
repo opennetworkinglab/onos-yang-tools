@@ -64,6 +64,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getBitSetAttr;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCatchSubString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getCompareToString;
+import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getExceptionThrowString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getForLoopString;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getGreaterThanCondition;
 import static org.onosproject.yangutils.translator.tojava.utils.StringGenerator.getIfConditionBegin;
@@ -98,7 +99,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.ADD;
 import static org.onosproject.yangutils.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.AND;
 import static org.onosproject.yangutils.utils.UtilConstants.APPEND;
-import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST;
+import static org.onosproject.yangutils.utils.UtilConstants.ARRAY_LIST_INIT;
 import static org.onosproject.yangutils.utils.UtilConstants.AUGMENTED;
 import static org.onosproject.yangutils.utils.UtilConstants.BASE64;
 import static org.onosproject.yangutils.utils.UtilConstants.BIG_INTEGER;
@@ -129,7 +130,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.ENCODE_TO_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.ENUM;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
-import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXTEND;
 import static org.onosproject.yangutils.utils.UtilConstants.FALSE;
 import static org.onosproject.yangutils.utils.UtilConstants.FOR;
@@ -203,7 +203,6 @@ import static org.onosproject.yangutils.utils.UtilConstants.SUBTREE_FILTERED;
 import static org.onosproject.yangutils.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yangutils.utils.UtilConstants.SWITCH;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
-import static org.onosproject.yangutils.utils.UtilConstants.THROW_NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_CAPS;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_STRING_METHOD;
@@ -634,23 +633,20 @@ public final class MethodsGenerator {
      * @return return type
      */
     private static String getReturnType(JavaAttributeInfo attr) {
-        String returnType;
         StringBuilder builder = new StringBuilder();
 
         if (attr.isQualifiedName() &&
                 attr.getImportInfo().getPkgInfo() != null) {
-            returnType = attr.getImportInfo().getPkgInfo() + PERIOD;
-            builder.append(returnType);
+            builder.append(attr.getImportInfo().getPkgInfo()).append(PERIOD);
         }
-        returnType = attr.getImportInfo().getClassInfo();
+        builder.append(attr.getImportInfo().getClassInfo());
 
         if (attr.getAttributeType() != null &&
                 attr.getAttributeType().getDataType() == IDENTITYREF) {
-            returnType = CLASS_STRING + DIAMOND_OPEN_BRACKET +
+            return CLASS_STRING + DIAMOND_OPEN_BRACKET +
                     QUESTION_MARK + SPACE + EXTEND + SPACE +
-                    returnType + DIAMOND_CLOSE_BRACKET;
+                    builder.toString() + DIAMOND_CLOSE_BRACKET;
         }
-        builder.append(returnType);
         return builder.toString();
     }
 
@@ -822,8 +818,7 @@ public final class MethodsGenerator {
      * @return from string method's close string
      */
     static String getFromStringMethodClose() {
-        return getReturnString(NULL, EIGHT_SPACE_INDENTATION) +
-                signatureClose() + methodClose(FOUR_SPACE);
+        return methodClose(FOUR_SPACE);
     }
 
     /**
@@ -841,9 +836,7 @@ public final class MethodsGenerator {
                 getNewLineAndSpace(TWELVE_SPACE_INDENTATION) +
                 getParsedSubString(attr, fromAttr) +
                 getReturnOfSubString() + EIGHT_SPACE_INDENTATION +
-                getCatchSubString() +
-                getNewLineAndSpace(EIGHT_SPACE_INDENTATION) +
-                CLOSE_CURLY_BRACKET;
+                getCatchSubString(attr.getCurHolderOrCount());
     }
 
     /**
@@ -1333,8 +1326,7 @@ public final class MethodsGenerator {
         String method = TWELVE_SPACE_INDENTATION + DEFAULT + SPACE + COLON +
                 NEW_LINE;
         builder.append(method)
-                .append(getReturnString(NULL, SIXTEEN_SPACE_INDENTATION))
-                .append(signatureClose())
+                .append(getExceptionThrowString(SIXTEEN_SPACE_INDENTATION))
                 .append(methodClose(EIGHT_SPACE))
                 .append(methodClose(FOUR_SPACE));
 
@@ -1621,7 +1613,7 @@ public final class MethodsGenerator {
                     break;
 
                 case LIST:
-                    type = ARRAY_LIST;
+                    type = ARRAY_LIST_INIT;
                     break;
 
                 case MAP:
@@ -1633,12 +1625,12 @@ public final class MethodsGenerator {
                     break;
 
                 default:
-                    type = ARRAY_LIST;
+                    type = ARRAY_LIST_INIT;
                     break;
 
             }
         } else {
-            type = ARRAY_LIST;
+            type = ARRAY_LIST_INIT;
         }
         return getIfConditionBegin(EIGHT_SPACE_INDENTATION, name + SPACE + EQUAL +
                 EQUAL + SPACE + NULL) + TWELVE_SPACE_INDENTATION +
@@ -1802,8 +1794,8 @@ public final class MethodsGenerator {
 
         condition = TMP_VAL + PERIOD + IS_EMPTY;
         sBuild.append(getIfConditionBegin(EIGHT_SPACE_INDENTATION, condition));
-        sBuild.append(TWELVE_SPACE_INDENTATION).append(THROW_NEW)
-                .append(EXCEPTION_STRING).append(methodClose(EIGHT_SPACE))
+        sBuild.append(getExceptionThrowString(TWELVE_SPACE_INDENTATION))
+                .append(methodClose(EIGHT_SPACE))
                 .append(getReturnString(TMP_VAL, EIGHT_SPACE_INDENTATION))
                 .append(signatureClose()).append(methodClose(FOUR_SPACE));
         return sBuild.toString();
@@ -2066,8 +2058,8 @@ public final class MethodsGenerator {
                 .append(getIfConditionBegin(EIGHT_SPACE_INDENTATION, cond))
                 .append(getReturnString(returnVal, TWELVE_SPACE_INDENTATION))
                 .append(signatureClose()).append(methodClose(EIGHT_SPACE))
-                .append(EIGHT_SPACE_INDENTATION).append(THROW_NEW)
-                .append(EXCEPTION_STRING).append(methodClose(FOUR_SPACE));
+                .append(getExceptionThrowString(EIGHT_SPACE_INDENTATION))
+                .append(methodClose(FOUR_SPACE));
         return builder.toString();
     }
 

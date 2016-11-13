@@ -159,6 +159,7 @@ public class InterFileIdentityLinkingTest {
         utilManager.translateToJava(yangPluginConfig);
         compileCode(System.getProperty("user.dir") + File
                 .separator + "target/identityTranslator/");
+        deleteDirectory("target/identityTranslator/");
     }
 
     /**

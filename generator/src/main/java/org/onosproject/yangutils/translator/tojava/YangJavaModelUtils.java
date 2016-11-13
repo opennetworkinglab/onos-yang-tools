@@ -433,7 +433,7 @@ public final class YangJavaModelUtils {
         generateCodeOfNode(info, config);
         TempJavaBeanFragmentFiles tempFiles = getBeanFiles(info);
         if (!(info instanceof YangChoice)) {
-            tempFiles.addYangAugmentedMap(config);
+            tempFiles.addYangAugmentedMap(config, (YangNode) info);
         }
         if (info instanceof YangCase) {
             YangNode parent = ((YangCase) info).getParent();

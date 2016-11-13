@@ -77,6 +77,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUAL;
 import static org.onosproject.yangutils.utils.UtilConstants.EQUALS_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION;
+import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.EXCEPTION_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.EXTEND;
 import static org.onosproject.yangutils.utils.UtilConstants.FALSE;
@@ -136,6 +137,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SPACE;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_BUILDER;
 import static org.onosproject.yangutils.utils.UtilConstants.STRING_BUILDER_VAR;
 import static org.onosproject.yangutils.utils.UtilConstants.THIS;
+import static org.onosproject.yangutils.utils.UtilConstants.THROW_NEW;
 import static org.onosproject.yangutils.utils.UtilConstants.TMP_VAL;
 import static org.onosproject.yangutils.utils.UtilConstants.TO_STRING_METHOD;
 import static org.onosproject.yangutils.utils.UtilConstants.TRY;
@@ -244,6 +246,16 @@ public final class StringGenerator {
      */
     static String getReturnString(String value, String space) {
         return space + RETURN + SPACE + value;
+    }
+
+    /**
+     * Returns illegal argument exception string.
+     *
+     * @param space indentation
+     * @return illegal argument exception string
+     */
+    static String getExceptionThrowString(String space) {
+        return space + THROW_NEW + EXCEPTION_STRING;
     }
 
     /**
@@ -823,12 +835,21 @@ public final class StringGenerator {
     /**
      * Returns sub string with catch statement for union's from string method.
      *
+     * @param attrHolder attribute holder/count for from string
      * @return sub string with catch statement for union's from string method
      */
-    static String getCatchSubString() {
-        return CLOSE_CURLY_BRACKET + SPACE + CATCH + SPACE +
+    static String getCatchSubString(String attrHolder) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(CLOSE_CURLY_BRACKET).append(SPACE).append(CATCH)
+                .append(SPACE).append(
                 brackets(OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE, EXCEPTION_VAR,
-                         EXCEPTION) + SPACE + OPEN_CURLY_BRACKET;
+                         EXCEPTION)).append(SPACE).append(OPEN_CURLY_BRACKET)
+                .append(NEW_LINE);
+        if (attrHolder != null) {
+            builder.append(getExceptionThrowString(TWELVE_SPACE_INDENTATION));
+        }
+        builder.append(EIGHT_SPACE_INDENTATION).append(CLOSE_CURLY_BRACKET);
+        return builder.toString();
     }
 
     /**

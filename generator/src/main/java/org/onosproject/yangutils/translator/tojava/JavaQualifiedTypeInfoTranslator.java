@@ -41,6 +41,7 @@ public class JavaQualifiedTypeInfoTranslator
         implements Comparable<JavaQualifiedTypeInfoTranslator>, Serializable {
     private static final long serialVersionUID = 806201634L;
     private boolean isQualified;
+    private boolean isForInterface = true;
 
     /**
      * Creates a java qualified type info object.
@@ -287,5 +288,23 @@ public class JavaQualifiedTypeInfoTranslator
      */
     public void setQualified(boolean qualified) {
         isQualified = qualified;
+    }
+
+    /**
+     * Returns true if import should be added to interface.
+     *
+     * @return true if import should be added to interface
+     */
+    boolean isForInterface() {
+        return isForInterface;
+    }
+
+    /**
+     * Sets true if import should be added to interface.
+     *
+     * @param forInterface true if import should be added to interface
+     */
+    void setForInterface(boolean forInterface) {
+        isForInterface = forInterface;
     }
 }

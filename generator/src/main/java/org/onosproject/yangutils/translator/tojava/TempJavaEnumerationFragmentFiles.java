@@ -178,7 +178,7 @@ public class TempJavaEnumerationFragmentFiles
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
 
-        List<String> imports = this.getJavaImportData().getImports();
+        List<String> imports = this.getJavaImportData().getImports(true);
         createPackage(curNode);
         enumClassJavaFileHandle = getJavaFileHandle(getJavaClassName(EMPTY_STRING));
         generateEnumClassFile(enumClassJavaFileHandle, curNode, imports);

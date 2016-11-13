@@ -76,6 +76,11 @@ public final class JavaAttributeInfo {
     private boolean isShortConflict;
 
     /**
+     * current holder or count in type list of attribute for from string method.
+     */
+    private String curHolderOrCount;
+
+    /**
      * Creates a java attribute info object.
      */
     private JavaAttributeInfo() {
@@ -317,5 +322,23 @@ public final class JavaAttributeInfo {
         newAttr.setCompilerAnnotation(compilerAnnotation);
 
         return newAttr;
+    }
+
+    /**
+     * Returns current holder or count in type list of attribute for from string method.
+     *
+     * @return current holder or count in type list of attribute for from string method
+     */
+    public String getCurHolderOrCount() {
+        return curHolderOrCount;
+    }
+
+    /**
+     * Sets current holder or count in type list of attribute for from string method.
+     *
+     * @param curHolderOrCount current holder or count in type list of attribute for from string method
+     */
+    public void setCurHolderOrCount(String curHolderOrCount) {
+        this.curHolderOrCount = curHolderOrCount;
     }
 }

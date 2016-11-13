@@ -16,14 +16,17 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.ResolvableStatus;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.COMPILER_ANNOTATION_DATA;
 
 /**
  * Represents data model node to maintain information defined in YANG compiler-annotation.
@@ -132,7 +135,7 @@ public class YangCompilerAnnotation extends DefaultLocationInfo
      * @param yangAppExtendedName the YANG app extended name to set
      */
     public void setYangAppExtendedName(YangAppExtended yangAppExtendedName) {
-        this.yangAppExtended = yangAppExtendedName;
+        yangAppExtended = yangAppExtendedName;
     }
 
     /**
@@ -141,7 +144,7 @@ public class YangCompilerAnnotation extends DefaultLocationInfo
      * @return the list of atomic path
      */
     public List<YangAtomicPath> getAtomicPathList() {
-        return atomicPathList;
+        return unmodifiableList(atomicPathList);
     }
 
     /**
@@ -155,7 +158,7 @@ public class YangCompilerAnnotation extends DefaultLocationInfo
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.COMPILER_ANNOTATION_DATA;
+        return COMPILER_ANNOTATION_DATA;
     }
 
     @Override

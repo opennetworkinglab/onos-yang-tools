@@ -163,7 +163,9 @@ public class YangJavaModuleTranslator
             }
 
             if (!isRootNodesCodeGenRequired(this)) {
-                generateInterfaceFileForNonDataNodes(this);
+                if (getChild() != null) {
+                    generateInterfaceFileForNonDataNodes(this);
+                }
             } else {
                 getTempJavaCodeFragmentFiles()
                         .generateJavaFile(GENERATE_INTERFACE_WITH_BUILDER, this);
