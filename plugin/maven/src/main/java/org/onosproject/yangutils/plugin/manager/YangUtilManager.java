@@ -34,6 +34,10 @@ import org.onosproject.yangutils.linker.impl.YangLinkerManager;
 import org.onosproject.yangutils.parser.YangUtilsParser;
 import org.onosproject.yangutils.parser.exceptions.ParserException;
 import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
+import org.onosproject.yangutils.tool.CallablePlugin;
+import org.onosproject.yangutils.tool.YangFileInfo;
+import org.onosproject.yangutils.tool.YangToolManager;
+import org.onosproject.yangutils.tool.exception.YangToolException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
 import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
@@ -55,8 +59,8 @@ import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.addToComp
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.copyYangFilesToTarget;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.resolveInterJarDependencies;
 import static org.onosproject.yangutils.plugin.manager.YangPluginUtils.serializeDataModel;
+import static org.onosproject.yangutils.tool.YangToolManager.DEFAULT_JAR_RES_PATH;
 import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
-import static org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil.translatorErrorHandler;
 import static org.onosproject.yangutils.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yangutils.utils.UtilConstants.IN;
@@ -78,7 +82,7 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getVersionValu
  */
 @Mojo(name = "yang2java", defaultPhase = PROCESS_SOURCES,
         requiresDependencyResolution = COMPILE)
-public class YangUtilManager extends AbstractMojo {
+public class YangUtilManager extends AbstractMojo implements CallablePlugin {
 
     private static final String DEFAULT_PKG =
             getPackageDirPathFromJavaJPackage(DEFAULT_BASE_PKG);
@@ -211,52 +215,45 @@ public class YangUtilManager extends AbstractMojo {
             yangPlugin.setCodeGenDir(codeGenDir);
             yangPlugin.setConflictResolver(conflictResolver);
 
+            yangPlugin.resourceGenDir(outputDir + DEFAULT_JAR_RES_PATH);
             yangPlugin.setCodeGenerateForSbi(generateJavaFileForSbi.toLowerCase());
+
             /*
              * Obtain the YANG files at a path mentioned in plugin and creates
              * YANG file information set.
              */
             createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
 
-            // Check if there are any file to translate, if not return.
-            if (yangFileInfoSet == null || yangFileInfoSet.isEmpty()) {
-                // No files to translate
-                return;
-            }
-            // Resolve inter jar dependency.
-            resolveInterJarDependency();
+            YangToolManager toolManager = new YangToolManager();
+            List<YangNode> interJarResolvedNodes =
+                    resolveInterJarDependencies(project, localRepository,
+                                                remoteRepository, outputDir);
+            System.out.println("going to call tool manager");
+            toolManager.compileYangFiles(yangFileInfoSet,
+                                         interJarResolvedNodes, yangPlugin,
+                                         this);
+            System.out.println("called tool manager");
 
-            // Carry out the parsing for all the YANG files.
-            parseYangFileInfoSet();
 
-            // Resolve dependencies using linker.
-            resolveDependenciesUsingLinker();
-
-            // Perform translation to JAVA.
-            translateToJava(yangPlugin);
-
-            // Serialize data model.
-            serializeDataModel(outputDir, yangFileInfoSet, project, true);
-            addToCompilationRoot(codeGenDir, project, context);
-
-            copyYangFilesToTarget(yangFileInfoSet, outputDir, project);
-        } catch (IOException | ParserException e) {
+        } catch (YangToolException e) {
             String fileName = EMPTY_STRING;
-            if (curYangFileInfo != null) {
-                fileName = curYangFileInfo.getYangFileName();
+            if (e.getCurYangFile() != null) {
+                fileName = e.getCurYangFile().getYangFileName();
             }
             try {
-                translatorErrorHandler(rootNode, yangPlugin);
                 deleteDirectory(codeGenDir + DEFAULT_PKG);
             } catch (IOException ex) {
                 e.printStackTrace();
                 throw new MojoExecutionException(
                         "Error handler failed to delete files for data model node.");
             }
-            getLog().info(e);
+            getLog().info(e.getCause());
             throw new MojoExecutionException(
                     "Exception occurred due to " + e.getLocalizedMessage() +
                             IN + fileName + " YANG file.");
+        } catch (IOException e) {
+            throw new MojoExecutionException(
+                    "Failed to process files");
         }
     }
 
@@ -282,30 +279,7 @@ public class YangUtilManager extends AbstractMojo {
     }
 
     /**
-     * Resolved inter-jar dependencies.
-     *
-     * @throws IOException when fails to do IO operations
-     */
-    private void resolveInterJarDependency()
-            throws IOException {
-        try {
-            List<YangNode> interJarResolvedNodes =
-                    resolveInterJarDependencies(project, localRepository,
-                                                remoteRepository, outputDir);
-            for (YangNode node : interJarResolvedNodes) {
-                YangFileInfo dependentFileInfo = new YangFileInfo();
-                node.setToTranslate(false);
-                dependentFileInfo.setRootNode(node);
-                dependentFileInfo.setForTranslator(false);
-                dependentFileInfo.setYangFileName(node.getName());
-                yangFileInfoSet.add(dependentFileInfo);
-            }
-        } catch (IOException e) {
-            throw new IOException("failed to resolve in inter-jar scenario.");
-        }
-    }
-
-    /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Links all the provided with the YANG file info set.
      *
      * @throws MojoExecutionException a violation in mojo execution
@@ -323,15 +297,17 @@ public class YangUtilManager extends AbstractMojo {
     }
 
     /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Creates YANG nodes set.
      */
-    public void createYangNodeSet() {
+    protected void createYangNodeSet() {
         for (YangFileInfo yangFileInfo : yangFileInfoSet) {
             yangNodeSet.add(yangFileInfo.getRootNode());
         }
     }
 
     /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Parses all the provided YANG files and generates YANG data model tree.
      *
      * @throws IOException a violation in IO
@@ -368,6 +344,7 @@ public class YangUtilManager extends AbstractMojo {
     }
 
     /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Translates to java code corresponding to the YANG schema.
      *
      * @param yangPlugin YANG plugin config
@@ -399,6 +376,7 @@ public class YangUtilManager extends AbstractMojo {
     }
 
     /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Returns the YANG file info set.
      *
      * @return the YANG file info set
@@ -408,6 +386,7 @@ public class YangUtilManager extends AbstractMojo {
     }
 
     /**
+     * TODO: Delete me and use the tool code for UT test cases
      * Sets the YANG file info set.
      *
      * @param yangFileInfoSet the YANG file info set
@@ -439,4 +418,19 @@ public class YangUtilManager extends AbstractMojo {
         getLog().info(logInfo);
     }
 
+    @Override
+    public void addGeneratedCodeToBundle() {
+        addToCompilationRoot(codeGenDir, project, context);
+    }
+
+
+    @Override
+    public void addCompiledSchemaToBundle() throws IOException {
+        serializeDataModel(outputDir, project, true);
+    }
+
+    @Override
+    public void addYangFilesToBundle() throws IOException {
+        copyYangFilesToTarget(outputDir, project);
+    }
 }

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.onosproject.yangutils.plugin.manager;
-
-import java.util.Objects;
+package org.onosproject.yangutils.tool;
 
 import org.onosproject.yangutils.datamodel.YangNode;
+
+import java.util.Objects;
 
 /**
  * Represents YANG file information.
