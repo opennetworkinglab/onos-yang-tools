@@ -271,10 +271,8 @@ public class YangDecimal64<T> extends DefaultLocationInfo
         } else {
             // Check value is in fraction-digits decimal64 value range
             if (!FractionDigits.isValueInDecimal64Range(value, getFractionDigit())) {
-                throw new DataModelException(getErrorMsg(
-                        "YANG file error : decimal64 validation failed.", "decimal64",
-                        getLineNumber(), getCharPosition(), getFileName() + "\""));
-
+                throw new DataModelException(
+                        "YANG file error : value is not in decimal64 range.");
             }
         }
     }

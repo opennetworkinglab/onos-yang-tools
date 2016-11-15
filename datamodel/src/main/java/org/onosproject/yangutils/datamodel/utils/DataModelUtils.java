@@ -22,6 +22,7 @@ import org.onosproject.yangutils.datamodel.YangAtomicPath;
 import org.onosproject.yangutils.datamodel.YangAugment;
 import org.onosproject.yangutils.datamodel.YangBase;
 import org.onosproject.yangutils.datamodel.YangCompilerAnnotation;
+import org.onosproject.yangutils.datamodel.YangDerivedInfo;
 import org.onosproject.yangutils.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yangutils.datamodel.YangEnumeration;
 import org.onosproject.yangutils.datamodel.YangIdentityRef;
@@ -58,6 +59,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 
 /**
  * Represents utilities for data model tree.
@@ -807,5 +810,36 @@ public final class DataModelUtils {
         }
         jar.close();
         return nodes;
+    }
+
+    /**
+     * Validates the requested data-type resolve type in empty or not.
+     *
+     * @param dataType the data type
+     * @return true, for empty resolved data-type; false otherwise
+     */
+    public static boolean validateEmptyDataType(YangType dataType) {
+        switch (dataType.getDataType()) {
+            case DERIVED:
+                return ((YangDerivedInfo) dataType.getDataTypeExtendedInfo())
+                        .getEffectiveBuiltInType().equals(EMPTY);
+
+            case LEAFREF:
+                YangType type = ((YangLeafRef) dataType
+                        .getDataTypeExtendedInfo())
+                        .getEffectiveDataType();
+                if (type.getDataType() == YangDataTypes.DERIVED) {
+                    return ((YangDerivedInfo) type.getDataTypeExtendedInfo())
+                            .getEffectiveBuiltInType().equals(EMPTY);
+                }
+                return ((YangLeafRef) dataType.getDataTypeExtendedInfo())
+                        .getEffectiveDataType().getDataType().equals(EMPTY);
+
+            case UNION:
+                return ((YangUnion) dataType.getDataTypeExtendedInfo())
+                        .getTypeList().contains(EMPTY);
+            default:
+                return dataType.getDataType().equals(EMPTY);
+        }
     }
 }

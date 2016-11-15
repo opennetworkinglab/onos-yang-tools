@@ -690,6 +690,12 @@ public abstract class YangNode
         throw new DataModelException("Method is called for node other than module/sub-module.");
     }
 
+    @Override
+    public boolean isEmptyDataType() throws DataModelException {
+        throw new DataModelException("Method is called for node other than " +
+                                             "leaf/leaf-list.");
+    }
+
     /**
      * Adds child schema in child schema map, this is used to add the schema
      * to the map in case of leaf as a child.

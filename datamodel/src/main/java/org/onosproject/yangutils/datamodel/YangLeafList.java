@@ -16,13 +16,16 @@
 
 package org.onosproject.yangutils.datamodel;
 
+import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
+import org.onosproject.yangutils.datamodel.utils.Parsable;
+import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
-import org.onosproject.yangutils.datamodel.utils.Parsable;
-import org.onosproject.yangutils.datamodel.utils.YangConstructType;
+
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.validateEmptyDataType;
 
 /*
  *  Reference:RFC 6020.
@@ -327,6 +330,11 @@ public abstract class YangLeafList extends DefaultLocationInfo
      */
     public YangType<?> getDataType() {
         return dataType;
+    }
+
+    @Override
+    public boolean isEmptyDataType() {
+        return validateEmptyDataType(dataType);
     }
 
     /**

@@ -156,7 +156,8 @@ public class Decimal64ListenerTest {
     @Test
     public void processDecimal64ValueFailureValidation() throws IOException, ParserException, DataModelException {
         thrown.expect(DataModelException.class);
-        thrown.expectMessage("YANG file error : decimal64 validation failed.");
+        thrown.expectMessage(
+                "YANG file error : value is not in decimal64 range.");
 
         YangNode node = manager.getDataModel("src/test/resources/decimal64/Decimal64TypeValidation.yang");
 

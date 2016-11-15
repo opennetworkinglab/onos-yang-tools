@@ -146,4 +146,13 @@ public interface YangSchemaNode extends LocationInfo {
      * @return referred schema node
      */
     YangSchemaNode getReferredSchema();
+
+    /**
+     * Checks for the presence of empty data-type in requested schema node.
+     * Exception will be thrown if this is called for other then leaf/leaf-list
+     * node type.
+     *
+     * @return true if empty data-type is present, false otherwise
+     */
+    boolean isEmptyDataType() throws DataModelException;
 }

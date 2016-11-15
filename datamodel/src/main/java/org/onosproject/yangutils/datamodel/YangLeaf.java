@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.validateEmptyDataType;
+
 /*
  * Reference:RFC 6020.
  *  The "leaf" statement is used to define a leaf node in the schema
@@ -310,6 +312,11 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     public YangType<?> getDataType() {
         return dataType;
+    }
+
+    @Override
+    public boolean isEmptyDataType() {
+        return validateEmptyDataType(dataType);
     }
 
     /**
