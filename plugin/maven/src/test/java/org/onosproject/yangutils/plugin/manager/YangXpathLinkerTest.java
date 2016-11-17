@@ -758,7 +758,5 @@ public class YangXpathLinkerTest {
         compileCode(dir);
         deleteDirectory("target/xpath/");
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
-
-        deleteDirectory("target/xpath/");
     }
 }

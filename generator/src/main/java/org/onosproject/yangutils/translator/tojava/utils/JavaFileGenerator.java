@@ -760,7 +760,7 @@ public final class JavaFileGenerator {
                                    imports, path);
 
         List<String> methods = new ArrayList<>();
-
+        insertDataIntoJavaFile(file, NEW_LINE);
         //Add attribute strings.
         try {
             insertDataIntoJavaFile(file, getDataFromTempFileHandle(

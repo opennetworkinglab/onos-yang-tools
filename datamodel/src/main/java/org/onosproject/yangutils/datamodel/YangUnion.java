@@ -16,13 +16,17 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.onosproject.yangutils.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
+import static org.onosproject.yangutils.datamodel.utils.YangConstructType.UNION_DATA;
 
 /*
  * Reference RFC 6020.
@@ -91,7 +95,7 @@ public abstract class YangUnion
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_NON_DATA_NODE;
+        return YANG_NON_DATA_NODE;
     }
 
     @Override
@@ -99,14 +103,6 @@ public abstract class YangUnion
         return typeList;
     }
 
-    /**
-     * Sets the list of YANG type.
-     *
-     * @param typeList list of YANG type.
-     */
-    public void setTypeList(List<YangType<?>> typeList) {
-        this.typeList = typeList;
-    }
 
     /**
      * Returns running child union number.
@@ -135,19 +131,24 @@ public abstract class YangUnion
      */
     public void addType(YangType<?> yangType)
             throws DataModelException {
-        if (yangType.getDataType() == YangDataTypes.EMPTY || yangType.getDataType() == YangDataTypes.LEAFREF) {
-            throw new DataModelException("Union member type must not be one of the built-in types \"empty\" or " +
-                    "\"leafref\"" + getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition()
-                    + " in " + getFileName() + "\"");
+        YangDataTypes type = yangType.getDataType();
+        String msg = "Union member type must not be one of the built-in types" +
+                " \"empty\" or \"leafref\"";
+        switch (type) {
+            case EMPTY:
+            case LEAFREF:
+                throw new DataModelException(getErrorMsg(
+                        msg, getName(), getLineNumber(), getCharPosition(),
+                        getFileName()));
+
+            default:
+                typeList.add(yangType);
         }
-        getTypeList().add(yangType);
     }
 
     @Override
     public YangConstructType getYangConstructType() {
-        return YangConstructType.UNION_DATA;
+        return UNION_DATA;
     }
 
     /**

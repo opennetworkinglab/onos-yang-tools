@@ -690,7 +690,7 @@ public class TempJavaFragmentFiles {
             qualified = parentImportData.addImportInfo(typeInfo, className,
                                                        fileInfo.getPackage());
             if (!qualified && !(curNode instanceof YangChoice) &&
-                    curNode.isOpTypeReq()) {
+                    targetNode.isOpTypeReq()) {
                 String name = DEFAULT_CAPS + typeInfo.getClassInfo();
                 JavaQualifiedTypeInfoTranslator qInfo =
                         new JavaQualifiedTypeInfoTranslator();

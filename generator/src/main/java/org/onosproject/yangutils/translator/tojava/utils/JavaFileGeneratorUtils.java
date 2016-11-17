@@ -459,7 +459,8 @@ public final class JavaFileGeneratorUtils {
                 break;
             case DEFAULT_CLASS_MASK:
                 appendHeaderContents(file, pkgString, importsList);
-                write(file, genType, DEFAULT_CLASS, curNode, className, true);
+                write(file, genType, DEFAULT_CLASS, curNode, className,
+                      curNode.isOpTypeReq());
                 break;
             case BUILDER_CLASS_MASK:
                 write(file, genType, BUILDER_CLASS, curNode, className, false);

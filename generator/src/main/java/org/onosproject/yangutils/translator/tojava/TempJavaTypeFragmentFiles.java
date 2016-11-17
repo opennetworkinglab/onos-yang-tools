@@ -20,6 +20,7 @@ import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.datamodel.YangType;
 import org.onosproject.yangutils.datamodel.YangTypeDef;
 import org.onosproject.yangutils.datamodel.YangTypeHolder;
+import org.onosproject.yangutils.datamodel.YangUnion;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yangutils.translator.exception.TranslatorException;
 import org.onosproject.yangutils.translator.tojava.javamodel.YangJavaTypeTranslator;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.onosproject.yangutils.datamodel.exceptions.ErrorMessages.getErrorMsg;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.BITS;
 import static org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes.INT16;
@@ -245,6 +247,32 @@ public class TempJavaTypeFragmentFiles
         return ofStringImplTempFileHandle;
     }
 
+    private void verifyUnionTypes(List<YangType<?>> typeList,
+                                  YangTypeHolder yangTypeHolder) {
+        String msg;
+        YangUnion union = (YangUnion) yangTypeHolder;
+        for (YangType<?> yangType : typeList) {
+            YangDataTypes type = yangType.getDataType();
+            switch (type) {
+                case EMPTY:
+                    msg = "Union member derived type must not be one of the " +
+                            "type whose built-in types is \"empty\"";
+                    break;
+                case LEAFREF:
+                    msg = "Union member derived type must not be one of the " +
+                            "type whose built-in types is \"leafref\"";
+                    break;
+                default:
+                    msg = null;
+            }
+            if (msg != null) {
+                throw new TranslatorException(getErrorMsg(
+                        msg, union.getName(), union.getLineNumber(), union
+                                .getCharPosition(), union.getFileName()));
+            }
+        }
+    }
+
     /**
      * Adds all the type in the current data model node as part of the generated temporary file.
      *
@@ -254,8 +282,10 @@ public class TempJavaTypeFragmentFiles
      */
     void addTypeInfoToTempFiles(YangTypeHolder yangTypeHolder, YangPluginConfig config)
             throws IOException {
-
         List<YangType<?>> typeList = yangTypeHolder.getTypeList();
+        if (yangTypeHolder instanceof YangUnion) {
+            verifyUnionTypes(typeList, yangTypeHolder);
+        }
         if (typeList != null) {
             List<YangType<?>> types = validateTypes(typeList);
             for (YangType<?> type : types) {

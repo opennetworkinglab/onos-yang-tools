@@ -9,7 +9,6 @@ module types {
      type union {
          type ipv4-address;
          type ipv6-address;
-         type leaf;
      }
   }
 

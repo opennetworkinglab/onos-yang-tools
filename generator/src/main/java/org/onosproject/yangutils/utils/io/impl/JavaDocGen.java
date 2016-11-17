@@ -406,7 +406,7 @@ public final class JavaDocGen {
     private static String generateForFromString(String attribute) {
         return getJavaDocStartLine(attribute, JAVA_DOC_OF
                 + attribute + SPACE + FROM_STRING_METHOD_NAME + SPACE + INPUT +
-                SPACE + STRING_DATA_TYPE) +
+                SPACE + STRING_DATA_TYPE + SPACE) +
                 getJavaDocEmptyAsteriskLine() +
                 getJavaDocParamLine(INPUT + SPACE + STRING_DATA_TYPE,
                                     FROM_STRING_PARAM_NAME) +

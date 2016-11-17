@@ -2028,6 +2028,7 @@ public final class MethodsGenerator {
      */
     public static String getToStringMethodForIdentity(String name) {
         StringBuilder builder = new StringBuilder(NEW_LINE);
+        builder.append(getJavaDoc(GETTER_METHOD, name, false, null));
         String returnVal = getQuotedString(name);
         String methodName = getCamelCase(name, null) + TO_CAPS + STRING_DATA_TYPE;
         builder.append(methodSignature(methodName, null, PUBLIC + SPACE + STATIC,
@@ -2047,6 +2048,7 @@ public final class MethodsGenerator {
     public static String getFromStringMethodForIdentity(String name,
                                                         String schemaName) {
         StringBuilder builder = new StringBuilder(NEW_LINE);
+        builder.append(getJavaDoc(FROM_METHOD, name, false, null));
         String caps = getCapitalCase(name);
         String returnVal = caps + PERIOD + CLASS;
         String cond = getTwoParaEqualsString(FROM_STRING_PARAM_NAME,
