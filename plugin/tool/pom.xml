@@ -13,6 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -20,41 +22,40 @@
 
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onos-yang-utils</artifactId>
+        <artifactId>onos-yang-plugins</artifactId>
         <version>1.10-SNAPSHOT</version>
     </parent>
 
-    <artifactId>onos-yang-plugins</artifactId>
+    <artifactId>onos-yang-tool</artifactId>
     <version>1.10-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <modules>
-        <module>tool</module>
-        <module>maven</module>
-        <module>buck</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-datamodel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-parser</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-utils-generator</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
-
-

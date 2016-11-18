@@ -47,6 +47,13 @@ public final class YangPluginConfig {
     private String codeGenerateForSbi;
 
     /**
+     * Path to generate the resource files, which will be used by the  plugin
+     * to add it as part of the resource, implicitly by the path location, or
+     * some explicit way to add to bundle.
+     */
+    private String resourceGenDir;
+
+    /**
      * Creates an object for YANG plugin config.
      */
     public YangPluginConfig() {
@@ -106,7 +113,18 @@ public final class YangPluginConfig {
         return conflictResolver;
     }
 
+
+    public String resourceGenDir() {
+        return resourceGenDir;
+    }
+
+    public void resourceGenDir(String resourceGenDir) {
+        this.resourceGenDir = resourceGenDir;
+    }
+
     /**
+     * TODO: delete me, it is not part of config, it needs to be updated for
+     * test scripts
      * Compiles the generated code for unit tests.
      *
      * @param dir1 directory path
