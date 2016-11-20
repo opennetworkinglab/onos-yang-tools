@@ -38,6 +38,7 @@
         <module>generator</module>
         <module>parser</module>
         <module>plugin</module>
+        <module>runtime</module>
     </modules>
 
     <!-- FIXME this can be removed if/when buck-api is released -->
