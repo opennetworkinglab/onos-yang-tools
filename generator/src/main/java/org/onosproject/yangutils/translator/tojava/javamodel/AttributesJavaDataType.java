@@ -320,7 +320,7 @@ public final class AttributesJavaDataType {
                                                   + " in " + type.getFileName());
         }
 
-        if (!(((YangDerivedInfo<?>) var).getReferredTypeDef() != null)) {
+        if ((((YangDerivedInfo<?>) var).getReferredTypeDef() == null)) {
             throw new TranslatorException("derived info is not an instance of typedef. " +
                                                   type.getDataTypeName() + " in " +
                                                   type.getLineNumber() + " at " +

@@ -34,6 +34,11 @@
             <version>0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-yang-tool</artifactId>
+            <version>1.10-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

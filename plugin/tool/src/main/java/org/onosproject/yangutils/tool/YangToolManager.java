@@ -94,6 +94,23 @@ public class YangToolManager {
     }
 
     /**
+     * Creates a YANG file info set.
+     *
+     * @param yangFileList YANG files list
+     */
+    public Set<YangFileInfo> createYangFileInfoSet(List<String> yangFileList) {
+        if (yangFileInfoSet == null) {
+            yangFileInfoSet = new HashSet<>();
+        }
+        for (String yangFile : yangFileList) {
+            YangFileInfo yangFileInfo = new YangFileInfo();
+            yangFileInfo.setYangFileName(yangFile);
+            yangFileInfoSet.add(yangFileInfo);
+        }
+        return yangFileInfoSet;
+    }
+
+    /**
      * Compile te YANG files and generate the corresponding Java files.
      * Update the generated bundle with the schema metadata.
      *
@@ -106,87 +123,89 @@ public class YangToolManager {
                                  YangPluginConfig config,
                                  CallablePlugin plugin) throws IOException {
 
-        try {
+        synchronized (yangFiles) {
+            try {
 
-            if (config == null || yangFiles == null) {
-                throw new YangToolException(E_MISSING_INPUT);
-            }
-            yangFileInfoSet = yangFiles;
-
-            if (config.getCodeGenDir() == null) {
-                throw new YangToolException(E_CODE_GEN_PATH);
-            }
-
-            // Check if there are any file to translate, if not return.
-            if (yangFileInfoSet == null || yangFileInfoSet.isEmpty()) {
-                // No files to translate
-                return;
-            }
-
-            createDirectories(config.resourceGenDir());
-
-            // Resolve inter jar dependency.
-            addSchemaToFileSet(dependentSchema);
-
-
-            // Carry out the parsing for all the YANG files.
-            parseYangFileInfoSet();
-
-            // Resolve dependencies using linker.
-            resolveDependenciesUsingLinker();
-
-            // Perform translation to JAVA.
-            translateToJava(config);
-
-            // Serialize data model.
-            Set<YangNode> compiledSchemas = new HashSet<>();
-            for (YangFileInfo fileInfo : yangFileInfoSet) {
-                compiledSchemas.add(fileInfo.getRootNode());
-            }
-
-            String serFileName = config.resourceGenDir() + YANG_META_DATA + SERIALIZED_FILE_EXTENSION;
-            FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(compiledSchemas);
-            objectOutputStream.close();
-            fileOutputStream.close();
-
-
-            //add YANG files to JAR
-            List<File> files = getListOfFile(yangFileInfoSet);
-            String path = config.resourceGenDir();
-            File targetDir = new File(path);
-            targetDir.mkdirs();
-
-            for (File file : files) {
-                Files.copy(file.toPath(),
-                           new File(path + file.getName()).toPath(),
-                           StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            if (plugin != null) {
-                plugin.addCompiledSchemaToBundle();
-                plugin.addGeneratedCodeToBundle();
-                plugin.addYangFilesToBundle();
-            }
-
-        } catch (IOException | ParserException e) {
-            YangToolException exception =
-                    new YangToolException(e.getMessage(), e);
-            exception.setCurYangFile(curYangFileInfo);
-
-            if (curYangFileInfo != null &&
-                    curYangFileInfo.getRootNode() != null) {
-                try {
-                    translatorErrorHandler(curYangFileInfo.getRootNode(),
-                                           config);
-                } catch (IOException ex) {
-                    e.printStackTrace();
-                    throw ex;
+                if (config == null || yangFiles == null) {
+                    throw new YangToolException(E_MISSING_INPUT);
                 }
-            }
+                yangFileInfoSet = yangFiles;
 
-            throw exception;
+                if (config.getCodeGenDir() == null) {
+                    throw new YangToolException(E_CODE_GEN_PATH);
+                }
+
+                // Check if there are any file to translate, if not return.
+                if (yangFileInfoSet == null || yangFileInfoSet.isEmpty()) {
+                    // No files to translate
+                    return;
+                }
+
+                createDirectories(config.resourceGenDir());
+
+                // Resolve inter jar dependency.
+                addSchemaToFileSet(dependentSchema);
+
+
+                // Carry out the parsing for all the YANG files.
+                parseYangFileInfoSet();
+
+                // Resolve dependencies using linker.
+                resolveDependenciesUsingLinker();
+
+                // Perform translation to JAVA.
+                translateToJava(config);
+
+                // Serialize data model.
+                Set<YangNode> compiledSchemas = new HashSet<>();
+                for (YangFileInfo fileInfo : yangFileInfoSet) {
+                    compiledSchemas.add(fileInfo.getRootNode());
+                }
+
+                String serFileName = config.resourceGenDir() + YANG_META_DATA + SERIALIZED_FILE_EXTENSION;
+                FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                objectOutputStream.writeObject(compiledSchemas);
+                objectOutputStream.close();
+                fileOutputStream.close();
+
+
+                //add YANG files to JAR
+                List<File> files = getListOfFile(yangFileInfoSet);
+                String path = config.resourceGenDir();
+                File targetDir = new File(path);
+                targetDir.mkdirs();
+
+                for (File file : files) {
+                    Files.copy(file.toPath(),
+                               new File(path + file.getName()).toPath(),
+                               StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (plugin != null) {
+                    plugin.addCompiledSchemaToBundle();
+                    plugin.addGeneratedCodeToBundle();
+                    plugin.addYangFilesToBundle();
+                }
+
+            } catch (IOException | ParserException e) {
+                YangToolException exception =
+                        new YangToolException(e.getMessage(), e);
+                exception.setCurYangFile(curYangFileInfo);
+
+                if (curYangFileInfo != null &&
+                        curYangFileInfo.getRootNode() != null) {
+                    try {
+                        translatorErrorHandler(curYangFileInfo.getRootNode(),
+                                               config);
+                    } catch (IOException ex) {
+                        e.printStackTrace();
+                        throw ex;
+                    }
+                }
+
+                throw exception;
+            }
         }
     }
 

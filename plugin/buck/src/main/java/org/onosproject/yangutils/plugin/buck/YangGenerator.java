@@ -16,41 +16,74 @@
 
 package org.onosproject.yangutils.plugin.buck;
 
+import org.onosproject.yangutils.tool.CallablePlugin;
+import org.onosproject.yangutils.tool.YangToolManager;
+import org.onosproject.yangutils.utils.io.YangPluginConfig;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.onosproject.yangutils.parser.impl.YangUtilsParserManager;
-import org.onosproject.yangutils.translator.tojava.JavaCodeGeneratorUtil;
-import org.onosproject.yangutils.utils.io.YangPluginConfig;
-import org.onosproject.yangutils.datamodel.YangNode;
+import static java.util.stream.Collectors.toList;
+import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
 
 /**
  * Generates Java sources from a Yang model.
  */
-public class YangGenerator {
+public class YangGenerator implements CallablePlugin {
 
     private final List<File> models;
     private String outputDirectory;
+    private final String DEFAULT_JAR_RES_PATH = SLASH + YANG_RESOURCES + SLASH;
 
-    public YangGenerator(List<File> models, String outputDirectory) {
+    YangGenerator(List<File> models, String outputDirectory) {
         this.models = models;
         this.outputDirectory = outputDirectory + "/";
     }
 
     public void execute() throws YangParsingException {
-        for (File model : models) {
+        List<String> files = getListOfFile();
+        synchronized (files) {
             try {
                 YangPluginConfig config = new YangPluginConfig();
                 config.setCodeGenDir(outputDirectory);
+                config.resourceGenDir(outputDirectory + DEFAULT_JAR_RES_PATH);
 
-                YangNode yangNode = new YangUtilsParserManager()
-                        .getDataModel(model.toString());
-
-                JavaCodeGeneratorUtil.generateJavaCode(yangNode, config);
+                //intra jar file linking.
+                YangToolManager manager = new YangToolManager();
+                manager.compileYangFiles(manager.createYangFileInfoSet(files),
+                                         null, config, this);
             } catch (Exception e) {
                 throw new YangParsingException(e);
             }
         }
     }
 
+    private List<String> getListOfFile() {
+        List<String> files = new ArrayList<>();
+        if (models != null) {
+            synchronized (models) {
+                files.addAll(models.stream().map(File::toString)
+                                     .collect(toList()));
+            }
+        }
+        return files;
+    }
+
+    @Override
+    public void addGeneratedCodeToBundle() {
+        //TODO: add functionality.
+    }
+
+    @Override
+    public void addCompiledSchemaToBundle() throws IOException {
+        //TODO: add functionality.
+    }
+
+    @Override
+    public void addYangFilesToBundle() throws IOException {
+        //TODO: add functionality.
+    }
 }

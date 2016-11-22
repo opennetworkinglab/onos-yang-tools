@@ -40,7 +40,6 @@ import org.onosproject.yangutils.tool.YangToolManager;
 import org.onosproject.yangutils.tool.exception.YangToolException;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
 import org.onosproject.yangutils.utils.io.YangToJavaNamingConflictUtil;
-import org.onosproject.yangutils.utils.io.impl.YangFileScanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.IOException;
@@ -69,6 +68,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.TEMP;
 import static org.onosproject.yangutils.utils.UtilConstants.VERSION_ERROR;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
+import static org.onosproject.yangutils.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.deleteDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getDirectory;
 import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
@@ -222,9 +222,11 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
              * Obtain the YANG files at a path mentioned in plugin and creates
              * YANG file information set.
              */
-            createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
 
             YangToolManager toolManager = new YangToolManager();
+
+            yangFileInfoSet = toolManager.createYangFileInfoSet(
+                    getYangFiles(searchDir));
             List<YangNode> interJarResolvedNodes =
                     resolveInterJarDependencies(project, localRepository,
                                                 remoteRepository, outputDir);
