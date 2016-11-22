@@ -23,11 +23,11 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-plugins</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.10</version>
     </parent>
 
     <artifactId>onos-yang-tool</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.10</version>
     <packaging>jar</packaging>
 
     <dependencies>
