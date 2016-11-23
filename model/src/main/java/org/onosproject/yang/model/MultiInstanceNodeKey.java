@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
+
+package org.onosproject.yang.model;
+
+import java.util.List;
 
 /**
- * Representation of a leaf data node capable of holding a value.
+ * Abstraction of an entity which identifies a unique branching node
+ * corresponding to a multi instance schema definition.
  */
-public interface LeafDataNode extends DataNode {
+public interface MultiInstanceNodeKey extends NodeKey {
 
-    // String, Number or Boolean primitive values
-    Object value();
-
+    /**
+     * Returns the list of key leaf nodes of a multi instance node, which
+     * uniquely identifies the branching node entry corresponding to a multi
+     * instance schema definition.
+     *
+     * @return List of key leaf nodes
+     */
+    List<LeafNode> keyLeafs();
 }

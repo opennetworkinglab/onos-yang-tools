@@ -38,6 +38,7 @@
         <module>generator</module>
         <module>parser</module>
         <module>plugin</module>
+        <module>model</module>
         <module>runtime</module>
     </modules>
 
