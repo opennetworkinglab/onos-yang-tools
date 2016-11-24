@@ -153,6 +153,7 @@ public interface YangSchemaNode extends LocationInfo {
      * node type.
      *
      * @return true if empty data-type is present, false otherwise
+     * @throws DataModelException when fails to do data model operations
      */
     boolean isEmptyDataType() throws DataModelException;
 }

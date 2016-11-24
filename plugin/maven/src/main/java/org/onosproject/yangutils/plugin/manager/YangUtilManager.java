@@ -230,13 +230,9 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
             List<YangNode> interJarResolvedNodes =
                     resolveInterJarDependencies(project, localRepository,
                                                 remoteRepository, outputDir);
-            System.out.println("going to call tool manager");
             toolManager.compileYangFiles(yangFileInfoSet,
                                          interJarResolvedNodes, yangPlugin,
                                          this);
-            System.out.println("called tool manager");
-
-
         } catch (YangToolException e) {
             String fileName = EMPTY_STRING;
             if (e.getCurYangFile() != null) {

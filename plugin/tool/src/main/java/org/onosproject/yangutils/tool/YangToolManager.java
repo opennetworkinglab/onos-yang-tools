@@ -97,6 +97,7 @@ public class YangToolManager {
      * Creates a YANG file info set.
      *
      * @param yangFileList YANG files list
+     * @return yang file info set
      */
     public Set<YangFileInfo> createYangFileInfoSet(List<String> yangFileList) {
         if (yangFileInfoSet == null) {
@@ -114,9 +115,11 @@ public class YangToolManager {
      * Compile te YANG files and generate the corresponding Java files.
      * Update the generated bundle with the schema metadata.
      *
-     * @param yangFiles Application YANG files
-     * @param config    tool configuration
-     * @param plugin    invoking plugin
+     * @param yangFiles       Application YANG files
+     * @param dependentSchema inter jar linked schema nodes
+     * @param config          tool configuration
+     * @param plugin          invoking plugin
+     * @throws IOException when fails to do IO operations
      */
     public void compileYangFiles(Set<YangFileInfo> yangFiles,
                                  List<YangNode> dependentSchema,
@@ -126,7 +129,7 @@ public class YangToolManager {
         synchronized (yangFiles) {
             try {
 
-                if (config == null || yangFiles == null) {
+                if (config == null) {
                     throw new YangToolException(E_MISSING_INPUT);
                 }
                 yangFileInfoSet = yangFiles;

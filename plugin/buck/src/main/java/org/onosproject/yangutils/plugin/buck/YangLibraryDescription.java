@@ -16,10 +16,6 @@
 
 package org.onosproject.yangutils.plugin.buck;
 
-import java.nio.file.Path;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import com.facebook.buck.cli.BuckConfig;
 import com.facebook.buck.jvm.java.CalculateAbi;
 import com.facebook.buck.jvm.java.DefaultJavaLibrary;
@@ -43,6 +39,7 @@ import com.facebook.buck.rules.BuildRuleResolver;
 import com.facebook.buck.rules.BuildRuleType;
 import com.facebook.buck.rules.BuildTargetSourcePath;
 import com.facebook.buck.rules.Description;
+import com.facebook.buck.rules.PathSourcePath;
 import com.facebook.buck.rules.SourcePath;
 import com.facebook.buck.rules.SourcePathResolver;
 import com.facebook.buck.rules.SourcePaths;
@@ -52,6 +49,14 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG;
 
 /**
  * Description of a Buck Yang Library.
@@ -94,7 +99,6 @@ public class YangLibraryDescription
         BuildRuleParams yangParams = params.copyWithBuildTarget(
                 BuildTargets.createFlavoredBuildTarget(
                         unflavoredBuildTarget, SOURCES));
-
         BuildRule yangLib = resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs));
 
         if (params.getBuildTarget().getFlavors().contains(SOURCES)) {
@@ -126,13 +130,21 @@ public class YangLibraryDescription
 
         BuildTarget abiJarTarget = params.getBuildTarget().withAppendedFlavors(CalculateAbi.FLAVOR);
 
+        //Add yang meta data resources to generated jar file resources.
+
+        Path rscRoot = ((YangLibrary) yangLib).getGenSrcsDirectory();
+        Path resPath = Paths.get(rscRoot + SLASH + YANG);
+
+        SourcePath path = new PathSourcePath(params.getProjectFilesystem(),
+                                             resPath);
+
         DefaultJavaLibrary library =
                 resolver.addToIndex(
                         new DefaultJavaLibrary(
                                 javaParams,
                                 pathResolver,
                                 ImmutableSet.of(SourcePaths.getToBuildTargetSourcePath().apply(yangLib)),
-                                /* resources */ ImmutableSet.<SourcePath>of(),
+                                /* resources */ImmutableSet.of(path),
                                 javacOptions.getGeneratedSourceFolderName(),
                                 /* proguardConfig */ Optional.<SourcePath>absent(),
                                 /* postprocessClassesCommands */ ImmutableList.<String>of(),
@@ -142,7 +154,7 @@ public class YangLibraryDescription
                                 javacOptions.trackClassUsage(),
                                 /* additionalClasspathEntries */ ImmutableSet.<Path>of(),
                                 new JavacToJarStepFactory(javacOptions, JavacOptionsAmender.IDENTITY),
-                                /* resourcesRoot */ Optional.<Path>absent(),
+                                /* resourcesRoot */ Optional.<Path>of(rscRoot),
                                 /* manifestFile */ Optional.absent(),
                                 /* mavenCoords */ Optional.<String>absent(),
                                 /* tests */ ImmutableSortedSet.<BuildTarget>of(),
@@ -169,4 +181,5 @@ public class YangLibraryDescription
 
         //TODO other params here
     }
+
 }

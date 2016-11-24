@@ -585,16 +585,17 @@ public final class JavaDocGen {
     /**
      * Generates javaDocs for add augmentation method.
      *
+     * @param name builder class name
      * @return javaDocs
      */
-    public static String generateForAddAugmentation() {
+    public static String generateForAddAugmentation(String name) {
         return getJavaDocStartLine(YANG_AUGMENTED_INFO_LOWER_CASE,
                                    JAVA_DOC_SETTERS_COMMON) +
                 getJavaDocEmptyAsteriskLine() +
                 getJavaDocParamLine(YANG_AUGMENTED_INFO_LOWER_CASE, VALUE) +
                 getJavaDocParamLine(YANG_AUGMENTED_INFO_LOWER_CASE, CLASS +
                         OBJECT_STRING) +
-                getJavaDocEndLine();
+                getJavaDocReturnLine(name) + getJavaDocEndLine();
     }
 
     /**
@@ -667,7 +668,9 @@ public final class JavaDocGen {
                     break;
             }
         }
-        javadoc.append(getJavaDocReturnLine(BUILDER_OBJECT + attribute))
+        javadoc.append(getJavaDocParamLine(
+                attribute, ADD_STRING + TO_CAPS))
+                .append(getJavaDocReturnLine(BUILDER_OBJECT + attribute))
                 .append(getJavaDocEndLine());
         return javadoc.toString();
     }

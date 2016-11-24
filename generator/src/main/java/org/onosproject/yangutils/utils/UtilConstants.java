@@ -228,6 +228,21 @@ public final class UtilConstants {
     public static final String PERIOD = ".";
 
     /**
+     * Static attribute for lib.
+     */
+    public static final String LIB = "lib__";
+
+    /**
+     * Static attribute for lib path.
+     */
+    public static final String LIB_PATH = "//lib:";
+
+    /**
+     * Static attribute for output.
+     */
+    public static final String OUT = "__output";
+
+    /**
      * Static attribute for period.
      */
     public static final String ENTRY = "Entry";

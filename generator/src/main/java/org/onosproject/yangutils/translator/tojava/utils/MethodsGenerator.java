@@ -1191,7 +1191,7 @@ public final class MethodsGenerator {
      * @return interface of add augmentation
      */
     static String getAddAugmentInfoMethodInterface(String className) {
-        StringBuilder builder = new StringBuilder(generateForAddAugmentation());
+        StringBuilder builder = new StringBuilder(generateForAddAugmentation(className));
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put(VALUE, OBJECT_STRING);
         map.put(CLASS + OBJECT_STRING, CLASS_STRING);

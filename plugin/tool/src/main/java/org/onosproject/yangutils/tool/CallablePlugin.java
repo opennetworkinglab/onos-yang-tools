@@ -23,6 +23,7 @@ import java.io.IOException;
  * will be used in by tool to be plugin agnostic.
  */
 public interface CallablePlugin {
+
     /**
      * Adds generated source directory to the compilation root.
      */
@@ -32,6 +33,7 @@ public interface CallablePlugin {
      * serialize the compiled schema and place it in the appropriate location
      * so that it will be part of the generated OSGi bundle.
      *
+     * @throws IOException when fails to do IO operations
      */
     void addCompiledSchemaToBundle()
             throws IOException;
@@ -41,6 +43,7 @@ public interface CallablePlugin {
      * Add the YANG files in the bundle, to support YANG display in protocols
      * like RESTCONF.
      *
+     * @throws IOException when fails to do IO operations
      */
     void addYangFilesToBundle() throws IOException;
 }

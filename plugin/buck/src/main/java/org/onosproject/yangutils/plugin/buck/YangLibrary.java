@@ -16,13 +16,6 @@
 
 package org.onosproject.yangutils.plugin.buck;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
 import com.facebook.buck.jvm.java.JarDirectoryStep;
 import com.facebook.buck.model.BuildTargets;
 import com.facebook.buck.rules.AbstractBuildRule;
@@ -39,6 +32,16 @@ import com.facebook.buck.step.fs.RmStep;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 
+import javax.annotation.Nullable;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
+import static org.onosproject.yangutils.utils.UtilConstants.YANG;
+
 /**
  * Buck rule to define a library built form a Yang model.
  */
@@ -46,7 +49,8 @@ public class YangLibrary extends AbstractBuildRule {
 
     @AddToRuleKey
     private final ImmutableSortedSet<SourcePath> srcs;
-    
+    private final BuildRuleParams params;
+
     private final Path genSrcsDirectory;
     private final Path outputDirectory;
     private final Path output;
@@ -57,7 +61,7 @@ public class YangLibrary extends AbstractBuildRule {
             ImmutableSortedSet<SourcePath> srcs) {
         super(params, resolver);
         this.srcs = srcs;
-
+        this.params = params;
         genSrcsDirectory = BuildTargets.getGenPath(getProjectFilesystem(),
                                                    params.getBuildTarget(),
                                                    "%s__yang-gen");
@@ -91,7 +95,8 @@ public class YangLibrary extends AbstractBuildRule {
                 .map(s -> getResolver().getRelativePath(s))
                 .collect(Collectors.toList());
 
-        steps.add(new YangStep(getProjectFilesystem(), sourcePaths, genSrcsDirectory));
+        steps.add(new YangStep(getProjectFilesystem(), sourcePaths, genSrcsDirectory,
+                               params.getDeps()));
 
         steps.add(new JarDirectoryStep(
                 getProjectFilesystem(),
@@ -108,4 +113,17 @@ public class YangLibrary extends AbstractBuildRule {
     public Path getPathToOutput() {
         return output;
     }
+
+
+    /**
+     * Returns generated sources directory.
+     *
+     * @return generated sources directory
+     */
+    public Path getGenSrcsDirectory() {
+        File dir = new File(genSrcsDirectory.toString() + SLASH + YANG);
+        dir.mkdirs();
+        return genSrcsDirectory;
+    }
+
 }

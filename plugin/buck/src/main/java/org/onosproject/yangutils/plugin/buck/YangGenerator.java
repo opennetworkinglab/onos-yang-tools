@@ -16,6 +16,7 @@
 
 package org.onosproject.yangutils.plugin.buck;
 
+import org.onosproject.yangutils.datamodel.YangNode;
 import org.onosproject.yangutils.tool.CallablePlugin;
 import org.onosproject.yangutils.tool.YangToolManager;
 import org.onosproject.yangutils.utils.io.YangPluginConfig;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.parseJarFile;
 import static org.onosproject.yangutils.utils.UtilConstants.SLASH;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
 
@@ -35,12 +37,14 @@ import static org.onosproject.yangutils.utils.UtilConstants.YANG_RESOURCES;
 public class YangGenerator implements CallablePlugin {
 
     private final List<File> models;
+    private final List<String> depJar;
     private String outputDirectory;
     private final String DEFAULT_JAR_RES_PATH = SLASH + YANG_RESOURCES + SLASH;
 
-    YangGenerator(List<File> models, String outputDirectory) {
+    YangGenerator(List<File> models, String outputDirectory, List<String> depJar) {
         this.models = models;
-        this.outputDirectory = outputDirectory + "/";
+        this.depJar = depJar;
+        this.outputDirectory = outputDirectory + SLASH;
     }
 
     public void execute() throws YangParsingException {
@@ -50,11 +54,15 @@ public class YangGenerator implements CallablePlugin {
                 YangPluginConfig config = new YangPluginConfig();
                 config.setCodeGenDir(outputDirectory);
                 config.resourceGenDir(outputDirectory + DEFAULT_JAR_RES_PATH);
-
+                //for inter-jar linking.
+                List<YangNode> dependentSchema = new ArrayList<>();
+                for (String jar : depJar) {
+                    dependentSchema.addAll(parseJarFile(jar, outputDirectory));
+                }
                 //intra jar file linking.
                 YangToolManager manager = new YangToolManager();
                 manager.compileYangFiles(manager.createYangFileInfoSet(files),
-                                         null, config, this);
+                                         dependentSchema, config, this);
             } catch (Exception e) {
                 throw new YangParsingException(e);
             }
