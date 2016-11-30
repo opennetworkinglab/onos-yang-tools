@@ -37,9 +37,6 @@ public final class CopyrightHeader {
     private static final String COPYRIGHTS_FIRST_LINE = "/*\n * Copyright " + Calendar.getInstance().get(Calendar.YEAR)
             + "-present Open Networking Laboratory\n";
     private static final String TEMP_FILE = "temp.txt";
-    private static ClassLoader classLoader = CopyrightHeader.class.getClassLoader();
-
-    private static String copyrightHeader;
 
     /**
      * Creates an instance of copyright header.
@@ -48,40 +45,18 @@ public final class CopyrightHeader {
     }
 
     /**
-     * Returns copyright file header.
-     *
-     * @return copyright file header
-     * @throws IOException when fails to parse copyright header
-     */
-    public static String getCopyrightHeader() throws IOException {
-
-        if (copyrightHeader == null) {
-            parseCopyrightHeader();
-        }
-        return copyrightHeader;
-    }
-
-    /**
-     * Sets the copyright header.
-     *
-     * @param header copyright header
-     */
-    private static void setCopyrightHeader(String header) {
-
-        copyrightHeader = header;
-    }
-
-    /**
      * parses Copyright to the temporary file.
      *
+     * @return string of file.
      * @throws IOException when fails to get the copyright header
      */
-    private static void parseCopyrightHeader() throws IOException {
+    public static String parseCopyrightHeader() throws IOException {
 
         File temp = new File(TEMP_FILE);
 
         try {
-            InputStream stream = classLoader.getResourceAsStream(COPYRIGHT_HEADER_FILE);
+            InputStream stream = CopyrightHeader.class.getClassLoader()
+                    .getResourceAsStream(COPYRIGHT_HEADER_FILE);
             OutputStream out = new FileOutputStream(temp);
 
             int index;
@@ -91,8 +66,7 @@ public final class CopyrightHeader {
             }
             out.close();
             stream.close();
-            getStringFileContent(temp);
-            setCopyrightHeader(getStringFileContent(temp));
+            return getStringFileContent(temp);
         } catch (IOException e) {
             throw new IOException("failed to parse the Copyright header");
         } finally {

@@ -562,7 +562,7 @@ public final class JavaFileGeneratorUtils {
                                              List<String> importsList)
             throws IOException {
 
-        insertDataIntoJavaFile(file, CopyrightHeader.getCopyrightHeader());
+        insertDataIntoJavaFile(file, CopyrightHeader.parseCopyrightHeader());
         insertDataIntoJavaFile(file, pkg);
 
         /*

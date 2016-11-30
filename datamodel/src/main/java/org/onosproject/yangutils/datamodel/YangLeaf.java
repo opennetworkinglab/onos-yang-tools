@@ -125,7 +125,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
     /**
      * YANG Node in which the leaf is contained.
      */
-    private transient YangLeavesHolder containedIn;
+    private YangLeavesHolder containedIn;
 
     /**
      * List of must statement constraints.

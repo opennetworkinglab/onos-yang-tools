@@ -1204,21 +1204,38 @@ public final class SubtreeFilteringMethodsGenerator {
         return "                    Class<?>[] classArray = " + call + "" +
                 ".getClass()" +
                 ".getInterfaces();\n" +
-                "                    Class<?> caseClass = classArray[0];\n" +
+                "                    Class<?> caseIntf = classArray[0];\n" +
                 "                    try {\n" +
-                "                        Object obj1 = caseClass.newInstance();\n" +
+                "                        ClassLoader classLoader = this" +
+                ".getClass().getClassLoader();\n" +
+                "                        String className = \"Default\" + " +
+                "caseIntf.getSimpleName();\n" +
+                "                        className = caseIntf.getPackage()" +
+                ".getName() + \".\" + className;\n" +
+                "                        Class<?> caseClass = classLoader" +
+                ".loadClass(className);\n" +
+                "                        java.lang.reflect.Constructor<?> " +
+                "constructor = caseClass.getDeclaredConstructor();\n" +
+                "                        constructor.setAccessible(true);\n" +
+                "                        Object obj1 = constructor" +
+                ".newInstance();\n" +
                 "                        java.lang.reflect.Method method =" +
-                " caseClass.getMethod(\"builder\", caseClass);\n" +
-                "                        Object obj = method.invoke(obj1," +
-                " (Object) null);\n" +
-                "                        method = caseClass.getMethod(\"build\", caseClass);\n" +
-                "                        Object obj2 = method.invoke(obj, " +
-                "(Object) null);\n" +
-                "                        method = caseClass.getMethod(\"processSubtreeFiltering\", caseClass);\n" +
+                " caseClass.getMethod(\"builder\");\n" +
+                "                        Object obj = method.invoke(obj1);\n" +
+                "                        Class<?> builderClass = obj.getClass();\n" +
+                "                        method = builderClass.getMethod(\"build\");\n" +
+                "                        Object obj2 = method.invoke(obj);\n" +
+                "                        Class<?> input = this.getClass()" +
+                ".getMethod(" + "\"" + name + "\").getReturnType();\n" +
+                "                        method = caseClass.getMethod" +
+                "(\"processSubtreeFiltering\", input,\n" +
+                "                                     boolean.class);\n" +
                 "                        result = (" + returnType + ") method.invoke" +
                 "(obj2, " + call + ", true);\n" +
                 "                    } catch (NoSuchMethodException | InstantiationException |\n" +
-                "                            IllegalAccessException | InvocationTargetException e) {\n" +
+                "                            IllegalAccessException | " +
+                "InvocationTargetException |\n" +
+                "                            ClassNotFoundException e) {\n" +
                 "                        e.printStackTrace();\n" +
                 "                    }\n";
     }

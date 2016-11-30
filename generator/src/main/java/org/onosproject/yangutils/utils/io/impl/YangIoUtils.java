@@ -68,7 +68,7 @@ import static org.onosproject.yangutils.utils.UtilConstants.TWELVE_SPACE_INDENTA
 import static org.onosproject.yangutils.utils.UtilConstants.UNDER_SCORE;
 import static org.onosproject.yangutils.utils.UtilConstants.UNUSED;
 import static org.onosproject.yangutils.utils.UtilConstants.YANG_AUTO_PREFIX;
-import static org.onosproject.yangutils.utils.io.impl.CopyrightHeader.getCopyrightHeader;
+import static org.onosproject.yangutils.utils.io.impl.CopyrightHeader.parseCopyrightHeader;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.appendFileContents;
 import static org.onosproject.yangutils.utils.io.impl.FileSystemUtil.updateFileHandle;
 import static org.onosproject.yangutils.utils.io.impl.JavaDocGen.JavaDocType.PACKAGE_INFO;
@@ -134,7 +134,7 @@ public final class YangIoUtils {
             FileWriter fileWriter = new FileWriter(packageInfo);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.write(getCopyrightHeader());
+            bufferedWriter.write(parseCopyrightHeader());
             //TODO: get the compiler annotations and pass the info
             bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode,
                                             null));
@@ -688,7 +688,8 @@ public final class YangIoUtils {
      * @param conflictResolver object of YANG to java naming conflict util
      * @return camel case rule checked string
      */
-    private static String applyCamelCaseRule(String[] stringArray, YangToJavaNamingConflictUtil conflictResolver) {
+    private static String applyCamelCaseRule(String[] stringArray,
+                                             YangToJavaNamingConflictUtil conflictResolver) {
 
         String ruleChecker = stringArray[0].toLowerCase();
         int i;

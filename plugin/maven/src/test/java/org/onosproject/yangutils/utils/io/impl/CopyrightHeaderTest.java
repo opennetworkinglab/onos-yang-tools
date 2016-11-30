@@ -33,7 +33,7 @@ import static org.apache.commons.io.FileUtils.contentEquals;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-import static org.onosproject.yangutils.utils.io.impl.CopyrightHeader.getCopyrightHeader;
+import static org.onosproject.yangutils.utils.io.impl.CopyrightHeader.parseCopyrightHeader;
 
 /**
  * Unit Tests for the CopyrightHeader contents.
@@ -89,7 +89,7 @@ public final class CopyrightHeaderTest {
             out.write(c);
         }
 
-        String licenseHeader = getCopyrightHeader();
+        String licenseHeader = parseCopyrightHeader();
         File test = new File("target/TestCopyrightHeader.txt");
 
         FileWriter writer = new FileWriter(test);

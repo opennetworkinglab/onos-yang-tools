@@ -91,10 +91,6 @@ public final class ListenerUtil {
     private static final String REGEX_EQUAL = "[=]";
     private static final String REGEX_OPEN_BRACE = "[(]";
 
-    private static YangConstructType pathType;
-    private static PathStatementContext pathCtx;
-    private static YangLeafRef yangLeafRef;
-
     // No instantiation.
     private ListenerUtil() {
     }
@@ -124,7 +120,9 @@ public final class ListenerUtil {
      * @param ctx           yang construct's context to get the line number and character position
      * @return concatenated string after removing double quotes
      */
-    public static String getValidIdentifier(String identifier, YangConstructType yangConstruct, ParserRuleContext ctx) {
+    public static String getValidIdentifier(String identifier,
+                                            YangConstructType yangConstruct,
+                                            ParserRuleContext ctx) {
 
         String identifierString = removeQuotesAndHandleConcat(identifier);
         ParserException parserException;
@@ -713,33 +711,33 @@ public final class ListenerUtil {
                                     YangLeafRef leafRef) {
 
         String concatPath = removeQuotesAndHandleConcat(path);
-        pathType = type;
-        pathCtx = ctx;
-        yangLeafRef = leafRef;
         if (!concatPath.startsWith(SLASH_FOR_STRING) &&
                 !concatPath.startsWith(ANCESTOR)) {
-            throw getPathException();
+            throw getPathException(ctx, leafRef);
         }
         leafRef.setPath(concatPath);
         if (concatPath.startsWith(SLASH_FOR_STRING)) {
             List<YangAtomicPath> atomicList = new LinkedList<>();
-            valAbsPath(concatPath, atomicList);
+            valAbsPath(concatPath, atomicList, ctx, leafRef, type);
             leafRef.setPathType(ABSOLUTE_PATH);
             valPrefix(atomicList, leafRef);
             leafRef.setAtomicPath(atomicList);
             return;
         }
         leafRef.setPathType(RELATIVE_PATH);
-        valRelPath(concatPath, leafRef);
+        valRelPath(concatPath, leafRef, ctx, type);
     }
 
     /**
      * Validates relative path, parses the string and stores it in the leaf-ref.
      *
-     * @param path    leaf-ref path
-     * @param leafRef YANG leaf-ref
+     * @param path     leaf-ref path
+     * @param leafRef  YANG leaf-ref data model information
+     * @param pathType yang construct for creating error message
      */
-    private static void valRelPath(String path, YangLeafRef leafRef) {
+    private static void valRelPath(String path, YangLeafRef leafRef,
+                                   PathStatementContext pathCtx,
+                                   YangConstructType pathType) {
 
         YangRelativePath relPath = new YangRelativePath();
         int count = 0;
@@ -748,12 +746,13 @@ public final class ListenerUtil {
             count = count + 1;
         }
         if (path.isEmpty()) {
-            throw getPathException();
+            throw getPathException(pathCtx, leafRef);
         }
 
         List<YangAtomicPath> atomicList = new ArrayList<>();
         relPath.setAncestorNodeCount(count);
-        valAbsPath(SLASH_FOR_STRING + path, atomicList);
+        valAbsPath(SLASH_FOR_STRING + path, atomicList, pathCtx, leafRef,
+                   pathType);
         valPrefix(atomicList, leafRef);
         relPath.setAtomicPathList(atomicList);
         leafRef.setRelativePath(relPath);
@@ -762,23 +761,30 @@ public final class ListenerUtil {
     /**
      * Validates absolute path, parses the string and stores it in leaf-ref.
      *
-     * @param path    leaf-ref path
-     * @param atomics atomic content list
+     * @param path        leaf-ref path
+     * @param atomics     atomic content list
+     * @param pathCtx     path statement context
+     * @param yangLeafRef YANG leaf ref
+     * @param pathType    yang construct for creating error message
      */
-    private static void valAbsPath(String path, List<YangAtomicPath> atomics) {
+    private static void valAbsPath(String path, List<YangAtomicPath> atomics,
+                                   PathStatementContext pathCtx,
+                                   YangLeafRef yangLeafRef,
+                                   YangConstructType pathType) {
 
         String comPath = path;
         while (comPath != null) {
             comPath = comPath.substring(1);
             if (comPath.isEmpty()) {
-                throw getPathException();
+                throw getPathException(pathCtx, yangLeafRef);
             }
             int nodeId = comPath.indexOf(CHAR_OF_SLASH);
             int predicate = comPath.indexOf(CHAR_OF_OPEN_SQUARE_BRACKET);
             if (predicate < nodeId && predicate != -1) {
-                comPath = getPathWithPredicate(comPath, atomics);
+                comPath = getPathWithPredicate(comPath, atomics,
+                                               pathCtx, yangLeafRef, pathType);
             } else {
-                comPath = getPath(comPath, atomics);
+                comPath = getPath(comPath, atomics, pathType, pathCtx);
             }
         }
     }
@@ -787,38 +793,53 @@ public final class ListenerUtil {
      * Returns the remaining path after parsing and the predicates of an atomic
      * content.
      *
-     * @param path    leaf-ref path
-     * @param atomics atomic content list
+     * @param path        leaf-ref path
+     * @param atomics     atomic content list
+     * @param pathCtx     yang construct's context to get the line number and
+     *                    character position
+     * @param yangLeafRef YANG leaf-ref data model information
+     * @param pathType    yang construct for creating error message
      * @return parsed path after removing one atomic content.
      */
     private static String getPathWithPredicate(String path,
-                                               List<YangAtomicPath> atomics) {
+                                               List<YangAtomicPath> atomics,
+                                               PathStatementContext pathCtx,
+                                               YangLeafRef yangLeafRef,
+                                               YangConstructType pathType) {
 
         String[] node = new String[2];
         int bracket = path.indexOf(CHAR_OF_OPEN_SQUARE_BRACKET);
         node[0] = path.substring(0, bracket);
         node[1] = path.substring(bracket);
-        return getParsedPath(node[0], node[1], atomics);
+        return getParsedPath(node[0], node[1], atomics, pathCtx, yangLeafRef,
+                             pathType);
     }
 
     /**
      * Returns the path after taking all the path predicates of an atomic
      * content.
      *
-     * @param nodeId  atomic content nodeId
-     * @param path    leaf-ref path
-     * @param atomics atomic content list
+     * @param nodeId      atomic content nodeId
+     * @param path        leaf-ref path
+     * @param atomics     atomic content list
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
+     * @param pathType    yang construct for creating error message
      * @return parsed path after removing one atomic content.
      */
     public static String getParsedPath(String nodeId, String path,
-                                       List<YangAtomicPath> atomics) {
+                                       List<YangAtomicPath> atomics,
+                                       PathStatementContext pathCtx,
+                                       YangLeafRef yangLeafRef,
+                                       YangConstructType pathType) {
 
         String comPath = path;
         List<String> predicateList = new ArrayList<>();
         while (comPath.startsWith(OPEN_SQUARE_BRACKET)) {
             String matchedVal = getMatchedPredicate(comPath);
             if (matchedVal == null || matchedVal.isEmpty()) {
-                throw getPathException();
+                throw getPathException(pathCtx, yangLeafRef);
             }
             predicateList.add(matchedVal);
             comPath = comPath.substring(matchedVal.length());
@@ -828,7 +849,9 @@ public final class ListenerUtil {
         YangNodeIdentifier validId =
                 getValidNodeIdentifier(nodeId, pathType, pathCtx);
 
-        List<YangPathPredicate> predicates = valPathPredicates(predicateList);
+        List<YangPathPredicate> predicates = valPathPredicates(predicateList,
+                                                               pathType,
+                                                               pathCtx, yangLeafRef);
         atomicPath.setNodeIdentifier(validId);
         atomicPath.setPathPredicatesList(predicates);
         atomics.add(atomicPath);
@@ -839,15 +862,22 @@ public final class ListenerUtil {
      * Validates the path predicates of an atomic content after parsing the
      * predicates and storing it in the leaf-ref.
      *
-     * @param predicates list of predicates
+     * @param predicates  list of predicates
+     * @param pathType    yang construct for creating error message
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
      * @return list of path predicates of an atomic content
      */
-    private static List<YangPathPredicate> valPathPredicates(List<String> predicates) {
+    private static List<YangPathPredicate> valPathPredicates(List<String> predicates,
+                                                             YangConstructType pathType,
+                                                             PathStatementContext pathCtx,
+                                                             YangLeafRef yangLeafRef) {
 
         List<YangPathPredicate> result = new ArrayList<>();
         for (String p : predicates) {
             p = p.substring(1, p.length() - 1);
-            result.add(valPathEqualityExp(p.trim()));
+            result.add(valPathEqualityExp(p.trim(), pathType, pathCtx, yangLeafRef));
         }
         return result;
     }
@@ -856,15 +886,23 @@ public final class ListenerUtil {
      * Validates the path equality expression of a path predicate and after
      * parsing the string assigns it to the YANG path predicate.
      *
-     * @param predicate path predicate
+     * @param predicate   path predicate
+     * @param pathType    yang construct for creating error message
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
      * @return YANG path predicate
      */
-    private static YangPathPredicate valPathEqualityExp(String predicate) {
+    private static YangPathPredicate valPathEqualityExp(String predicate,
+                                                        YangConstructType pathType,
+                                                        PathStatementContext pathCtx,
+                                                        YangLeafRef yangLeafRef) {
 
         String[] exp = predicate.split(REGEX_EQUAL);
         YangNodeIdentifier nodeId =
                 getValidNodeIdentifier(exp[0].trim(), pathType, pathCtx);
-        YangRelativePath relPath = valPathKeyExp(exp[1].trim());
+        YangRelativePath relPath = valPathKeyExp(exp[1].trim(), pathType,
+                                                 pathCtx, yangLeafRef);
 
         YangPathPredicate pathPredicate = new YangPathPredicate();
         pathPredicate.setNodeId(nodeId);
@@ -877,10 +915,17 @@ public final class ListenerUtil {
      * Validates the path key expression of the path-predicate and stores it
      * in the relative path of the leaf-ref.
      *
-     * @param relPath relative path
+     * @param relPath     relative path
+     * @param pathType    yang construct for creating error message
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
      * @return YANG relative path
      */
-    private static YangRelativePath valPathKeyExp(String relPath) {
+    private static YangRelativePath valPathKeyExp(String relPath,
+                                                  YangConstructType pathType,
+                                                  PathStatementContext pathCtx,
+                                                  YangLeafRef yangLeafRef) {
 
         String[] relative = relPath.split(SLASH_FOR_STRING);
         int count = 0;
@@ -895,7 +940,9 @@ public final class ListenerUtil {
 
         YangRelativePath relativePath = new YangRelativePath();
         relativePath.setAncestorNodeCount(count);
-        relativePath.setAtomicPathList(valRelPathKeyExp(atomicContent));
+        relativePath.setAtomicPathList(valRelPathKeyExp(atomicContent,
+                                                        pathType,
+                                                        pathCtx, yangLeafRef));
         return relativePath;
     }
 
@@ -903,16 +950,23 @@ public final class ListenerUtil {
      * Validates relative path key expression in the right relative path of
      * the path predicate, by taking every atomic content in it.
      *
-     * @param content atomic content list
+     * @param content     atomic content list
+     * @param pathType    yang construct for creating error message
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
      * @return YANG atomic content list
      */
-    private static List<YangAtomicPath> valRelPathKeyExp(List<String> content) {
+    private static List<YangAtomicPath> valRelPathKeyExp(List<String> content,
+                                                         YangConstructType pathType,
+                                                         PathStatementContext pathCtx,
+                                                         YangLeafRef yangLeafRef) {
 
         String current = content.get(0);
         String[] curStr = (current.trim()).split(REGEX_OPEN_BRACE);
         if (!(curStr[0].trim().equals(CURRENT)) ||
                 !(curStr[1].trim().equals(CLOSE_PARENTHESIS))) {
-            throw getPathException();
+            throw getPathException(pathCtx, yangLeafRef);
         }
 
         content.remove(0);
@@ -933,9 +987,14 @@ public final class ListenerUtil {
      *
      * @param path       leaf-ref path
      * @param atomicList atomic content list
+     * @param pathType   yang construct for creating error message
+     * @param pathCtx    yang construct's context to get the line number
+     *                   and character position
      * @return remaining path after parsing one atomic content
      */
-    public static String getPath(String path, List<YangAtomicPath> atomicList) {
+    public static String getPath(String path, List<YangAtomicPath> atomicList,
+                                 YangConstructType pathType,
+                                 PathStatementContext pathCtx) {
 
         String comPath = path;
         String nodeId;
@@ -958,9 +1017,13 @@ public final class ListenerUtil {
     /**
      * Returns the path syntax parser exception.
      *
+     * @param pathCtx     yang construct's context to get the line number
+     *                    and character position
+     * @param yangLeafRef YANG leaf-ref data model information
      * @return parser exception
      */
-    private static ParserException getPathException() {
+    private static ParserException getPathException(PathStatementContext pathCtx,
+                                                    YangLeafRef yangLeafRef) {
         ParserException exception = new ParserException(
                 "YANG file error : Path " + yangLeafRef.getPath() +
                         " does not follow valid path syntax");

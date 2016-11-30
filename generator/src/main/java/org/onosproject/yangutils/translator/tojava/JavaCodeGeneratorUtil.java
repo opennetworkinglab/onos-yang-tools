@@ -39,37 +39,9 @@ import static org.onosproject.yangutils.utils.io.impl.YangIoUtils.searchAndDelet
 public final class JavaCodeGeneratorUtil {
 
     /**
-     * Current YANG node.
-     */
-    private static YangNode curNode;
-
-    /**
-     * Root node.
-     */
-    private static YangNode rootNode;
-
-    /**
      * Creates a java code generator utility object.
      */
     private JavaCodeGeneratorUtil() {
-    }
-
-    /**
-     * Returns current YANG node.
-     *
-     * @return current YANG node
-     */
-    public static YangNode getCurNode() {
-        return curNode;
-    }
-
-    /**
-     * Sets current YANG node.
-     *
-     * @param node current YANG node
-     */
-    public static void setCurNode(YangNode node) {
-        curNode = node;
     }
 
     /**
@@ -84,7 +56,6 @@ public final class JavaCodeGeneratorUtil {
             throws TranslatorException, IOException {
 
         YangNode codeGenNode = rootNode;
-        setRootNode(rootNode);
         TraversalType curTraversal = ROOT;
 
         while (codeGenNode != null) {
@@ -94,9 +65,8 @@ public final class JavaCodeGeneratorUtil {
                             codeGenNode.getName() + " in " + codeGenNode.getLineNumber() + " at "
                             + codeGenNode.getCharPosition() + " in " + codeGenNode.getFileName());
                 }
-                setCurNode(codeGenNode);
                 try {
-                    generateCodeEntry(codeGenNode, yangPlugin);
+                    generateCodeEntry(codeGenNode, yangPlugin, rootNode);
                     codeGenNode.setNameSpaceAndAddToParentSchemaMap();
                 } catch (InvalidNodeForTranslatorException e) {
                     if (codeGenNode.getNextSibling() != null) {
@@ -109,7 +79,7 @@ public final class JavaCodeGeneratorUtil {
                     continue;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    close(codeGenNode, yangPlugin);
+                    close(codeGenNode, yangPlugin, rootNode);
                     throw new TranslatorException(e.getMessage());
                 }
 
@@ -119,20 +89,20 @@ public final class JavaCodeGeneratorUtil {
                 codeGenNode = codeGenNode.getChild();
             } else if (codeGenNode.getNextSibling() != null) {
                 try {
-                    generateCodeExit(codeGenNode, yangPlugin);
+                    generateCodeExit(codeGenNode, yangPlugin, rootNode);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    close(codeGenNode, yangPlugin);
+                    close(codeGenNode, yangPlugin, rootNode);
                     throw new TranslatorException(e.getMessage());
                 }
                 curTraversal = SIBILING;
                 codeGenNode = codeGenNode.getNextSibling();
             } else {
                 try {
-                    generateCodeExit(codeGenNode, yangPlugin);
+                    generateCodeExit(codeGenNode, yangPlugin, rootNode);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    close(codeGenNode, yangPlugin);
+                    close(codeGenNode, yangPlugin, rootNode);
                     throw new TranslatorException(e.getMessage());
                 }
                 curTraversal = PARENT;
@@ -146,16 +116,19 @@ public final class JavaCodeGeneratorUtil {
      *
      * @param codeGenNode current data model node for which the code needs to be generated
      * @param yangPlugin  YANG plugin config
+     * @param rootNode    YANG root node
      * @throws TranslatorException when fails to generate java code file the current node
      * @throws IOException         when fails to do IO operations
      */
-    private static void generateCodeEntry(YangNode codeGenNode, YangPluginConfig yangPlugin)
+    private static void generateCodeEntry(YangNode codeGenNode,
+                                          YangPluginConfig yangPlugin,
+                                          YangNode rootNode)
             throws TranslatorException, IOException {
 
         if (codeGenNode instanceof JavaCodeGenerator) {
             ((JavaCodeGenerator) codeGenNode).generateCodeEntry(yangPlugin);
         } else {
-            close(codeGenNode, yangPlugin);
+            close(codeGenNode, yangPlugin, rootNode);
             throw new TranslatorException(
                     "Generated data model node cannot be translated to target language code for " +
                             codeGenNode.getName() + " in " + codeGenNode.getLineNumber()
@@ -168,16 +141,19 @@ public final class JavaCodeGeneratorUtil {
      *
      * @param codeGenNode  current data model node for which the code needs to be generated
      * @param pluginConfig plugin configurations
+     * @param rootNode     YANG root node
      * @throws TranslatorException when fails to generate java code file the current node
      * @throws IOException         when fails to do IO operations
      */
-    private static void generateCodeExit(YangNode codeGenNode, YangPluginConfig pluginConfig)
+    private static void generateCodeExit(YangNode codeGenNode,
+                                         YangPluginConfig pluginConfig,
+                                         YangNode rootNode)
             throws TranslatorException, IOException {
 
         if (codeGenNode instanceof JavaCodeGenerator) {
             ((JavaCodeGenerator) codeGenNode).generateCodeExit();
         } else {
-            close(codeGenNode, pluginConfig);
+            close(codeGenNode, pluginConfig, rootNode);
             throw new TranslatorException(
                     "Generated data model node cannot be translated to target language code for " +
                             codeGenNode.getName() + " in " + codeGenNode.getLineNumber()
@@ -187,11 +163,12 @@ public final class JavaCodeGeneratorUtil {
 
     /**
      * Free other YANG nodes of data-model tree when error occurs while file generation of current node.
+     *
+     * @param freedNode current data model node
      */
-    private static void freeRestResources() {
+    private static void freeRestResources(YangNode freedNode) {
 
-        YangNode freedNode = getCurNode();
-        if (getCurNode() != null) {
+        if (freedNode != null) {
             YangNode tempNode = freedNode;
             TraversalType curTraversal = ROOT;
 
@@ -246,18 +223,16 @@ public final class JavaCodeGeneratorUtil {
             throws IOException {
 
         if (rootNode != null) {
-            //Free other resources where translator has failed.
-            freeRestResources();
 
             // Start removing all open files.
             YangNode tempNode = rootNode;
-            setCurNode(tempNode.getChild());
+            YangNode curNode = tempNode.getChild();
             TraversalType curTraversal = ROOT;
 
             while (tempNode != null) {
 
                 if (curTraversal != PARENT) {
-                    close(tempNode, yangPluginConfig);
+                    close(tempNode, yangPluginConfig, rootNode);
                 }
                 if (curTraversal != PARENT && tempNode.getChild() != null) {
                     curTraversal = CHILD;
@@ -271,7 +246,7 @@ public final class JavaCodeGeneratorUtil {
                 }
             }
 
-            freeRestResources();
+            freeRestResources(curNode);
         }
     }
 
@@ -280,42 +255,26 @@ public final class JavaCodeGeneratorUtil {
      *
      * @param node       current YANG node
      * @param yangPlugin plugin configurations
+     * @param rootNode   YANG root node
      * @throws IOException when fails to do IO operations
      */
-    private static void close(YangNode node, YangPluginConfig yangPlugin)
+    private static void close(YangNode node, YangPluginConfig yangPlugin,
+                              YangNode rootNode)
             throws IOException {
         if (node instanceof JavaCodeGenerator && ((TempJavaCodeFragmentFilesContainer) node)
                 .getTempJavaCodeFragmentFiles() != null) {
             ((TempJavaCodeFragmentFilesContainer) node).getTempJavaCodeFragmentFiles().freeTemporaryResources(true);
         }
-        if (getRootNode() != null) {
-            JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) getRootNode()).getJavaFileInfo();
+        if (rootNode != null) {
+            JavaFileInfoTranslator javaFileInfo = ((JavaFileInfoContainer) rootNode).getJavaFileInfo();
             if (javaFileInfo.getPackage() != null) {
                 searchAndDeleteTempDir(javaFileInfo.getBaseCodeGenPath() +
-                        javaFileInfo.getPackageFilePath());
+                                               javaFileInfo.getPackageFilePath());
             } else {
                 searchAndDeleteTempDir(yangPlugin.getCodeGenDir());
             }
         }
 
-    }
-
-    /**
-     * Returns root node.
-     *
-     * @return root node
-     */
-    private static YangNode getRootNode() {
-        return rootNode;
-    }
-
-    /**
-     * Sets root node.
-     *
-     * @param rootNode root node
-     */
-    private static void setRootNode(YangNode rootNode) {
-        JavaCodeGeneratorUtil.rootNode = rootNode;
     }
 
     /**
