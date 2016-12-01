@@ -21,11 +21,11 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-utils</artifactId>
-        <version>1.11-SNAPSHOT</version>
+        <version>1.11</version>
     </parent>
 
     <artifactId>onos-yang-plugins</artifactId>
-    <version>1.11-SNAPSHOT</version>
+    <version>1.11</version>
     <packaging>pom</packaging>
 
     <properties>
