@@ -98,7 +98,7 @@ public abstract class YangNotification
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangIfFeatureHolder, InvalidOpTypeHolder,
-        SingleInstanceNodeContext {
+        SingleInstanceNodeContext, DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201611L;
 
@@ -133,6 +133,11 @@ public abstract class YangNotification
     private List<YangIfFeature> ifFeatureList;
 
     private List<YangAugment> yangAugmentedInfo;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Create a notification node.
@@ -359,5 +364,24 @@ public abstract class YangNotification
         } catch (DataModelException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    /**
+     * Returns the defaultDenyAll.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    /**
+     * Sets the defaultDenyAll.
+     *
+     * @param defaultDenyAll
+     */
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 }

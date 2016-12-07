@@ -1938,5 +1938,34 @@ public interface GeneratedYangListener extends ParseTreeListener {
      *
      * @param currentContext current context in the parsed tree
      */
-    void exitRequireInstance(RequireInstanceContext currentContext);
+    void exitRequireInstance(GeneratedYangParser.RequireInstanceContext currentContext);
+
+    /**
+     * From ietf-netconf-acm.yang extension.
+     * @param currentContext
+     */
+    void enterDefaultDenyWriteStatement(
+            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext);
+
+    /**
+     * From ietf-netconf-acm.yang extension.
+     * @param currentContext
+     */
+    void exitDefaultDenyWriteStatement(
+            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext);
+
+    /**
+     * From ietf-netconf-acm.yang extension.
+     * @param currentContext
+     */
+    void enterDefaultDenyAllStatement(
+            GeneratedYangParser.DefaultDenyAllStatementContext currentContext);
+
+    /**
+     * From ietf-netconf-acm.yang extension.
+     * @param currentContext
+     */
+    void exitDefaultDenyAllStatement(
+            GeneratedYangParser.DefaultDenyAllStatementContext currentContext);
+
 }

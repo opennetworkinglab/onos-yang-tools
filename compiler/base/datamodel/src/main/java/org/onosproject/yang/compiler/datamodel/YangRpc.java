@@ -81,7 +81,7 @@ public abstract class YangRpc
         extends YangNode
         implements YangCommonInfo, Parsable,
         CollisionDetector, YangIfFeatureHolder, InvalidOpTypeHolder,
-        SingleInstanceNodeContext, SchemaDataNode {
+        SingleInstanceNodeContext, SchemaDataNode, DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201613L;
 
@@ -104,6 +104,11 @@ public abstract class YangRpc
      * List of if-feature.
      */
     private List<YangIfFeature> ifFeatureList;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Creates a rpc node.
@@ -162,6 +167,25 @@ public abstract class YangRpc
                     COLLISION_DETECTION, getName(), getLineNumber(),
                     getCharPosition(), RPC, getFileName()));
         }
+    }
+
+    /**
+     * Gets the defaultDenyAll.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    /**
+     * Sets the defaultDenyAll.
+     *
+     * @param defaultDenyAll
+     */
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 
     @Override

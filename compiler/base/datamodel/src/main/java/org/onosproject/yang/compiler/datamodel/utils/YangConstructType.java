@@ -400,6 +400,16 @@ public enum YangConstructType {
     APP_EXTENDED_NAME_DATA,
 
     /**
+     * Identifies a reference to the extension default-deny-write.
+     */
+    DEFAULT_DENY_WRITE_DATA,
+
+    /**
+     * Identifies a reference to the extension default-deny-all.
+     */
+    DEFAULT_DENY_ALL_DATA,
+
+    /**
      * Identifies the YANG argument element parsed data.
      */
     ARGUMENT_DATA,
@@ -585,6 +595,10 @@ public enum YangConstructType {
                 return "app-data-structure";
             case APP_EXTENDED_NAME_DATA:
                 return "app-extended-name";
+            case DEFAULT_DENY_WRITE_DATA:
+                return "default-deny-write";
+            case DEFAULT_DENY_ALL_DATA:
+                return "default-deny-all";
             case ARGUMENT_DATA:
                 return "argument";
             case DEVIATE_NOT_SUPPORTED:

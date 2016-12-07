@@ -73,7 +73,8 @@ public abstract class YangLeafList extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangConfig, YangUnits, YangMaxElementHolder, YangMinElementHolder,
-        SchemaDataNode, LeafSchemaContext {
+        SchemaDataNode, LeafSchemaContext, DefaultDenyWriteExtension,
+        DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201637L;
 
@@ -173,6 +174,16 @@ public abstract class YangLeafList extends DefaultLocationInfo
      * Parent context of data node.
      */
     private SchemaContext parentContext;
+
+    /**
+     * References the extension default-deny-write.
+     */
+    private boolean defaultDenyWrite;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Creates a YANG leaf-list.
@@ -655,5 +666,43 @@ public abstract class YangLeafList extends DefaultLocationInfo
     @Override
     public Object fromString(String value) {
         return ObjectProvider.getObject(dataType, value, dataType.getDataType());
+    }
+
+    /**
+     * Returns the defaultDenyWrite.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyWrite() {
+        return defaultDenyWrite;
+    }
+
+    /**
+     * Sets the defaultDenyWrite.
+     *
+     * @param defaultDenyWrite
+     */
+    @Override
+    public void setDefaultDenyWrite(boolean defaultDenyWrite) {
+        this.defaultDenyWrite = defaultDenyWrite;
+    }
+
+    /**
+     * Returns the defaultDenyAll.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    /**
+     * Sets the defaultDenyAll.
+     *
+     * @param defaultDenyAll
+     */
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 }

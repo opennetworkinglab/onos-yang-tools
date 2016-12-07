@@ -800,13 +800,15 @@ import YangLexer;
      *                             *((typedef-stmt /
      *                                grouping-stmt) stmtsep)
      *                             *(data-def-stmt stmtsep)
+     *                             [default-deny-write-stmt stmtsep]
+     *                             [default-deny-all-stmt stmtsep]
      *                         "}")
-     * TODO : 0..1 occurance to be checked in listener
+     * TODO : 0..1 occurrence to be checked in listener
      */
     containerStatement : CONTAINER_KEYWORD identifier
                      (STMTEND | LEFT_CURLY_BRACE (whenStatement | ifFeatureStatement | mustStatement | presenceStatement | configStatement
                      | statusStatement | descriptionStatement | referenceStatement | typedefStatement | groupingStatement
-                     | dataDefStatement)* RIGHT_CURLY_BRACE);
+                     | dataDefStatement | defaultDenyWriteStatement | defaultDenyAllStatement )* RIGHT_CURLY_BRACE);
 
     /**
      *  leaf-stmt           = leaf-keyword sep identifier-arg-str optsep
@@ -823,12 +825,14 @@ import YangLexer;
      *                            [status-stmt stmtsep]
      *                            [description-stmt stmtsep]
      *                            [reference-stmt stmtsep]
+     *                            [default-deny-write-stmt stmtsep]
+     *                            [default-deny-all-stmt stmtsep]
      *                         "}"
-     * TODO : 0..1 occurance to be checked in listener
+     * TODO : 0..1 occurrence to be checked in listener
      */
     leafStatement : LEAF_KEYWORD identifier LEFT_CURLY_BRACE (whenStatement | ifFeatureStatement | typeStatement | unitsStatement
               | mustStatement | defaultStatement | configStatement | mandatoryStatement | statusStatement  | descriptionStatement
-              | referenceStatement)* RIGHT_CURLY_BRACE;
+              | referenceStatement | defaultDenyWriteStatement | defaultDenyAllStatement )* RIGHT_CURLY_BRACE;
 
     /**
      *  leaf-list-stmt      = leaf-list-keyword sep identifier-arg-str optsep
@@ -846,12 +850,15 @@ import YangLexer;
      *                            [status-stmt stmtsep]
      *                            [description-stmt stmtsep]
      *                            [reference-stmt stmtsep]
+     *                            [default-deny-write-stmt stmtsep]
+     *                            [default-deny-all-stmt stmtsep]
      *                         "}"
      * TODO : 0..1 occurance to be checked in listener
      */
     leafListStatement : LEAF_LIST_KEYWORD identifier LEFT_CURLY_BRACE (whenStatement | ifFeatureStatement | typeStatement
                      | unitsStatement | mustStatement | configStatement | minElementsStatement | maxElementsStatement | orderedByStatement
-                     | statusStatement | descriptionStatement | referenceStatement)* RIGHT_CURLY_BRACE;
+                     | statusStatement | descriptionStatement | referenceStatement
+                     | defaultDenyWriteStatement | defaultDenyAllStatement )* RIGHT_CURLY_BRACE;
 
     /**
      *  list-stmt           = list-keyword sep identifier-arg-str optsep
@@ -869,6 +876,8 @@ import YangLexer;
      *                            [status-stmt stmtsep]
      *                            [description-stmt stmtsep]
      *                            [reference-stmt stmtsep]
+     *                            [default-deny-write-stmt stmtsep]
+     *                            [default-deny-all-stmt stmtsep]
      *                            *((typedef-stmt /
      *                               grouping-stmt) stmtsep)
      *                            1*(data-def-stmt stmtsep)
@@ -877,7 +886,8 @@ import YangLexer;
      */
     listStatement : LIST_KEYWORD identifier LEFT_CURLY_BRACE (whenStatement | ifFeatureStatement | mustStatement | keyStatement
               | uniqueStatement | configStatement | minElementsStatement | maxElementsStatement | orderedByStatement | statusStatement
-              | descriptionStatement | referenceStatement | typedefStatement | groupingStatement| dataDefStatement)* RIGHT_CURLY_BRACE;
+              | descriptionStatement | referenceStatement | defaultDenyWriteStatement | defaultDenyAllStatement
+              | typedefStatement | groupingStatement| dataDefStatement)* RIGHT_CURLY_BRACE;
 
     /**
      *  key-stmt            = key-keyword sep key-arg-str stmtend
@@ -1114,10 +1124,12 @@ import YangLexer;
      *                                grouping-stmt) stmtsep)
      *                             [input-stmt stmtsep]
      *                             [output-stmt stmtsep]
+     *                             [default-deny-all-stmt stmtsep]
      *                         "}")
      */
     rpcStatement : RPC_KEYWORD identifier (STMTEND | LEFT_CURLY_BRACE (ifFeatureStatement | statusStatement | descriptionStatement
-                | referenceStatement | typedefStatement | groupingStatement | inputStatement | outputStatement)* RIGHT_CURLY_BRACE);
+                | referenceStatement | typedefStatement | groupingStatement | inputStatement | outputStatement
+                | defaultDenyAllStatement)* RIGHT_CURLY_BRACE);
 
     /**
      * input-stmt          = input-keyword optsep
@@ -1151,6 +1163,7 @@ import YangLexer;
      *                             [status-stmt stmtsep]
      *                             [description-stmt stmtsep]
      *                             [reference-stmt stmtsep]
+     *                             [default-deny-all-stmt stmtsep]
      *                             *((typedef-stmt /
      *                                grouping-stmt) stmtsep)
      *                             *(data-def-stmt stmtsep)
@@ -1158,7 +1171,8 @@ import YangLexer;
      * TODO : 0..1 occurance to be checked in listener
      */
      notificationStatement : NOTIFICATION_KEYWORD identifier (STMTEND | LEFT_CURLY_BRACE (ifFeatureStatement
-                           | statusStatement | descriptionStatement | referenceStatement | typedefStatement
+                           | statusStatement | descriptionStatement | referenceStatement
+                           | typedefStatement | defaultDenyAllStatement
                            | groupingStatement | dataDefStatement)* RIGHT_CURLY_BRACE);
 
     /**
@@ -1275,6 +1289,18 @@ import YangLexer;
      */
     appExtendedStatement : APP_EXTENDED extendedName STMTEND;
 
+    /**
+     *   default-deny-write-stmt = prefix:default-deny-write ";"
+     *   From ietf-netconf-acm.yang RFC 6536
+     */
+    defaultDenyWriteStatement : DEFAULT_DENY_WRITE STMTEND;
+
+    /**
+     *   default-deny-all-stmt = prefix:default-deny-all ";"
+     *   From ietf-netconf-acm.yang RFC 6536
+     */
+    defaultDenyAllStatement : DEFAULT_DENY_ALL STMTEND;
+
     string : STRING (PLUS STRING)*
            | IDENTIFIER
            | INTEGER
@@ -1346,4 +1372,4 @@ import YangLexer;
                   | FALSE_KEYWORD | MAX_KEYWORD | MIN_KEYWORD | NOT_SUPPORTED_KEYWORD | OBSOLETE_KEYWORD
                   | REPLACE_KEYWORD | SYSTEM_KEYWORD | TRUE_KEYWORD | UNBOUNDED_KEYWORD | USER_KEYWORD
                   | COMPILER_ANNOTATION_KEYWORD | APP_DATA_STRUCTURE_KEYWORD | DATA_STRUCTURE_KEYWORD
-                  | APP_EXTENDED_KEYWORD;
+                  | APP_EXTENDED_KEYWORD | DEFAULT_DENY_WRITE_KEYWORD | DEFAULT_DENY_ALL_KEYWORD;

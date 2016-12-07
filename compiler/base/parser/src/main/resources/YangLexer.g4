@@ -113,6 +113,11 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
     DATA_STRUCTURE_KEY : IDENTIFIER COLON KEY_KEYWORD;
     APP_EXTENDED_KEYWORD : 'app-extended-name';
     APP_EXTENDED : IDENTIFIER COLON APP_EXTENDED_KEYWORD;
+    //From ietf-netconf-acm.yang RFC 6536
+    DEFAULT_DENY_WRITE_KEYWORD : 'default-deny-write';
+    DEFAULT_DENY_WRITE : IDENTIFIER COLON DEFAULT_DENY_WRITE_KEYWORD;
+    DEFAULT_DENY_ALL_KEYWORD : 'default-deny-all';
+    DEFAULT_DENY_ALL : IDENTIFIER COLON DEFAULT_DENY_ALL_KEYWORD;
 
     // Lexer tokens to be skipped
     COMMENT

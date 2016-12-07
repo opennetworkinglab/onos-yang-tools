@@ -90,7 +90,8 @@ public abstract class YangList
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangIsFilterContentNodes, YangConfig, YangUniqueHolder,
-        YangMaxElementHolder, YangMinElementHolder, SchemaDataNode, ListSchemaContext {
+        YangMaxElementHolder, YangMinElementHolder, SchemaDataNode, ListSchemaContext,
+        DefaultDenyWriteExtension, DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201609L;
 
@@ -229,6 +230,16 @@ public abstract class YangList
      * Parent context of data node.
      */
     private SchemaContext parentContext;
+
+    /**
+     * References the extension default-deny-write.
+     */
+    private boolean defaultDenyWrite;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Creates a YANG list object.
@@ -882,5 +893,43 @@ public abstract class YangList
         } catch (DataModelException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    /**
+     * Returns the defaultDenyWrite.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyWrite() {
+        return defaultDenyWrite;
+    }
+
+    /**
+     * Sets the defaultDenyWrite.
+     *
+     * @param defaultDenyWrite
+     */
+    @Override
+    public void setDefaultDenyWrite(boolean defaultDenyWrite) {
+        this.defaultDenyWrite = defaultDenyWrite;
+    }
+
+    /**
+     * Returns the defaultDenyAll.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    /**
+     * Sets the defaultDenyAll.
+     *
+     * @param defaultDenyAll
+     */
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 }

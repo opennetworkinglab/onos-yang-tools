@@ -23,6 +23,7 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangListener;
+import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppDataStructureListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppExtendedNameListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.ArgumentListener;
@@ -100,6 +101,8 @@ import org.onosproject.yang.compiler.parser.impl.listeners.VersionListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.WhenListener;
 import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
 import org.onosproject.yang.compiler.utils.UtilConstants;
+import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyAllExtRefListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyWriteExtRefListener;
 
 import java.util.Stack;
 
@@ -1846,5 +1849,31 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void exitEveryRule(ParserRuleContext parserRuleContext) {
         // do nothing.
+    }
+
+    @Override
+    public void enterDefaultDenyWriteStatement(
+            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext) {
+        DefaultDenyWriteExtRefListener
+            .processDefaultDenyWriteStructureEntry(this, currentContext);
+    }
+
+    @Override
+    public void exitDefaultDenyWriteStatement(
+            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void enterDefaultDenyAllStatement(
+            GeneratedYangParser.DefaultDenyAllStatementContext currentContext) {
+        DefaultDenyAllExtRefListener
+            .processDefaultDenyAllStructureEntry(this, currentContext);
+    }
+
+    @Override
+    public void exitDefaultDenyAllStatement(
+            GeneratedYangParser.DefaultDenyAllStatementContext currentContext) {
+        // do nothing
     }
 }

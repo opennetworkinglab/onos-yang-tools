@@ -103,9 +103,10 @@ public abstract class YangContainer
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes,
-        YangConfig, SingleInstanceNodeContext, SchemaDataNode {
+        YangConfig, SingleInstanceNodeContext, SchemaDataNode,
+        DefaultDenyWriteExtension, DefaultDenyAllExtension {
 
-    private static final long serialVersionUID = 806201605L;
+    private static final long serialVersionUID = -4962764560362228905L;
 
     /**
      * If container maintains config data.
@@ -159,6 +160,16 @@ public abstract class YangContainer
      * List of if-feature.
      */
     private List<YangIfFeature> ifFeatureList;
+
+    /**
+     * References the extension default-deny-write.
+     */
+    private boolean defaultDenyWrite;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Create a container node.
@@ -389,6 +400,44 @@ public abstract class YangContainer
     @Override
     public void setStatus(YangStatusType status) {
         this.status = status;
+    }
+
+    /**
+     * Returns the defaultDenyWrite.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyWrite() {
+        return defaultDenyWrite;
+    }
+
+    /**
+     * Sets the defaultDenyWrite.
+     *
+     * @param defaultDenyWrite
+     */
+    @Override
+    public void setDefaultDenyWrite(boolean defaultDenyWrite) {
+        this.defaultDenyWrite = defaultDenyWrite;
+    }
+
+    /**
+     * Returns the defaultDenyAll.
+     * @return
+     */
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    /**
+     * Sets the defaultDenyAll.
+     *
+     * @param defaultDenyAll
+     */
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 
     /**

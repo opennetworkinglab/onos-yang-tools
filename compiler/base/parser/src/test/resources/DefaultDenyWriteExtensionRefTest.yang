@@ -1,0 +1,64 @@
+module default-deny-write-extension-ref-test {
+  namespace "urn:ietf:params:xml:ns:yang:ietf-netconf-acm";
+  prefix "nacm";
+
+  description
+  "This version of this YANG module is part of RFC 6536; see
+   the RFC itself for full legal notices.";
+
+  revision 2016-12-08 {
+    description
+      "Initial revision.";
+  }
+
+  extension default-deny-write {
+    description
+      "Used to indicate that the data model node
+       represents a sensitive security system parameter.";
+  }
+
+
+  container test {
+    nacm:default-deny-write;
+    leaf test1 {
+      type string {
+        length 1..6;
+      }
+      description "A leaf without an extension";
+    }
+
+    leaf test2 {
+      nacm:default-deny-write;
+      type string {
+        length 1..6;
+      }
+      description "A leaf with an extension";
+    }
+
+    leaf-list test3 {
+      nacm:default-deny-all;
+      type string {
+        length 1..6;
+      }
+      description "A leaf-list with an extension";
+    }
+
+    list test4 {
+      key test4a;
+      nacm:default-deny-all;
+      description "A list with the extension";
+
+      leaf test4a {
+        type uint8;
+        description "Key leaf in the list";
+      }
+
+      leaf test4b {
+        type string {
+          length 1..6;
+        }
+        description "Another leaf in the list";
+      }
+    }
+  }
+}
