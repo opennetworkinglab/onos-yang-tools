@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
+package org.onosproject.yang.model;
 
 /**
- * Representation of a configuration data node capable of either carrying data
- * or conveying the configuration tree structure.
+ * Abstraction of an entity which identifies a uniquely branching leaf
+ * corresponding to a multi instance leaf schema.
  */
-public interface DataNode {
+public interface MultiInstanceLeafKey extends NodeKey {
 
-    // TODO: specify generic nature of holding data and/or tree structure
-    // TODO: determine whether there should be subclasses for leaf, container, etc.
-    // identifier
-    // type
-    // no parent!
+    /**
+     * Returns value of node, this is only valid for multi-instance leaf, node.
+     *
+     * @return value maintained in the node
+     */
+    Object value();
 
+    /**
+     * Returns value as string, for usage in serializers.
+     *
+     * @return string representation of value
+     */
+    String asString();
 }

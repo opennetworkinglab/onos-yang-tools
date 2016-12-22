@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2016-present Open Networking Laboratory
   ~
@@ -24,16 +25,11 @@
         <version>1.10-SNAPSHOT</version>
     </parent>
 
-    <artifactId>onos-yang-runtime</artifactId>
+    <artifactId>onos-yang-model</artifactId>
     <version>1.10-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

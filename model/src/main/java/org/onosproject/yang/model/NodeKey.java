@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
 
-import java.util.List;
+package org.onosproject.yang.model;
 
 /**
- * Representation of a container data node capable of containing children nodes.
+ * Abstraction of an entity which identifies a node uniquely among its
+ * siblings.
  */
-public interface ContainerDataNode extends DataNode {
+public interface NodeKey extends Comparable<NodeKey> {
 
-    // List of children
-    List<DataNode> children();
-
-    // Child with specific identifier
-    DataNode child(String identifier); // TODO: Use NodeIdentifier instead of String
-
+    /**
+     * Returns the schema identifier as minimal key required to identify a
+     * branching node.
+     *
+     * @return schema identifier of a key
+     */
+    SchemaIdentifier identifier();
 }

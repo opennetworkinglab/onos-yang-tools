@@ -16,7 +16,7 @@
 
 package org.onosproject.yang.runtime;
 
-import org.onosproject.yang.DataNode;
+import org.onosproject.yang.model.DataNode;
 
 import java.io.InputStream;
 
