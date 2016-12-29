@@ -160,7 +160,7 @@ public abstract class YangChoice
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private final List<YangAugment> yangAugmentedInfo;
+    private List<YangAugment> yangAugmentedInfo;
 
     /**
      * YANG application error information.
@@ -487,4 +487,7 @@ public abstract class YangChoice
         return yangAppErrorInfo;
     }
 
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
+    }
 }

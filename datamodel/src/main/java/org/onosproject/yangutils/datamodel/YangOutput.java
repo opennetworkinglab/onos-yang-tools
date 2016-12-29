@@ -92,7 +92,7 @@ public abstract class YangOutput
      */
     private List<YangLeafList> listOfLeafList;
 
-    private final List<YangAugment> yangAugmentedInfo;
+    private List<YangAugment> yangAugmentedInfo;
 
     /**
      * Create a rpc output node.
@@ -219,5 +219,9 @@ public abstract class YangOutput
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
     }
 }

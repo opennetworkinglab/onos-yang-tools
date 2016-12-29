@@ -43,4 +43,9 @@ public interface YangAugmentableNode {
      * @return list of augment info
      */
     List<YangAugment> getAugmentedInfoList();
+
+    /**
+     * Clones augment info.
+     */
+    void cloneAugmentInfo();
 }

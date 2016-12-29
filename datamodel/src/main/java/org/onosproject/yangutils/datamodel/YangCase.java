@@ -144,7 +144,7 @@ public abstract class YangCase
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private final List<YangAugment> yangAugmentedInfo;
+    private List<YangAugment> yangAugmentedInfo;
 
     /**
      * Creates a choice node.
@@ -439,5 +439,10 @@ public abstract class YangCase
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
     }
 }

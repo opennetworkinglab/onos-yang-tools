@@ -16,15 +16,15 @@
 
 package org.onosproject.yangutils.datamodel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 import org.onosproject.yangutils.datamodel.utils.builtindatatype.YangDataTypes;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.onosproject.yangutils.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 
@@ -90,7 +90,7 @@ public abstract class YangList
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "key" statement, which MUST be present if the list represents
      * configuration, and MAY be present otherwise, takes as an argument a
      * string that specifies a space-separated list of leaf identifiers of this
@@ -98,39 +98,39 @@ public abstract class YangList
      * such leaf identifier MUST refer to a child leaf of the list. The leafs
      * can be defined directly in sub-statements to the list, or in groupings
      * used in the list.
-     *
+     * <p>
      * The combined values of all the leafs specified in the key are used to
      * uniquely identify a list entry. All key leafs MUST be given values when a
      * list entry is created. Thus, any default values in the key leafs or their
      * types are ignored. It also implies that any mandatory statement in the
      * key leafs are ignored.
-     *
+     * <p>
      * A leaf that is part of the key can be of any built-in or derived type,
      * except it MUST NOT be the built-in type "empty".
-     *
+     * <p>
      * All key leafs in a list MUST have the same value for their "config" as
      * the list itself.
-     *
+     * <p>
      * List of key leaf names.
      */
     private List<String> keyList;
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "unique" statement is used to put constraints on valid list
      * entries.  It takes as an argument a string that contains a space-
      * separated list of schema node identifiers, which MUST be given in the
      * descendant form.  Each such schema node identifier MUST refer to a leaf.
-     *
+     * <p>
      * If one of the referenced leafs represents configuration data, then
      * all of the referenced leafs MUST represent configuration data.
-     *
+     * <p>
      * The "unique" constraint specifies that the combined values of all the
      * leaf instances specified in the argument string, including leafs with
      * default values, MUST be unique within all list entry instances in
      * which all referenced leafs exist.
-     *
+     * <p>
      * List of unique leaf/leaf-list names
      */
     private List<String> uniqueList;
@@ -149,32 +149,32 @@ public abstract class YangList
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "max-elements" statement, which is optional, takes as an argument a
      * positive integer or the string "unbounded", which puts a constraint on
      * valid list entries. A valid leaf-list or list always has at most
      * max-elements entries.
-     *
+     * <p>
      * If no "max-elements" statement is present, it defaults to "unbounded".
      */
     private YangMaxElement maxElements;
 
     /**
      * Reference RFC 6020.
-     *
+     * <p>
      * The "min-elements" statement, which is optional, takes as an argument a
      * non-negative integer that puts a constraint on valid list entries. A
      * valid leaf-list or list MUST have at least min-elements entries.
-     *
+     * <p>
      * If no "min-elements" statement is present, it defaults to zero.
-     *
+     * <p>
      * The behavior of the constraint depends on the type of the leaf-list's or
      * list's closest ancestor node in the schema tree that is not a non-
      * presence container:
-     *
+     * <p>
      * o If this ancestor is a case node, the constraint is enforced if any
      * other node from the case exists.
-     *
+     * <p>
      * o Otherwise, it is enforced if the ancestor node exists.
      */
     private YangMinElement minElements;
@@ -371,11 +371,11 @@ public abstract class YangList
 
         if (getKeyList().contains(key)) {
             throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                    "   key" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+                                                 "   key" +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
 
         getKeyList().add(key);
@@ -394,11 +394,11 @@ public abstract class YangList
         }
         if (getUniqueList().contains(unique)) {
             throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                    "   unique" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+                                                 "   unique" +
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
         getUniqueList().add(unique);
     }
@@ -578,10 +578,10 @@ public abstract class YangList
         if (isConfig && (keys.isEmpty() || leaves.isEmpty()) && !isUsesPresentInList()
                 && !isListPresentInGrouping()) {
             throw new DataModelException("A list must have atleast one key leaf if config is true; " +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         } else if (keys != null) {
             validateKey(leaves, keys);
         }
@@ -605,11 +605,11 @@ public abstract class YangList
             for (YangLeaf leaf : leaves) {
                 if (leaf.isConfig()) {
                     throw new DataModelException("If a list has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\"." +
-                            getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition() +
-                            " in " + getFileName() + "\"");
+                                                         "it can have \"config\" set to \"true\"." +
+                                                         getName() + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition() +
+                                                         " in " + getFileName() + "\"");
                 }
             }
         }
@@ -618,10 +618,10 @@ public abstract class YangList
             for (YangLeafList leafList : leafLists) {
                 if (leafList.isConfig()) {
                     throw new DataModelException("If a list has \"config\" set to \"false\", no node underneath " +
-                            "it can have \"config\" set to \"true\"." + getName() + " in " +
-                            getLineNumber() + " at " +
-                            getCharPosition() +
-                            " in " + getFileName() + "\"");
+                                                         "it can have \"config\" set to \"true\"." + getName() + " in " +
+                                                         getLineNumber() + " at " +
+                                                         getCharPosition() +
+                                                         " in " + getFileName() + "\"");
                 }
             }
         }
@@ -649,11 +649,11 @@ public abstract class YangList
                     if (key.equals(leaf.getName())) {
                         if (leaf.getDataType().getDataType() == YangDataTypes.EMPTY) {
                             throw new DataModelException(" A leaf that is part of the key must not be the built-in " +
-                                    "type \"empty\"." +
-                                    getName() + " in " +
-                                    getLineNumber() + " at " +
-                                    getCharPosition() +
-                                    " in " + getFileName() + "\"");
+                                                                 "type \"empty\"." +
+                                                                 getName() + " in " +
+                                                                 getLineNumber() + " at " +
+                                                                 getCharPosition() +
+                                                                 " in " + getFileName() + "\"");
                         }
                         leafFound = true;
                         keyLeaves.add(leaf);
@@ -664,10 +664,10 @@ public abstract class YangList
 
             if (!leafFound && !isUsesPresentInList() && !isListPresentInGrouping()) {
                 throw new DataModelException("An identifier, in key, must refer to a child leaf of the list" +
-                        getName() + " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     getName() + " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
             }
             leafFound = false;
         }
@@ -679,11 +679,11 @@ public abstract class YangList
         for (YangLeaf keyLeaf : keyLeaves) {
             if (isConfig != keyLeaf.isConfig()) {
                 throw new DataModelException("All key leafs in a list must have the same value for their" +
-                        " \"config\" as the list itself." +
-                        getName() + " in " +
-                        getLineNumber() + " at " +
-                        getCharPosition() +
-                        " in " + getFileName() + "\"");
+                                                     " \"config\" as the list itself." +
+                                                     getName() + " in " +
+                                                     getLineNumber() + " at " +
+                                                     getCharPosition() +
+                                                     " in " + getFileName() + "\"");
             }
         }
     }
@@ -700,10 +700,10 @@ public abstract class YangList
             throws DataModelException {
         if (getName().equals(identifierName)) {
             throw new DataModelException("YANG file error: Duplicate input identifier detected, same as list \"" +
-                    getName() + " in " +
-                    getLineNumber() + " at " +
-                    getCharPosition() +
-                    " in " + getFileName() + "\"");
+                                                 getName() + " in " +
+                                                 getLineNumber() + " at " +
+                                                 getCharPosition() +
+                                                 " in " + getFileName() + "\"");
         }
     }
 
@@ -792,5 +792,9 @@ public abstract class YangList
         for (YangLeafList yangLeafList : getListOfLeafList()) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
     }
 }

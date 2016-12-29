@@ -94,7 +94,7 @@ public abstract class YangInput
      */
     private List<YangLeafList> listOfLeafList;
 
-    private final List<YangAugment> yangAugmentedInfo;
+    private List<YangAugment> yangAugmentedInfo;
 
     /**
      * Create a rpc input node.
@@ -223,5 +223,9 @@ public abstract class YangInput
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
     }
 }

@@ -20,6 +20,7 @@ import org.onosproject.yangutils.datamodel.exceptions.DataModelException;
 import org.onosproject.yangutils.datamodel.utils.Parsable;
 import org.onosproject.yangutils.datamodel.utils.YangConstructType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +121,7 @@ public abstract class YangNotification
      */
     private List<YangIfFeature> ifFeatureList;
 
-    private final List<YangAugment> yangAugmentedInfo;
+    private List<YangAugment> yangAugmentedInfo;
 
     /**
      * Create a notification node.
@@ -290,5 +291,9 @@ public abstract class YangNotification
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
     }
 }

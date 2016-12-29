@@ -421,6 +421,9 @@ public abstract class YangNode
         clonedNode.yangSchemaNodeIdentifier =
                 clonedNode.yangSchemaNodeIdentifier.clone();
         clonedNode.ysnContextInfoMap = new HashMap<>();
+        if (clonedNode instanceof YangAugmentableNode) {
+            ((YangAugmentableNode) clonedNode).cloneAugmentInfo();
+        }
         return clonedNode;
     }
 
@@ -505,7 +508,6 @@ public abstract class YangNode
                      * update the traversal's current node.
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
-
                 } else if (nextNodeToClone.getNextSibling() != null) {
 
                     curTraversal = SIBILING;
@@ -523,7 +525,6 @@ public abstract class YangNode
                                                  " at " + nextNodeToClone.getCharPosition() +
                                                  " in " + nextNodeToClone.getFileName() + "\"");
         }
-
     }
 
     /**
@@ -573,7 +574,6 @@ public abstract class YangNode
                                                  " at " + currentNode.getCharPosition() +
                                                  " in " + currentNode.getFileName() + "\"");
         }
-
     }
 
     /**
@@ -618,7 +618,6 @@ public abstract class YangNode
              * as the current node's parent
              */
             newSibling.setParent(getParent());
-
         } else {
             throw new DataModelException("Node is already part of a tree, " +
                                                  "and cannot be added as a " +

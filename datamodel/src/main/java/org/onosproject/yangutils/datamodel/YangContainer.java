@@ -516,4 +516,8 @@ public abstract class YangContainer
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
     }
+
+    public void cloneAugmentInfo() {
+        yangAugmentedInfo = new ArrayList<>();
+    }
 }
