@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-
 package org.onosproject.yang.model;
 
-import java.util.List;
-
 /**
- * Abstraction of an entity which identifies a unique branching node
- * corresponding to a multi instance schema definition.
+ * Constants used in model package.
  */
-public interface MultiInstanceNodeKey extends NodeKey {
-
-    /**
-     * Returns the list of key leaf nodes of a multi instance node, which
-     * uniquely identifies the branching node entry corresponding to a multi
-     * instance schema definition.
-     *
-     * @return List of key leaf nodes
-     */
-    List<LeafNode> keyLeafs();
+final class ModelConstants {
+    static final String INCOMPLETE_SCHEMA_INFO = "Schema info is not complete";
+    static final String LEAF_IS_TERMINAL = "Leaf must be the terminal node";
+    static final String NON_KEY_LEAF = "Leaf list is not a key of list";
+    static final String NO_KEY_SET = "Resource Identifier is empty";
 }
