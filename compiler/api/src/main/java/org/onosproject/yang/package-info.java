@@ -15,6 +15,6 @@
  */
 
 /**
- * Basic constructs for compiling and working with YANG models.
+ * Representation of a compiled YANG model.
  */
 package org.onosproject.yang;

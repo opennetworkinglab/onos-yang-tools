@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
+package org.onosproject.yang.compiler.api;
 
-import java.io.InputStream;
+import org.onosproject.yang.YangModel;
+
+import java.nio.file.Path;
 import java.util.Set;
 
 /**
- * Representation of a compiled YANG model.
+ * Representation of an entity that provides YANG compiled output.
  */
-public interface YangModel {
+public interface YangCompiledOutput {
 
-    // name
-    // schema meta-data!!!
+    /**
+     * Returns compiled YANG model.
+     *
+     * @return YANG model
+     */
+    YangModel getYangModel();
 
-    // set of source yang files (names & streams)
-    Set<String> getYangFiles();
-
-    InputStream getYangSource(String name);
-
-    // set of generated model classes
-    Set<String> getJavaModelClasses();
-
+    /**
+     * Returns generated JAVA files.
+     *
+     * @return generated JAVA files.
+     */
+    Set<Path> getGeneratedJava();
 }
