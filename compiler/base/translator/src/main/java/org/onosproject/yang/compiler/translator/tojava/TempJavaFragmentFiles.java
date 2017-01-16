@@ -57,9 +57,6 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ATTRIBUTES_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EDIT_CONTENT_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EQUALS_IMPL_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_NODES_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FROM_STRING_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
@@ -98,22 +95,16 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.parseBuilderInterfaceBuildMethodString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeaf;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForLeafList;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getSubtreeFilteringForNode;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_LEAF_HOLDER;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_PARENT_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.MISSING_PARENT_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
-import static org.onosproject.yang.compiler.utils.UtilConstants.AUGMENT_MAP_TYPE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BOOLEAN_DATA_TYPE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.COLLECTION_IMPORTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
@@ -123,34 +114,29 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
-import static org.onosproject.yang.compiler.utils.UtilConstants.HASH_MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OPERATION_TYPE_ATTRIBUTE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OPERATION_TYPE_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REFLECT_IMPORTS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SUBTREE_FILTERED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
-import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.*;
+import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
+import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.readAppendFile;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.ADD_TO_LIST;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
@@ -159,9 +145,6 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackage
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.mergeJavaFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
-import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF;
 
 /**
  * Represents implementation of java code fragments temporary implementations.
@@ -406,21 +389,6 @@ public class TempJavaFragmentFiles {
     private File leafIdAttributeTempFileHandle;
 
     /**
-     * Temporary file handle for is content match method for leaf-list.
-     */
-    private File getSubtreeFilteringForListTempFileHandle;
-
-    /**
-     * Temporary file handle for is content match method for node.
-     */
-    private File getSubtreeFilteringForChildNodeTempFileHandle;
-
-    /**
-     * Temporary file handle for is content match method for leaf.
-     */
-    private File subtreeFilteringForLeafTempFileHandle;
-
-    /**
      * Temporary file handle for edit content file.
      */
     private File editContentTempFileHandle;
@@ -465,6 +433,7 @@ public class TempJavaFragmentFiles {
          */
         if (javaFlagSet(INTERFACE_MASK)) {
             addGeneratedTempFile(GETTER_FOR_INTERFACE_MASK |
+                                         SETTER_FOR_INTERFACE_MASK |
                                          ADD_TO_LIST_INTERFACE_MASK |
                                          LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK);
         }
@@ -492,10 +461,7 @@ public class TempJavaFragmentFiles {
             addGeneratedTempFile(
                     ATTRIBUTES_MASK | GETTER_FOR_CLASS_MASK |
                             HASH_CODE_IMPL_MASK | EQUALS_IMPL_MASK |
-                            TO_STRING_IMPL_MASK | ADD_TO_LIST_IMPL_MASK |
-                            FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK |
-                            FILTER_CONTENT_MATCH_FOR_LEAF_MASK |
-                            FILTER_CONTENT_MATCH_FOR_NODES_MASK);
+                            TO_STRING_IMPL_MASK | ADD_TO_LIST_IMPL_MASK);
         }
         /*
          * Initialize temp files to generate type class.
@@ -558,18 +524,6 @@ public class TempJavaFragmentFiles {
         if (tempFlagSet(LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK)) {
             leafIdAttributeTempFileHandle =
                     getTemporaryFileHandle(LEAF_IDENTIFIER_ATTRIBUTES_FILE_NAME);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_MASK)) {
-            subtreeFilteringForLeafTempFileHandle =
-                    getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_FILE_NAME);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK)) {
-            getSubtreeFilteringForListTempFileHandle =
-                    getTemporaryFileHandle(FILTER_CONTENT_MATCH_LEAF_LIST_FILE_NAME);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_NODES_MASK)) {
-            getSubtreeFilteringForChildNodeTempFileHandle =
-                    getTemporaryFileHandle(FILTER_CONTENT_MATCH_NODE_FILE_NAME);
         }
         if (tempFlagSet(EDIT_CONTENT_MASK)) {
             editContentTempFileHandle =
@@ -1065,43 +1019,6 @@ public class TempJavaFragmentFiles {
     }
 
     /**
-     * Adds is filter content match for leaf.
-     *
-     * @param attr java attribute
-     * @throws IOException when fails to do IO operations
-     */
-    private void addSubTreeFilteringForLeaf(JavaAttributeInfo attr)
-            throws IOException {
-        appendToFile(subtreeFilteringForLeafTempFileHandle,
-                     getSubtreeFilteringForLeaf(attr, attr.getAttributeType()) +
-                             NEW_LINE);
-    }
-
-    /**
-     * Adds is filter content match for leaf-list.
-     *
-     * @param attr java attribute
-     * @throws IOException when fails to do IO operations
-     */
-    private void addSubtreeFilteringForLeafList(JavaAttributeInfo attr)
-            throws IOException {
-        appendToFile(getSubtreeFilteringForListTempFileHandle,
-                     getSubtreeFilteringForLeafList(attr) + NEW_LINE);
-    }
-
-    /**
-     * Adds is filter content match for nodes.
-     *
-     * @param attr java attribute
-     * @throws IOException when fails to do IO operations
-     */
-    private void addSubtreeFilteringForChildNode(JavaAttributeInfo attr)
-            throws IOException {
-        appendToFile(getSubtreeFilteringForChildNodeTempFileHandle,
-                     getSubtreeFilteringForNode(attr, attrNode) + NEW_LINE);
-    }
-
-    /**
      * Adds attribute for class.
      *
      * @param attr attribute info
@@ -1149,10 +1066,6 @@ public class TempJavaFragmentFiles {
         String setter = getSetterForClass(attr, getGeneratedJavaClassName(),
                                           getGeneratedJavaFiles());
         String javadoc = getOverRideString();
-        if (attr.getAttributeName().equals(SUBTREE_FILTERED)) {
-            javadoc = getJavaDoc(SETTER_METHOD, attr.getAttributeName(),
-                                 false, null);
-        }
         appendToFile(setterImplTempFileHandle, javadoc + setter);
     }
 
@@ -1171,10 +1084,6 @@ public class TempJavaFragmentFiles {
         String annotation = null;
         if (ds != null) {
             annotation = ds.name();
-        }
-        if (attr.getAttributeName().equals(SUBTREE_FILTERED)) {
-            javadoc = getJavaDoc(GETTER_METHOD, attr.getAttributeName(),
-                                 false, annotation);
         }
         if (javaFlagSet(BUILDER_CLASS_MASK)) {
             appendToFile(getterImplTempFileHandle, javadoc + getter);
@@ -1559,42 +1468,6 @@ public class TempJavaFragmentFiles {
         }
     }
 
-    /**
-     * Adds operation type to temp files.
-     *
-     * @param curNode current YANG node
-     * @param config  YANG plugin config
-     * @throws IOException IO exception
-     */
-    protected void addOperationTypeToTempFiles(YangNode curNode,
-                                               YangPluginConfig config)
-            throws IOException {
-        JavaQualifiedTypeInfoTranslator typeInfo =
-                new JavaQualifiedTypeInfoTranslator();
-        typeInfo.setClassInfo(OPERATION_TYPE_CLASS);
-        JavaFileInfo curInfo = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        JavaFileInfo info;
-        if (curNode instanceof RpcNotificationContainer) {
-            info = ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-        } else {
-            info = ((JavaFileInfoContainer) getModuleNode(curNode))
-                    .getJavaFileInfo();
-        }
-
-        typeInfo.setPkgInfo(info.getPackage().toLowerCase() + PERIOD +
-                                    getCapitalCase(info.getJavaName()));
-        String curNodeName = getCapitalCase(curInfo.getJavaName());
-        boolean isQualified = false;
-        if (!(curNode instanceof RpcNotificationContainer)) {
-            isQualified = javaImportData.addImportInfo(typeInfo, curNodeName,
-                                                       curInfo.getPackage());
-        }
-        JavaAttributeInfo attributeInfo =
-                getAttributeInfoForTheData(typeInfo, YANG + curNodeName +
-                        OPERATION_TYPE_ATTRIBUTE, null, isQualified, false);
-        addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
-    }
-
     private YangNode getModuleNode(YangNode curNode) {
         YangNode tempNode = curNode.getParent();
         while (!(tempNode instanceof RpcNotificationContainer)) {
@@ -1624,78 +1497,6 @@ public class TempJavaFragmentFiles {
         addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
     }
 
-    /**
-     * Adds value leaf flag to temp files.
-     *
-     * @param config YANG plugin config
-     * @throws IOException IO exception
-     */
-    protected void addSelectLeafFlag(YangPluginConfig config)
-            throws IOException {
-        JavaQualifiedTypeInfoTranslator typeInfo =
-                new JavaQualifiedTypeInfoTranslator();
-        typeInfo.setClassInfo(BIT_SET);
-        typeInfo.setPkgInfo(JAVA_UTIL_PKG);
-        JavaAttributeInfo attributeInfo =
-                getAttributeInfoForTheData(typeInfo, SELECT_LEAF, null, false, false);
-        addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
-    }
-
-    /**
-     * Adds sub tree filtering to temp files.
-     *
-     * @param config YANG plugin config
-     * @throws IOException IO exception
-     */
-    protected void addIsSubTreeFilteredFlag(YangPluginConfig config)
-            throws IOException {
-        JavaQualifiedTypeInfoTranslator typeInfo =
-                new JavaQualifiedTypeInfoTranslator();
-        typeInfo.setClassInfo(BOOLEAN_DATA_TYPE);
-        typeInfo.setPkgInfo(null);
-        JavaAttributeInfo attributeInfo =
-                getAttributeInfoForTheData(typeInfo, SUBTREE_FILTERED, null, false, false);
-        addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
-    }
-
-    /**
-     * Adds value leaf flag to temp files.
-     *
-     * @param config  YANG plugin config
-     * @param curNode current yang node
-     * @throws IOException IO exception
-     */
-    protected void addYangAugmentedMap(YangPluginConfig config, YangNode curNode)
-            throws IOException {
-        JavaFileInfoTranslator info = ((JavaCodeGeneratorInfo) curNode)
-                .getJavaFileInfo();
-        JavaQualifiedTypeInfoTranslator typeInfo =
-                new JavaQualifiedTypeInfoTranslator();
-        typeInfo.setClassInfo(AUGMENT_MAP_TYPE);
-        //Fix for add yangAugmentedInfo in equals/hashcode/and to string method.
-        typeInfo.setPkgInfo(null);
-        typeInfo.setForInterface(false);
-        JavaAttributeInfo attributeInfo =
-                getAttributeInfoForTheData(typeInfo, YANG_AUGMENTED_INFO_MAP,
-                                           null, false, false);
-        //MAP
-        addImportInfoOfNode(MAP, COLLECTION_IMPORTS,
-                            getCapitalCase(info.getJavaName()),
-                            info.getPackage(), true);
-        //HASH map
-        addImportInfoOfNode(HASH_MAP, COLLECTION_IMPORTS,
-                            getCapitalCase(info.getJavaName()),
-                            info.getPackage(), false);
-
-        if (curNode.isOpTypeReq()) {
-            //exception
-            addImportInfoOfNode(INVOCATION_TARGET_EXCEPTION, REFLECT_IMPORTS,
-                                getCapitalCase(info.getJavaName()),
-                                info.getPackage(), false);
-        }
-        addJavaSnippetInfoToApplicableTempFiles(attributeInfo, config);
-    }
-
     private JavaQualifiedTypeInfoTranslator addImportInfoOfNode(
             String cls, String pkg, String nodeName, String nodePkg,
             boolean isForInterface) {
@@ -1722,27 +1523,20 @@ public class TempJavaFragmentFiles {
         isAttributePresent = true;
         String attrName = newAttrInfo.getAttributeName();
         //Boolean flag for operation type attr info generation control.
-        boolean required = !attrName.equals(VALUE_LEAF) &&
-                !attrName.equals(SELECT_LEAF) &&
-                !attrName.equals(YANG_AUGMENTED_INFO_MAP);
-        //Boolean flag for subtree for nodes info generation control.
-        boolean subTreeForChild =
-                tempFlagSet(FILTER_CONTENT_MATCH_FOR_NODES_MASK) &&
-                        newAttrInfo.getAttributeType() == null &&
-                        !attrName.contains(OPERATION_TYPE_ATTRIBUTE) &&
-                        required && !attrName.equals(SUBTREE_FILTERED);
-        ;
+        boolean required = !attrName.equals(VALUE_LEAF);
+
         if (tempFlagSet(ATTRIBUTES_MASK)) {
             addAttribute(newAttrInfo);
         }
-        if (tempFlagSet(GETTER_FOR_INTERFACE_MASK) &&
-                !attrName.equals(SUBTREE_FILTERED)) {
+
+        if (tempFlagSet(GETTER_FOR_INTERFACE_MASK)) {
             addGetterForInterface(newAttrInfo);
         }
-        if (tempFlagSet(SETTER_FOR_INTERFACE_MASK) && required &&
-                !attrName.equals(SUBTREE_FILTERED)) {
+
+        if (tempFlagSet(SETTER_FOR_INTERFACE_MASK) && required) {
             addSetterForInterface(newAttrInfo);
         }
+
         if (tempFlagSet(SETTER_FOR_CLASS_MASK) && required) {
             addSetterImpl(newAttrInfo);
         }
@@ -1766,17 +1560,7 @@ public class TempJavaFragmentFiles {
             addAddToListInterface(newAttrInfo);
         }
         YangType attrType = newAttrInfo.getAttributeType();
-        if (subTreeForChild) {
-            addSubtreeFilteringForChildNode(newAttrInfo);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_MASK) &&
-                !listAttr && attrType != null) {
-            addSubTreeFilteringForLeaf(newAttrInfo);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) &&
-                listAttr && attrType != null) {
-            addSubtreeFilteringForLeafList(newAttrInfo);
-        }
+
         if (tempFlagSet(LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) &&
                 !listAttr && attrType != null) {
             leafCount++;
@@ -1787,6 +1571,7 @@ public class TempJavaFragmentFiles {
             if (tempFlagSet(GETTER_FOR_CLASS_MASK)) {
                 addGetterImpl(newAttrInfo);
             }
+
             if (tempFlagSet(FROM_STRING_IMPL_MASK)) {
                 JavaQualifiedTypeInfoTranslator typeInfo =
                         getQualifiedInfoOfFromString(newAttrInfo,
@@ -1847,10 +1632,15 @@ public class TempJavaFragmentFiles {
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
 
-        if (curNode.isOpTypeReq()) {
-            addImportInfoOfNode(BIT_SET, JAVA_UTIL_PKG, getGeneratedJavaClassName(),
+        addImportInfoOfNode(MODEL_OBJECT, MODEL_OBJECT_PKG, getGeneratedJavaClassName(),
+                            getJavaFileInfo().getPackage(), false);
+
+        if (curNode instanceof RpcNotificationContainer) {
+            addImportInfoOfNode(MAP, JAVA_UTIL_PKG,
+                                getGeneratedJavaClassName(),
                                 getJavaFileInfo().getPackage(), false);
         }
+
         if (isAttributePresent) {
             //Object utils
             addImportInfoOfNode(JAVA_UTIL_OBJECTS_IMPORT_CLASS, JAVA_UTIL_PKG,
@@ -1905,6 +1695,18 @@ public class TempJavaFragmentFiles {
             removeCaseParentImport(curNode, imports);
         }
 
+        if ((fileType & DEFAULT_CLASS_MASK) != 0) {
+            //add model object to extend list
+            JavaQualifiedTypeInfoTranslator typeInfo = new
+                    JavaQualifiedTypeInfoTranslator();
+            typeInfo.setClassInfo(MODEL_OBJECT);
+            typeInfo.setForInterface(false);
+            typeInfo.setPkgInfo(MODEL_OBJECT_PKG);
+            typeInfo.setQualified(false);
+            getBeanFiles(curNode).getJavaExtendsListHolder()
+                    .addToExtendsList(typeInfo, curNode, getBeanFiles(curNode));
+        }
+
         if ((fileType & BUILDER_CLASS_MASK) != 0 ||
                 (fileType & DEFAULT_CLASS_MASK) != 0) {
 
@@ -1930,6 +1732,7 @@ public class TempJavaFragmentFiles {
                 mergeJavaFiles(builderClassJavaFileHandle,
                                implClassJavaFileHandle);
             }
+
             insertDataIntoJavaFile(implClassJavaFileHandle, CLOSE_CURLY_BRACKET);
             validateLineLength(implClassJavaFileHandle);
         }
@@ -1944,6 +1747,7 @@ public class TempJavaFragmentFiles {
                         getJavaFileHandle(getJavaClassName(
                                 KEY_CLASS_FILE_NAME_SUFFIX));
                 generateKeyClassFile(keyClassJavaFileHandle, curNode);
+
             }
         }
         //Close all the file handles.
@@ -2012,15 +1816,6 @@ public class TempJavaFragmentFiles {
         if (tempFlagSet(LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK)) {
             closeFile(leafIdAttributeTempFileHandle);
         }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_MASK)) {
-            closeFile(subtreeFilteringForLeafTempFileHandle);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK)) {
-            closeFile(getSubtreeFilteringForListTempFileHandle);
-        }
-        if (tempFlagSet(FILTER_CONTENT_MATCH_FOR_NODES_MASK)) {
-            closeFile(getSubtreeFilteringForChildNodeTempFileHandle);
-        }
         if (tempFlagSet(EDIT_CONTENT_MASK)) {
             closeFile(editContentTempFileHandle);
         }
@@ -2078,39 +1873,12 @@ public class TempJavaFragmentFiles {
     }
 
     /**
-     * Returns temp file for is content match.
-     *
-     * @return temp file for is content match
-     */
-    public File getSubtreeFilteringForLeafTempFileHandle() {
-        return subtreeFilteringForLeafTempFileHandle;
-    }
-
-    /**
      * Returns temp file for edit content file.
      *
      * @return temp file for edit content file
      */
     public File getEditContentTempFileHandle() {
         return editContentTempFileHandle;
-    }
-
-    /**
-     * Returns temp file for is content match.
-     *
-     * @return temp file for is content match
-     */
-    public File getGetSubtreeFilteringForListTempFileHandle() {
-        return getSubtreeFilteringForListTempFileHandle;
-    }
-
-    /**
-     * Returns temp file for is content match.
-     *
-     * @return temp file for is content match
-     */
-    public File getGetSubtreeFilteringForChildNodeTempFileHandle() {
-        return getSubtreeFilteringForChildNodeTempFileHandle;
     }
 
     /**
@@ -2146,4 +1914,5 @@ public class TempJavaFragmentFiles {
     public void setAttrNode(YangNode attrNode) {
         this.attrNode = attrNode;
     }
+
 }

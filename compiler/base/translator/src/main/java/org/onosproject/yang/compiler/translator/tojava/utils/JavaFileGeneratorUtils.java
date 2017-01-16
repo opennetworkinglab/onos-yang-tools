@@ -71,9 +71,6 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_ATTRIBUTE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_GETTER_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EVENT_SUBJECT_SETTER_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_LEAF_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FILTER_CONTENT_MATCH_FOR_NODES_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.FROM_STRING_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.GETTER_FOR_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.GETTER_FOR_INTERFACE_MASK;
@@ -208,21 +205,6 @@ public final class JavaFileGeneratorUtils {
         if ((tempFiles & ADD_TO_LIST_IMPL_MASK) != 0) {
             return tempHandle.getTemporaryDataFromFileHandle(
                     tempHandle.getAddToListImplTempFileHandle(),
-                    path);
-        }
-        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_MASK) != 0) {
-            return tempHandle.getTemporaryDataFromFileHandle(
-                    tempHandle.getSubtreeFilteringForLeafTempFileHandle(),
-                    path);
-        }
-        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK) != 0) {
-            return tempHandle.getTemporaryDataFromFileHandle(
-                    tempHandle.getGetSubtreeFilteringForListTempFileHandle(),
-                    path);
-        }
-        if ((tempFiles & FILTER_CONTENT_MATCH_FOR_NODES_MASK) != 0) {
-            return tempHandle.getTemporaryDataFromFileHandle(
-                    tempHandle.getGetSubtreeFilteringForChildNodeTempFileHandle(),
                     path);
         }
         if ((tempFiles & EDIT_CONTENT_MASK) != 0) {

@@ -263,16 +263,6 @@ public final class YangJavaModelUtils {
             if (isLeafPresent) {
                 bean.addValueLeafFlag(config, (YangNode) info);
             }
-            if (((YangNode) info).isOpTypeReq()) {
-                // Add operation type as an attribute.
-                bean.addOperationTypeToTempFiles((YangNode) info,
-                                                 config);
-                bean.addIsSubTreeFilteredFlag(config);
-                if (isLeafPresent) {
-                    //Add select leaf flag attribute to temp file.
-                    bean.addSelectLeafFlag(config);
-                }
-            }
         } else if (info instanceof YangTypeHolder) {
             /*
              * Typedef
@@ -429,9 +419,6 @@ public final class YangJavaModelUtils {
 
         generateCodeOfNode(info, config);
         TempJavaBeanFragmentFiles tempFiles = getBeanFiles(info);
-        if (!(info instanceof YangChoice)) {
-            tempFiles.addYangAugmentedMap(config, (YangNode) info);
-        }
         if (info instanceof YangCase) {
             YangNode parent = ((YangCase) info).getParent();
             JavaQualifiedTypeInfoTranslator typeInfo =

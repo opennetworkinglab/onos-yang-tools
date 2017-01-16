@@ -74,13 +74,15 @@ public class JavaExtendsListHolder {
      */
     public void addToExtendsList(JavaQualifiedTypeInfoTranslator info, YangNode node,
                                  TempJavaFragmentFiles tempJavaFragmentFiles) {
-        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) node).getJavaFileInfo();
+
+        JavaFileInfoTranslator fileInfo = ((JavaFileInfoContainer) node)
+                .getJavaFileInfo();
 
         JavaImportData importData = tempJavaFragmentFiles.getJavaImportData();
-        boolean qualified = importData.addImportInfo(info,
-                                                     getCapitalCase(fileInfo.getJavaName()), fileInfo.getPackage());
-
-            /*true means import should be added*/
+        boolean qualified = importData
+                .addImportInfo(info, getCapitalCase(fileInfo.getJavaName()),
+                               fileInfo.getPackage());
+        /*true means import should be added*/
         getExtendedClassStore().put(info, qualified);
 
         addToExtendsList(info);

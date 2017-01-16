@@ -106,7 +106,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.MORE_OBJ_ATTR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OMIT_NULL_VALUE_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
@@ -120,7 +119,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.PARSE_LONG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PARSE_SHORT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PATTERN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUEUE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTE_STRING;
@@ -151,7 +149,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MAX_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MIN_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_UTILS_TODO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ZERO;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
@@ -348,18 +345,6 @@ public final class StringGenerator {
                         signatureClose();
             case DEFAULT_CONSTRUCTOR:
                 return EMPTY_STRING;
-            case AUGMENTED_MAP_ADD:
-                return space + YANG_AUGMENTED_INFO_MAP +
-                        PERIOD + PUT + OPEN_PARENTHESIS + CLASS +
-                        OBJECT_STRING + COMMA + SPACE + VALUE +
-                        CLOSE_PARENTHESIS + signatureClose();
-            case AUGMENTED_MAP_GET_VALUE:
-                return getReturnString(
-                        YANG_AUGMENTED_INFO_MAP + PERIOD + GET + getOpenCloseParaWithValue(
-                                CLASS + OBJECT_STRING) + signatureClose(), space);
-            case AUGMENTED_MAP_GETTER:
-                return getReturnString(YANG_AUGMENTED_INFO_MAP +
-                                               signatureClose(), space);
             case MANAGER_METHODS:
                 body = space + YANG_UTILS_TODO + NEW_LINE;
                 builder.append(body);
@@ -644,53 +629,6 @@ public final class StringGenerator {
                 "    @Override\n" +
                 "    public boolean isLeafValueSet(LeafIdentifier leaf) {\n" +
                 "        return valueLeafFlags.get(leaf.getLeafIndex());\n" +
-                "    }\n" +
-                "\n";
-    }
-
-    /**
-     * Returns is select leaf set.
-     *
-     * @return is select leaf set
-     */
-    static String getIsSelectLeafSet() {
-        return "    @Override\n" +
-                "    public boolean isSelectLeaf(LeafIdentifier leaf) {\n" +
-                "        return selectLeafFlags.get(leaf.getLeafIndex());\n" +
-                "    }\n";
-    }
-
-    /**
-     * Returns getter methods for operation attributes.
-     *
-     * @return getter methods for operation attributes
-     */
-    static String getValueLeafGetters() {
-        return "\n" +
-                "    /**\n" +
-                "     * Returns the valueLeafFlags.\n" +
-                "     *\n" +
-                "     * @return value of valueLeafFlags\n" +
-                "     */\n" +
-                "    public BitSet getValueLeafFlags() {\n" +
-                "        return valueLeafFlags;\n" +
-                "    }\n" +
-                "\n";
-    }
-
-    /**
-     * Returns getter methods for operation attributes.
-     *
-     * @return getter methods for operation attributes
-     */
-    static String getSelectLeafGetters() {
-        return "    /**\n" +
-                "     * Returns the selectLeafFlags.\n" +
-                "     *\n" +
-                "     * @return value of selectLeafFlags\n" +
-                "     */\n" +
-                "    public BitSet getSelectLeafFlags() {\n" +
-                "        return selectLeafFlags;\n" +
                 "    }\n" +
                 "\n";
     }

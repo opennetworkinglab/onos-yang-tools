@@ -386,18 +386,6 @@ public final class JavaDocGen {
                 " * valueLeafFlags identify the leafs whose value are " +
                 "explicitly set\n" +
                 " * Applicable in protocol edit and query operation.\n" +
-                " * </p>\n" +
-                " *\n" +
-                " * <p>\n" +
-                " * selectLeafFlags identify the leafs to be selected, in" +
-                " a query operation.\n" +
-                " * </p>\n" +
-                " *\n" +
-                " * <p>\n" +
-                " * Operation type specify the node specific operation in" +
-                " protocols like NETCONF.\n" +
-                " * Applicable in protocol edit operation, not applicable" +
-                " in query operation.\n" +
                 " * </p>\n";
     }
 
@@ -520,37 +508,6 @@ public final class JavaDocGen {
                                    JAVA_DOC_CONSTRUCTOR) +
                 getJavaDocEmptyAsteriskLine() +
                 getJavaDocParamLine(attribute, attribute) +
-                getJavaDocEndLine();
-    }
-
-    /**
-     * Generates javaDocs for add augmentation method.
-     *
-     * @param name builder class name
-     * @return javaDocs
-     */
-    public static String generateForAddAugmentation(String name) {
-        return getJavaDocStartLine(YANG_AUGMENTED_INFO_LOWER_CASE,
-                                   JAVA_DOC_SETTERS_COMMON) +
-                getJavaDocEmptyAsteriskLine() +
-                getJavaDocParamLine(YANG_AUGMENTED_INFO_LOWER_CASE, VALUE) +
-                getJavaDocParamLine(YANG_AUGMENTED_INFO_LOWER_CASE, CLASS +
-                        OBJECT_STRING) +
-                getJavaDocReturnLine(name) + getJavaDocEndLine();
-    }
-
-    /**
-     * Returns javadoc for get augmentation method.
-     *
-     * @return javadoc for get augmentation method
-     */
-    public static String generateForGetAugmentation() {
-        return NEW_LINE + getJavaDocStartLine(YANG_AUGMENTED_INFO_LOWER_CASE,
-                                              JAVA_DOC_GETTERS) +
-                getJavaDocEmptyAsteriskLine() +
-                getJavaDocParamLine(YANG_AUGMENTED_INFO_LOWER_CASE, CLASS +
-                        OBJECT_STRING) +
-                getJavaDocReturnLine(YANG_AUGMENTED_INFO) +
                 getJavaDocEndLine();
     }
 

@@ -332,23 +332,6 @@ public final class UtilConstants {
      * Static attribute for space.
      */
     public static final String SPACE = " ";
-    /**
-     * Static attribute for space.
-     */
-    public static final String TWO = "2";
-    /**
-     * Static attribute for space.
-     */
-    public static final String FLAG = "flag";
-    /**
-     * Static attribute for result.
-     */
-    public static final String RESULT = "result";
-
-    /**
-     * Static attribute for isSelectAllSchemaChild.
-     */
-    public static final String SELECT_ALL_CHILD = "isSelectAllSchemaChild";
 
     /**
      * Static attribute for schema name.
@@ -652,16 +635,6 @@ public final class UtilConstants {
     public static final String KEYS = "Keys";
 
     /**
-     * Static attribute for key syntax.
-     */
-    public static final String GET_KEY = "getKey()";
-
-    /**
-     * Static attribute for key syntax.
-     */
-    public static final String GET_VALUE = "getValue()";
-
-    /**
      * Static attribute for -1 to syntax.
      */
     public static final String NEG_ONE = "-1";
@@ -909,36 +882,6 @@ public final class UtilConstants {
      */
     public static final String OP_PARAM = "OpParam";
 
-
-    /**
-     * Static attribute for is filter content match method prefix.
-     */
-    public static final String PROCESS_SUBTREE_FILTERING =
-            "processSubtreeFiltering";
-
-    /**
-     * variable name of the subtree  filtering result builder.
-     */
-    public static final String SUBTREE_FILTERING_RESULT_BUILDER =
-            "subTreeFilteringResultBuilder";
-
-    /**
-     * variable name of the subtree  filtering result flag.
-     */
-    public static final String IS_ANY_SELECT_OR_CONTAINMENT_NODE_FLAG =
-            "isAnySelectOrContainmentNode";
-
-    /**
-     * variable name of the subtree  filtering to select all child.
-     */
-    public static final String IS_SELECT_ALL_SCHEMA_CHILD_FLAG =
-            "isSelectAllSchemaChild";
-
-    /**
-     * Static attribute for break prefix.
-     */
-    public static final String BREAK = "break";
-
     /**
      * Static attribute for isEmpty.
      */
@@ -978,21 +921,6 @@ public final class UtilConstants {
      * Static attribute for is valueLeafFlags method prefix.
      */
     public static final String VALUE_LEAF = "valueLeafFlags";
-
-    /**
-     * Static attribute for is selectLeafFlags method prefix.
-     */
-    public static final String SELECT_LEAF = "selectLeafFlags";
-
-    /**
-     * Static attribute for is isSelectLeaf method prefix.
-     */
-    public static final String IS_SELECT_LEAF = "isSelectLeaf";
-
-    /**
-     * Static attribute for is selectLeaf method prefix.
-     */
-    public static final String SET_SELECT_LEAF = "selectLeaf";
 
     /**
      * Static attribute for is LeafIdentifier enum prefix.
@@ -1512,6 +1440,11 @@ public final class UtilConstants {
     public static final String JAVA_UTIL_PKG = "java.util";
 
     /**
+     * Static attribute for model object import package.
+     */
+    public static final String MODEL_OBJECT_PKG = "org.onosproject.yang.model";
+
+    /**
      * Static attribute for java utilities import package.
      */
     public static final String JAVA_UTIL_REGEX_PKG = "java.util.regex";
@@ -1535,23 +1468,6 @@ public final class UtilConstants {
      * Static attribute for java utilities objects import class.
      */
     public static final String JAVA_UTIL_OBJECTS_IMPORT_CLASS = "Objects";
-
-    /**
-     * Static attribute for AugmentedInfo class.
-     */
-    public static final String YANG_AUGMENTED_INFO = "YangAugmentedInfo";
-
-    /**
-     * Static attribute for AugmentedInfo class.
-     */
-    public static final String YANG_AUGMENTED_INFO_LOWER_CASE =
-            "yangAugmentedInfo";
-
-    /**
-     * Static attribute for AugmentedInfo class.
-     */
-    public static final String YANG_AUGMENTED_INFO_MAP =
-            "yangAugmentedInfoMap";
 
     /**
      * Static attribute for augmented.
@@ -1773,12 +1689,6 @@ public final class UtilConstants {
     public static final String ONE = "1";
 
     /**
-     * Static attribute for YANG node operation type class.
-     */
-    public static final String OPERATION_TYPE_CLASS =
-            "OnosYangOpType";
-
-    /**
      * Static attribute for YANG node operation type attribute.
      */
     public static final String OPERATION_TYPE_ATTRIBUTE =
@@ -1882,39 +1792,6 @@ public final class UtilConstants {
      */
     public static final String AT = " at ";
 
-    /**
-     * Static param for processChildNodesSubTreeFiltering.
-     */
-    public static final String PROCESS_CHILD_NODE_STF_PARAM =
-            "processChildNodesSubTreeFiltering";
-
-    /**
-     * Static param for processLeafListSubTreeFiltering.
-     */
-    public static final String PROCESS_LEAF_LIST_STF_PARAM =
-            "processLeafListSubTreeFiltering";
-    /**
-     * Static param for processLeafListSubTreeFiltering.
-     */
-    public static final String PROCESS_LEAF_STF_PARAM =
-            "processLeafSubtreeFiltering";
-    /**
-     * Static param for subTreeFilteringResultBuilder.
-     */
-    public static final String STF_BUILDER_PARAM =
-            "subTreeFilteringResultBuilder";
-
-    /**
-     * Static param for isAnySelectOrContainmentNode.
-     */
-    public static final String SELECT_OR_CONTAINMENT_NODE_PARAM =
-            "isAnySelectOrContainmentNode";
-    /**
-     * Static param for isSelectAllSchemaChild.
-     */
-    public static final String SELECT_ALL_CHILD_SCHEMA_PARAM =
-            "isSelectAllSchemaChild";
-
     //File type extension for java classes.
     public static final String JAVA_FILE_EXTENSION = ".java";
 
@@ -1927,6 +1804,56 @@ public final class UtilConstants {
      * Static param for last.
      */
     public static final String LAST = "last";
+
+    /**
+     * Static param for model object.
+     */
+    public static final String MODEL_OBJECT = "ModelObject";
+
+    /**
+     * Static param for add augmentation.
+     */
+    public static final String ADD_AUGMENTATION = "addAugmentation";
+
+    /**
+     * Static param for remove augmentation.
+     */
+    public static final String REMOVE_AUGMENTATION = "removeAugmentation";
+
+    /**
+     * Static param for augmentations.
+     */
+    public static final String AUGMENTATIONS = "augmentations";
+
+    /**
+     * Static param for augmentation.
+     */
+    public static final String AUGMENTATION = "augmentation";
+
+    /**
+     * Static param for variable c.
+     */
+    public static final String VARIABLE_C = "c";
+
+    /**
+     * Static param for left angular bracket.
+     */
+    public static final String LEFT_ANGULAR_BRACKET = "<";
+
+    /**
+     * Static param for right angular brace.
+     */
+    public static final String RIGHT_ANGULAR_BRACKET = ">";
+
+    /**
+     * Static param for template t.
+     */
+    public static final String TEMPLATE_T = "T";
+
+    /**
+     * Static param for class.
+     */
+    public static final String CAMEL_CLASS = "Class";
 
     // No instantiation.
     private UtilConstants() {

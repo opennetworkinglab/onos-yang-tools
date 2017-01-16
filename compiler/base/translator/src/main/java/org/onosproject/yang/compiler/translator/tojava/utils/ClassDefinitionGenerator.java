@@ -71,6 +71,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.FINAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LISTENER_SERVICE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
@@ -416,14 +417,30 @@ final class ClassDefinitionGenerator {
                             def.toString(), holder));
                     break;
                 case BUILDER_CLASS_MASK:
+                    boolean isModelObject = false;
+                    for (JavaQualifiedTypeInfoTranslator info : holder.getExtendsList()) {
+                        if (info.getClassInfo().equals(MODEL_OBJECT)) {
+                            isModelObject = true;
+                        }
+                    }
                     def.append(STATIC).append(SPACE).append(CLASS)
-                            .append(SPACE).append(yangName).append(BUILDER)
-                            .append(SPACE).append(EXTEND).append(SPACE);
-                    def = new StringBuilder(getDefinitionString(def.toString(),
-                                                                holder));
+                            .append(SPACE).append(yangName).append(BUILDER);
+                    if (!isModelObject) {
+                        def.append(SPACE).append(EXTEND).append(SPACE);
+                        def = new StringBuilder(getDefinitionString(def.toString(),
+                                                                    holder));
+                    }
                     def.append(SPACE).append(IMPLEMENTS).append(SPACE)
                             .append(yangName).append(PERIOD)
                             .append(yangName).append(BUILDER);
+//                    def.append(STATIC).append(SPACE).append(CLASS)
+//                            .append(SPACE).append(yangName).append(BUILDER)
+//                            .append(SPACE).append(EXTEND).append(SPACE);
+//                    def = new StringBuilder(getDefinitionString(def.toString(),
+//                                                                holder));
+//                    def.append(SPACE).append(IMPLEMENTS).append(SPACE)
+//                            .append(yangName).append(PERIOD)
+//                            .append(yangName).append(BUILDER);
                     break;
                 case DEFAULT_CLASS_MASK:
                     if (curNode instanceof RpcNotificationContainer) {

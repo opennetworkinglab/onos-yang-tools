@@ -17,8 +17,6 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
-import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
-import org.onosproject.yang.compiler.datamodel.YangChoice;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -88,16 +86,15 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnip
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getEnumsValueAttribute;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getEventEnumTypeStart;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getJavaAttributeDefinition;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getOperationTypeEnum;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getSetValueParaForUnionClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getDataFromTempFileHandle;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_INT_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_STRING_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.builderMethod;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.generateBuildMethodForSubTree;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodImpl;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddAugmentInfoMethodInterface;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddAugmentationString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationsString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentsDataMethodForService;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassFromString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassToString;
@@ -118,33 +115,20 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getHashCodeMethodOpen;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumSignature;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRangeValidatorMethodForUnion;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRemoveAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForClass;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForSelectLeaf;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringForEnumClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringForType;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodOpen;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getUnionToStringMethod;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoImpl;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangAugmentInfoInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.isLeafValueSetInterface;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.isSelectLeafSetInterface;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.setSelectLeafSetInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getInterfaceLeafIdEnumMethods;
-import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getIsSelectLeafSet;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getIsValueLeafSet;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.methodClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getAugmentableSubTreeFiltering;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessChildNodeSubtreeFiltering;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessLeafListSubtreeFiltering;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessLeafSubtreeFiltering;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubTreeFilteringEnd;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubTreeForChoiceInterface;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubtreeFilteringStart;
-import static org.onosproject.yang.compiler.translator.tojava.utils.SubtreeFilteringMethodsGenerator.getProcessSubtreeFunctionBody;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.addDefaultConstructor;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getTypeFiles;
@@ -238,17 +222,7 @@ public final class JavaFileGenerator {
         initiateJavaFileGeneration(file, INTERFACE_MASK, imports, curNode,
                                    className);
 
-        // Generate ENUM interface
-        if (curNode instanceof RpcNotificationContainer) {
-            insertDataIntoJavaFile(file, getOperationTypeEnum());
-        }
         List<String> methods = new ArrayList<>();
-
-        //Add only for choice class
-        if (curNode instanceof YangChoice) {
-            insertDataIntoJavaFile(file, getProcessSubTreeForChoiceInterface(
-                    curNode));
-        }
 
         if (attrPresent) {
             // Add getter methods to interface file.
@@ -273,16 +247,8 @@ public final class JavaFileGenerator {
             }
         }
 
-        if (curNode instanceof YangAugmentableNode &&
-                !(curNode instanceof YangChoice)) {
-            methods.add(getYangAugmentInfoInterface());
-        }
-
         if (leavesPresent) {
             methods.add(isLeafValueSetInterface());
-            if (curNode.isOpTypeReq()) {
-                methods.add(isSelectLeafSetInterface());
-            }
         }
         for (String method : methods) {
             insertDataIntoJavaFile(file, method);
@@ -349,15 +315,6 @@ public final class JavaFileGenerator {
             }
         }
 
-        if (curNode instanceof YangAugmentableNode &&
-                !(curNode instanceof YangChoice)) {
-            methods.add(getAddAugmentInfoMethodInterface(className + BUILDER));
-            methods.add(getYangAugmentInfoInterface());
-        }
-
-        if (leavesPresent) {
-            methods.add(setSelectLeafSetInterface(className));
-        }
         //Add build method to builder interface file.
         methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
                             .getTempJavaCodeFragmentFiles()
@@ -432,12 +389,6 @@ public final class JavaFileGenerator {
                         ADD_TO_LIST_IMPL_MASK, getBeanFiles(curNode), path));
 
                 insertDataIntoJavaFile(file, NEW_LINE);
-
-                //Add operation attribute methods.
-                if (leavesPresent && curNode.isOpTypeReq()) {
-                    insertDataIntoJavaFile(file, NEW_LINE);
-                    methods.add(getSetterForSelectLeaf(className));
-                }
             } catch (IOException e) {
                 throw new IOException(getErrorMsg(className, BUILDER_CLASS));
             }
@@ -445,18 +396,11 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, NEW_LINE);
         }
 
-        if (curNode instanceof YangAugmentableNode) {
-            methods.add(getAddAugmentInfoMethodImpl(className + BUILDER));
-            methods.add(getYangAugmentInfoImpl());
-        }
-
         // Add default constructor and build method impl.
         methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
                             .getTempJavaCodeFragmentFiles()
                             .addBuildMethodImpl());
-        if (curNode.isOpTypeReq()) {
-            methods.add(generateBuildMethodForSubTree(curNode));
-        }
+
         methods.add(addDefaultConstructor(curNode, PUBLIC, BUILDER));
 
         //Add methods in builder class.
@@ -618,9 +562,6 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, NEW_LINE);
         }
 
-        if (curNode instanceof YangAugmentableNode) {
-            methods.add(getYangAugmentInfoImpl());
-        }
         try {
             //Constructor.
             String constructor = getConstructorStart(className, rootNode) +
@@ -628,35 +569,6 @@ public final class JavaFileGenerator {
                             CONSTRUCTOR_IMPL_MASK, getBeanFiles(curNode), path)
                     + methodClose(FOUR_SPACE);
             methods.add(constructor);
-            if (curNode.isOpTypeReq()) {
-                String augmentableSubTreeFiltering = EMPTY_STRING;
-                if (curNode instanceof YangAugmentableNode) {
-                    // add is filter content match.
-                    augmentableSubTreeFiltering = getAugmentableSubTreeFiltering();
-                }
-                methods.add(getProcessSubtreeFilteringStart(curNode) +
-                                    getProcessSubtreeFunctionBody(curNode) +
-                                    augmentableSubTreeFiltering +
-                                    getProcessSubTreeFilteringEnd(name));
-
-                if (curNode instanceof YangLeavesHolder) {
-                    if (((YangLeavesHolder) curNode).getListOfLeaf() != null &&
-                            !((YangLeavesHolder) curNode).getListOfLeaf().isEmpty()) {
-                        methods.add(getProcessLeafSubtreeFiltering(curNode,
-                                                                   path));
-                    }
-                    if (((YangLeavesHolder) curNode).getListOfLeafList() != null &&
-                            !((YangLeavesHolder) curNode).getListOfLeafList().isEmpty()) {
-                        methods.add(getProcessLeafListSubtreeFiltering(curNode,
-                                                                       path));
-                    }
-                }
-
-                if (curNode.getChild() != null) {
-                    methods.add(getProcessChildNodeSubtreeFiltering(curNode,
-                                                                    path));
-                }
-            }
         } catch (IOException e) {
             throw new IOException(getErrorMsg(className, IMPL_CLASS));
         }
@@ -666,10 +578,15 @@ public final class JavaFileGenerator {
         methods.add(builderMethod(className));
         if (leavesPresent) {
             methods.add(getIsValueLeafSet());
-            if (curNode.isOpTypeReq()) {
-                methods.add(getIsSelectLeafSet());
-            }
         }
+
+        if (curNode instanceof RpcNotificationContainer) {
+            methods.add(getAddAugmentationString());
+            methods.add(getRemoveAugmentationString());
+            methods.add(getAugmentationsString());
+            methods.add(getAugmentationString());
+        }
+
         // Add methods in impl class.
         for (String method : methods) {
             insertDataIntoJavaFile(file, method);

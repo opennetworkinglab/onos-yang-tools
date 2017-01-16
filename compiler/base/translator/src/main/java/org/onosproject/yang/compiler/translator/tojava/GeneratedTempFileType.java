@@ -137,21 +137,6 @@ public final class GeneratedTempFileType {
     public static final int LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK = 1 << 22;
 
     /**
-     * Is filter content match for leaves class.
-     */
-    public static final int FILTER_CONTENT_MATCH_FOR_LEAF_MASK = 1 << 23;
-
-    /**
-     * Is filter content match for leaf lists class.
-     */
-    public static final int FILTER_CONTENT_MATCH_FOR_LEAF_LIST_MASK = 1 << 24;
-
-    /**
-     * Is filter content match for nodes class.
-     */
-    public static final int FILTER_CONTENT_MATCH_FOR_NODES_MASK = 1 << 25;
-
-    /**
      * Edit config class content for class.
      */
     public static final int EDIT_CONTENT_MASK = 1 << 26;

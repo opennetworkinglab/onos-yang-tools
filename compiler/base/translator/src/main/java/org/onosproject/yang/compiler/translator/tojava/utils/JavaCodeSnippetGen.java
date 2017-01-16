@@ -43,7 +43,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ENUM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
-import static org.onosproject.yang.compiler.utils.UtilConstants.HASH_MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT_MAX_RANGE_ATTR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT_MIN_RANGE_ATTR;
@@ -55,14 +54,12 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CLOSE_DIAMOND_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUEUE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SCHEMA_NAME;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SELECT_LEAF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET_VALUE_PARA;
@@ -78,7 +75,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.UINT_MIN_RANGE_A
 import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MAX_RANGE_ATTR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MIN_RANGE_ATTR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_AUGMENTED_INFO_MAP;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.ENUM_ATTRIBUTE;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.enumJavaDocForInnerClass;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
@@ -147,14 +143,9 @@ public final class JavaCodeSnippetGen {
             attrDef.append(attrType).append(SPACE)
                     .append(attrName);
             //Initialize select leaf/value leaf/ augment map attribute.
-            if (attrName.equals(SELECT_LEAF) || attrName.equals(VALUE_LEAF)) {
+            if (attrName.equals(VALUE_LEAF)) {
                 attrDef.append(SPACE).append(EQUAL).append(SPACE).append(NEW)
                         .append(SPACE).append(BIT_SET)
-                        .append(OPEN_CLOSE_BRACKET_STRING);
-            } else if (attrName.equals(YANG_AUGMENTED_INFO_MAP)) {
-                attrDef.append(SPACE).append(EQUAL).append(SPACE).append(NEW)
-                        .append(SPACE).append(HASH_MAP)
-                        .append(OPEN_CLOSE_DIAMOND_STRING)
                         .append(OPEN_CLOSE_BRACKET_STRING);
             }
 
@@ -402,38 +393,6 @@ public final class JavaCodeSnippetGen {
         return FOUR_SPACE_INDENTATION + modifier + SPACE +
                 attr1 + FOUR_SPACE_INDENTATION + modifier +
                 SPACE + att2 + NEW_LINE;
-    }
-
-    /**
-     * Returns operation type enum.
-     *
-     * @return operation type enum
-     */
-    static String getOperationTypeEnum() {
-        return "    /**\n" +
-                "     * Specify the node specific operation in protocols " +
-                "like NETCONF.\n" +
-                "     * Applicable in protocol edit operation, not applicable" +
-                " in query operation\n" +
-                "     */\n" +
-                "    public static enum OnosYangOpType {\n" +
-                "        MERGE,\n" +
-                "        REPLACE,\n" +
-                "        CREATE,\n" +
-                "        DELETE,\n" +
-                "        REMOVE,\n" +
-                "        NONE\n" +
-                "    }\n";
-    }
-
-    /**
-     * Returns attribute in constructor for yang augmented info map.
-     *
-     * @return augment info map
-     */
-    static String getYangAugmentedMapObjectForConstruct() {
-        return "        this.yangAugmentedInfoMap = builderObject" +
-                ".yangAugmentedInfoMap();\n";
     }
 
     /**

@@ -48,15 +48,6 @@ enum MethodBodyTypes {
     //add to list method body.
     ADD_TO_LIST,
 
-    //Augment map getter for full map.
-    AUGMENTED_MAP_GETTER,
-
-    //Augment map getter for value.
-    AUGMENTED_MAP_GET_VALUE,
-
-    //Augment map add
-    AUGMENTED_MAP_ADD,
-
     //Manager methods
     MANAGER_METHODS,
 
