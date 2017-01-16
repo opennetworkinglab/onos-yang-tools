@@ -835,6 +835,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             ((YangUses) entity).setRefGroup((YangGrouping) refNode);
         } else if (entity instanceof YangBase) {
             ((YangBase) entity).setReferredIdentity((YangIdentity) refNode);
+            addToIdentityExtendList(((YangIdentity) ((YangBase) entity).getParentIdentity()),
+                                    (YangIdentity) refNode);
         } else if (entity instanceof YangIdentityRef) {
             ((YangIdentityRef) entity).setReferredIdentity((YangIdentity) refNode);
         } else if (!(entity instanceof YangIfFeature) &&
@@ -845,6 +847,20 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         }
         // Sets the resolution status in inside the type/uses.
         ((Resolvable) entity).setResolvableStatus(linkedStatus);
+    }
+
+    private void addToIdentityExtendList(YangIdentity baseIdentity, YangIdentity
+            referredIdentity) {
+        YangIdentity referredId = referredIdentity;
+        while (referredId != null) {
+            referredId.addToExtendList(baseIdentity);
+            YangBase base = referredId.getBaseNode();
+            if (base == null) {
+                return;
+            } else {
+                referredId = base.getReferredIdentity();
+            }
+        }
     }
 
     /**

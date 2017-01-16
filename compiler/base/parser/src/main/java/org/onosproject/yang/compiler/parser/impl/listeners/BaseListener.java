@@ -90,6 +90,7 @@ public final class BaseListener {
         YangBase yangBase = new YangBase();
         yangBase.setBaseIdentifier(nodeIdentifier);
         ((YangIdentity) tmpData).setBaseNode(yangBase);
+        yangBase.setParentIdentity(((YangIdentity) tmpData));
 
         int errorLine = ctx.getStart().getLine();
         int errorPosition = ctx.getStart().getCharPositionInLine();

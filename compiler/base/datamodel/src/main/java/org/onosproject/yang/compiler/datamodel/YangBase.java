@@ -51,6 +51,9 @@ public class YangBase extends DefaultLocationInfo implements Resolvable, Seriali
     // Referred identity parent information.
     private YangIdentity referredIdentity;
 
+    // Reference to parent
+    private YangIdentity parentIdentity;
+
     /**
      * Status of resolution. If completely resolved enum value is "RESOLVED",
      * if not enum value is "UNRESOLVED", in case reference of grouping/typedef/base/identityref
@@ -113,5 +116,23 @@ public class YangBase extends DefaultLocationInfo implements Resolvable, Seriali
     @Override
     public Object resolve() throws DataModelException {
         return null;
+    }
+
+    /**
+     * Returns the parent identity node.
+     *
+     * @return the parent identity node
+     */
+    public YangIdentity getParentIdentity() {
+        return parentIdentity;
+    }
+
+    /**
+     * Sets the parent identity node.
+     *
+     * @param parentIdentity the parent identity node to set
+     */
+    public void setParentIdentity(YangIdentity parentIdentity) {
+        this.parentIdentity = parentIdentity;
     }
 }

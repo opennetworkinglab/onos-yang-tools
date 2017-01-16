@@ -20,6 +20,8 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
 /*-
  * Reference RFC 6020.
@@ -65,14 +67,21 @@ public abstract class YangIdentity
     //YANG reference of the identity.
     private String reference;
 
+    /*
+     * Identity extend list to contain list of all the direct/indirect derived
+     * identities.
+     */
+    private List<YangIdentity> extendList;
+
     //Creates a identity type of node.
     public YangIdentity() {
         super(YangNodeType.IDENTITY_NODE, null);
+        extendList = new LinkedList<>();
     }
 
     @Override
     public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
+                                    YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
             throws DataModelException {
         // Do nothing.
     }
@@ -153,5 +162,32 @@ public abstract class YangIdentity
      */
     public void setBaseNode(YangBase baseNode) {
         this.baseNode = baseNode;
+    }
+
+    /**
+     * Returns the list of derived identities which extends the identity.
+     *
+     * @return the list of derived identities which extends the identity
+     */
+    public List<YangIdentity> getExtendList() {
+        return extendList;
+    }
+
+    /**
+     * Sets the list of derived identity.
+     *
+     * @param extendList the list of derived identities
+     */
+    public void setExtendList(List<YangIdentity> extendList) {
+        this.extendList = extendList;
+    }
+
+    /**
+     * Adds a derived identity.
+     *
+     * @param identity derived identity
+     */
+    public void addToExtendList(YangIdentity identity) {
+        extendList.add(identity);
     }
 }

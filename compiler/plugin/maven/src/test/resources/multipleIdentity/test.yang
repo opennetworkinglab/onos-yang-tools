@@ -1,0 +1,21 @@
+module test {
+    namespace "identitytest";
+    prefix test ;
+
+    identity identity3;
+
+    identity identity2 {
+       base "identity3";
+    }
+
+    identity identity1 {
+       base "identity2";
+    }
+    container node {
+        leaf node-id{
+           type identityref {
+              base "identity1";
+           }
+        }
+    }
+}
