@@ -1,0 +1,21 @@
+module deviation-module3 {
+    yang-version 1;
+    namespace test:deviation3;
+    prefix On;
+    import "Test2" {
+        prefix "t";
+    }
+    deviation /t:ospf/t:process-id {
+        description "desc";
+        reference "ref";
+         deviate replace {
+            type int8;
+            units "units";
+            default "0";
+            config "true";
+            mandatory "true";
+            min-elements 0;
+            max-elements 3;
+         }
+    }
+}

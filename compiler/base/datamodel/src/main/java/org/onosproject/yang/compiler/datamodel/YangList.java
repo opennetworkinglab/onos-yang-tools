@@ -78,7 +78,8 @@ public abstract class YangList
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
-        YangIsFilterContentNodes, YangConfig {
+        YangIsFilterContentNodes, YangConfig, YangUniqueHolder,
+        YangMaxElementHolder, YangMinElementHolder {
 
     private static final long serialVersionUID = 806201609L;
 
@@ -330,6 +331,7 @@ public abstract class YangList
      *
      * @return the list of unique field names
      */
+    @Override
     public List<String> getUniqueList() {
         return uniqueList;
     }
@@ -339,7 +341,8 @@ public abstract class YangList
      *
      * @param uniqueList the list of unique field names
      */
-    private void setUniqueList(List<String> uniqueList) {
+    @Override
+    public void setUniqueList(List<String> uniqueList) {
         this.uniqueList = uniqueList;
     }
 
@@ -391,6 +394,7 @@ public abstract class YangList
      * @param unique unique field name.
      * @throws DataModelException a violation of data model rules
      */
+    @Override
     public void addUnique(String unique)
             throws DataModelException {
         if (getUniqueList() == null) {
@@ -434,7 +438,17 @@ public abstract class YangList
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
+    }
+
+    /**
+     * Removes a leaf.
+     *
+     * @param leaf the leaf to be removed
+     */
+    @Override
+    public void removeLeaf(YangLeaf leaf) {
+        listOfLeaf.remove(leaf);
     }
 
     /**
@@ -464,7 +478,17 @@ public abstract class YangList
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
+    }
+
+    /**
+     * Removes a leaf-list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    @Override
+    public void removeLeafList(YangLeafList leafList) {
+        listOfLeafList.remove(leafList);
     }
 
     /**
@@ -472,6 +496,7 @@ public abstract class YangList
      *
      * @return the max elements
      */
+    @Override
     public YangMaxElement getMaxElements() {
         return maxElements;
     }
@@ -481,6 +506,7 @@ public abstract class YangList
      *
      * @param max the max elements
      */
+    @Override
     public void setMaxElements(YangMaxElement max) {
         this.maxElements = max;
     }
@@ -490,6 +516,7 @@ public abstract class YangList
      *
      * @return the minimum elements
      */
+    @Override
     public YangMinElement getMinElements() {
         return minElements;
     }
@@ -499,6 +526,7 @@ public abstract class YangList
      *
      * @param minElements the minimum elements
      */
+    @Override
     public void setMinElements(YangMinElement minElements) {
         this.minElements = minElements;
     }

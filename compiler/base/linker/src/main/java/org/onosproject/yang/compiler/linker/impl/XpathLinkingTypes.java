@@ -27,5 +27,8 @@ public enum XpathLinkingTypes {
     LEAF_REF_LINKING,
 
     // Compiler annotation linking.
-    COMPILER_ANNOTATION_LINKING
+    COMPILER_ANNOTATION_LINKING,
+
+    // Deviation linking.
+    DEVIATION_LINKING
 }

@@ -1,0 +1,14 @@
+module target {
+    yang-version 1;
+    namespace "test:deviation";
+    prefix test;
+    container ospf {
+        leaf process-id {
+            type "uint16";
+            units "seconds";
+            status current;
+            reference "RFC 6020";
+            default "1";
+         }
+    }
+}

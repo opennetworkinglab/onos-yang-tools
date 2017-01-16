@@ -396,19 +396,22 @@ public abstract class YangNode
     /**
      * Clones the current node contents and create a new node.
      *
-     * @param yangUses YANG uses
+     * @param yangUses    YANG uses
+     * @param isDeviation flag to identify cloning is for deviation
      * @return cloned node
      * @throws CloneNotSupportedException clone is not supported by the referred
      *                                    node
      */
-    public YangNode clone(YangUses yangUses)
+    public YangNode clone(YangUses yangUses, boolean isDeviation)
             throws CloneNotSupportedException {
         YangNode clonedNode = (YangNode) super.clone();
-        clonedNode.referredSchemaNode = this;
+
         if (clonedNode instanceof YangLeavesHolder) {
             try {
-                cloneListOfLeaf((YangLeavesHolder) clonedNode, yangUses);
-                cloneListOfLeafList((YangLeavesHolder) clonedNode, yangUses);
+                cloneListOfLeaf((YangLeavesHolder) clonedNode, yangUses,
+                                isDeviation);
+                cloneListOfLeafList((YangLeavesHolder) clonedNode, yangUses,
+                                    isDeviation);
             } catch (DataModelException e) {
                 throw new CloneNotSupportedException(e.getMessage());
             }
@@ -418,9 +421,12 @@ public abstract class YangNode
         clonedNode.setChild(null);
         clonedNode.setNextSibling(null);
         clonedNode.setPreviousSibling(null);
-        clonedNode.yangSchemaNodeIdentifier =
-                clonedNode.yangSchemaNodeIdentifier.clone();
-        clonedNode.ysnContextInfoMap = new HashMap<>();
+        if (!isDeviation) {
+            clonedNode.yangSchemaNodeIdentifier =
+                    clonedNode.yangSchemaNodeIdentifier.clone();
+            clonedNode.ysnContextInfoMap = new HashMap<>();
+            clonedNode.referredSchemaNode = this;
+        }
         if (clonedNode instanceof YangAugmentableNode) {
             ((YangAugmentableNode) clonedNode).cloneAugmentInfo();
         }
@@ -435,10 +441,11 @@ public abstract class YangNode
      * @param srcRootNode source node for sub tree cloning
      * @param dstRootNode destination node where the sub tree needs to be cloned
      * @param yangUses    YANG uses
+     * @param isDeviation flag to check whether cloning is for deviation
      * @throws DataModelException data model error
      */
     public static void cloneSubTree(YangNode srcRootNode, YangNode dstRootNode,
-                                    YangUses yangUses)
+                                    YangUses yangUses, boolean isDeviation)
             throws DataModelException {
 
         YangNode nextNodeToClone = srcRootNode;
@@ -473,7 +480,7 @@ public abstract class YangNode
                                                          " in " + nextNodeToClone.getFileName() + "\"");
                 }
                 if (curTraversal != PARENT) {
-                    newNode = nextNodeToClone.clone(yangUses);
+                    newNode = nextNodeToClone.clone(yangUses, isDeviation);
                     detectCollisionWhileCloning(clonedTreeCurNode, newNode,
                                                 curTraversal);
                 }
@@ -508,6 +515,7 @@ public abstract class YangNode
                      * update the traversal's current node.
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
+
                 } else if (nextNodeToClone.getNextSibling() != null) {
 
                     curTraversal = SIBILING;
@@ -525,6 +533,7 @@ public abstract class YangNode
                                                  " at " + nextNodeToClone.getCharPosition() +
                                                  " in " + nextNodeToClone.getFileName() + "\"");
         }
+
     }
 
     /**

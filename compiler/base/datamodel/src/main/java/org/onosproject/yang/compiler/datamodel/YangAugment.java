@@ -85,8 +85,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detec
 public abstract class YangAugment
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable,
-                   CollisionDetector, Resolvable,
-                   YangXPathResolver, YangWhenHolder, YangIfFeatureHolder {
+        CollisionDetector, Resolvable, YangXPathResolver, YangWhenHolder,
+        YangIfFeatureHolder {
 
     private static final long serialVersionUID = 806201602L;
 
@@ -343,7 +343,17 @@ public abstract class YangAugment
      */
     @Override
     public void addLeaf(YangLeaf leaf) {
-        getListOfLeaf().add(leaf);
+        listOfLeaf.add(leaf);
+    }
+
+    /**
+     * Removes a leaf.
+     *
+     * @param leaf the leaf to be removed
+     */
+    @Override
+    public void removeLeaf(YangLeaf leaf) {
+        listOfLeaf.remove(leaf);
     }
 
     /**
@@ -373,7 +383,17 @@ public abstract class YangAugment
      */
     @Override
     public void addLeafList(YangLeafList leafList) {
-        getListOfLeafList().add(leafList);
+        listOfLeafList.add(leafList);
+    }
+
+    /**
+     * Removes a leaf-list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    @Override
+    public void removeLeafList(YangLeafList leafList) {
+        listOfLeafList.remove(leafList);
     }
 
     @Override

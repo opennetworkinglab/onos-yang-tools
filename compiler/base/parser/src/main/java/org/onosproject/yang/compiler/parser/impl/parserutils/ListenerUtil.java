@@ -90,6 +90,7 @@ public final class ListenerUtil {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String REGEX_EQUAL = "[=]";
     private static final String REGEX_OPEN_BRACE = "[(]";
+    public static final String SPACE = " ";
 
     // No instantiation.
     private ListenerUtil() {

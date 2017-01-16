@@ -16,7 +16,7 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangMandatory;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
@@ -73,18 +73,16 @@ public final class MandatoryListener {
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, MANDATORY_DATA, "", ENTRY);
 
-        boolean isMandatory = getValidBooleanValue(ctx.mandatory().getText(), MANDATORY_DATA, ctx);
+        boolean isMandatory = getValidBooleanValue(ctx.mandatory().getText(),
+                                                   MANDATORY_DATA, ctx);
 
         Parsable tmpNode = listener.getParsedDataStack().peek();
-        switch (tmpNode.getYangConstructType()) {
-            case LEAF_DATA:
-                YangLeaf leaf = (YangLeaf) tmpNode;
-                leaf.setMandatory(isMandatory);
-                break;
-            case CHOICE_DATA: // TODO
-                break;
-            default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, MANDATORY_DATA, "", ENTRY));
+        if (tmpNode instanceof YangMandatory) {
+            YangMandatory yangMandatory = ((YangMandatory) tmpNode);
+            yangMandatory.setMandatory(isMandatory);
+        } else {
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, MANDATORY_DATA, "", ENTRY));
         }
     }
 }

@@ -16,28 +16,6 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangContainer;
-import org.onosproject.yang.compiler.datamodel.YangLeaf;
-import org.onosproject.yang.compiler.datamodel.YangLeafList;
-import org.onosproject.yang.compiler.datamodel.YangList;
-import org.onosproject.yang.compiler.datamodel.utils.Parsable;
-import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
-import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation;
-
-import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.CONFIG_DATA;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidBooleanValue;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
-
 /*
  * Reference: RFC6020 and YANG ANTLR Grammar
  *
@@ -52,6 +30,20 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  * configStatement : CONFIG_KEYWORD config STMTEND;
  * config          : string;
  */
+
+import org.onosproject.yang.compiler.datamodel.YangConfig;
+import org.onosproject.yang.compiler.datamodel.utils.Parsable;
+import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
+import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
+
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.CONFIG_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidBooleanValue;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /**
  * Represents listener based call back function corresponding to the "config"
@@ -78,30 +70,17 @@ public final class ConfigListener {
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, CONFIG_DATA, "", ENTRY);
 
-        boolean isConfig = getValidBooleanValue(ctx.config().getText(), CONFIG_DATA, ctx);
+        boolean isConfig = getValidBooleanValue(ctx.config().getText(),
+                                                CONFIG_DATA, ctx);
 
         Parsable tmpData = listener.getParsedDataStack().peek();
-        switch (tmpData.getYangConstructType()) {
-            case LEAF_DATA:
-                YangLeaf leaf = (YangLeaf) tmpData;
-                leaf.setConfig(isConfig);
-                break;
-            case CONTAINER_DATA:
-                YangContainer container = (YangContainer) tmpData;
-                container.setConfig(isConfig);
-                break;
-            case LEAF_LIST_DATA:
-                YangLeafList leafList = (YangLeafList) tmpData;
-                leafList.setConfig(isConfig);
-                break;
-            case LIST_DATA:
-                YangList yangList = (YangList) tmpData;
-                yangList.setConfig(isConfig);
-                break;
-            case CHOICE_DATA: // TODO
-                break;
-            default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, CONFIG_DATA, "", ENTRY));
+        if (tmpData instanceof YangConfig) {
+            YangConfig config = ((YangConfig) tmpData);
+            config.setConfig(isConfig);
+        } else {
+            throw new ParserException(
+                    constructListenerErrorMessage(INVALID_HOLDER,
+                                                  CONFIG_DATA, "", ENTRY));
         }
     }
 }

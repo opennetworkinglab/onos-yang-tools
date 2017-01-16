@@ -25,12 +25,8 @@ import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation;
 
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateMultipleDeviationStatement;
 import static org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.MODULE_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.SUB_MODULE_DATA;
@@ -153,6 +149,16 @@ public final class SubModuleListener {
             linkerException.setCharPosition(e.getCharPositionInLine());
             linkerException.setFileName(listener.getFileName());
             throw linkerException;
+        }
+
+        /*
+         * Validate whether all deviation statement xpath is referring to same
+         * module
+         */
+        try {
+            validateMultipleDeviationStatement(subModule);
+        } catch (DataModelException e) {
+            throw new ParserException(e.getMessage());
         }
     }
 }

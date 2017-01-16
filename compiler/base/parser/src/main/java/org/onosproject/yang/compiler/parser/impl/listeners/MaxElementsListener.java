@@ -16,9 +16,8 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangLeafList;
-import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangMaxElement;
+import org.onosproject.yang.compiler.datamodel.YangMaxElementHolder;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
@@ -85,17 +84,12 @@ public final class MaxElementsListener {
         maxElement.setCharPosition(ctx.getStart().getCharPositionInLine());
         maxElement.setFileName(listener.getFileName());
         Parsable tmpData = listener.getParsedDataStack().peek();
-        switch (tmpData.getYangConstructType()) {
-            case LEAF_LIST_DATA:
-                YangLeafList leafList = (YangLeafList) tmpData;
-                leafList.setMaxElements(maxElement);
-                break;
-            case LIST_DATA:
-                YangList yangList = (YangList) tmpData;
-                yangList.setMaxElements(maxElement);
-                break;
-            default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, MAX_ELEMENT_DATA, "", ENTRY));
+        if (tmpData instanceof YangMaxElementHolder) {
+            YangMaxElementHolder holder = ((YangMaxElementHolder) tmpData);
+            holder.setMaxElements(maxElement);
+        } else {
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, MAX_ELEMENT_DATA, "", ENTRY));
         }
     }
 

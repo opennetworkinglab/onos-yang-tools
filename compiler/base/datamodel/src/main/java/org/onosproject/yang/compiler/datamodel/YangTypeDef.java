@@ -67,7 +67,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.TY
 public abstract class YangTypeDef
         extends YangNode
         implements YangCommonInfo, Parsable, YangTypeHolder, CollisionDetector,
-        YangTranslatorOperatorNode {
+        YangTranslatorOperatorNode, YangUnits, YangDefault {
 
     private static final long serialVersionUID = 806201615L;
 
@@ -141,6 +141,7 @@ public abstract class YangTypeDef
      *
      * @return the default value
      */
+    @Override
     public String getDefaultValueInString() {
         return defaultValueInString;
     }
@@ -150,6 +151,7 @@ public abstract class YangTypeDef
      *
      * @param defaultValueInString the default value
      */
+    @Override
     public void setDefaultValueInString(String defaultValueInString) {
         this.defaultValueInString = defaultValueInString;
     }
@@ -240,6 +242,7 @@ public abstract class YangTypeDef
      *
      * @return the units
      */
+    @Override
     public String getUnits() {
         return units;
     }
@@ -249,6 +252,7 @@ public abstract class YangTypeDef
      *
      * @param units the units to set
      */
+    @Override
     public void setUnits(String units) {
         this.units = units;
     }

@@ -240,4 +240,38 @@ public final class ListenerValidation {
             throw parserException;
         }
     }
+
+    /**
+     * Checks if a either of one construct occurrence.
+     *
+     * @param ctx1       first optional child's context
+     * @param type1      first child construct for whom cardinality is
+     *                   to be validated
+     * @param ctx2       second optional child's context
+     * @param type2      second child construct for whom cardinality is
+     *                   to be validated
+     * @param type       parent construct
+     * @param parentName parent name
+     * @param ctx        parents's context
+     * @throws ParserException exception if cardinality check fails
+     */
+    public static void validateCardinalityMutuallyExclusive(List<?> ctx1,
+                                                            YangConstructType type1,
+                                                            List<?> ctx2,
+                                                            YangConstructType type2,
+                                                            YangConstructType type,
+                                                            String parentName,
+                                                            ParserRuleContext ctx)
+            throws ParserException {
+
+        if (!ctx1.isEmpty() && !ctx2.isEmpty()) {
+            String error = "YANG file error: Either " + getYangConstructType(type1)
+                    + " or " + getYangConstructType(type2) + " should be present in "
+                    + getYangConstructType(type) + " " + parentName + ".";
+            ParserException parserException = new ParserException(error);
+            parserException.setLine(ctx.getStart().getLine());
+            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
+            throw parserException;
+        }
+    }
 }

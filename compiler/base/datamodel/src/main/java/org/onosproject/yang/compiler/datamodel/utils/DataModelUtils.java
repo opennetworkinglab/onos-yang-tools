@@ -17,12 +17,18 @@
 package org.onosproject.yang.compiler.datamodel.utils;
 
 import org.onosproject.yang.compiler.datamodel.CollisionDetector;
-import org.onosproject.yang.compiler.datamodel.ResolvableType;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangBase;
 import org.onosproject.yang.compiler.datamodel.YangCompilerAnnotation;
+import org.onosproject.yang.compiler.datamodel.YangConfig;
+import org.onosproject.yang.compiler.datamodel.YangDefault;
 import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
+import org.onosproject.yang.compiler.datamodel.YangDeviateAdd;
+import org.onosproject.yang.compiler.datamodel.YangDeviateDelete;
+import org.onosproject.yang.compiler.datamodel.YangDeviateReplace;
+import org.onosproject.yang.compiler.datamodel.YangDeviation;
+import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfo;
 import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
@@ -32,13 +38,21 @@ import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
+import org.onosproject.yang.compiler.datamodel.YangMandatory;
+import org.onosproject.yang.compiler.datamodel.YangMaxElementHolder;
+import org.onosproject.yang.compiler.datamodel.YangMinElementHolder;
 import org.onosproject.yang.compiler.datamodel.YangModule;
+import org.onosproject.yang.compiler.datamodel.YangMust;
+import org.onosproject.yang.compiler.datamodel.YangMustHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
+import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
+import org.onosproject.yang.compiler.datamodel.YangUnits;
 import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
@@ -60,11 +74,19 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_AUGMENT;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_BASE;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_COMPILER_ANNOTATION;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DEVIATION;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTITYREF;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.ENUMERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UNION;
-
 
 /**
  * Represents utilities for data model tree.
@@ -200,35 +222,36 @@ public final class DataModelUtils {
             }
         }
         YangReferenceResolver resolutionNode = (YangReferenceResolver) curNode;
-
-        if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangType) {
+        YangEntityToResolveInfo entityToResolveInfo = resolutionInfo.getEntityToResolveInfo();
+        if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangType) {
             resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_DERIVED_DATA_TYPE);
-        } else if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangUses) {
+                                               YANG_DERIVED_DATA_TYPE);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangUses) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_USES);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangAugment) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_AUGMENT);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangIfFeature) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_IF_FEATURE);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangLeafRef) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_LEAFREF);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangBase) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_BASE);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangIdentityRef) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_IDENTITYREF);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangCompilerAnnotation) {
             resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_USES);
-        } else if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangAugment) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_AUGMENT);
-        } else if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangIfFeature) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_IF_FEATURE);
-        } else if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangLeafRef) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_LEAFREF);
-        } else if (resolutionInfo.getEntityToResolveInfo().getEntityToResolve() instanceof YangBase) {
-            resolutionNode.addToResolutionList(resolutionInfo, ResolvableType.YANG_BASE);
-        } else if (resolutionInfo.getEntityToResolveInfo().getEntityToResolve() instanceof YangIdentityRef) {
-            resolutionNode.addToResolutionList(resolutionInfo, ResolvableType.YANG_IDENTITYREF);
-        } else if (resolutionInfo.getEntityToResolveInfo()
-                .getEntityToResolve() instanceof YangCompilerAnnotation) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               ResolvableType.YANG_COMPILER_ANNOTATION);
+                                               YANG_COMPILER_ANNOTATION);
+        } else if (entityToResolveInfo.getEntityToResolve()
+                instanceof YangDeviation) {
+            resolutionNode.addToResolutionList(resolutionInfo, YANG_DEVIATION);
         }
     }
 
@@ -350,22 +373,30 @@ public final class DataModelUtils {
      * cloning. Under the cloned node, with cloned leaf, attributes are set
      * and added to resolution list.
      *
-     * @param clonedNode holder node
-     * @param yangUses   YANG uses
+     * @param clonedNode  holder node
+     * @param yangUses    YANG uses
+     * @param isDeviation flag to identify cloning is for deviation
      * @throws CloneNotSupportedException clone not supported error
      * @throws DataModelException         data model error
      */
-    public static void cloneListOfLeaf(
-            YangLeavesHolder clonedNode, YangUses yangUses)
+    public static void cloneListOfLeaf(YangLeavesHolder clonedNode,
+                                       YangUses yangUses,
+                                       boolean isDeviation)
             throws CloneNotSupportedException, DataModelException {
 
         List<YangLeaf> leaves = clonedNode.getListOfLeaf();
         if (nonEmpty(leaves)) {
             List<YangLeaf> clonedLeaves = new LinkedList<>();
             for (YangLeaf leaf : leaves) {
-                YangLeaf clonedLeaf = leaf.clone();
+                YangLeaf clonedLeaf;
+                if (!isDeviation) {
+                    clonedLeaf = leaf.clone();
+                    addUnresolvedType(yangUses, clonedLeaf,
+                                      (YangNode) clonedNode);
+                } else {
+                    clonedLeaf = leaf.cloneForDeviation();
+                }
                 clonedLeaf.setReferredLeaf(leaf);
-                addUnresolvedType(yangUses, clonedLeaf, (YangNode) clonedNode);
                 clonedLeaf.setContainedIn(clonedNode);
                 clonedLeaves.add(clonedLeaf);
             }
@@ -413,23 +444,29 @@ public final class DataModelUtils {
      * after cloning. Under the cloned node, with cloned leaf-list,
      * attributes are set and added to resolution list.
      *
-     * @param clonedNode cloned holder
-     * @param yangUses   YANG uses
+     * @param clonedNode  cloned holder
+     * @param yangUses    YANG uses
+     * @param isDeviation flag to identify cloning is for deviation
      * @throws CloneNotSupportedException clone not supported error
      * @throws DataModelException         data model error
      */
     public static void cloneListOfLeafList(
-            YangLeavesHolder clonedNode, YangUses yangUses)
+            YangLeavesHolder clonedNode, YangUses yangUses, boolean isDeviation)
             throws CloneNotSupportedException, DataModelException {
 
         List<YangLeafList> listOfLeafList = clonedNode.getListOfLeafList();
         if (nonEmpty(listOfLeafList)) {
             List<YangLeafList> clonedList = new LinkedList<>();
             for (YangLeafList leafList : listOfLeafList) {
-                YangLeafList clonedLeafList = leafList.clone();
+                YangLeafList clonedLeafList;
+                if (!isDeviation) {
+                    clonedLeafList = leafList.clone();
+                    addUnresolvedType(yangUses, clonedLeafList,
+                                      (YangNode) clonedNode);
+                } else {
+                    clonedLeafList = leafList.cloneForDeviation();
+                }
                 clonedLeafList.setReferredSchemaLeafList(leafList);
-                addUnresolvedType(yangUses, clonedLeafList,
-                                  (YangNode) clonedNode);
                 clonedLeafList.setContainedIn(clonedNode);
                 clonedList.add(clonedLeafList);
             }
@@ -843,5 +880,278 @@ public final class DataModelUtils {
             default:
                 return dataType.getDataType().equals(EMPTY);
         }
+    }
+
+    /**
+     * Validates whether multiple deviation statement's Xpath is referring
+     * to same module.
+     *
+     * @param node YANG data model node
+     * @throws DataModelException if deviations referring to multiple module
+     */
+    public static void validateMultipleDeviationStatement(
+            YangReferenceResolver node) throws DataModelException {
+        List<YangResolutionInfo> deviationList = node
+                .getUnresolvedResolutionList(YANG_DEVIATION);
+        String prefix = null;
+        if (!deviationList.isEmpty()) {
+            YangDeviation firstDeviation = (YangDeviation) deviationList.get(0)
+                    .getEntityToResolveInfo().getEntityToResolve();
+            YangAtomicPath atomic = firstDeviation.getTargetNode().get(0);
+            prefix = atomic.getNodeIdentifier().getPrefix();
+        }
+
+        Iterator<YangResolutionInfo> deviationIterator = deviationList.iterator();
+        while (deviationIterator.hasNext()) {
+            YangDeviation deviation = (YangDeviation) deviationIterator.next()
+                    .getEntityToResolveInfo().getEntityToResolve();
+            List<YangAtomicPath> targetNode = deviation.getTargetNode();
+            YangAtomicPath atomicPath = targetNode.get(0);
+            if (!atomicPath.getNodeIdentifier().getPrefix().equals(prefix)) {
+                throw new DataModelException("YANG FILE ERROR : Deviations " +
+                                                     "of multiple module is" +
+                                                     " currently not " +
+                                                     "supported.");
+            }
+        }
+    }
+
+    /**
+     * Removes node from data model tree.
+     *
+     * @param node YANG data model node
+     */
+    public static void deleteUnsupportedNodeFromTree(YangNode node) {
+        // unlink from parent
+        YangNode parentNode = node.getParent();
+        if (parentNode.getChild().equals(node)) {
+            parentNode.setChild(node.getNextSibling());
+        }
+
+        //unlink from siblings
+        YangNode previousSibling = node.getPreviousSibling();
+        YangNode nextSibling = node.getNextSibling();
+        if (nextSibling != null && previousSibling != null) {
+            previousSibling.setNextSibling(nextSibling);
+            nextSibling.setPreviousSibling(previousSibling);
+        } else if (nextSibling != null) {
+            nextSibling.setPreviousSibling(null);
+        } else if (previousSibling != null) {
+            previousSibling.setNextSibling(null);
+        }
+        node.setParent(null);
+        node.setPreviousSibling(null);
+        node.setNextSibling(null);
+        node.setChild(null);
+    }
+
+    /**
+     * Removes leaf/leaf-list from data model tree.
+     *
+     * @param node     YANG data model node
+     * @param leafName name of leaf to be removed
+     */
+    public static void deleteUnsupportedLeafOrLeafList(YangLeavesHolder node,
+                                                       String leafName) {
+        List<YangLeaf> leaves = node.getListOfLeaf();
+        if (leaves != null && !leaves.isEmpty()) {
+            for (YangLeaf leaf : leaves) {
+                if (leaf.getName().equals(leafName)) {
+                    node.removeLeaf(leaf);
+                    return;
+                }
+            }
+        }
+
+        List<YangLeafList> leafList = node.getListOfLeafList();
+        if (leafList != null && !leafList.isEmpty()) {
+            for (YangLeafList leaf : leafList) {
+                if (leaf.getName().equals(leafName)) {
+                    node.removeLeafList(leaf);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the target data model with deviate delete sub statements.
+     *
+     * @param targetNode    target node of deviation
+     * @param deviateDelete YANG deviate delete data model node
+     * @throws DataModelException if deviations referring to multiple module
+     */
+    public static void updateDeviateDeleteToTargetNode(YangSchemaNode targetNode,
+                                                       YangDeviateDelete deviateDelete)
+            throws DataModelException {
+
+        // delete must statement
+        if (targetNode instanceof YangMustHolder
+                && !deviateDelete.getListOfMust().isEmpty()) {
+            deviateDelete.setListOfMust(new LinkedList<>());
+        }
+
+        // delete unique statement
+        if (targetNode instanceof YangUniqueHolder
+                && !deviateDelete.getUniqueList().isEmpty()) {
+            deviateDelete.setUniqueList(new LinkedList<>());
+        }
+
+        // delete units statement
+        if (targetNode instanceof YangUnits) {
+            ((YangUnits) targetNode).setUnits(null);
+        }
+
+        // delete default statement
+        if (targetNode instanceof YangDefault) {
+            ((YangDefault) targetNode)
+                    .setDefaultValueInString(null);
+        }
+    }
+
+    /**
+     * Updates the target data model with deviate add sub statements.
+     *
+     * @param targetNode target node of deviation
+     * @param deviateAdd YANG deviate add data model node
+     * @throws DataModelException if deviations referring to multiple module
+     */
+    public static void updateDeviateAddToTargetNode(YangSchemaNode targetNode,
+                                                    YangDeviateAdd deviateAdd)
+            throws DataModelException {
+        // update must statement
+        if (targetNode instanceof YangMustHolder
+                && !deviateAdd.getListOfMust().isEmpty()) {
+            Iterator<YangMust> mustList = deviateAdd.getListOfMust().listIterator();
+            while (mustList.hasNext()) {
+                ((YangMustHolder) targetNode).addMust(mustList.next());
+            }
+        }
+
+        // update unique statement
+        if (targetNode instanceof YangUniqueHolder
+                && !deviateAdd.getUniqueList().isEmpty()) {
+            Iterator<String> uniqueList = deviateAdd.getUniqueList()
+                    .listIterator();
+            while (uniqueList.hasNext()) {
+                ((YangUniqueHolder) targetNode).addUnique(uniqueList.next());
+            }
+        }
+
+        // update config statement
+        if (targetNode instanceof YangConfig) {
+            ((YangConfig) targetNode).setConfig(deviateAdd.isConfig());
+        }
+
+        // update units statement
+        if (targetNode instanceof YangUnits) {
+            ((YangUnits) targetNode).setUnits(deviateAdd.getUnits());
+        }
+
+        // update default statement
+        if (targetNode instanceof YangDefault) {
+            ((YangDefault) targetNode)
+                    .setDefaultValueInString(deviateAdd.getDefaultValueInString());
+        }
+
+        // update mandatory statement
+        if (targetNode instanceof YangMandatory) {
+            ((YangMandatory) targetNode).setMandatory(deviateAdd.isMandatory());
+        }
+
+        // update minelement statement
+        if (targetNode instanceof YangMinElementHolder) {
+            ((YangMinElementHolder) targetNode)
+                    .setMinElements(deviateAdd.getMinElements());
+        }
+
+        // update max-element statement
+        if (targetNode instanceof YangMaxElementHolder) {
+            ((YangMaxElementHolder) targetNode)
+                    .setMaxElements(deviateAdd.getMaxElements());
+        }
+    }
+
+    /**
+     * Replaces the substatements of deviate replace to target node.
+     *
+     * @param targetNode     target node of deviation
+     * @param deviateReplace YANG deviate replace data model node
+     */
+    public static void updateDeviateReplaceToTargetNode(YangSchemaNode targetNode,
+                                                        YangDeviateReplace deviateReplace) {
+
+        if (targetNode instanceof YangLeaf
+                && deviateReplace.getDataType() != null) {
+            ((YangLeaf) targetNode).setDataType(deviateReplace.getDataType());
+        }
+
+        if (targetNode instanceof YangLeafList
+                && deviateReplace.getDataType() != null) {
+            ((YangLeafList) targetNode).setDataType(deviateReplace
+                                                            .getDataType());
+        }
+
+        // update config statement
+        if (targetNode instanceof YangConfig) {
+            ((YangConfig) targetNode).setConfig(deviateReplace.isConfig());
+        }
+
+        // update units statement
+        if (targetNode instanceof YangUnits) {
+            ((YangUnits) targetNode).setUnits(deviateReplace.getUnits());
+        }
+
+        // update default statement
+        if (targetNode instanceof YangDefault) {
+            ((YangDefault) targetNode)
+                    .setDefaultValueInString(deviateReplace.getDefaultValueInString());
+        }
+
+        // update mandatory statement
+        if (targetNode instanceof YangMandatory) {
+            ((YangMandatory) targetNode).setMandatory(deviateReplace.isMandatory());
+        }
+
+        // update minelement statement
+        if (targetNode instanceof YangMinElementHolder) {
+            ((YangMinElementHolder) targetNode)
+                    .setMinElements(deviateReplace.getMinElements());
+        }
+
+        // update max-element statement
+        if (targetNode instanceof YangMaxElementHolder) {
+            ((YangMaxElementHolder) targetNode)
+                    .setMaxElements(deviateReplace.getMaxElements());
+        }
+    }
+
+    /**
+     * Searches for leaf/leaf-list in given leaf holder node.
+     *
+     * @param target leaf holder
+     * @param name   leaf/leaf-list name
+     * @return leaf/leaf-list node
+     */
+    public static YangSchemaNode findLeafNode(YangLeavesHolder target,
+                                              String name) {
+        List<YangLeaf> leaves = target.getListOfLeaf();
+        if (leaves != null && !leaves.isEmpty()) {
+            for (YangLeaf leaf : leaves) {
+                if (leaf.getName().equals(name)) {
+                    return leaf;
+                }
+            }
+        }
+
+        List<YangLeafList> listOfleafList = target.getListOfLeafList();
+        if (listOfleafList != null && !listOfleafList.isEmpty()) {
+            for (YangLeafList leafList : listOfleafList) {
+                if (leafList.getName().equals(name)) {
+                    return leafList;
+                }
+            }
+        }
+        return null;
     }
 }

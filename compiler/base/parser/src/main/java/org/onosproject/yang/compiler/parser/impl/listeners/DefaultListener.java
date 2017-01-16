@@ -39,9 +39,7 @@ package org.onosproject.yang.compiler.parser.impl.listeners;
  * defaultStatement : DEFAULT_KEYWORD string STMTEND;
  */
 
-import org.onosproject.yang.compiler.datamodel.YangChoice;
-import org.onosproject.yang.compiler.datamodel.YangLeaf;
-import org.onosproject.yang.compiler.datamodel.YangTypeDef;
+import org.onosproject.yang.compiler.datamodel.YangDefault;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
@@ -77,28 +75,20 @@ public final class DefaultListener {
                                            DefaultStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, DEFAULT_DATA, ctx.string().getText(), ENTRY);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, DEFAULT_DATA,
+                             ctx.string().getText(), ENTRY);
+        String value = removeQuotesAndHandleConcat(ctx.string().getText());
 
         Parsable tmpNode = listener.getParsedDataStack().peek();
-        switch (tmpNode.getYangConstructType()) {
-            case TYPEDEF_DATA: {
-                YangTypeDef typeDef = (YangTypeDef) tmpNode;
-                typeDef.setDefaultValueInString(removeQuotesAndHandleConcat(ctx.string().getText()));
-                break;
-            }
-            case LEAF_DATA: {
-                YangLeaf leaf = (YangLeaf) tmpNode;
-                leaf.setDefaultValueInString(removeQuotesAndHandleConcat(ctx.string().getText()));
-                break;
-            }
-            case CHOICE_DATA: {
-                YangChoice choice = (YangChoice) tmpNode;
-                choice.setDefaultValueInString(removeQuotesAndHandleConcat(ctx.string().getText()));
-                break;
-            }
-            default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER,
-                                                                        DEFAULT_DATA, ctx.string().getText(), ENTRY));
+        if (tmpNode instanceof YangDefault) {
+            YangDefault defaultHolder = ((YangDefault) tmpNode);
+            defaultHolder.setDefaultValueInString(value);
+        } else {
+            throw new ParserException(
+                    constructListenerErrorMessage(INVALID_HOLDER,
+                                                  DEFAULT_DATA,
+                                                  ctx.string().getText(),
+                                                  ENTRY));
         }
     }
 }

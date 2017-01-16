@@ -59,5 +59,10 @@ public enum ResolvableType {
     /**
      * Identifies the compiler annotations.
      */
-    YANG_COMPILER_ANNOTATION
+    YANG_COMPILER_ANNOTATION,
+
+    /**
+     * Identifies the deviation.
+     */
+    YANG_DEVIATION
 }

@@ -79,7 +79,8 @@ public abstract class YangChoice
         extends YangNode
         implements YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder,
-        YangAppErrorHolder, YangIsFilterContentNodes, YangConfig {
+        YangAppErrorHolder, YangIsFilterContentNodes, YangConfig,
+        YangDefault, YangMandatory {
 
     private static final long serialVersionUID = 806201604L;
 
@@ -166,6 +167,11 @@ public abstract class YangChoice
      * YANG application error information.
      */
     private YangAppErrorInfo yangAppErrorInfo;
+
+    /**
+     * If mandatory leaf.
+     */
+    private boolean isMandatory;
 
     /**
      * Create a choice node.
@@ -341,6 +347,7 @@ public abstract class YangChoice
      *
      * @return the default value
      */
+    @Override
     public String getDefaultValueInString() {
         return defaultValueInString;
     }
@@ -350,6 +357,7 @@ public abstract class YangChoice
      *
      * @param defaultValueInString the default value
      */
+    @Override
     public void setDefaultValueInString(String defaultValueInString) {
         this.defaultValueInString = defaultValueInString;
     }
@@ -489,5 +497,23 @@ public abstract class YangChoice
 
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();
+    }
+
+    /**
+     * Returns true, if the leaf is mandatory; false otherwise.
+     *
+     * @return true if leaf is mandatory; false otherwise
+     */
+    public boolean isMandatory() {
+        return isMandatory;
+    }
+
+    /**
+     * Sets the mandatory flag.
+     *
+     * @param isReq the flag value to set
+     */
+    public void setMandatory(boolean isReq) {
+        isMandatory = isReq;
     }
 }

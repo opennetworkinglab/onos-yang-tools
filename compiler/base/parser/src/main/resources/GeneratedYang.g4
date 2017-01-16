@@ -1207,9 +1207,12 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
      *                             [max-elements-stmt stmtsep]
      *                         "}")
      */
-    deviateAddStatement: DEVIATE_KEYWORD ADD_KEYWORD (STMTEND | (LEFT_CURLY_BRACE unitsStatement? mustStatement* uniqueStatement*
-                      defaultStatement? configStatement? mandatoryStatement? minElementsStatement? maxElementsStatement?
-                      RIGHT_CURLY_BRACE));
+    deviateAddStatement: DEVIATE_KEYWORD ADD_KEYWORD (STMTEND
+                       | LEFT_CURLY_BRACE (unitsStatement | mustStatement
+                         | uniqueStatement| defaultStatement| configStatement
+                         | mandatoryStatement | minElementsStatement
+                         | maxElementsStatement)*
+                       RIGHT_CURLY_BRACE);
 
     /**
      *  deviate-delete-stmt = deviate-keyword sep delete-keyword optsep
@@ -1222,7 +1225,8 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
      *                           "}")
      */
     deviateDeleteStatement: DEVIATE_KEYWORD DELETE_KEYWORD (STMTEND
-                       | (LEFT_CURLY_BRACE  unitsStatement? mustStatement* uniqueStatement* defaultStatement? RIGHT_CURLY_BRACE));
+                       | LEFT_CURLY_BRACE (unitsStatement | mustStatement |
+                       uniqueStatement | defaultStatement)* RIGHT_CURLY_BRACE);
 
     /**
      *   deviate-replace-stmt = deviate-keyword sep replace-keyword optsep
@@ -1237,9 +1241,11 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
      *                              [max-elements-stmt stmtsep]
      *                          "}")
      */
-    deviateReplaceStatement: DEVIATE_KEYWORD REPLACE_KEYWORD (STMTEND | (LEFT_CURLY_BRACE typeStatement? unitsStatement?
-                           defaultStatement? configStatement? mandatoryStatement? minElementsStatement?
-                           maxElementsStatement? RIGHT_CURLY_BRACE));
+    deviateReplaceStatement: DEVIATE_KEYWORD REPLACE_KEYWORD (STMTEND
+                           | LEFT_CURLY_BRACE (typeStatement | unitsStatement
+                             | defaultStatement | configStatement
+                             | mandatoryStatement | minElementsStatement
+                             | maxElementsStatement)* RIGHT_CURLY_BRACE);
 
     /**
      *   compiler-annotation-stmt = prefix:compiler-annotation-keyword string

@@ -32,6 +32,7 @@ import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
@@ -293,8 +294,7 @@ public class YangXpathLinker<T> {
      * @param root root node
      * @return linked target node
      */
-    private YangNode parsePath(YangNode root) {
-
+    public YangNode parsePath(YangNode root) {
         YangNode tempNode = root;
         Stack<YangNode> linkerStack = new Stack<>();
         Iterator<YangAtomicPath> pathIterator = absPaths.iterator();
@@ -667,7 +667,7 @@ public class YangXpathLinker<T> {
      * @param index    current index of list
      * @return false if target node found
      */
-    private boolean validate(YangNode tempNode, int index) {
+    private boolean validate(YangSchemaNode tempNode, int index) {
 
         int size = absPaths.size();
         if (tempNode != null && index != size) {
@@ -689,7 +689,16 @@ public class YangXpathLinker<T> {
      * @param curNodeId YANG node identifier
      * @return linked target node
      */
-    private YangNode searchTargetNode(YangNode node, YangNodeIdentifier curNodeId) {
+    private YangNode searchTargetNode(YangNode node,
+                                      YangNodeIdentifier curNodeId) {
+
+        if (linkingType == XpathLinkingTypes.DEVIATION_LINKING &&
+                node instanceof YangLeavesHolder) {
+            YangNode targetNode = searchTargetLeaf(node, curNodeId);
+            if (targetNode != null) {
+                return targetNode;
+            }
+        }
 
         if (node != null) {
             node = node.getChild();
@@ -708,7 +717,45 @@ public class YangXpathLinker<T> {
                     !(node instanceof YangUses)) {
                 return node;
             }
+
+            if (linkingType == XpathLinkingTypes.DEVIATION_LINKING &&
+                    node instanceof YangLeavesHolder) {
+                YangNode targetNode = searchTargetLeaf(node, curNodeId);
+                if (targetNode != null) {
+                    return targetNode;
+                }
+            }
             node = node.getNextSibling();
+        }
+        return null;
+    }
+
+    /**
+     * Searches target leaf in root node.
+     *
+     * @param node      root node
+     * @param curNodeId YANG node identifier
+     * @return linked target leaf node holder
+     */
+    private YangNode searchTargetLeaf(YangNode node,
+                                      YangNodeIdentifier curNodeId) {
+        YangLeavesHolder holder = (YangLeavesHolder) node;
+        List<YangLeafList> leavesList = holder.getListOfLeafList();
+        if (leavesList != null && !leavesList.isEmpty()) {
+            for (YangLeafList leafList : leavesList) {
+                if (leafList.getName().equals(curNodeId.getName())) {
+                    return node;
+                }
+            }
+        }
+
+        List<YangLeaf> leaves = holder.getListOfLeaf();
+        if (leaves != null && !leaves.isEmpty()) {
+            for (YangLeaf leaf : leaves) {
+                if (leaf.getName().equals(curNodeId.getName())) {
+                    return node;
+                }
+            }
         }
         return null;
     }

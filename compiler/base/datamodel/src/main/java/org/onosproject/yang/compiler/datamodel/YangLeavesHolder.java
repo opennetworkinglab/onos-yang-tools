@@ -47,6 +47,13 @@ public interface YangLeavesHolder extends LocationInfo {
     void addLeaf(YangLeaf leaf);
 
     /**
+     * Removes leaf in data holder like container / list.
+     *
+     * @param leaf the leaf to be removed
+     */
+    void removeLeaf(YangLeaf leaf);
+
+    /**
      * Returns the list of leaf-list from data holder like container / list.
      *
      * @return the list of leaf-list
@@ -66,6 +73,13 @@ public interface YangLeavesHolder extends LocationInfo {
      * @param leafList the leaf-list to be added
      */
     void addLeafList(YangLeafList leafList);
+
+    /**
+     * Removes leaf-list in data holder like container / list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    void removeLeafList(YangLeafList leafList);
 
     /**
      * Adds namespace for leafs and leaf-list, this is used in case of

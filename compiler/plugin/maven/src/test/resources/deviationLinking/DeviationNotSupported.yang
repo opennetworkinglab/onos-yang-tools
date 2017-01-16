@@ -1,0 +1,19 @@
+module deviation-module {
+    yang-version 1;
+    namespace test:deviation;
+    prefix On;
+    import "Test2" {
+        prefix "t";
+    }
+    deviation /t:ospf {
+        description "desc";
+        reference "ref";
+        deviate not-supported;
+    }
+
+    deviation /t:valid/t:invalid-interval {
+            description "desc";
+            reference "ref";
+            deviate not-supported;
+    }
+}

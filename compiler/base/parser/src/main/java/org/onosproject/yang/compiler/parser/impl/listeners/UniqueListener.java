@@ -16,15 +16,12 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangList;
+import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.UNIQUE_DATA;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
@@ -33,6 +30,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.SPACE;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
@@ -70,35 +68,43 @@ public final class UniqueListener {
                                           GeneratedYangParser.UniqueStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, UNIQUE_DATA, ctx.unique().getText(), ENTRY);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, UNIQUE_DATA, ctx.unique()
+                .getText(), ENTRY);
 
         Parsable tmpData = listener.getParsedDataStack().peek();
-        if (listener.getParsedDataStack().peek() instanceof YangList) {
-            YangList yangList = (YangList) tmpData;
-            String tmpUniqueValue = removeQuotesAndHandleConcat(ctx.unique().getText());
+        if (listener.getParsedDataStack().peek() instanceof YangUniqueHolder) {
+            YangUniqueHolder uniqueHolder = (YangUniqueHolder) tmpData;
+            String tmpUniqueValue = removeQuotesAndHandleConcat(
+                    ctx.unique().getText());
 
-            if (tmpUniqueValue.contains(" ")) {
-                String[] uniqueValues = tmpUniqueValue.split(" ");
+            if (tmpUniqueValue.contains(SPACE)) {
+                String[] uniqueValues = tmpUniqueValue.split(SPACE);
                 for (String uniqueValue : uniqueValues) {
                     try {
-                        yangList.addUnique(uniqueValue);
+                        uniqueHolder.addUnique(uniqueValue);
                     } catch (DataModelException e) {
-                        throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                UNIQUE_DATA,
-                                ctx.unique().getText(), ENTRY, e.getMessage()));
+                        throw new ParserException(
+                                constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
+                                                                      UNIQUE_DATA,
+                                                                      ctx.unique().getText(),
+                                                                      ENTRY, e.getMessage()));
                     }
                 }
             } else {
                 try {
-                    yangList.addUnique(tmpUniqueValue);
+                    uniqueHolder.addUnique(tmpUniqueValue);
                 } catch (DataModelException e) {
-                    throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA, UNIQUE_DATA,
-                            ctx.unique().getText(), ENTRY, e.getMessage()));
+                    throw new ParserException(
+                            constructExtendedListenerErrorMessage(
+                                    UNHANDLED_PARSED_DATA, UNIQUE_DATA,
+                                    ctx.unique().getText(), ENTRY, e.getMessage()));
                 }
             }
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, UNIQUE_DATA, ctx.unique().getText(),
-                    ENTRY));
+            throw new ParserException(
+                    constructListenerErrorMessage(INVALID_HOLDER, UNIQUE_DATA,
+                                                  ctx.unique().getText(),
+                                                  ENTRY));
         }
     }
 }

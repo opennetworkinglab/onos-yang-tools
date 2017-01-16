@@ -42,6 +42,10 @@ import org.onosproject.yang.compiler.parser.impl.listeners.DataStructureKeyListe
 import org.onosproject.yang.compiler.parser.impl.listeners.Decimal64Listener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DefaultListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DescriptionListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DeviateAddListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DeviateDeleteListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DeviateReplaceListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DeviationListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.EnumListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.EnumerationListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.ErrorAppTagListener;
@@ -1473,14 +1477,12 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDeviationStatement(DeviationStatementContext ctx) {
-        increaseUnsupportedYangConstructDepth();
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.DEVIATION_DATA, ctx, UtilConstants.UNSUPPORTED_YANG_CONSTRUCT,
-                                                    getFileName());
+        DeviationListener.processDeviationEntry(this, ctx);
     }
 
     @Override
     public void exitDeviationStatement(DeviationStatementContext ctx) {
-        decreaseUnsupportedYangConstructDepth();
+        DeviationListener.processDeviationExit(this, ctx);
     }
 
     @Override
@@ -1495,32 +1497,32 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDeviateAddStatement(DeviateAddStatementContext ctx) {
-        // do nothing.
+        DeviateAddListener.processDeviateAddEntry(this, ctx);
     }
 
     @Override
     public void exitDeviateAddStatement(DeviateAddStatementContext ctx) {
-        // do nothing.
+        DeviateAddListener.processDeviateAddExit(this, ctx);
     }
 
     @Override
     public void enterDeviateDeleteStatement(DeviateDeleteStatementContext ctx) {
-        // do nothing.
+        DeviateDeleteListener.processDeviateDeleteEntry(this, ctx);
     }
 
     @Override
     public void exitDeviateDeleteStatement(DeviateDeleteStatementContext ctx) {
-        // do nothing.
+        DeviateDeleteListener.processDeviateDeleteExit(this, ctx);
     }
 
     @Override
     public void enterDeviateReplaceStatement(DeviateReplaceStatementContext ctx) {
-        // do nothing.
+        DeviateReplaceListener.processDeviateReplaceEntry(this, ctx);
     }
 
     @Override
     public void exitDeviateReplaceStatement(DeviateReplaceStatementContext ctx) {
-        // do nothing.
+        DeviateReplaceListener.processDeviateReplaceExit(this, ctx);
     }
 
     @Override

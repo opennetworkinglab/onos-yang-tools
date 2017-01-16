@@ -1,0 +1,16 @@
+module deviation-module4 {
+    yang-version 1;
+    namespace test:deviation4;
+    prefix On;
+    import "Test2" {
+        prefix "t";
+    }
+    deviation /t:ospf/t:process-id {
+        description "desc";
+        reference "ref";
+         deviate delete {
+           units "units";
+           default "defaultValue";
+         }
+    }
+}

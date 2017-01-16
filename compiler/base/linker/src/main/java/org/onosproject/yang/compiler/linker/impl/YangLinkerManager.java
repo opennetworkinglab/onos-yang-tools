@@ -33,6 +33,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_AUGMEN
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_BASE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_COMPILER_ANNOTATION;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DEVIATION;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTITYREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
@@ -179,22 +180,17 @@ public class YangLinkerManager
         sort(yangNodeSortedList);
         for (YangNode yangNode : yangNodeSortedList) {
             try {
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_IF_FEATURE);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_USES);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_AUGMENT);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_DERIVED_DATA_TYPE);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_BASE);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_IDENTITYREF);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_LEAFREF);
-                ((YangReferenceResolver) yangNode)
-                        .resolveInterFileLinking(YANG_COMPILER_ANNOTATION);
+                YangReferenceResolver resolver = ((YangReferenceResolver)
+                        yangNode);
+                resolver.resolveInterFileLinking(YANG_IF_FEATURE);
+                resolver.resolveInterFileLinking(YANG_USES);
+                resolver.resolveInterFileLinking(YANG_AUGMENT);
+                resolver.resolveInterFileLinking(YANG_DERIVED_DATA_TYPE);
+                resolver.resolveInterFileLinking(YANG_BASE);
+                resolver.resolveInterFileLinking(YANG_IDENTITYREF);
+                resolver.resolveInterFileLinking(YANG_LEAFREF);
+                resolver.resolveInterFileLinking(YANG_COMPILER_ANNOTATION);
+                resolver.resolveInterFileLinking(YANG_DEVIATION);
             } catch (DataModelException e) {
                 String errorInfo = "Error in file: " + yangNode.getName() + " in " +
                         yangNode.getFileName() + " at " +

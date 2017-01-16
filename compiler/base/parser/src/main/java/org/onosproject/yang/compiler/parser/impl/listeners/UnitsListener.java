@@ -16,12 +16,15 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
+import org.onosproject.yang.compiler.datamodel.YangDeviateAdd;
+import org.onosproject.yang.compiler.datamodel.YangDeviateDelete;
+import org.onosproject.yang.compiler.datamodel.YangDeviateReplace;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
+import org.onosproject.yang.compiler.datamodel.YangTypeDef;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.UNITS_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UnitsStatementContext;
@@ -78,11 +81,27 @@ public final class UnitsListener {
                 leafList.setUnits(ctx.string().getText());
                 break;
             case TYPEDEF_DATA:
-                // TODO
+                YangTypeDef typeDef = (YangTypeDef) tmpData;
+                typeDef.setUnits(ctx.string().getText());
+                break;
+            case DEVIATE_ADD:
+                YangDeviateAdd deviateAdd = (YangDeviateAdd) tmpData;
+                deviateAdd.setUnits(ctx.string().getText());
+                break;
+            case DEVIATE_DELETE:
+                YangDeviateDelete deviateDelete = (YangDeviateDelete) tmpData;
+                deviateDelete.setUnits(ctx.string().getText());
+                break;
+            case DEVIATE_REPLACE:
+                YangDeviateReplace replace = (YangDeviateReplace) tmpData;
+                replace.setUnits(ctx.string().getText());
                 break;
             default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, UNITS_DATA,
-                                ctx.string().getText(), ENTRY));
+                throw new ParserException(
+                        constructListenerErrorMessage(INVALID_HOLDER,
+                                                      UNITS_DATA,
+                                                      ctx.string().getText(),
+                                                      ENTRY));
         }
     }
 }

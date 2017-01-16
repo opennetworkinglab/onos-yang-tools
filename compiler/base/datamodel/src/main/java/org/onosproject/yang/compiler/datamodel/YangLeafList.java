@@ -64,7 +64,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.valid
 public abstract class YangLeafList extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
-        YangConfig {
+        YangConfig, YangUnits, YangMaxElementHolder, YangMinElementHolder {
 
     private static final long serialVersionUID = 806201637L;
 
@@ -235,6 +235,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @return the maximum elements number
      */
+    @Override
     public YangMaxElement getMaxElements() {
         return maxElement;
     }
@@ -244,6 +245,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @param maxElement maximum elements number
      */
+    @Override
     public void setMaxElements(YangMaxElement maxElement) {
         this.maxElement = maxElement;
     }
@@ -253,6 +255,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @return the minimum elements number
      */
+    @Override
     public YangMinElement getMinElements() {
         return minElements;
     }
@@ -262,6 +265,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @param minElements the minimum elements number
      */
+    @Override
     public void setMinElements(YangMinElement minElements) {
         this.minElements = minElements;
     }
@@ -311,6 +315,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @return the units
      */
+    @Override
     public String getUnits() {
         return units;
     }
@@ -320,6 +325,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
      *
      * @param units the units to set
      */
+    @Override
     public void setUnits(String units) {
         this.units = units;
     }
@@ -370,6 +376,19 @@ public abstract class YangLeafList extends DefaultLocationInfo
             throws CloneNotSupportedException {
         YangLeafList cll = (YangLeafList) super.clone();
         cll.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier.clone();
+        return cll;
+    }
+
+    /**
+     * Returns the cloned leaf-list.
+     *
+     * @return returns cloned leaf-list
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the interface
+     */
+    public YangLeafList cloneForDeviation()
+            throws CloneNotSupportedException {
+        YangLeafList cll = (YangLeafList) super.clone();
         return cll;
     }
 

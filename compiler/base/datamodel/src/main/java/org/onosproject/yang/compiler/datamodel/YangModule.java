@@ -30,6 +30,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_AUGMEN
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_BASE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_COMPILER_ANNOTATION;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DEVIATION;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTITYREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
@@ -87,7 +88,7 @@ public abstract class YangModule
         extends YangNode
         implements YangLeavesHolder, YangDesc, YangReference, Parsable,
         CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
-        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace {
+        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace, YangDeviationHolder {
 
     private static final long serialVersionUID = 806201610L;
 
@@ -239,6 +240,11 @@ public abstract class YangModule
     private List<YangResolutionInfo> compilerAnnotationList;
 
     /**
+     * Deviation list.
+     */
+    private List<YangResolutionInfo> deviationList;
+
+    /**
      * Extension list.
      */
     private List<YangExtension> extensionList;
@@ -264,10 +270,19 @@ public abstract class YangModule
     private String namespace;
 
     /**
+     * Flag to check whether target node is already cloned.
+     */
+    private boolean isDeviatedNodeCloned;
+
+    /**
+     * Flag to check whether this module is only for deviation.
+     */
+    private boolean isModuleForDeviation;
+
+    /**
      * Creates a YANG node of module type.
      */
     public YangModule() {
-
         super(YangNodeType.MODULE_NODE, new HashMap<>());
         derivedTypeResolutionList = new LinkedList<>();
         augmentResolutionList = new LinkedList<>();
@@ -277,6 +292,7 @@ public abstract class YangModule
         baseResolutionList = new LinkedList<>();
         identityRefResolutionList = new LinkedList<>();
         compilerAnnotationList = new LinkedList<>();
+        deviationList = new LinkedList<>();
         importList = new LinkedList<>();
         includeList = new LinkedList<>();
         listOfLeaf = new LinkedList<>();
@@ -423,6 +439,16 @@ public abstract class YangModule
     }
 
     /**
+     * Removes a leaf.
+     *
+     * @param leaf the leaf to be removed
+     */
+    @Override
+    public void removeLeaf(YangLeaf leaf) {
+        getListOfLeaf().remove(leaf);
+    }
+
+    /**
      * Returns the list of leaf-list from module.
      *
      * @return the list of leaf-list
@@ -446,6 +472,16 @@ public abstract class YangModule
     @Override
     public void addLeafList(YangLeafList leafList) {
         listOfLeafList.add(leafList);
+    }
+
+    /**
+     * Removes a leaf-list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    @Override
+    public void removeLeafList(YangLeafList leafList) {
+        getListOfLeafList().remove(leafList);
     }
 
     @Override
@@ -680,8 +716,10 @@ public abstract class YangModule
             return unmodifiableList(baseResolutionList);
         } else if (type == YANG_IDENTITYREF) {
             return unmodifiableList(identityRefResolutionList);
-        } else {
+        } else if (type == YANG_COMPILER_ANNOTATION) {
             return unmodifiableList(compilerAnnotationList);
+        } else {
+            return unmodifiableList(deviationList);
         }
     }
 
@@ -704,6 +742,8 @@ public abstract class YangModule
             identityRefResolutionList.add(info);
         } else if (type == YANG_COMPILER_ANNOTATION) {
             compilerAnnotationList.add(info);
+        } else if (type == YANG_DEVIATION) {
+            deviationList.add(info);
         }
     }
 
@@ -726,6 +766,8 @@ public abstract class YangModule
             identityRefResolutionList = resolutionList;
         } else if (type == YANG_COMPILER_ANNOTATION) {
             compilerAnnotationList = resolutionList;
+        } else if (type == YANG_DEVIATION) {
+            deviationList = resolutionList;
         }
     }
 
@@ -816,5 +858,25 @@ public abstract class YangModule
 
     public void setModuleNamespace(String namespace) {
         this.namespace = namespace;
+    }
+
+    @Override
+    public boolean isDeviatedNodeCloned() {
+        return isDeviatedNodeCloned;
+    }
+
+    @Override
+    public void setDeviatedNodeCloned(boolean deviatedNodeCloned) {
+        this.isDeviatedNodeCloned = deviatedNodeCloned;
+    }
+
+    @Override
+    public boolean isModuleForDeviation() {
+        return isModuleForDeviation;
+    }
+
+    @Override
+    public void setModuleForDeviation(boolean moduleForDeviation) {
+        isModuleForDeviation = moduleForDeviation;
     }
 }

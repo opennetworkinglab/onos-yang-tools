@@ -18,6 +18,7 @@ package org.onosproject.yang.compiler.utils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -1228,20 +1229,20 @@ public final class UtilConstants {
      * List of keywords in java, this is used for checking if the input does not
      * contain these keywords.
      */
-    public static final List<String> JAVA_KEY_WORDS =
-            Arrays.asList("abstract", "assert", "boolean", "break", "byte",
-                          "case", "catch", "char", "class", "const", "continue",
-                          "default", "do", "double", "else", "extends", "false",
-                          "final", "finally", "float", "for", "goto", "if",
-                          "implements", "import", "instanceof", "enum", "int",
-                          "interface", "long", "native", "new", "null",
-                          "package", "private", "protected", "public", "return",
-                          "short", "static", "strictfp", "super", "switch",
-                          "synchronized", "this", "throw", "throws", "transient",
-                          "true", "try", "void", "volatile", "while", "list",
-                          "map", "arrayList", "hashMap", "linkedList", "notify",
-                          "notifyAll", "Method",
-                          "collections");
+    public static final List<String> JAVA_KEY_WORDS = Collections
+            .unmodifiableList(Arrays.asList("abstract", "assert", "boolean", "break", "byte",
+                                            "case", "catch", "char", "class", "const", "continue",
+                                            "default", "do", "double", "else", "extends", "false",
+                                            "final", "finally", "float", "for", "goto", "if",
+                                            "implements", "import", "instanceof", "enum", "int",
+                                            "interface", "long", "native", "new", "null",
+                                            "package", "private", "protected", "public", "return",
+                                            "short", "static", "strictfp", "super", "switch",
+                                            "synchronized", "this", "throw", "throws", "transient",
+                                            "true", "try", "void", "volatile", "while", "list",
+                                            "map", "arrayList", "hashMap", "linkedList", "notify",
+                                            "notifyAll", "Method",
+                                            "collections"));
 
     /**
      * Static attribute for regex for all the special characters.
@@ -1669,6 +1670,13 @@ public final class UtilConstants {
      */
     public static final String FAILED_TO_FIND_ANNOTATION = "Failed to link " +
             "compiler annotation ";
+
+    /**
+     * Static attribute for compiler annotation resolve entity error
+     * information.
+     */
+    public static final String FAILED_TO_FIND_DEVIATION = "Failed to link " +
+            "deviation ";
 
     /**
      * Static attribute for failed to link entity error information.

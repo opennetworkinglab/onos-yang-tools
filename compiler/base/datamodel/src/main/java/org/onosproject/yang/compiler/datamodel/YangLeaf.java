@@ -68,7 +68,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.valid
 public abstract class YangLeaf extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode,
-        YangConfig {
+        YangConfig, YangUnits, YangDefault, YangMandatory {
 
     private static final long serialVersionUID = 806201635L;
 
@@ -143,7 +143,8 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     private YangLeaf referredLeaf;
 
-    private  boolean isKeyLeaf;
+    private boolean isKeyLeaf;
+
     /**
      * Creates a YANG leaf.
      */
@@ -217,6 +218,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @return if leaf is mandatory
      */
+    @Override
     public boolean isMandatory() {
         return isMandatory;
     }
@@ -226,6 +228,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @param isReq if the leaf is mandatory
      */
+    @Override
     public void setMandatory(boolean isReq) {
         isMandatory = isReq;
     }
@@ -275,6 +278,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @return the units
      */
+    @Override
     public String getUnits() {
         return units;
     }
@@ -284,6 +288,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @param units the units to set
      */
+    @Override
     public void setUnits(String units) {
         this.units = units;
     }
@@ -293,6 +298,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @return the default value
      */
+    @Override
     public String getDefaultValueInString() {
         return defaultValueInString;
     }
@@ -302,6 +308,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
      *
      * @param defaultValueInString the default value
      */
+    @Override
     public void setDefaultValueInString(String defaultValueInString) {
         this.defaultValueInString = defaultValueInString;
     }
@@ -352,6 +359,19 @@ public abstract class YangLeaf extends DefaultLocationInfo
             throws CloneNotSupportedException {
         YangLeaf cl = (YangLeaf) super.clone();
         cl.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier.clone();
+        return cl;
+    }
+
+    /**
+     * Returns the cloned leaf.
+     *
+     * @return returns cloned leaf
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the interface
+     */
+    public YangLeaf cloneForDeviation()
+            throws CloneNotSupportedException {
+        YangLeaf cl = (YangLeaf) super.clone();
         return cl;
     }
 
@@ -557,6 +577,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
     public void setReferredLeaf(YangLeaf leaf) {
         referredLeaf = leaf;
     }
+
     /**
      * Returns true if its a key leaf.
      *

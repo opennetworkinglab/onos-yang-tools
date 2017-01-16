@@ -174,6 +174,16 @@ public abstract class YangOutput
         listOfLeaf.add(leaf);
     }
 
+    /**
+     * Removes a leaf.
+     *
+     * @param leaf the leaf to be removed
+     */
+    @Override
+    public void removeLeaf(YangLeaf leaf) {
+        listOfLeaf.remove(leaf);
+    }
+
     @Override
     public void setListOfLeaf(List<YangLeaf> leafsList) {
         listOfLeaf = leafsList;
@@ -192,6 +202,16 @@ public abstract class YangOutput
     @Override
     public void addLeafList(YangLeafList leafList) {
         listOfLeafList.add(leafList);
+    }
+
+    /**
+     * Removes a leaf-list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    @Override
+    public void removeLeafList(YangLeafList leafList) {
+        listOfLeafList.remove(leafList);
     }
 
     @Override

@@ -35,6 +35,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTI
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateMultipleDeviationStatement;
 import static org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.MODULE_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.ModuleStatementContext;
@@ -147,6 +148,16 @@ public final class ModuleListener {
             linkerException.setCharPosition(e.getCharPositionInLine());
             linkerException.setFileName(listener.getFileName());
             throw linkerException;
+        }
+
+        /*
+         * Validate whether all deviation statement xpath is referring to same
+         * module
+         */
+        try {
+            validateMultipleDeviationStatement(module);
+        } catch (DataModelException e) {
+            throw new ParserException(e.getMessage());
         }
     }
 

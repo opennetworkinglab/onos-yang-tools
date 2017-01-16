@@ -16,16 +16,17 @@
 
 package org.onosproject.yang.compiler.base.tool;
 
-import org.onosproject.yang.compiler.parser.YangUtilsParser;
-import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 import org.onosproject.yang.compiler.base.tool.exception.YangToolException;
+import org.onosproject.yang.compiler.datamodel.YangDeviationHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.linker.YangLinker;
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
+import org.onosproject.yang.compiler.parser.YangUtilsParser;
+import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.slf4j.Logger;
 
@@ -302,7 +303,8 @@ public class YangToolManager {
         yangNodeSortedList.addAll(yangNodeSet);
         sort(yangNodeSortedList);
         for (YangNode node : yangNodeSortedList) {
-            if (node.isToTranslate()) {
+            if (node.isToTranslate() && !(!((YangDeviationHolder) node)
+                    .isModuleForDeviation())) {
                 generateJavaCode(node, pluginConfig);
             }
         }

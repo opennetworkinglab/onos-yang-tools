@@ -17,6 +17,7 @@
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
 import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
+import org.onosproject.yang.compiler.datamodel.YangDeviateReplace;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -32,7 +33,6 @@ import org.onosproject.yang.compiler.linker.impl.YangResolutionInfoImpl;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
 
 import static org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus.UNRESOLVED;
@@ -247,8 +247,10 @@ public final class TypeListener {
                     addToResolutionList(resolutionInfo, ctx);
                 }
                 break;
-            //TODO: deviate replacement statement.
-
+            case DEVIATE_REPLACE:
+                YangDeviateReplace replace = (YangDeviateReplace) tmpData;
+                replace.setDataType(type);
+                break;
             default:
                 throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
                                                                         ctx.string().getText(), EXIT));

@@ -1,0 +1,16 @@
+module deviation-module5 {
+    yang-version 1;
+    namespace test:deviation5;
+    prefix On;
+    import "target" {
+        prefix "t";
+    }
+    deviation /t:ospf/t:intf-id {
+        description "desc";
+        reference "ref";
+         deviate delete {
+           units "units";
+           default "defaultValue";
+         }
+    }
+}

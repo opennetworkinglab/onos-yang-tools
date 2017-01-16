@@ -16,15 +16,11 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangLeafList;
-import org.onosproject.yang.compiler.datamodel.YangList;
+import org.onosproject.yang.compiler.datamodel.YangMinElementHolder;
 import org.onosproject.yang.compiler.datamodel.YangMinElement;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.MIN_ELEMENT_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.MinElementsStatementContext;
@@ -74,9 +70,11 @@ public final class MinElementsListener {
                                                MinElementsStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, MIN_ELEMENT_DATA, ctx.minValue().getText(), ENTRY);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, MIN_ELEMENT_DATA,
+                             ctx.minValue().getText(), ENTRY);
 
-        int minElementValue = getValidNonNegativeIntegerValue(ctx.minValue().getText(), MIN_ELEMENT_DATA, ctx);
+        int minElementValue = getValidNonNegativeIntegerValue(
+                ctx.minValue().getText(), MIN_ELEMENT_DATA, ctx);
 
         YangMinElement minElement = new YangMinElement();
 
@@ -84,19 +82,15 @@ public final class MinElementsListener {
         minElement.setLineNumber(ctx.getStart().getLine());
         minElement.setCharPosition(ctx.getStart().getCharPositionInLine());
         minElement.setFileName(listener.getFileName());
+
         Parsable tmpData = listener.getParsedDataStack().peek();
-        switch (tmpData.getYangConstructType()) {
-            case LEAF_LIST_DATA:
-                YangLeafList leafList = (YangLeafList) tmpData;
-                leafList.setMinElements(minElement);
-                break;
-            case LIST_DATA:
-                YangList yangList = (YangList) tmpData;
-                yangList.setMinElements(minElement);
-                break;
-            default:
-                throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, MIN_ELEMENT_DATA,
-                                                                        ctx.minValue().getText(), ENTRY));
+        if (tmpData instanceof YangMinElementHolder) {
+            YangMinElementHolder holder = ((YangMinElementHolder) tmpData);
+            holder.setMinElements(minElement);
+        } else {
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, MIN_ELEMENT_DATA, ctx.minValue().getText(),
+                    ENTRY));
         }
     }
 }

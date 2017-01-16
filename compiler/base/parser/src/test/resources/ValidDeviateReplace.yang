@@ -1,0 +1,16 @@
+module Test {
+    yang-version 1;
+    namespace urn:ietf:params:xml:ns:yang:ietf-ospf;
+    prefix On;
+    deviation /base:system/base:name-server {
+        deviate replace {
+            type int8;
+            units "units";
+            default "0";
+            config "true";
+            mandatory "true";
+            min-elements 0;
+            max-elements 3;
+        }
+    }
+}

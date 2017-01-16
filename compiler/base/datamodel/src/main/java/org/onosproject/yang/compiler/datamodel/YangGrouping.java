@@ -204,6 +204,16 @@ public abstract class YangGrouping
     }
 
     /**
+     * Removes a leaf.
+     *
+     * @param leaf the leaf to be removed
+     */
+    @Override
+    public void removeLeaf(YangLeaf leaf) {
+        listOfLeaf.remove(leaf);
+    }
+
+    /**
      * Returns the list of leaf-list.
      *
      * @return the list of leaf-list
@@ -231,6 +241,16 @@ public abstract class YangGrouping
     @Override
     public void addLeafList(YangLeafList leafList) {
         listOfLeafList.add(leafList);
+    }
+
+    /**
+     * Removes a leaf-list.
+     *
+     * @param leafList the leaf-list to be removed
+     */
+    @Override
+    public void removeLeafList(YangLeafList leafList) {
+        listOfLeafList.remove(leafList);
     }
 
     /**

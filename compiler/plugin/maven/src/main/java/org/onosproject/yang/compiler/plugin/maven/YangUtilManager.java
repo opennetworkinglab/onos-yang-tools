@@ -25,6 +25,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.onosproject.yang.compiler.datamodel.YangDeviationHolder;
 import org.onosproject.yang.compiler.parser.YangUtilsParser;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
@@ -295,7 +296,7 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
      * TODO: Delete me and use the tool code for UT test cases
      * Creates YANG nodes set.
      */
-    protected void createYangNodeSet() {
+    public void createYangNodeSet() {
         for (YangFileInfo yangFileInfo : yangFileInfoSet) {
             yangNodeSet.add(yangFileInfo.getRootNode());
         }
@@ -351,7 +352,8 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
         yangNodeSortedList.addAll(yangNodeSet);
         sort(yangNodeSortedList);
         for (YangNode node : yangNodeSortedList) {
-            if (node.isToTranslate()) {
+            if (node.isToTranslate() && (!((YangDeviationHolder) node)
+                    .isModuleForDeviation())) {
                 JavaCodeGeneratorUtil.generateJavaCode(node, yangPlugin);
             }
         }
