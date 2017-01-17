@@ -20,9 +20,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils;
 import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 
 import java.io.IOException;
 
@@ -47,11 +47,9 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -68,7 +66,6 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -85,7 +82,6 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -102,11 +98,9 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -124,11 +118,9 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -145,7 +137,6 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -163,11 +154,9 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }
@@ -185,7 +174,6 @@ public class YangJavaModelUtilsTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isGetSetOfRootNodeRequired(node)));
                 assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
             }
         }

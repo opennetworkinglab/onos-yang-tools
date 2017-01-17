@@ -18,7 +18,6 @@ package org.onosproject.yang.compiler.translator.tojava;
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangCase;
-import org.onosproject.yang.compiler.datamodel.YangChoice;
 import org.onosproject.yang.compiler.datamodel.YangDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
@@ -115,7 +114,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDEN
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.INVOCATION_TARGET_EXCEPTION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
@@ -128,7 +126,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
-import static org.onosproject.yang.compiler.utils.UtilConstants.REFLECT_IMPORTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
@@ -576,18 +573,6 @@ public class TempJavaFragmentFiles {
         TempJavaBeanFragmentFiles tempFiles =
                 getBeanFiles((JavaCodeGeneratorInfo) parent);
         tempFiles.setAttrNode(curNode);
-        JavaFileInfoTranslator fileInfo = ((JavaCodeGeneratorInfo) parent)
-                .getJavaFileInfo();
-        if (curNode instanceof YangChoice && curNode.isOpTypeReq()) {
-            JavaQualifiedTypeInfoTranslator info = new
-                    JavaQualifiedTypeInfoTranslator();
-            info.setClassInfo(INVOCATION_TARGET_EXCEPTION);
-            info.setPkgInfo(REFLECT_IMPORTS);
-            info.setForInterface(false);
-            tempFiles.getJavaImportData().addImportInfo(
-                    info, getCapitalCase(fileInfo.getJavaName()),
-                    fileInfo.getPackage());
-        }
         JavaAttributeInfo attr = getCurNodeAsAttributeInTarget(
                 curNode, parent, isList, tempFiles);
         tempFiles.addJavaSnippetInfoToApplicableTempFiles(attr, config);
@@ -645,17 +630,6 @@ public class TempJavaFragmentFiles {
             }
             qualified = parentImportData.addImportInfo(typeInfo, className,
                                                        fileInfo.getPackage());
-            if (!qualified && !(curNode instanceof YangChoice) &&
-                    targetNode.isOpTypeReq()) {
-                String name = DEFAULT_CAPS + typeInfo.getClassInfo();
-                JavaQualifiedTypeInfoTranslator qInfo =
-                        new JavaQualifiedTypeInfoTranslator();
-                qInfo.setForInterface(false);
-                qInfo.setPkgInfo(typeInfo.getPkgInfo());
-                qInfo.setClassInfo(name);
-                parentImportData.addImportInfo(qInfo, className,
-                                               fileInfo.getPackage());
-            }
         }
         boolean collectionSet = false;
         if (curNode instanceof YangList) {

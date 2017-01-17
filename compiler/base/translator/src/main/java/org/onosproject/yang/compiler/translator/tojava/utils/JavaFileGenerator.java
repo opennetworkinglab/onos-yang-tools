@@ -76,9 +76,7 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.SETTER_FOR_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.TO_STRING_IMPL_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles.getCurNodeAsAttributeInTarget;
 import static org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles.getListOfAttributesForKey;
-import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.isGetSetOfRootNodeRequired;
 import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.addStaticAttributeIntRange;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.addStaticAttributeLongRange;
@@ -95,7 +93,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationsString;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentsDataMethodForService;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassFromString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassToString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getCompareToForKeyClass;
@@ -109,7 +106,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethodSignature;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getGetter;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getGetterForClass;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getGetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getHashCodeMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getHashCodeMethodClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getHashCodeMethodOpen;
@@ -117,7 +113,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRangeValidatorMethodForUnion;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRemoveAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForClass;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringForEnumClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringForType;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodClose;
@@ -1046,25 +1041,8 @@ public final class JavaFileGenerator {
                                    curNode, className);
 
         List<String> methods = new ArrayList<>();
-        JavaAttributeInfo rootAttribute =
-                getCurNodeAsAttributeInTarget(curNode, curNode, false,
-                                              tempFiles);
 
         try {
-
-            if (isGetSetOfRootNodeRequired(curNode)) {
-                //Getter methods.
-                methods.add(getGetterString(rootAttribute,
-                                            GENERATE_SERVICE_AND_MANAGER) +
-                                    NEW_LINE);
-                // Setter methods.
-                methods.add(getSetterString(rootAttribute, className,
-                                            GENERATE_SERVICE_AND_MANAGER) +
-                                    NEW_LINE);
-            }
-
-            methods.add(getAugmentsDataMethodForService(curNode));
-
             if (((JavaCodeGeneratorInfo) curNode).getTempJavaCodeFragmentFiles()
                     .getServiceTempFiles() != null) {
                 JavaCodeGeneratorInfo javaGenInfo =

@@ -240,16 +240,10 @@ final class ClassDefinitionGenerator {
      */
     private static String getImplClassDefinition(String yangName,
                                                  YangNode curNode) {
-        if (!(curNode instanceof YangCase)) {
-            String clsDef = getClassDefinitionForWhenExtended(
-                    curNode, yangName, DEFAULT_CLASS_MASK);
-            if (clsDef != null) {
-                return clsDef;
-            }
-        }
-        if (curNode instanceof RpcNotificationContainer) {
-            return getDefaultDefinitionWithImpl(
-                    CLASS, getSuffixedName(yangName, OP_PARAM), PUBLIC, yangName);
+        String clsDef = getClassDefinitionForWhenExtended(
+                curNode, yangName, DEFAULT_CLASS_MASK);
+        if (clsDef != null) {
+            return clsDef;
         }
         return getDefaultDefinitionWithImpl(CLASS, getDefaultName(yangName),
                                             PUBLIC, yangName);
@@ -433,16 +427,10 @@ final class ClassDefinitionGenerator {
                     def.append(SPACE).append(IMPLEMENTS).append(SPACE)
                             .append(yangName).append(PERIOD)
                             .append(yangName).append(BUILDER);
-//                    def.append(STATIC).append(SPACE).append(CLASS)
-//                            .append(SPACE).append(yangName).append(BUILDER)
-//                            .append(SPACE).append(EXTEND).append(SPACE);
-//                    def = new StringBuilder(getDefinitionString(def.toString(),
-//                                                                holder));
-//                    def.append(SPACE).append(IMPLEMENTS).append(SPACE)
-//                            .append(yangName).append(PERIOD)
-//                            .append(yangName).append(BUILDER);
                     break;
                 case DEFAULT_CLASS_MASK:
+
+                    // class defination
                     if (curNode instanceof RpcNotificationContainer) {
                         def.append(CLASS).append(SPACE).append(yangName)
                                 .append(OP_PARAM).append(SPACE).append(EXTEND)
@@ -452,9 +440,18 @@ final class ClassDefinitionGenerator {
                                 .append(yangName).append(SPACE).append(EXTEND)
                                 .append(SPACE);
                     }
-                    def = new StringBuilder(getDefinitionString(def.toString(),
-                                                                holder));
-                    def.append(SPACE).append(IMPLEMENTS).append(SPACE)
+
+                    // append with extendList
+                    if (curNode instanceof YangCase) {
+                        def = new StringBuilder(getDefinitionStringForCase(def.toString(),
+                                                                           holder));
+                    } else {
+                        def = new StringBuilder(getDefinitionString(def.toString(),
+                                                                    holder));
+                    }
+
+                    // append implements
+                    def.append(IMPLEMENTS).append(SPACE)
                             .append(yangName);
                     break;
                 default:
@@ -485,6 +482,26 @@ final class ClassDefinitionGenerator {
                         COMMA + SPACE;
             }
             builder.append(str);
+        }
+        def = builder.toString();
+        return trimAtLast(def, COMMA);
+    }
+
+    /**
+     * Returns updated class definition for case.
+     *
+     * @param def    current definition
+     * @param holder extend list holder
+     * @return updated class definition
+     */
+    private static String getDefinitionStringForCase(String def,
+                                                     JavaExtendsListHolder holder) {
+        StringBuilder builder = new StringBuilder(def);
+        for (JavaQualifiedTypeInfoTranslator info : holder.getExtendsList()) {
+            if (!info.getClassInfo().equals(MODEL_OBJECT)) {
+                continue;
+            }
+            builder.append(info.getClassInfo() + COMMA + SPACE);
         }
         def = builder.toString();
         return trimAtLast(def, COMMA);

@@ -45,6 +45,7 @@ import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangMust;
 import org.onosproject.yang.compiler.datamodel.YangMustHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
@@ -302,6 +303,25 @@ public final class DataModelUtils {
         YangNode childNode = rootNode.getChild();
         while (childNode != null) {
             if (childNode instanceof YangRpc) {
+                return true;
+            }
+            childNode = childNode.getNextSibling();
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there is any rpc/notification defined in the module or
+     * sub-module.
+     *
+     * @param rootNode root node of the data model
+     * @return status of rpc/notification existence
+     */
+    public static boolean isRpcNotificationPresent(YangNode rootNode) {
+        YangNode childNode = rootNode.getChild();
+        while (childNode != null) {
+            if (childNode instanceof YangRpc ||
+                    childNode instanceof YangNotification) {
                 return true;
             }
             childNode = childNode.getNextSibling();

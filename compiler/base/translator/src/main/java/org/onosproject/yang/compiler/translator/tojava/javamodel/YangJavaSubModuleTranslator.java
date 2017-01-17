@@ -29,6 +29,8 @@ import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcNotificationPresent;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
@@ -145,8 +147,10 @@ public class YangJavaSubModuleTranslator
         }
         try {
             generateCodeOfRootNode(this, yangPlugin, subModulePkg);
-            tempFileHandle.getServiceTempFiles().addAugmentedRpcMethod(
-                    this);
+            if (isRpcChildNodePresent(this)) {
+                tempFileHandle.getServiceTempFiles().addAugmentedRpcMethod(
+                        this);
+            }
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
                                                       e.getLocalizedMessage()));
@@ -183,8 +187,10 @@ public class YangJavaSubModuleTranslator
                         .getCodeGenerateForSbi() == null ||
                         !getJavaFileInfo().getPluginConfig()
                                 .getCodeGenerateForSbi().equals(SBI)) {
-                    getTempJavaCodeFragmentFiles().generateJavaFile(
-                            GENERATE_SERVICE_AND_MANAGER, this);
+                    if (isRpcNotificationPresent(this)) {
+                        getTempJavaCodeFragmentFiles().generateJavaFile(
+                                GENERATE_SERVICE_AND_MANAGER, this);
+                    }
                 }
             }
 
