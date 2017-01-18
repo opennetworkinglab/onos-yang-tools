@@ -303,8 +303,8 @@ public class YangToolManager {
         yangNodeSortedList.addAll(yangNodeSet);
         sort(yangNodeSortedList);
         for (YangNode node : yangNodeSortedList) {
-            if (node.isToTranslate() && !(!((YangDeviationHolder) node)
-                    .isModuleForDeviation())) {
+            if (node.isToTranslate() && !((YangDeviationHolder) node)
+                    .isModuleForDeviation()) {
                 generateJavaCode(node, pluginConfig);
             }
         }

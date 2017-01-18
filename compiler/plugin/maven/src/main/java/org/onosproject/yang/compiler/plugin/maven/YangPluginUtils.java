@@ -18,7 +18,6 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.onosproject.yang.compiler.base.tool.YangToolManager;
@@ -30,13 +29,9 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
-import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
@@ -50,10 +45,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public final class YangPluginUtils {
 
     private static final Logger log = getLogger(YangPluginUtils.class);
-
-    private static final String TEXT_FILE_EXTENSION = ".txt";
-    private static final String VERSION_META_DATA = "VersionMetaData";
-    private static final String PLUGIN_ARTIFACT = "onos-yang-maven-plugin";
 
     private YangPluginUtils() {
     }
@@ -80,7 +71,6 @@ public final class YangPluginUtils {
      */
     static void copyYangFilesToTarget(String outputDir, MavenProject project)
             throws IOException {
-
         addToProjectResource(outputDir + SLASH + TEMP + SLASH, project);
     }
 
@@ -104,39 +94,6 @@ public final class YangPluginUtils {
         if (operation) {
             addToProjectResource(directory + SLASH + TEMP + SLASH, project);
         }
-
-        if (operation) {
-            addVersionMetaDataFile(project, serFileDirPath);
-        }
-    }
-
-    /**
-     * Adds version meta data files for YSR to know version of YANG tools.
-     *
-     * @param project maven project
-     * @param dir     directory
-     * @throws IOException when fails to do IO operations
-     */
-    private static void addVersionMetaDataFile(MavenProject project, String dir)
-            throws IOException {
-        List<Plugin> plugins = project.getBuildPlugins();
-        Iterator<Plugin> it = plugins.iterator();
-        Plugin plugin = it.next();
-        String data = EMPTY_STRING;
-        while (it.hasNext()) {
-            if (plugin.getArtifactId().equals(PLUGIN_ARTIFACT)) {
-                data = plugin.getGroupId() + COLON + plugin.getArtifactId()
-                        + COLON + plugin.getVersion();
-            }
-            plugin = it.next();
-        }
-        if (data.equals(EMPTY_STRING)) {
-            throw new IOException("Invalid artifact for " + PLUGIN_ARTIFACT);
-        }
-        String verFileName = dir + VERSION_META_DATA + TEXT_FILE_EXTENSION;
-        PrintWriter out = new PrintWriter(verFileName);
-        out.print(data);
-        out.close();
     }
 
     /**
