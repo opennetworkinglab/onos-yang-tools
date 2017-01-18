@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime;
+package org.onosproject.yang.runtime.api;
 
 import org.onosproject.yang.YangModel;
 
@@ -28,16 +28,18 @@ public interface YangModelRegistry {
     /**
      * Registers a new model.
      *
-     * @param model model to be registered
+     * @param param parameters having model to be registered with additional
+     *              informations provided by app
      */
-    void registerModel(YangModel model);
+    void registerModel(ModelRegistrationParam param);
 
     /**
      * Unregisters the specified model.
      *
-     * @param model model to be unregistered
+     * @param param parameters having model to be registered with additional
+     *              informations provided by app
      */
-    void unregisterModel(YangModel model);
+    void unregisterModel(ModelRegistrationParam param);
 
     /**
      * Returns collection of all registered models.
@@ -45,5 +47,4 @@ public interface YangModelRegistry {
      * @return collection of models
      */
     Set<YangModel> getModels();
-
 }
