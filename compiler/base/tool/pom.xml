@@ -62,6 +62,11 @@
             <artifactId>onos-yang-compiler-parser</artifactId>
             <version>1.12-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-yang-compiler-api</artifactId>
+            <version>1.12-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

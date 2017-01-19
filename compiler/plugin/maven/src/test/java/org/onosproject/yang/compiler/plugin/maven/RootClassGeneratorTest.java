@@ -18,29 +18,41 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit test case for root node's code generation.
  */
 public class RootClassGeneratorTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
 
     @Test
     public void rootClassGenTest() throws IOException, ParserException, MojoExecutionException {
         YangIoUtils.deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/singleChild";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -66,7 +78,13 @@ public class RootClassGeneratorTest {
     public void rootClassGenwithoutRevTest() throws IOException, ParserException, MojoExecutionException {
         YangIoUtils.deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/genwithoutrev";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -87,7 +105,13 @@ public class RootClassGeneratorTest {
     public void rootClassMethodGenTest() throws IOException, ParserException, MojoExecutionException {
         YangIoUtils.deleteDirectory("target/manager/");
         String searchDir = "src/test/resources/manager/MultiChild";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

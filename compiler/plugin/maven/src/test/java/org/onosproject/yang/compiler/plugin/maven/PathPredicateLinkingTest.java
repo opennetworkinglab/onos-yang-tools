@@ -31,21 +31,27 @@ import org.onosproject.yang.compiler.datamodel.YangPathPredicate;
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for path predicate linking in leaf-ref.
  */
 public class PathPredicateLinkingTest {
 
-    private final YangUtilManager utilMgr = new YangUtilManager();
+    private final YangCompilerManager utilMgr =
+            new YangCompilerManager();
     private final YangLinkerManager linkerMgr = new YangLinkerManager();
 
     @Rule
@@ -70,7 +76,12 @@ public class PathPredicateLinkingTest {
     public void processSimplePathPredicate() throws IOException {
 
         String searchDir = "src/test/resources/pathpredicate/simple";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -134,7 +145,12 @@ public class PathPredicateLinkingTest {
     public void processSimpleInterFilePathPredicate() throws IOException {
 
         String searchDir = "src/test/resources/pathpredicate/simpleinterfile";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangModule selfNode;
@@ -207,7 +223,12 @@ public class PathPredicateLinkingTest {
     public void processInterFilePathPredicateFromAugment() throws IOException {
 
         String searchDir = "src/test/resources/pathpredicate/interfileaugment";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangModule selfNode;
@@ -289,7 +310,12 @@ public class PathPredicateLinkingTest {
                         "/address/ip");
 
         String searchDir = "src/test/resources/pathpredicate/invalidlinking";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
 
@@ -317,7 +343,12 @@ public class PathPredicateLinkingTest {
                         "[ifname = current()/../ifname]/ifname");
 
         String searchDir = "src/test/resources/pathpredicate/invalidlinking2";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -346,7 +377,12 @@ public class PathPredicateLinkingTest {
                         "../../address/ifname]/address/ip");
 
         String searchDir = "src/test/resources/pathpredicate/invalidlinking3";
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
 

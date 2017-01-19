@@ -18,20 +18,27 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit test case for typedef translator.
  */
 public class TypeDefTranslatorTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private static final String DIR = "target/typedefTranslator/";
     private static final String DIR1 = System.getProperty("user.dir") + File
             .separator + DIR;
@@ -47,7 +54,12 @@ public class TypeDefTranslatorTest {
 
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/without";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -70,7 +82,12 @@ public class TypeDefTranslatorTest {
 
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/with";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -80,7 +97,6 @@ public class TypeDefTranslatorTest {
         utilManager.translateToJava(yangPluginConfig);
         YangPluginConfig.compileCode(DIR1);
         YangIoUtils.deleteDirectory(DIR);
-
     }
 
     /**
@@ -94,7 +110,12 @@ public class TypeDefTranslatorTest {
 
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/typedefTranslator/union";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

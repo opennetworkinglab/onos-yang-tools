@@ -62,11 +62,6 @@
             <artifactId>onos-yang-compiler-linker</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-datamodel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>
 

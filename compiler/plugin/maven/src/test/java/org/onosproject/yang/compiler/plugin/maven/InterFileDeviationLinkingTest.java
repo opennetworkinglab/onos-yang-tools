@@ -30,15 +30,19 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,6 +54,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT16;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.updateFilePriority;
 import static org.onosproject.yang.compiler.utils.io.YangPluginConfig.compileCode;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
 
 
@@ -59,7 +64,8 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDire
 public class InterFileDeviationLinkingTest {
 
     private static final String DIR = "target/deviationTest/";
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
@@ -72,7 +78,12 @@ public class InterFileDeviationLinkingTest {
             ParserException {
 
         String searchDir = "src/test/resources/deviationLinking";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -144,7 +155,6 @@ public class InterFileDeviationLinkingTest {
         // Check whether the node type is set properly to module.
         assertThat(selfNode.getNodeType(), is(MODULE_NODE));
 
-
         // Check whether the module name is set correctly.
         yangRefNode = (YangModule) refNode;
         assertThat(yangRefNode.getName(), is("Test2"));
@@ -186,7 +196,12 @@ public class InterFileDeviationLinkingTest {
             ParserException {
 
         String searchDir = "src/test/resources/deviationLinking";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -282,7 +297,12 @@ public class InterFileDeviationLinkingTest {
             ParserException {
 
         String searchDir = "src/test/resources/deviationLinking";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -386,7 +406,12 @@ public class InterFileDeviationLinkingTest {
             ParserException {
 
         String searchDir = "src/test/resources/deviationLinking";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -498,7 +523,12 @@ public class InterFileDeviationLinkingTest {
             ParserException {
 
         String searchDir = "src/test/resources/InvalidDeviation";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 

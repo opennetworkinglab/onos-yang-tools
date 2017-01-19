@@ -21,12 +21,17 @@ import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.isRootNodesCodeGenRequired;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit test case for java model utils.
@@ -34,23 +39,30 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class YangJavaModelUtilsTest {
 
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
 
     @Test
     public void isRootNodeContainsOnlyAugmentTest() throws IOException,
             ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyaugment";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
     }
@@ -59,14 +71,20 @@ public class YangJavaModelUtilsTest {
     public void isRootNodeCodeGenRequiredOnlyLeafTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyleaf";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
     }
@@ -75,14 +93,20 @@ public class YangJavaModelUtilsTest {
     public void isRootNodeCodeGenRequiredOnlyLeafListTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyleaflist";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
     }
@@ -91,17 +115,23 @@ public class YangJavaModelUtilsTest {
     public void isRootNodeCodeGenRequiredOnlyGroupingTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlygrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
     }
@@ -111,17 +141,23 @@ public class YangJavaModelUtilsTest {
     public void isRootNodeCodeGenRequiredOnlyTypeDefTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlytypdef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
     }
@@ -130,53 +166,68 @@ public class YangJavaModelUtilsTest {
     public void isRootNodeCodeGenRequiredNoGenTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/nogen";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
-
     }
 
     @Test
     public void isRootNodeCodeGenRequiredMixedTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/mixed";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
             if (node.getName().equals("test6")) {
-                assertThat(true, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(true, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
-
     }
 
     @Test
     public void isRootNodeCodeGenRequiredTypedefGroupingTest() throws IOException
             , ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/typedefgrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             if (node.getName().equals("test5")) {
-                assertThat(false, Is.is(YangJavaModelUtils.isRootNodesCodeGenRequired(node)));
+                assertThat(false, Is.is(isRootNodesCodeGenRequired(node)));
             }
         }
-
     }
 }

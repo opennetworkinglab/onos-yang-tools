@@ -1855,6 +1855,17 @@ public final class UtilConstants {
      */
     public static final String CAMEL_CLASS = "Class";
 
+	/*
+     * Default meta data path.
+     */
+    public static final String DEFAULT_JAR_RES_PATH = SLASH + TEMP + SLASH +
+            YANG_RESOURCES + SLASH;
+
+    /**
+     * Meta data file name.
+     */
+    public static final String YANG_META_DATA = "YangMetaData.ser";
+
     // No instantiation.
     private UtilConstants() {
     }

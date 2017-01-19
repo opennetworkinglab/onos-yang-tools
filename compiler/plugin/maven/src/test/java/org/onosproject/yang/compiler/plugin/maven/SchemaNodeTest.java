@@ -25,27 +25,33 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeContextInfo;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing YANG schema node.
  */
 public class SchemaNodeTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
 
     /**
      * Checks method to get schema node from map.
@@ -62,8 +68,12 @@ public class SchemaNodeTest {
 
         YangIoUtils.deleteDirectory("target/schemaMap/");
         String searchDir = "src/test/resources/schemaMap";
-        utilManager
-                .createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -198,8 +208,12 @@ public class SchemaNodeTest {
 
         YangIoUtils.deleteDirectory("target/schemaMap/");
         String searchDir = "src/test/resources/schemaMap";
-        utilManager
-                .createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

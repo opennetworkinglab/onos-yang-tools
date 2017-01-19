@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.base.tool;
+package org.onosproject.yang.compiler.tool;
 
 
 import org.onosproject.yang.compiler.datamodel.YangNode;

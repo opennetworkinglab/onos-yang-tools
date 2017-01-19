@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.base.tool;
-
 /**
- * Represents common constant utility for YANG tool.
+ * Compiler api implementation.
  */
-final class ToolConstants {
-    private ToolConstants() {
-
-    }
-
-    static final String E_MISSING_INPUT = "Missing extected input ";
-    static final String E_CODE_GEN_PATH = "Missing plugin code gen directory";
-}
+package org.onosproject.yang.compiler.tool.impl;

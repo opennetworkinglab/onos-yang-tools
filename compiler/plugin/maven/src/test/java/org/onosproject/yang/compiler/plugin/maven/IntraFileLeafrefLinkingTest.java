@@ -43,20 +43,25 @@ import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTyp
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing leafref intra file linking.
@@ -66,7 +71,9 @@ public class IntraFileLeafrefLinkingTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
 
@@ -78,7 +85,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/simpleleafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -141,7 +154,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefwithrpc";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -206,7 +225,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefwithrpcandgrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -274,7 +299,13 @@ public class IntraFileLeafrefLinkingTest {
                 "YANG file error: The target node, in the leafref path /networks/network-id, is invalid.");
 */
         String searchDir = "src/test/resources/leafreflinker/intrafile/invalidscenerioforgrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -315,7 +346,13 @@ public class IntraFileLeafrefLinkingTest {
         thrown.expectMessage(
                 "YANG file error: Unable to find base leaf/leaf-list for given leafref path /define/network-id");
         String searchDir = "src/test/resources/leafreflinker/intrafile/invalidsceneriowithinvalidnode";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -340,7 +377,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreflinking";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -404,7 +447,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefreferingtoleaflist";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -467,7 +516,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftoinputinrpc";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -528,7 +583,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefwithrefleafderived";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -593,7 +654,13 @@ public class IntraFileLeafrefLinkingTest {
         thrown.expectMessage(
                 "YANG file error: Unable to find base leaf/leaf-list for given leafref path /networks");
         String searchDir = "src/test/resources/leafreflinker/intrafile/invalidsceneriowithnorefleaf";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -616,7 +683,13 @@ public class IntraFileLeafrefLinkingTest {
     public void processSelfResolutionWhenLeafrefInTypedefReferToContainer()
             throws IOException, ParserException {
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefintypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -677,7 +750,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftorpcinputleaflist";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -740,7 +819,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftoleafrefwithtypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -803,7 +888,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftoleafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -863,7 +954,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftomultileafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -926,7 +1023,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftoderivedtype";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -986,7 +1089,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftomultitypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1049,7 +1158,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafreftotypedefwithleafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1111,7 +1226,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/simpleleafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1173,7 +1294,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/leafreftoinputwithgroupinginrpc";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1237,7 +1364,13 @@ public class IntraFileLeafrefLinkingTest {
         thrown.expectMessage(
                 "YANG file error: The target node, in the leafref path ../../../define/network-id, is invalid.");
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/invalidrelativeancestoraccess";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -1261,12 +1394,17 @@ public class IntraFileLeafrefLinkingTest {
     public void processSelfResolutionWhenLeafrefInModuleReferToInvalidNodeRelPath()
             throws IOException, ParserException {
 
-
         thrown.expect(LinkerException.class);
         thrown.expectMessage(
                 "YANG file error: Unable to find base leaf/leaf-list for given leafref path ../define/network-id");
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/invalidnode";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -1290,7 +1428,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/leafrefintypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1350,7 +1494,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/leafreftomultileafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1413,7 +1563,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/leafreftotypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1475,7 +1631,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/relativepath/pathlistener";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1573,7 +1735,13 @@ public class IntraFileLeafrefLinkingTest {
 
         String searchDir = "src/test/resources/leafreflinker/interfile" +
                 "/interfileleafrefreferstomultipleleafrefinmultiplefiles";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode refNode1 = null;
@@ -1637,7 +1805,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/iffeatuinleafref/simpleleafrefwithiffeature";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1707,7 +1881,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/iffeatuinleafref/featurebymultileafref";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1783,7 +1963,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefInAugment";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1850,7 +2036,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefinusesundergrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -1928,7 +2120,13 @@ public class IntraFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/intrafile/leafrefintypedefwithsamereferpath";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;

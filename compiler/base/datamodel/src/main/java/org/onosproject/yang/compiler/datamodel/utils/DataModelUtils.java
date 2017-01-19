@@ -872,6 +872,51 @@ public final class DataModelUtils {
     }
 
     /**
+     * Parses jar file and returns list of serialized file names.
+     *
+     * @param jarFile   jar file to be parsed
+     * @param directory directory where to search
+     * @return list of serialized files
+     * @throws IOException when fails to do IO operations
+     */
+    public static File parseDepSchemaPath(String jarFile, String directory)
+            throws IOException {
+        JarFile jar = new JarFile(jarFile);
+        Enumeration<?> enumEntries = jar.entries();
+        File serializedFile = null;
+        while (enumEntries.hasMoreElements()) {
+            JarEntry file = (JarEntry) enumEntries.nextElement();
+            if (file.getName().endsWith(".ser")) {
+
+                if (file.getName().contains(SLASH)) {
+                    String[] strArray = file.getName().split(SLASH);
+                    String tempPath = "";
+                    for (int i = 0; i < strArray.length - 1; i++) {
+                        tempPath = SLASH + tempPath + SLASH + strArray[i];
+                    }
+                    File dir = new File(directory + tempPath);
+                    dir.mkdirs();
+                }
+                serializedFile = new File(directory + SLASH + file.getName());
+                if (file.isDirectory()) {
+                    serializedFile.mkdirs();
+                    continue;
+                }
+                InputStream inputStream = jar.getInputStream(file);
+
+                FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
+                while (inputStream.available() > 0) {
+                    fileOutputStream.write(inputStream.read());
+                }
+                fileOutputStream.close();
+                inputStream.close();
+            }
+        }
+        jar.close();
+        return serializedFile;
+    }
+
+    /**
      * Validates the requested data-type resolve type in empty or not.
      *
      * @param dataType the data type

@@ -18,25 +18,30 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.datamodel.ResolvableType;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
-import org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
 import org.onosproject.yang.compiler.linker.impl.YangXpathLinker;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_AUGMENT;
+import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
 
 /**
  * Unit test cases for x-path linker.
@@ -46,7 +51,9 @@ public class YangXpathLinkerTest {
     private static final String INTRA_FILE_PATH = "src/test/resources/xPathLinker/IntraFile/";
     private static final String INTER_FILE_PATH = "src/test/resources/xPathLinker/InterFile/";
     private static final String CASE_FILE_PATH = "src/test/resources/xPathLinker/Case/";
-    private YangUtilManager utilManager = new YangUtilManager();
+
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private YangXpathLinker<?> linker = new YangXpathLinker();
     private YangLinkerManager linkerManager = new YangLinkerManager();
 
@@ -59,7 +66,12 @@ public class YangXpathLinkerTest {
     @Test
     public void processIntraFileLinkingSingleLevel() throws IOException, MojoExecutionException {
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraSingle/"));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH + "IntraSingle/")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -69,14 +81,15 @@ public class YangXpathLinkerTest {
 
         for (YangNode node : utilManager.getYangNodeSet()) {
             YangReferenceResolver ref = (YangReferenceResolver) node;
-            List<YangResolutionInfo> infos = ref.getUnresolvedResolutionList(ResolvableType.YANG_AUGMENT);
+            List<YangResolutionInfo> infos = ref.getUnresolvedResolutionList(YANG_AUGMENT);
             YangResolutionInfo info = infos.get(0);
 
-            YangAugment augment = (YangAugment) info.getEntityToResolveInfo().getEntityToResolve();
-            targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+            YangAugment augment = (YangAugment) info
+                    .getEntityToResolveInfo().getEntityToResolve();
+            targetNodeName = augment.getTargetNode().get(
+                    augment.getTargetNode().size() - 1).getNodeIdentifier()
                     .getName();
             targetNode = augment.getAugmentedNode();
-
         }
 
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
@@ -90,7 +103,12 @@ public class YangXpathLinkerTest {
     @Test
     public void processIntraFileLinkingMultipleLevel() throws IOException {
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraMulti/"));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH + "IntraMulti/")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -101,9 +119,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -117,7 +137,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileLinkingInAugmentSingleLevel() throws IOException {
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraSingleAugment/"));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH + "IntraSingleAugment/")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -128,9 +154,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(augment.getTargetNode(),
+                                                        node, AUGMENT_LINKING);
             }
         }
 
@@ -145,9 +173,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileMultiLevelWithoutPrefix() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraMultiAugment/withoutprefix/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(
-                INTRA_FILE_PATH + "IntraMultiAugment/withoutprefix"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -165,7 +197,7 @@ public class YangXpathLinkerTest {
                         .get(augment.getTargetNode().size() - 1)
                         .getNodeIdentifier().getName();
                 target = linker.processXpathLinking(augment.getTargetNode(),
-                                                    node, XpathLinkingTypes.AUGMENT_LINKING);
+                                                    node, AUGMENT_LINKING);
             }
         }
         assertThat(true, is(target.getName().equals(name)));
@@ -179,9 +211,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileWithPrefix() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraMultiAugment/withprefix/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(
-                INTRA_FILE_PATH + "IntraMultiAugment/withprefix"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -199,11 +235,10 @@ public class YangXpathLinkerTest {
                         .get(augment.getTargetNode().size() - 1)
                         .getNodeIdentifier().getName();
                 target = linker.processXpathLinking(augment.getTargetNode(),
-                                                    node, XpathLinkingTypes.AUGMENT_LINKING);
+                                                    node, AUGMENT_LINKING);
             }
         }
         assertThat(true, is(target.getName().equals(name)));
-
     }
 
     /**
@@ -214,9 +249,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileWithPartialPrefix() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraMultiAugment/withpartialprefix/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(
-                INTRA_FILE_PATH + "IntraMultiAugment/withpartialprefix"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -234,7 +273,7 @@ public class YangXpathLinkerTest {
                         .get(augment.getTargetNode().size() - 1)
                         .getNodeIdentifier().getName();
                 target = linker.processXpathLinking(augment.getTargetNode(),
-                                                    node, XpathLinkingTypes.AUGMENT_LINKING);
+                                                    node, AUGMENT_LINKING);
             }
         }
         assertThat(true, is(target.getName().equals(name)));
@@ -247,7 +286,14 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileLinkingInSubModuleSingleLevel() throws IOException {
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraSingleSubModule/"));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraSingleSubModule/")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -261,9 +307,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking
+                        (augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -277,8 +325,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileLinkingInSubModuleMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraMultiSubModule/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraMultiSubModule/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -292,9 +345,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -308,8 +363,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileLinkingInUsesSingleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraSingleUses/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraSingleUses/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -323,9 +383,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -339,8 +401,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processIntraFileLinkingInUsesMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTRA_FILE_PATH +
+                                                "IntraMultiUses/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTRA_FILE_PATH + "IntraMultiUses/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -354,9 +421,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -370,8 +439,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingSingleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterSingle/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterSingle/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -384,9 +458,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -400,8 +476,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingMultipleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMulti/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMulti/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -414,9 +495,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -430,8 +513,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInAugmentSingleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterSingleAugment/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterSingleAugment/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -444,9 +532,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -460,8 +550,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInAugmentMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMultiAugment/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMultiAugment/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -474,9 +569,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -490,8 +587,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processMultiInterFileLinkingInAugmentSingleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMultiFileAugment/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMultiFileAugment/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -504,9 +606,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -520,9 +624,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processMultiInterFileLinkingInAugmentMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMultiFileAugmentMulti/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager
-                .createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMultiFileAugmentMulti/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -539,7 +647,8 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
                 targetNode = augment.getAugmentedNode();
             }
@@ -555,8 +664,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInSubModuleSingleLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterSingleSubModule/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterSingleSubModule/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -572,7 +686,8 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
                 targetNode = augment.getAugmentedNode();
             }
@@ -588,8 +703,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInSubModuleMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMultiSubModule/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMultiSubModule/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -605,7 +725,8 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
                 targetNode = augment.getAugmentedNode();
             }
@@ -621,8 +742,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInUsesInAugment() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterSingleUses/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterSingleUses/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -639,14 +765,14 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1)
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1)
                         .getNodeIdentifier().getName();
                 targetNode = augment.getAugmentedNode();
             }
         }
 
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
-
     }
 
     /**
@@ -656,8 +782,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInUsesMultiLevel() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(INTER_FILE_PATH +
+                                                "InterMultiUses/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(INTER_FILE_PATH + "InterMultiUses/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -673,9 +804,11 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1).getNodeIdentifier()
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, XpathLinkingTypes.AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(
+                        augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 
@@ -689,8 +822,13 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInMultipleSubmodules() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(CASE_FILE_PATH +
+                                                "submodule/")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(CASE_FILE_PATH + "submodule/"));
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -708,14 +846,14 @@ public class YangXpathLinkerTest {
             List<YangAugment> augments = linker.getListOfYangAugment(node);
 
             for (YangAugment augment : augments) {
-                targetNodeName = augment.getTargetNode().get(augment.getTargetNode().size() - 1)
+                targetNodeName = augment.getTargetNode().get(
+                        augment.getTargetNode().size() - 1)
                         .getNodeIdentifier().getName();
                 targetNode = augment.getAugmentedNode();
             }
         }
 
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
-
     }
 
     /**
@@ -725,9 +863,14 @@ public class YangXpathLinkerTest {
      */
     @Test
     public void processInterFileLinkingInMultipleUses() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(CASE_FILE_PATH +
+                                                "uses/")) {
+            paths.add(Paths.get(file));
+        }
 
-        YangIoUtils.deleteDirectory("target/xpath/");
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(CASE_FILE_PATH + "uses/"));
+        utilManager.createYangFileInfoSet(paths);
+        deleteDirectory("target/xpath/");
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         linkerManager.createYangNodeSet(utilManager.getYangNodeSet());
@@ -755,7 +898,7 @@ public class YangXpathLinkerTest {
         utilManager.translateToJava(yangPluginConfig);
         String dir = System.getProperty("user.dir") + File.separator + "target/xpath/";
         YangPluginConfig.compileCode(dir);
-        YangIoUtils.deleteDirectory("target/xpath/");
+        deleteDirectory("target/xpath/");
         assertThat(true, is(targetNode.getName().equals(targetNodeName)));
     }
 }

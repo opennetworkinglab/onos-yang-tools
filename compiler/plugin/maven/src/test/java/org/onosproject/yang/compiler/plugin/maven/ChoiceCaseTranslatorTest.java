@@ -21,14 +21,19 @@ import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit tests for choice-case translator.
@@ -37,7 +42,7 @@ public final class ChoiceCaseTranslatorTest {
     private static final String DIR = "target/ChoiceCaseTestGenFile/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager = new YangCompilerManager();
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
 
     /**
@@ -69,7 +74,13 @@ public final class ChoiceCaseTranslatorTest {
             ParserException, MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/choiceTranslator";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

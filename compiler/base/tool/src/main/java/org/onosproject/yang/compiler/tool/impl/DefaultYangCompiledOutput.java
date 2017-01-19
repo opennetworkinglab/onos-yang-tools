@@ -1,0 +1,84 @@
+/*
+ * Copyright 2017-present Open Networking Laboratory
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.onosproject.yang.compiler.tool.impl;
+
+import org.onosproject.yang.YangModel;
+import org.onosproject.yang.compiler.api.YangCompiledOutput;
+
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Set;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Represents default YANG compiled output implementation.
+ */
+public class DefaultYangCompiledOutput implements YangCompiledOutput {
+
+    private final YangModel model;
+    private final Set<Path> generatedJava;
+
+    /**
+     * Creates an instance of YANG compiled output.
+     *
+     * @param model         YANG model
+     * @param generatedJava generated java paths
+     */
+    public DefaultYangCompiledOutput(YangModel model, Set<Path> generatedJava) {
+        checkNotNull(model);
+        checkNotNull(generatedJava);
+        this.model = model;
+        this.generatedJava = generatedJava;
+    }
+
+    @Override
+    public YangModel getYangModel() {
+        return model;
+    }
+
+    @Override
+    public Set<Path> getGeneratedJava() {
+        return generatedJava;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, generatedJava);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        DefaultYangCompiledOutput that = (DefaultYangCompiledOutput) obj;
+        return generatedJava.size() == that.generatedJava.size() &&
+                generatedJava.containsAll(that.generatedJava) &&
+                Objects.equals(model, that.model);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("yangModel", model)
+                .add("generatedJava", generatedJava)
+                .toString();
+    }
+}

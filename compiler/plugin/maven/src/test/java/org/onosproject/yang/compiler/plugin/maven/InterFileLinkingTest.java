@@ -37,15 +37,19 @@ import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,6 +57,7 @@ import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing inter file linking.
@@ -63,7 +68,9 @@ public class InterFileLinkingTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
-    private final YangUtilManager utilManager = new YangUtilManager();
+
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
 
     /**
@@ -74,7 +81,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfiletype";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -146,7 +159,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileuses";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -218,7 +237,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfiletypewithinclude";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -293,7 +318,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileuseswithinclude";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -368,7 +399,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfiletypewithrevision";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -440,7 +477,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfiletypewithrevisioninname";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -512,7 +555,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/hierarchicalinterfiletype";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -583,7 +632,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/hierarchicalintrawithinterfiletype";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -651,7 +706,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilewithusesreferringtype";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -661,7 +722,6 @@ public class InterFileLinkingTest {
         utilManager.translateToJava(yangPluginConfig);
 
         YangIoUtils.deleteDirectory("target/interfilewithusesreferringtype/");
-
     }
 
     /**
@@ -672,7 +732,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/file1UsesFile2TypeDefFile3Type";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -684,7 +750,6 @@ public class InterFileLinkingTest {
                 + "target/file1UsesFile2TypeDefFile3Type/";
         YangPluginConfig.compileCode(dir1);
         YangIoUtils.deleteDirectory("target/file1UsesFile2TypeDefFile3Type/");
-
     }
 
     /**
@@ -696,7 +761,13 @@ public class InterFileLinkingTest {
 
         YangIoUtils.deleteDirectory("target/interfileietf/");
         String searchDir = "src/test/resources/interfileietf";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -706,7 +777,6 @@ public class InterFileLinkingTest {
         utilManager.translateToJava(yangPluginConfig);
 
         YangIoUtils.deleteDirectory("target/interfileietf/");
-
     }
 
     /**
@@ -717,7 +787,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/usesInContainer";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -727,7 +803,6 @@ public class InterFileLinkingTest {
         utilManager.translateToJava(yangPluginConfig);
 
         YangIoUtils.deleteDirectory("target/usesInContainer/");
-
     }
 
     /**
@@ -738,7 +813,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/groupingNodeSameAsModule";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -750,7 +831,6 @@ public class InterFileLinkingTest {
                 + "target/groupingNodeSameAsModule/";
         YangPluginConfig.compileCode(dir1);
         YangIoUtils.deleteDirectory("target/groupingNodeSameAsModule/");
-
     }
 
     /**
@@ -761,7 +841,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilepriority";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -809,7 +895,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/usesInsideChildOfGrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -865,7 +957,13 @@ public class InterFileLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interFileUsesInsideChildOfGrouping";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 

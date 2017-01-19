@@ -18,20 +18,27 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing YANG schema node.
  */
 public class IncludeReferenceWithPrefix {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
 
     /**
      * Checks method to get schema node from map.
@@ -44,7 +51,12 @@ public class IncludeReferenceWithPrefix {
         String dir = "target/refincludecontentwithprefix/";
         YangIoUtils.deleteDirectory(dir);
         String searchDir = "src/test/resources/refincludecontentwithprefix";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

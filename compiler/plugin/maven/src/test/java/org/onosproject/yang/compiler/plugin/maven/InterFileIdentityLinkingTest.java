@@ -32,27 +32,33 @@ import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.updateFilePriority;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing inter file linking for identity.
  */
 public class InterFileIdentityLinkingTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
 
     @Rule
@@ -66,7 +72,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentityimport";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -140,7 +151,6 @@ public class InterFileIdentityLinkingTest {
         assertThat(yangIdentityRef.getBaseIdentity().getName(), is("ref-address-family"));
         assertThat(yangIdentityRef.getReferredIdentity().getName(), is("ref-address-family"));
         assertThat(yangIdentityRef.getResolvableStatus(), is(ResolvableStatus.RESOLVED));
-
     }
 
     @Test
@@ -148,7 +158,12 @@ public class InterFileIdentityLinkingTest {
 
         YangIoUtils.deleteDirectory("target/identityTranslator/");
         String searchDir = "src/test/resources/interfileidentityimport";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -169,7 +184,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentityinlude";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -259,7 +279,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentityimportdependency";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -343,7 +368,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentityincludedependency";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -436,7 +466,12 @@ public class InterFileIdentityLinkingTest {
         thrown.expectMessage("YANG file error: Unable to find base identity for given base");
 
         String searchDir = "src/test/resources/interfileidentityimportdependencyUndefined";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -467,7 +502,12 @@ public class InterFileIdentityLinkingTest {
         thrown.expectMessage("YANG file error: Unable to find base identity for given base");
 
         String searchDir = "src/test/resources/interfileidentityincludedependencyUndefined";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -498,7 +538,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentitytypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -593,7 +638,12 @@ public class InterFileIdentityLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfileidentitytypedef";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 

@@ -18,20 +18,27 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit test case for process sub tree code generation test.
  */
 public class ProcessSubTreeCodeGenTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private static final String DIR = "target/pstf/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
@@ -46,7 +53,13 @@ public class ProcessSubTreeCodeGenTest {
 
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/pstcodegen";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -57,5 +70,4 @@ public class ProcessSubTreeCodeGenTest {
         YangPluginConfig.compileCode(COMP);
         YangIoUtils.deleteDirectory(DIR);
     }
-
 }

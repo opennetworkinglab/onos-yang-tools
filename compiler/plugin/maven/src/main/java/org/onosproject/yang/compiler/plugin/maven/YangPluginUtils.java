@@ -20,29 +20,28 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
-import org.onosproject.yang.compiler.base.tool.YangToolManager;
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.slf4j.Logger;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.parseDepSchemaPath;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
-import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents YANG plugin utilities.
  */
-public final class YangPluginUtils {
+final class YangPluginUtils {
 
     private static final Logger log = getLogger(YangPluginUtils.class);
 
@@ -63,40 +62,6 @@ public final class YangPluginUtils {
     }
 
     /**
-     * Copies YANG files to the current project's output directory.
-     *
-     * @param outputDir project's output directory
-     * @param project   maven project
-     * @throws IOException when fails to copy files to destination resource directory
-     */
-    static void copyYangFilesToTarget(String outputDir, MavenProject project)
-            throws IOException {
-        addToProjectResource(outputDir + SLASH + TEMP + SLASH, project);
-    }
-
-    /**
-     * Serializes data-model.
-     *
-     * @param directory base directory for serialized files
-     * @param project   maven project
-     * @param operation true if need to add to resource
-     * @throws IOException when fails to do IO operations
-     */
-    public static void serializeDataModel(String directory,
-                                          MavenProject project,
-                                          boolean operation)
-            throws IOException {
-
-        String serFileDirPath = directory + YangToolManager.DEFAULT_JAR_RES_PATH;
-        File dir = new File(serFileDirPath);
-        dir.mkdirs();
-
-        if (operation) {
-            addToProjectResource(directory + SLASH + TEMP + SLASH, project);
-        }
-    }
-
-    /**
      * Returns list of jar path.
      *
      * @param project         maven project
@@ -104,8 +69,9 @@ public final class YangPluginUtils {
      * @param remoteRepos     remote repository
      * @return list of jar paths
      */
-    private static List<String> resolveDependencyJarPath(MavenProject project, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepos) {
+    private static List<String> resolveDependencyJarPath(
+            MavenProject project, ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepos) {
 
         StringBuilder path = new StringBuilder();
         List<String> jarPaths = new ArrayList<>();
@@ -114,7 +80,7 @@ public final class YangPluginUtils {
             Dependency dependency = (Dependency) obj;
             path.append(localRepository.getBasedir());
             path.append(SLASH);
-            path.append(YangIoUtils.getPackageDirPathFromJavaJPackage(dependency.getGroupId()));
+            path.append(getPackageDirPathFromJavaJPackage(dependency.getGroupId()));
             path.append(SLASH);
             path.append(dependency.getArtifactId());
             path.append(SLASH);
@@ -141,23 +107,29 @@ public final class YangPluginUtils {
      * @param localRepository local maven repository
      * @param remoteRepos     list of remote repository
      * @param directory       directory for serialized files
-     * @return list of resolved datamodel nodes
+     * @return list of resolved serialized file paths
      * @throws IOException when fails to do IO operations
      */
-    static List<YangNode> resolveInterJarDependencies(MavenProject project, ArtifactRepository localRepository,
-                                                      List<ArtifactRepository> remoteRepos, String directory)
+    static List<Path> resolveInterJarDependencies(MavenProject project,
+                                                  ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepos,
+                                                  String directory)
             throws IOException {
 
-        List<String> dependenciesJarPaths = resolveDependencyJarPath(project, localRepository, remoteRepos);
-        List<YangNode> resolvedDataModelNodes = new ArrayList<>();
-        for (String dependency : dependenciesJarPaths) {
-            resolvedDataModelNodes.addAll(DataModelUtils.parseJarFile(dependency, directory));
+        List<String> depJars = resolveDependencyJarPath(
+                project, localRepository, remoteRepos);
+        List<Path> serFilePaths = new ArrayList<>();
+        for (String dependency : depJars) {
+            File path = parseDepSchemaPath(dependency, directory);
+            if (path != null) {
+                serFilePaths.add(Paths.get(path.getAbsolutePath()));
+            }
         }
-        return resolvedDataModelNodes;
+        return serFilePaths;
     }
 
     /* Adds directory to resources of project */
-    private static void addToProjectResource(String dir, MavenProject project) {
+    static void addToProjectResource(String dir, MavenProject project) {
         Resource rsc = new Resource();
         rsc.setDirectory(dir);
         project.addResource(rsc);

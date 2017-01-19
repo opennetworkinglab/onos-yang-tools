@@ -22,28 +22,34 @@ import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.updateFilePriority;
 import static org.onosproject.yang.compiler.utils.io.YangPluginConfig.compileCode;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
+
 
 /**
  * Translator test case for identity.
  */
 public class IdentityTranslatorTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private static final String DIR = "target/identity/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
@@ -58,7 +64,12 @@ public class IdentityTranslatorTest {
             ParserException, MojoExecutionException {
         deleteDirectory(DIR);
         String searchDir = "src/test/resources/identityTranslator";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -80,7 +91,12 @@ public class IdentityTranslatorTest {
             ParserException, MojoExecutionException {
         deleteDirectory(DIR);
         String searchDir = "src/test/resources/multipleIdentity";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 

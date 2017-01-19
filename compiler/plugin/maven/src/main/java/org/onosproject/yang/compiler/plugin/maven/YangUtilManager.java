@@ -25,44 +25,28 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.onosproject.yang.compiler.datamodel.YangDeviationHolder;
-import org.onosproject.yang.compiler.parser.YangUtilsParser;
-import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
-import org.onosproject.yang.compiler.base.tool.CallablePlugin;
-import org.onosproject.yang.compiler.base.tool.YangFileInfo;
-import org.onosproject.yang.compiler.base.tool.YangToolManager;
-import org.onosproject.yang.compiler.base.tool.exception.YangToolException;
-import org.onosproject.yang.compiler.datamodel.ResolvableType;
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
-import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.linker.YangLinker;
-import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
-import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
-import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
+import org.onosproject.yang.compiler.api.YangCompilationParam;
+import org.onosproject.yang.compiler.api.YangCompiledOutput;
+import org.onosproject.yang.compiler.api.YangCompilerException;
+import org.onosproject.yang.compiler.api.YangCompilerService;
+import org.onosproject.yang.compiler.tool.impl.DefaultYangCompilationParam;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
 
-import static java.util.Collections.sort;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PROCESS_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
-import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.resolveGroupingInDefinationScope;
 import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.addToCompilationRoot;
-import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.copyYangFilesToTarget;
+import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.addToProjectResource;
 import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.resolveInterJarDependencies;
-import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.serializeDataModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_BASE_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_JAR_RES_PATH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
-import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VERSION_ERROR;
@@ -81,29 +65,23 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getVersion
  */
 @Mojo(name = "yang2java", defaultPhase = PROCESS_SOURCES,
         requiresDependencyResolution = COMPILE)
-public class YangUtilManager extends AbstractMojo implements CallablePlugin {
+public class YangUtilManager extends AbstractMojo {
 
-    private static final String DEFAULT_PKG =
-            getPackageDirPathFromJavaJPackage(DEFAULT_BASE_PKG);
     private static final int SUPPORTED_VERSION = 339;
-    private final YangPluginConfig yangPlugin = new YangPluginConfig();
-    private final YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
-    private final YangLinker yangLinker = new YangLinkerManager();
-    private final Set<YangNode> yangNodeSet = new HashSet<>();
-    private YangNode rootNode;
-    // YANG file information set.
-    private Set<YangFileInfo> yangFileInfoSet = new HashSet<>();
-    private YangFileInfo curYangFileInfo = new YangFileInfo();
+    private String codeGenDir;
+    private YangCompiledOutput output;
+
     /**
      * Source directory for YANG files.
      */
-    @Parameter(property = "yangFilesDir", defaultValue = "src/main/yang")
+    @Parameter(property = "yangFilesDir", defaultValue = "src/main/yang/")
     private String yangFilesDir;
 
     /**
      * Source directory for generated files.
      */
-    @Parameter(property = "classFileDir", defaultValue = "target/generated-sources")
+    @Parameter(property = "classFileDir", defaultValue =
+            "target/generated-sources/")
     private String classFileDir;
 
     /**
@@ -127,36 +105,6 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
     private MavenProject project;
 
     /**
-     * Replacement required for period special character in the identifier.
-     */
-    @Parameter(property = "replacementForPeriod")
-    private String replacementForPeriod;
-
-    /**
-     * Replacement required for underscore special character in the identifier.
-     */
-    @Parameter(property = "replacementForUnderscore")
-    private String replacementForUnderscore;
-
-    /**
-     * Replacement required for hyphen special character in the identifier.
-     */
-    @Parameter(property = "replacementForHyphen")
-    private String replacementForHyphen;
-
-    /**
-     * Prefix which is required for adding with the identifier.
-     */
-    @Parameter(property = "prefixForIdentifier")
-    private String prefixForIdentifier;
-
-    /**
-     * Build context.
-     */
-    @Component
-    private BuildContext context;
-
-    /**
      * Local maven repository.
      */
     @Parameter(readonly = true, defaultValue = "${localRepository}")
@@ -169,10 +117,10 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
     private List<ArtifactRepository> remoteRepository;
 
     /**
-     * Code generation is for nbi or sbi.
+     * Build context.
      */
-    @Parameter(property = "generateJavaFileForSbi", defaultValue = "nbi")
-    private String generateJavaFileForSbi;
+    @Component
+    private BuildContext context;
 
     /**
      * The Runtime information for the current instance of Maven.
@@ -186,13 +134,12 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
     @Parameter(defaultValue = "maven.version")
     private String versionProperty;
 
-    private String outputDir;
-    private String codeGenDir;
-
     @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException {
 
+        String metaDataGenDir;
+        String outputDir;
         try {
             validateMavenVersion();
             /*
@@ -202,44 +149,46 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
             deleteDirectory(outputDir + SLASH + TEMP);
             deleteDirectory(outputDir + SLASH + YANG_RESOURCES);
             String searchDir = getDirectory(baseDir, yangFilesDir);
+
+            //Get the code gen directory.
             codeGenDir = getDirectory(baseDir, classFileDir) + SLASH;
+            //Get the meta data gen directory.
+            metaDataGenDir = outputDir + SLASH + DEFAULT_JAR_RES_PATH;
 
-            // Creates conflict resolver and set values to it.
-            YangToJavaNamingConflictUtil conflictResolver = new YangToJavaNamingConflictUtil();
-            conflictResolver.setReplacementForPeriod(replacementForPeriod);
-            conflictResolver.setReplacementForHyphen(replacementForHyphen);
-            conflictResolver.setReplacementForUnderscore(replacementForUnderscore);
-            conflictResolver.setPrefixForIdentifier(prefixForIdentifier);
-            yangPlugin.setCodeGenDir(codeGenDir);
-            yangPlugin.setConflictResolver(conflictResolver);
+            //Yang compiler service.
+            YangCompilerService compiler = new YangCompilerManager();
 
-            yangPlugin.resourceGenDir(outputDir + YangToolManager.DEFAULT_JAR_RES_PATH);
-            yangPlugin.setCodeGenerateForSbi(generateJavaFileForSbi.toLowerCase());
+            //Need to get dependent schema paths to give inter jar dependencies.
+            List<Path> depSchemas = resolveInterJarDependencies(
+                    project, localRepository, remoteRepository, outputDir);
 
-            /*
-             * Obtain the YANG files at a path mentioned in plugin and creates
-             * YANG file information set.
-             */
+            //Create compiler param.
+            YangCompilationParam param = new DefaultYangCompilationParam();
+            param.setCodeGenDir(Paths.get(codeGenDir));
+            param.setMetadataGenDir(Paths.get(metaDataGenDir));
 
-            YangToolManager toolManager = new YangToolManager();
+            for (Path path : depSchemas) {
+                param.addDependentSchema(path);
+            }
 
-            yangFileInfoSet = toolManager.createYangFileInfoSet(
-                    getYangFiles(searchDir));
-            List<YangNode> interJarResolvedNodes =
-                    resolveInterJarDependencies(project, localRepository,
-                                                remoteRepository, outputDir);
-            toolManager.compileYangFiles(yangFileInfoSet,
-                                         interJarResolvedNodes, yangPlugin,
-                                         this);
-        } catch (YangToolException e) {
+            for (String file : getYangFiles(searchDir)) {
+                param.addYangFile(Paths.get(file));
+            }
+
+            //Compile yang files and generate java code.
+            output = compiler.compileYangFiles(param);
+
+            addToCompilationRoot(codeGenDir, project, context);
+            addToProjectResource(outputDir + SLASH + TEMP + SLASH, project);
+        } catch (YangCompilerException e) {
             String fileName = EMPTY_STRING;
-            if (e.getCurYangFile() != null) {
-                fileName = e.getCurYangFile().getYangFileName();
+            if (e.getYangFile() != null) {
+                fileName = e.getYangFile().toString();
             }
             try {
-                deleteDirectory(codeGenDir + DEFAULT_PKG);
+                deleteDirectory(codeGenDir + getPackageDirPathFromJavaJPackage(
+                        DEFAULT_BASE_PKG));
             } catch (IOException ex) {
-                e.printStackTrace();
                 throw new MojoExecutionException(
                         "Error handler failed to delete files for data model node.");
             }
@@ -263,170 +212,5 @@ public class YangUtilManager extends AbstractMojo implements CallablePlugin {
         if (getVersionValue(version) < SUPPORTED_VERSION) {
             throw new MojoExecutionException(VERSION_ERROR + version);
         }
-    }
-
-    /**
-     * Returns the YANG node set.
-     *
-     * @return YANG node set
-     */
-    public Set<YangNode> getYangNodeSet() {
-        return yangNodeSet;
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Links all the provided with the YANG file info set.
-     *
-     * @throws MojoExecutionException a violation in mojo execution
-     */
-    public void resolveDependenciesUsingLinker()
-            throws MojoExecutionException {
-        createYangNodeSet();
-        try {
-            yangLinker.resolveDependencies(yangNodeSet);
-        } catch (LinkerException e) {
-            printLog(e.getFileName(), e.getLineNumber(), e.getCharPositionInLine(),
-                     e.getMessage(), e.getLocalizedMessage());
-            throw new MojoExecutionException(e.getMessage());
-        }
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Creates YANG nodes set.
-     */
-    public void createYangNodeSet() {
-        for (YangFileInfo yangFileInfo : yangFileInfoSet) {
-            yangNodeSet.add(yangFileInfo.getRootNode());
-        }
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Parses all the provided YANG files and generates YANG data model tree.
-     *
-     * @throws IOException a violation in IO
-     */
-    public void parseYangFileInfoSet()
-            throws IOException {
-        for (YangFileInfo yangFileInfo : yangFileInfoSet) {
-            curYangFileInfo = yangFileInfo;
-            if (yangFileInfo.isForTranslator()) {
-                try {
-                    YangNode yangNode = yangUtilsParser.getDataModel(
-                            yangFileInfo.getYangFileName());
-                    yangFileInfo.setRootNode(yangNode);
-                    rootNode = yangNode;
-                    resolveGroupingInDefinationScope((YangReferenceResolver) yangNode);
-                    try {
-                        ((YangReferenceResolver) yangNode)
-                                .resolveSelfFileLinking(ResolvableType.YANG_DERIVED_DATA_TYPE);
-                        ((YangReferenceResolver) yangNode)
-                                .resolveSelfFileLinking(ResolvableType.YANG_IDENTITYREF);
-                    } catch (DataModelException e) {
-                        printLog(e.getFileName(), e.getLineNumber(), e
-                                .getCharPositionInLine(), e.getMessage(), e
-                                         .getLocalizedMessage());
-                    }
-                } catch (ParserException e) {
-                    printLog(e.getFileName(), e.getLineNumber(), e
-                            .getCharPositionInLine(), e.getMessage(), e
-                                     .getLocalizedMessage());
-                    throw e;
-                }
-            }
-        }
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Translates to java code corresponding to the YANG schema.
-     *
-     * @param yangPlugin YANG plugin config
-     * @throws IOException when fails to generate java code file the current node
-     */
-    public void translateToJava(YangPluginConfig yangPlugin)
-            throws IOException {
-        List<YangNode> yangNodeSortedList = new LinkedList<>();
-        yangNodeSortedList.addAll(yangNodeSet);
-        sort(yangNodeSortedList);
-        for (YangNode node : yangNodeSortedList) {
-            if (node.isToTranslate() && (!((YangDeviationHolder) node)
-                    .isModuleForDeviation())) {
-                JavaCodeGeneratorUtil.generateJavaCode(node, yangPlugin);
-            }
-        }
-    }
-
-    /**
-     * Creates a YANG file info set.
-     *
-     * @param yangFileList YANG files list
-     */
-    public void createYangFileInfoSet(List<String> yangFileList) {
-        for (String yangFile : yangFileList) {
-            YangFileInfo yangFileInfo = new YangFileInfo();
-            yangFileInfo.setYangFileName(yangFile);
-            yangFileInfoSet.add(yangFileInfo);
-        }
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Returns the YANG file info set.
-     *
-     * @return the YANG file info set
-     */
-    public Set<YangFileInfo> getYangFileInfoSet() {
-        return yangFileInfoSet;
-    }
-
-    /**
-     * TODO: Delete me and use the tool code for UT test cases
-     * Sets the YANG file info set.
-     *
-     * @param yangFileInfoSet the YANG file info set
-     */
-    void setYangFileInfoSet(Set<YangFileInfo> yangFileInfoSet) {
-        this.yangFileInfoSet = yangFileInfoSet;
-    }
-
-    /**
-     * Adds log info for exception.
-     *
-     * @param fileName file name
-     * @param line     line number
-     * @param position character position
-     * @param msg      error message
-     * @param localMsg local message
-     */
-    private void printLog(String fileName, int line, int position, String
-            msg, String localMsg) {
-        String logInfo = "Error in file: " + fileName;
-        if (line != 0) {
-            logInfo = logInfo + " at line: " + line + " at position: "
-                    + position;
-        }
-        if (msg != null) {
-            logInfo = logInfo + NEW_LINE + localMsg;
-        }
-        getLog().info(logInfo);
-    }
-
-    @Override
-    public void addGeneratedCodeToBundle() {
-        addToCompilationRoot(codeGenDir, project, context);
-    }
-
-
-    @Override
-    public void addCompiledSchemaToBundle() throws IOException {
-        serializeDataModel(outputDir, project, true);
-    }
-
-    @Override
-    public void addYangFilesToBundle() throws IOException {
-        copyYangFilesToTarget(outputDir, project);
     }
 }

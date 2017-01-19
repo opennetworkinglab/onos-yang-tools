@@ -18,21 +18,26 @@ package org.onosproject.yang.compiler.plugin.maven.ietfyang;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.plugin.maven.YangUtilManager;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing IETF YANG files.
  */
 public class IetfYangFileTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager = new YangCompilerManager();
 
     /**
      * Checks hierarchical intra with inter file type linking.
@@ -45,7 +50,12 @@ public class IetfYangFileTest {
         String dir = "target/ietfyang/l3vpnservice/";
         YangIoUtils.deleteDirectory(dir);
         String searchDir = "src/test/resources/ietfyang/l3vpnservice";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.resolveDependenciesUsingLinker();
 
@@ -57,5 +67,4 @@ public class IetfYangFileTest {
         YangPluginConfig.compileCode(dir1);
         YangIoUtils.deleteDirectory("target/ietfyang/");
     }
-
 }

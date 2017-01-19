@@ -19,15 +19,21 @@ package org.onosproject.yang.compiler.plugin.maven;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
-import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Unit tests for union translator.
@@ -38,6 +44,8 @@ public final class UnionTranslatorTest {
     private static final String DIR = "target/unionTranslator/";
     private static final String DIR1 = System.getProperty("user.dir") + File
             .separator + DIR;
+
+    YangCompilerManager utilManager = new YangCompilerManager();
 
     /**
      * Checks union translation should not result in any exception.
@@ -66,8 +74,13 @@ public final class UnionTranslatorTest {
     public void processUnionIntUintConflictingTypes() throws IOException, MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/intuint";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -91,8 +104,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/uintint";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -116,8 +134,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/longulong";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -141,8 +164,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/ulonglong";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -166,8 +194,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/intuintulonglong";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -191,8 +224,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/intuintulonglongstring";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -216,8 +254,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/intuintstring";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
@@ -241,8 +284,13 @@ public final class UnionTranslatorTest {
             MojoExecutionException {
         YangIoUtils.deleteDirectory(DIR);
         String searchDir = "src/test/resources/unionTranslator/unionwithbinary";
-        YangUtilManager utilManager = new YangUtilManager();
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();

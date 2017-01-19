@@ -34,12 +34,16 @@ import org.onosproject.yang.compiler.datamodel.YangUnion;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -47,6 +51,7 @@ import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for type linking after cloning happens grouping.
@@ -74,8 +79,8 @@ public class TypeLinkingAfterCloningTest {
     private static final String BASE2 = "id1";
     private static final String DIR =
             "src/test/resources/typelinkingaftercloning/";
-
-    private final YangUtilManager utilMgr = new YangUtilManager();
+    private final YangCompilerManager utilMgr =
+            new YangCompilerManager();
     private final YangLinkerManager linkerMgr = new YangLinkerManager();
 
     @Rule
@@ -155,7 +160,12 @@ public class TypeLinkingAfterCloningTest {
     @Test
     public void processLeafRefAfterCloning() throws IOException {
 
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "leafref/intrafile"));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "leafref/intrafile")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -249,11 +259,17 @@ public class TypeLinkingAfterCloningTest {
      */
     @Test
     public void processInvalidLeafRef() throws IOException {
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "leafref/invalid")) {
+            paths.add(Paths.get(file));
+        }
+
+        utilMgr.createYangFileInfoSet(paths);
         thrown.expect(ParserException.class);
         thrown.expectMessage("Union member type must not be one of the " +
                                      "built-in types \"empty\" or " +
                                      "\"leafref\"node-id_union");
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "leafref/invalid"));
         utilMgr.parseYangFileInfoSet();
     }
 
@@ -264,8 +280,12 @@ public class TypeLinkingAfterCloningTest {
      */
     @Test
     public void processIdentityRefBeforeCloning() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "identityref")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "identityref"));
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -389,7 +409,6 @@ public class TypeLinkingAfterCloningTest {
         assertThat(getInCrtLeafType(LEAF, NODE_ID),
                    idRef.getBaseIdentity().getName(),
                    is(FACILITY_SYS_LOG));
-
     }
 
     /**
@@ -399,8 +418,12 @@ public class TypeLinkingAfterCloningTest {
      */
     @Test
     public void processUnionAfterCloning() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "union")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "union"));
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -530,7 +553,6 @@ public class TypeLinkingAfterCloningTest {
         YangContainer container = (YangContainer) list.getChild()
                 .getNextSibling().getNextSibling();
 
-
         Iterator<YangLeafList> leafListItr = container.getListOfLeafList()
                 .listIterator();
         YangLeafList leafListInfo = leafListItr.next();
@@ -631,8 +653,12 @@ public class TypeLinkingAfterCloningTest {
      */
     @Test
     public void processIdentityRefWithTypeDef() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "idreftypedef")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "idreftypedef"));
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;
@@ -741,8 +767,12 @@ public class TypeLinkingAfterCloningTest {
      */
     @Test
     public void processIdentityRefInGrouping() throws IOException {
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(DIR + "idrefingrouping")) {
+            paths.add(Paths.get(file));
+        }
 
-        utilMgr.createYangFileInfoSet(YangFileScanner.getYangFiles(DIR + "idrefingrouping"));
+        utilMgr.createYangFileInfoSet(paths);
         utilMgr.parseYangFileInfoSet();
         utilMgr.createYangNodeSet();
         YangNode selfNode;

@@ -28,23 +28,29 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerUtils;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing inter file linking.
  */
 public class InterFileIfFeatureLinkingTest {
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
 
     /**
@@ -55,7 +61,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureimport";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -121,7 +132,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureinclude";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -193,7 +209,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureimportdependency";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -261,7 +282,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureincludedependency";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -334,7 +360,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureimportdependencyUndefined";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 
@@ -402,7 +433,12 @@ public class InterFileIfFeatureLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/interfilefeatureincludedependencyUndefined";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
 

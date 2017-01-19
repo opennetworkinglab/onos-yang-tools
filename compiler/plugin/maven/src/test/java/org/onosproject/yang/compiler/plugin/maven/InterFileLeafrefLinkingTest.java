@@ -32,18 +32,23 @@ import org.onosproject.yang.compiler.datamodel.YangNodeType;
 import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
-import org.onosproject.yang.compiler.utils.io.impl.YangFileScanner;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.LEAFREF;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.updateFilePriority;
+import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 
 /**
  * Test cases for testing leafref inter file linking.
@@ -53,7 +58,9 @@ public class InterFileLeafrefLinkingTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private final YangUtilManager utilManager = new YangUtilManager();
+
+    private final YangCompilerManager utilManager =
+            new YangCompilerManager();
     private final YangLinkerManager yangLinkerManager = new YangLinkerManager();
 
     /**
@@ -64,7 +71,13 @@ public class InterFileLeafrefLinkingTest {
             throws IOException, ParserException, MojoExecutionException {
 
         String searchDir = "src/test/resources/leafreflinker/interfile/interfileleafrefwithimport";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode refNode = null;
@@ -127,7 +140,7 @@ public class InterFileLeafrefLinkingTest {
         assertThat(leafref.getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
     }
 
     /**
@@ -138,7 +151,13 @@ public class InterFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/interfile/interfileleafreffromgroupingreferstootherfile";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -192,7 +211,7 @@ public class InterFileLeafrefLinkingTest {
         assertThat(leafref.getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
     }
 
     /**
@@ -203,7 +222,13 @@ public class InterFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/interfile/leafrefInGroupingWithPrefix";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -262,7 +287,7 @@ public class InterFileLeafrefLinkingTest {
         assertThat(leafref.getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
     }
 
     /**
@@ -274,7 +299,13 @@ public class InterFileLeafrefLinkingTest {
             throws IOException, ParserException {
 
         String searchDir = "src/test/resources/leafreflinker/interfile/leafrefInGroupingWithPrefixAndManyReference";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -336,7 +367,7 @@ public class InterFileLeafrefLinkingTest {
         assertThat(leafref.getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.DERIVED));
+                   is(YangDataTypes.DERIVED));
 
         leafInfo = leafIterator.next();
 
@@ -351,7 +382,7 @@ public class InterFileLeafrefLinkingTest {
         assertThat(leafref1.getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
 
         assertThat(leafref1.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.DERIVED));
+                   is(YangDataTypes.DERIVED));
     }
 
     /**
@@ -361,7 +392,13 @@ public class InterFileLeafrefLinkingTest {
     public void processLeafrefWhenUsedMultipleTimes()
             throws IOException, ParserException {
         String searchDir = "src/test/resources/leafreflinker/interfile/typedefreferredmultipletimes";
-        utilManager.createYangFileInfoSet(YangFileScanner.getYangFiles(searchDir));
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
         utilManager.createYangNodeSet();
         YangNode selfNode = null;
@@ -413,11 +450,11 @@ public class InterFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
 
         leafInfo = leafIterator.next();
 
@@ -429,10 +466,10 @@ public class InterFileLeafrefLinkingTest {
 
         // Check whether leafref type got resolved.
         assertThat(leafref1.getResolvableStatus(),
-                is(ResolvableStatus.RESOLVED));
+                   is(ResolvableStatus.RESOLVED));
 
         // Check the effective type for the leaf.
         assertThat(leafref1.getEffectiveDataType().getDataType(),
-                is(YangDataTypes.STRING));
+                   is(YangDataTypes.STRING));
     }
 }

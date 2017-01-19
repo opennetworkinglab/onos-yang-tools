@@ -23,7 +23,6 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.utils.UtilConstants;
 
 import static org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.INPUT_DATA;

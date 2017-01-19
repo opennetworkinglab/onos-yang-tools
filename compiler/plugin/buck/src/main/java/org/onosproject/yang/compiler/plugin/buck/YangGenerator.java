@@ -16,82 +16,93 @@
 
 package org.onosproject.yang.compiler.plugin.buck;
 
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
-import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-import org.onosproject.yang.compiler.base.tool.CallablePlugin;
-import org.onosproject.yang.compiler.base.tool.YangToolManager;
+import org.onosproject.yang.compiler.api.YangCompilationParam;
+import org.onosproject.yang.compiler.api.YangCompiledOutput;
+import org.onosproject.yang.compiler.api.YangCompilerException;
+import org.onosproject.yang.compiler.api.YangCompilerService;
+import org.onosproject.yang.compiler.tool.impl.DefaultYangCompilationParam;
+import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.parseDepSchemaPath;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RESOURCES;
 
 /**
  * Generates Java sources from a Yang model.
  */
-public class YangGenerator implements CallablePlugin {
+public class YangGenerator {
 
     private final List<File> models;
     private final List<String> depJar;
-    private final String DEFAULT_JAR_RES_PATH = SLASH + YANG_RESOURCES + SLASH;
     private String outputDirectory;
+    private YangCompiledOutput output;
 
+    /**
+     * Creates an instance of YANG generator.
+     *
+     * @param models          YANG models
+     * @param outputDirectory output directory
+     * @param depJar          dependent jar paths
+     */
     YangGenerator(List<File> models, String outputDirectory, List<String> depJar) {
         this.models = models;
         this.depJar = depJar;
         this.outputDirectory = outputDirectory + SLASH;
     }
 
+    /**
+     * Executes YANG library code generation step.
+     *
+     * @throws YangParsingException when fails to parse yang files
+     */
     public void execute() throws YangParsingException {
-        List<String> files = getListOfFile();
-        synchronized (files) {
-            try {
-                YangPluginConfig config = new YangPluginConfig();
-                config.setCodeGenDir(outputDirectory);
-                config.resourceGenDir(outputDirectory + DEFAULT_JAR_RES_PATH);
-                //for inter-jar linking.
-                List<YangNode> dependentSchema = new ArrayList<>();
-                for (String jar : depJar) {
-                    dependentSchema.addAll(DataModelUtils.parseJarFile(jar, outputDirectory));
+        synchronized (YangGenerator.class) {
+            //Yang compiler service.
+            YangCompilerService compiler = new YangCompilerManager();
+
+            //Create compiler param.
+            YangCompilationParam param = new DefaultYangCompilationParam();
+
+            //Need to get dependent schema paths to give inter jar dependencies.
+            for (String jar : depJar) {
+                try {
+                    File path = parseDepSchemaPath(jar, outputDirectory);
+                    if (path != null) {
+                        param.addDependentSchema(Paths.get(path.getAbsolutePath()));
+                    }
+                } catch (IOException e) {
+                    throw new YangCompilerException(
+                            "Failed to parse dependent schema path");
                 }
-                //intra jar file linking.
-                YangToolManager manager = new YangToolManager();
-                manager.compileYangFiles(manager.createYangFileInfoSet(files),
-                                         dependentSchema, config, this);
-            } catch (Exception e) {
+            }
+            param.setCodeGenDir(Paths.get(outputDirectory));
+            param.setMetadataGenDir(Paths.get(outputDirectory + SLASH +
+                                                      YANG_RESOURCES + SLASH));
+
+            for (File file : models) {
+                param.addYangFile(Paths.get(file.getAbsolutePath()));
+            }
+
+            //Compile yang files and generate java code.
+            try {
+                output = compiler.compileYangFiles(param);
+            } catch (IOException e) {
                 throw new YangParsingException(e);
             }
         }
     }
 
-    private List<String> getListOfFile() {
-        List<String> files = new ArrayList<>();
-        if (models != null) {
-            synchronized (models) {
-                files.addAll(models.stream().map(File::toString)
-                                     .collect(toList()));
-            }
-        }
-        return files;
-    }
-
-    @Override
-    public void addGeneratedCodeToBundle() {
-        //TODO: add functionality.
-    }
-
-    @Override
-    public void addCompiledSchemaToBundle() throws IOException {
-        //TODO: add functionality.
-    }
-
-    @Override
-    public void addYangFilesToBundle() throws IOException {
-        //TODO: add functionality.
+    /**
+     * Returns YANG compiled output.
+     *
+     * @return YANG compiled output
+     */
+    public YangCompiledOutput output() {
+        return output;
     }
 }
