@@ -19,6 +19,9 @@ package org.onosproject.yang.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.hash;
 import static org.onosproject.yang.model.ModelConstants.LEAF_IS_TERMINAL;
 import static org.onosproject.yang.model.ModelConstants.NON_KEY_LEAF;
 import static org.onosproject.yang.model.ModelConstants.NO_KEY_SET;
@@ -30,6 +33,10 @@ import static org.onosproject.yang.model.ModelConstants.NO_KEY_SET;
  */
 
 public class ResourceId {
+
+    /**
+     * List of node keys.
+     */
     private List<NodeKey> nodeKeyList;
 
     /**
@@ -58,6 +65,29 @@ public class ResourceId {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(nodeKeyList);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        ResourceId that = (ResourceId) obj;
+        List<NodeKey> thatList = that.nodeKeyList;
+        return nodeKeyList.size() == thatList.size() &&
+                nodeKeyList.containsAll(thatList);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("nodeKeyList", nodeKeyList)
+                .toString();
     }
 
     /**
@@ -144,9 +174,7 @@ public class ResourceId {
          * @return built resource identifier
          */
         public ResourceId build() {
-            if (curKeyBuilder == null) {
-                throw new ModelException(NO_KEY_SET);
-            }
+            checkNotNull(curKeyBuilder, NO_KEY_SET);
             nodeKeyList.add(curKeyBuilder.build());
             return new ResourceId(this);
         }

@@ -16,25 +16,27 @@
 
 package org.onosproject.yang.model;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
 
 /**
  * Representation of an entity which identifies a schema node in the schema /
  * data tree.
  */
-public class SchemaId {
+public class SchemaId implements Comparable<SchemaId> {
 
     private String name;
     private String nameSpace;
 
     private SchemaId() {
-
     }
 
     public SchemaId(String name, String nameSpace) {
-        if (name == null || nameSpace == null) {
-            throw new ModelException(INCOMPLETE_SCHEMA_INFO);
-        }
+        checkNotNull(name, INCOMPLETE_SCHEMA_INFO);
+        checkNotNull(nameSpace, INCOMPLETE_SCHEMA_INFO);
         this.name = name;
         this.nameSpace = nameSpace;
     }
@@ -57,5 +59,39 @@ public class SchemaId {
      */
     String namespace() {
         return nameSpace;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, nameSpace);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        SchemaId that = (SchemaId) obj;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(nameSpace, that.nameSpace);
+    }
+
+    @Override
+    public int compareTo(SchemaId o) {
+        checkNotNull(o);
+        if (name.equals(o.name)) {
+            if (nameSpace.equals(o.nameSpace)) {
+                return 0;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("name", name)
+                .add("nameSpace", nameSpace)
+                .toString();
     }
 }

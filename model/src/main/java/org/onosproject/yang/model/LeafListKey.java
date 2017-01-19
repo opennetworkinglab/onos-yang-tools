@@ -16,6 +16,10 @@
 
 package org.onosproject.yang.model;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 /**
  * Representation of an entity which identifies a uniquely branching
  * leaf-list entry corresponding to a multi instance leaf schema.
@@ -52,6 +56,36 @@ public class LeafListKey extends NodeKey<LeafListKey>
         return val.toString();
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(schemaId, val);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        LeafListKey that = (LeafListKey) obj;
+        return Objects.equals(val, that.val) &&
+                Objects.equals(schemaId, that.schemaId);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("value", val)
+                .toString();
+    }
+
+    /**
+     * Represents Leaf list key builder.
+     */
     public static class LeafListKeyBuilder
             extends NodeKeyBuilder<LeafListKeyBuilder> {
 

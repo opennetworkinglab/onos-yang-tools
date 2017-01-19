@@ -17,7 +17,11 @@
 
 package org.onosproject.yang.model;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.hash;
 import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
 
 /**
@@ -26,7 +30,7 @@ import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
  */
 public class NodeKey<E extends NodeKey> implements Comparable<E> {
 
-    private SchemaId schemaId;
+    protected SchemaId schemaId;
 
     /**
      * Create object from builder.
@@ -49,10 +53,50 @@ public class NodeKey<E extends NodeKey> implements Comparable<E> {
 
     @Override
     public int compareTo(NodeKey o) {
-        //TODO: implement me
-        return 0;
+        checkNotNull(o);
+        return schemaId.compareTo(o.schemaId());
     }
 
+    /**
+     * Returns node key builder.
+     *
+     * @return node key builder
+     */
+    public static NodeKeyBuilder builder() {
+        return new NodeKeyBuilder();
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(schemaId);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        NodeKey that = (NodeKey) obj;
+        return Objects.equals(schemaId, that.schemaId);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("schemaId", schemaId)
+                .toString();
+    }
+
+    /**
+     * Builder for node key.
+     *
+     * @param <B> node key type
+     */
     public static class NodeKeyBuilder<B extends NodeKeyBuilder<B>> {
         private SchemaId schemaId;
 
@@ -60,7 +104,6 @@ public class NodeKey<E extends NodeKey> implements Comparable<E> {
          * Create the node key from scratch.
          */
         public NodeKeyBuilder() {
-
         }
 
         /**

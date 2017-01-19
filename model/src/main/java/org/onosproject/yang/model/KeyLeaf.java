@@ -16,15 +16,20 @@
 
 package org.onosproject.yang.model;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static java.util.Objects.hash;
+
 /**
  * Represents the List's key leaf value.
  */
 public class KeyLeaf {
+
     private SchemaId leafSchema;
     private Object leafVal;
 
     private KeyLeaf() {
-
     }
 
     /**
@@ -64,5 +69,29 @@ public class KeyLeaf {
      */
     public String leafValAsString() {
         return leafVal.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(leafSchema, leafVal);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        KeyLeaf that = (KeyLeaf) obj;
+        return Objects.equals(leafSchema, that.leafSchema) &&
+                Objects.equals(leafVal, that.leafVal);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("schemaId", leafSchema)
+                .add("leafValue", leafVal)
+                .toString();
     }
 }

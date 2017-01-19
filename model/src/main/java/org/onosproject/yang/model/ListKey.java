@@ -19,6 +19,9 @@ package org.onosproject.yang.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
  * Represents an entity which identifies a unique branching node
@@ -54,6 +57,38 @@ public class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
         return 0;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(schemaId, keyLeafs);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        ListKey that = (ListKey) obj;
+        List<KeyLeaf> thatList = that.keyLeafs;
+        return keyLeafs.size() == thatList.size() &&
+                keyLeafs.containsAll(thatList) &&
+                Objects.equals(schemaId, that.schemaId);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("value", keyLeafs)
+                .toString();
+    }
+
+    /**
+     * Represents list key builder.
+     */
     public static class ListKeyBuilder extends NodeKeyBuilder<ListKeyBuilder> {
         private List<KeyLeaf> keyLeafs = new LinkedList<>();
 
@@ -61,7 +96,6 @@ public class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
          * used to construct the key from scratch.
          */
         public ListKeyBuilder() {
-
         }
 
         /**
