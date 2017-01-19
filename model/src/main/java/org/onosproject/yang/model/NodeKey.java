@@ -17,11 +17,25 @@
 
 package org.onosproject.yang.model;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
+
 /**
  * Abstraction of an entity which identifies a node uniquely among its
  * siblings.
  */
-public interface NodeKey extends Comparable<NodeKey> {
+public class NodeKey<E extends NodeKey> implements Comparable<E> {
+
+    private SchemaId schemaId;
+
+    /**
+     * Create object from builder.
+     *
+     * @param builder initialized builder
+     */
+    protected NodeKey(NodeKeyBuilder builder) {
+        schemaId = builder.schemaId;
+    }
 
     /**
      * Returns the schema identifier as minimal key required to identify a
@@ -29,5 +43,68 @@ public interface NodeKey extends Comparable<NodeKey> {
      *
      * @return schema identifier of a key
      */
-    SchemaIdentifier identifier();
+    public SchemaId schemaId() {
+        return schemaId;
+    }
+
+    @Override
+    public int compareTo(NodeKey o) {
+        //TODO: implement me
+        return 0;
+    }
+
+    public static class NodeKeyBuilder<B extends NodeKeyBuilder<B>> {
+        private SchemaId schemaId;
+
+        /**
+         * Create the node key from scratch.
+         */
+        public NodeKeyBuilder() {
+
+        }
+
+        /**
+         * Support the derived object to inherit from existing node key builder.
+         *
+         * @param base existing node key builder
+         */
+        protected NodeKeyBuilder(NodeKeyBuilder base) {
+            checkNotNull(base.schemaId, INCOMPLETE_SCHEMA_INFO);
+            schemaId = base.schemaId;
+        }
+
+        /**
+         * set the schema identifier.
+         *
+         * @param schema schema identifier
+         * @return current builder
+         */
+        public B schemaId(SchemaId schema) {
+            schemaId = schema;
+            return (B) this;
+        }
+
+        /**
+         * set the schema identifier.
+         *
+         * @param name      name of the node
+         * @param nameSpace name space of the node
+         * @return current builder
+         */
+        public B schemaId(String name, String nameSpace) {
+            schemaId = new SchemaId(name, nameSpace);
+            return (B) this;
+        }
+
+        /**
+         * construct the node key.
+         *
+         * @return node key
+         */
+        public NodeKey build() {
+            checkNotNull(schemaId.name(), INCOMPLETE_SCHEMA_INFO);
+            checkNotNull(schemaId.namespace(), INCOMPLETE_SCHEMA_INFO);
+            return new NodeKey(this);
+        }
+    }
 }

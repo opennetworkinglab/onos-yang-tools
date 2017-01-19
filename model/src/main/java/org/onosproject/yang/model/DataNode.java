@@ -28,7 +28,7 @@ public interface DataNode {
      *
      * @return node schema identifier
      */
-    SchemaIdentifier identifier();
+    SchemaId identifier();
 
     /**
      * Returns the type of node.

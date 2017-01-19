@@ -16,18 +16,38 @@
 
 package org.onosproject.yang.model;
 
+import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
+
 /**
- * Abstraction of an entity which identifies a schema node in the schema / data
- * tree.
+ * Representation of an entity which identifies a schema node in the schema /
+ * data tree.
  */
-public interface SchemaIdentifier {
+public class SchemaId {
+
+    private String name;
+    private String nameSpace;
+
+    private SchemaId() {
+
+    }
+
+    public SchemaId(String name, String nameSpace) {
+        if (name == null || nameSpace == null) {
+            throw new ModelException(INCOMPLETE_SCHEMA_INFO);
+        }
+        this.name = name;
+        this.nameSpace = nameSpace;
+    }
+
     /**
      * Returns node schema name. This is mandatory to identify node according
      * to schema.
      *
      * @return node name
      */
-    String name();
+    String name() {
+        return name;
+    }
 
     /**
      * Returns node's namespace. This is mandatory serializers must translate
@@ -35,5 +55,7 @@ public interface SchemaIdentifier {
      *
      * @return node's namespace
      */
-    String namespace();
+    String namespace() {
+        return nameSpace;
+    }
 }
