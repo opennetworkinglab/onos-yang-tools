@@ -25,10 +25,7 @@
     </parent>
 
     <artifactId>onos-yang-compiler-api</artifactId>
-    <packaging>pom</packaging>
-    <!--
-        Change packaging to jar
-    -->
+    <packaging>jar</packaging>
     <build>
         <plugins>
             <plugin>
