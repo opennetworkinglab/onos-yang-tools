@@ -44,10 +44,9 @@ import java.util.List;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.BITS;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPE_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
@@ -71,8 +70,6 @@ import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils
 import static org.onosproject.yang.compiler.translator.tojava.javamodel.AttributesJavaDataType.updateJavaFileInfo;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.generateEnumAttributeString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getJavaAttributeDefinition;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateBuilderClassFile;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateBuilderInterfaceFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateDefaultClassFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateInterfaceFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateKeyClassFile;
@@ -80,7 +77,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGene
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddToListMethodImpl;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddToListMethodInterface;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBuildString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getDefaultConstructorString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethod;
@@ -91,7 +87,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.parseBuilderInterfaceBuildMethodString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_LEAF_HOLDER;
@@ -101,7 +96,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorEr
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
@@ -113,7 +107,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
-import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
@@ -134,13 +127,13 @@ import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFi
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.readAppendFile;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.ADD_TO_LIST;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
+import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.mergeJavaFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
@@ -257,16 +250,6 @@ public class TempJavaFragmentFiles {
      */
     private static final String INTERFACE_FILE_NAME_SUFFIX = EMPTY_STRING;
 
-    /**
-     * File name for builder interface file name suffix.
-     */
-    private static final String BUILDER_INTERFACE_FILE_NAME_SUFFIX =
-            BUILDER + INTERFACE;
-
-    /**
-     * File name for builder class file name suffix.
-     */
-    private static final String BUILDER_CLASS_FILE_NAME_SUFFIX = BUILDER;
 
     /**
      * File name for list key class file name suffix.
@@ -309,16 +292,6 @@ public class TempJavaFragmentFiles {
      * Java file handle for interface file.
      */
     private File interfaceJavaFileHandle;
-
-    /**
-     * Java file handle for builder interface file.
-     */
-    private File builderInterfaceJavaFileHandle;
-
-    /**
-     * Java file handle for builder class file.
-     */
-    private File builderClassJavaFileHandle;
 
     /**
      * Java file handle for impl class file.
@@ -434,22 +407,7 @@ public class TempJavaFragmentFiles {
                                          ADD_TO_LIST_INTERFACE_MASK |
                                          LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK);
         }
-        /*
-         * Initialize getter and setter when generation file type matches to
-         * builder interface mask.
-         */
-        if (javaFlagSet(BUILDER_INTERFACE_MASK)) {
-            addGeneratedTempFile(GETTER_FOR_INTERFACE_MASK |
-                                         SETTER_FOR_INTERFACE_MASK);
-        }
-        /*
-         * Initialize getterImpl, setterImpl and attributes when generation file
-         * type matches to builder class mask.
-         */
-        if (javaFlagSet(BUILDER_CLASS_MASK)) {
-            addGeneratedTempFile(ATTRIBUTES_MASK | GETTER_FOR_CLASS_MASK |
-                                         SETTER_FOR_CLASS_MASK);
-        }
+
         /*
          * Initialize getterImpl, attributes, constructor, hash code, equals and
          * to strings when generation file type matches to impl class mask.
@@ -457,6 +415,7 @@ public class TempJavaFragmentFiles {
         if (javaFlagSet(DEFAULT_CLASS_MASK)) {
             addGeneratedTempFile(
                     ATTRIBUTES_MASK | GETTER_FOR_CLASS_MASK |
+                            SETTER_FOR_CLASS_MASK |
                             HASH_CODE_IMPL_MASK | EQUALS_IMPL_MASK |
                             TO_STRING_IMPL_MASK | ADD_TO_LIST_IMPL_MASK);
         }
@@ -465,6 +424,7 @@ public class TempJavaFragmentFiles {
          */
         if (javaFlagSet(GENERATE_TYPE_CLASS)) {
             addGeneratedTempFile(ATTRIBUTES_MASK | GETTER_FOR_CLASS_MASK |
+                                         SETTER_FOR_CLASS_MASK |
                                          HASH_CODE_IMPL_MASK | EQUALS_IMPL_MASK |
                                          FROM_STRING_IMPL_MASK);
 
@@ -1037,10 +997,25 @@ public class TempJavaFragmentFiles {
      */
     private void addSetterImpl(JavaAttributeInfo attr)
             throws IOException {
+        int generatedJavaFiles = getGeneratedJavaFiles();
         String setter = getSetterForClass(attr, getGeneratedJavaClassName(),
-                                          getGeneratedJavaFiles());
-        String javadoc = getOverRideString();
-        appendToFile(setterImplTempFileHandle, javadoc + setter);
+                                          generatedJavaFiles);
+        YangDataStructure ds = getYangDataStructure(
+                attr.getCompilerAnnotation());
+        String annotation = null;
+        if (ds != null) {
+            annotation = ds.name();
+        }
+        String javaDoc;
+        if (generatedJavaFiles != GENERATE_TYPEDEF_CLASS &&
+                generatedJavaFiles != GENERATE_UNION_CLASS) {
+            javaDoc = getOverRideString();
+        } else {
+            javaDoc = getJavaDoc(SETTER_METHOD, attr.getAttributeName(),
+                                 false, annotation);
+        }
+        appendToFile(setterImplTempFileHandle,
+                     javaDoc + setter);
     }
 
     /**
@@ -1051,21 +1026,23 @@ public class TempJavaFragmentFiles {
      */
     protected void addGetterImpl(JavaAttributeInfo attr)
             throws IOException {
+        int generatedJavaFiles = getGeneratedJavaFiles();
         String getter = getGetterForClass(attr, getGeneratedJavaFiles());
-        String javadoc = getOverRideString();
         YangDataStructure ds = getYangDataStructure(
                 attr.getCompilerAnnotation());
         String annotation = null;
         if (ds != null) {
             annotation = ds.name();
         }
-        if (javaFlagSet(BUILDER_CLASS_MASK)) {
-            appendToFile(getterImplTempFileHandle, javadoc + getter);
+        String javaDoc;
+        if (generatedJavaFiles != GENERATE_TYPEDEF_CLASS &&
+                generatedJavaFiles != GENERATE_UNION_CLASS) {
+            javaDoc = getOverRideString();
         } else {
-            appendToFile(getterImplTempFileHandle,
-                         getJavaDoc(GETTER_METHOD, attr.getAttributeName(),
-                                    false, annotation) + getter);
+            javaDoc = getJavaDoc(GETTER_METHOD, attr.getAttributeName(),
+                                 false, annotation);
         }
+        appendToFile(getterImplTempFileHandle, javaDoc + getter);
     }
 
     /**
@@ -1115,29 +1092,6 @@ public class TempJavaFragmentFiles {
     }
 
     /**
-     * Adds build method for interface.
-     *
-     * @return build method for interface
-     * @throws IOException when fails to append to temporary file
-     */
-    protected String addBuildMethodForInterface()
-            throws IOException {
-        return parseBuilderInterfaceBuildMethodString(
-                getGeneratedJavaClassName());
-    }
-
-    /**
-     * Adds build method's implementation for class.
-     *
-     * @return build method implementation for class
-     * @throws IOException when fails to append to temporary file
-     */
-    protected String addBuildMethodImpl()
-            throws IOException {
-        return getBuildString(getGeneratedJavaClassName(), rootNode) + NEW_LINE;
-    }
-
-    /**
      * Adds default constructor for class.
      *
      * @param modifier modifier for constructor
@@ -1151,7 +1105,7 @@ public class TempJavaFragmentFiles {
             throws IOException {
         StringBuilder name = new StringBuilder();
         name.append(getGeneratedJavaClassName());
-        if (rootNode && !toAppend.equals(BUILDER)) {
+        if (rootNode) {
             name.append(OP_PARAM);
             return getDefaultConstructorString(name.toString(), modifier);
         }
@@ -1632,8 +1586,7 @@ public class TempJavaFragmentFiles {
         createPackage(curNode);
 
         //Generate java code.
-        if ((fileType & INTERFACE_MASK) != 0 ||
-                (fileType & BUILDER_INTERFACE_MASK) != 0) {
+        if ((fileType & INTERFACE_MASK) != 0) {
 
             //Create interface file.
             interfaceJavaFileHandle =
@@ -1641,23 +1594,6 @@ public class TempJavaFragmentFiles {
             interfaceJavaFileHandle =
                     generateInterfaceFile(interfaceJavaFileHandle, imports,
                                           curNode, isAttributePresent);
-
-            //Create builder interface file.
-            if ((fileType & BUILDER_INTERFACE_MASK) != 0) {
-                builderInterfaceJavaFileHandle =
-                        getJavaFileHandle(getJavaClassName(
-                                BUILDER_INTERFACE_FILE_NAME_SUFFIX));
-                builderInterfaceJavaFileHandle =
-                        generateBuilderInterfaceFile(
-                                builderInterfaceJavaFileHandle,
-                                curNode, isAttributePresent);
-                    /*
-                     * Append builder interface file to interface file and
-                     * close it.
-                     */
-                mergeJavaFiles(builderInterfaceJavaFileHandle,
-                               interfaceJavaFileHandle);
-            }
 
             insertDataIntoJavaFile(interfaceJavaFileHandle, CLOSE_CURLY_BRACKET);
             validateLineLength(interfaceJavaFileHandle);
@@ -1670,6 +1606,7 @@ public class TempJavaFragmentFiles {
         }
 
         if ((fileType & DEFAULT_CLASS_MASK) != 0) {
+
             //add model object to extend list
             JavaQualifiedTypeInfoTranslator typeInfo = new
                     JavaQualifiedTypeInfoTranslator();
@@ -1679,10 +1616,6 @@ public class TempJavaFragmentFiles {
             typeInfo.setQualified(false);
             getBeanFiles(curNode).getJavaExtendsListHolder()
                     .addToExtendsList(typeInfo, curNode, getBeanFiles(curNode));
-        }
-
-        if ((fileType & BUILDER_CLASS_MASK) != 0 ||
-                (fileType & DEFAULT_CLASS_MASK) != 0) {
 
             //Create impl class file.
             implClassJavaFileHandle =
@@ -1691,21 +1624,6 @@ public class TempJavaFragmentFiles {
                     generateDefaultClassFile(implClassJavaFileHandle,
                                              curNode, isAttributePresent,
                                              imports);
-
-            //Create builder class file.
-            if ((fileType & BUILDER_CLASS_MASK) != 0) {
-                builderClassJavaFileHandle =
-                        getJavaFileHandle(getJavaClassName(
-                                BUILDER_CLASS_FILE_NAME_SUFFIX));
-                builderClassJavaFileHandle =
-                        generateBuilderClassFile(builderClassJavaFileHandle,
-                                                 curNode,
-                                                 isAttributePresent);
-
-                //Append impl class to builder class and close it.
-                mergeJavaFiles(builderClassJavaFileHandle,
-                               implClassJavaFileHandle);
-            }
 
             insertDataIntoJavaFile(implClassJavaFileHandle, CLOSE_CURLY_BRACKET);
             validateLineLength(implClassJavaFileHandle);
@@ -1751,12 +1669,7 @@ public class TempJavaFragmentFiles {
         if (javaFlagSet(INTERFACE_MASK)) {
             closeFile(interfaceJavaFileHandle, errorOccurred);
         }
-        if (javaFlagSet(BUILDER_CLASS_MASK)) {
-            closeFile(builderClassJavaFileHandle);
-        }
-        if (javaFlagSet(BUILDER_INTERFACE_MASK)) {
-            closeFile(builderInterfaceJavaFileHandle);
-        }
+
         if (javaFlagSet(DEFAULT_CLASS_MASK)) {
             closeFile(implClassJavaFileHandle, errorOccurred);
         }
@@ -1765,6 +1678,9 @@ public class TempJavaFragmentFiles {
          */
         if (tempFlagSet(GETTER_FOR_CLASS_MASK)) {
             closeFile(getterImplTempFileHandle);
+        }
+        if (tempFlagSet(SETTER_FOR_CLASS_MASK)) {
+            closeFile(setterImplTempFileHandle);
         }
         if (tempFlagSet(ATTRIBUTES_MASK)) {
             closeFile(attributesTempFileHandle);

@@ -47,7 +47,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassT
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AND;
-import static org.onosproject.yang.compiler.utils.UtilConstants.APPEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.APP_INSTANCE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_DECIMAL;
@@ -55,8 +54,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BITSET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BOOLEAN_DATA_TYPE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BOOLEAN_WRAPPER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER_LOWER_CASE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CATCH;
@@ -333,13 +330,9 @@ public final class StringGenerator {
                     builder.append(body);
                 }
                 return builder.toString();
-            case BUILD:
-                return getReturnString(
-                        NEW + SPACE + paraName + getOpenCloseParaWithValue(
-                                THIS) + signatureClose(), space);
             case CONSTRUCTOR:
                 return space + paraName + SPACE +
-                        EQUAL + SPACE + BUILDER_LOWER_CASE + OBJECT + PERIOD +
+                        EQUAL + SPACE + OBJECT + PERIOD +
                         prefix + methodName +
                         brackets(OPEN_CLOSE_BRACKET, null, null) +
                         signatureClose();
@@ -1063,17 +1056,6 @@ public final class StringGenerator {
     }
 
     /**
-     * Returns builder string for class definition.
-     *
-     * @param yangName class name
-     * @return builder string for class definition
-     */
-    static String getBuilderImplStringClassDef(String yangName) {
-        return new StringBuilder(yangName).append(PERIOD).append(yangName)
-                .append(BUILDER).toString();
-    }
-
-    /**
      * Returns default name string.
      *
      * @param yangName class name
@@ -1136,18 +1118,6 @@ public final class StringGenerator {
      */
     static String getQuotedString(String name) {
         return QUOTES + name + QUOTES;
-    }
-
-    /**
-     * Returns string builder's append string.
-     *
-     * @param append data to be append
-     * @param space  indentation
-     * @return string builder's append string
-     */
-    static String getStringBuilderAppendString(String append, String space) {
-        return space + STRING_BUILDER_VAR + PERIOD + APPEND + OPEN_PARENTHESIS +
-                append + CLOSE_PARENTHESIS + signatureClose();
     }
 
     /**

@@ -27,9 +27,6 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_CLASS;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_INTERFACE;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILD_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.CONSTRUCTOR;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CONSTRUCTOR;
@@ -50,36 +47,6 @@ public final class JavaDocGenTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    /**
-     * This test case checks the content received for the builder class java doc.
-     */
-    @Test
-    public void builderClassGenerationTest() {
-        String builderClassJavaDoc = getJavaDoc(BUILDER_CLASS, TEST_NAME, false, null);
-        assertThat(true, is(builderClassJavaDoc.contains("Represents the builder implementation of")
-                                    && builderClassJavaDoc.contains(END_STRING)));
-    }
-
-    /**
-     * This test case checks the content received for the builder interface ge java doc.
-     */
-    @Test
-    public void builderInterfaceGenerationTest() {
-        String builderInterfaceJavaDoc = getJavaDoc(BUILDER_INTERFACE, TEST_NAME, false, null);
-        assertThat(true,
-                   is(builderInterfaceJavaDoc.contains("Builder for")
-                              && builderInterfaceJavaDoc.contains(END_STRING)));
-    }
-
-    /**
-     * This test case checks the content received for the build  java doc.
-     */
-    @Test
-    public void buildGenerationTest() {
-        String buildDoc = getJavaDoc(BUILD_METHOD, TEST_NAME, false, null);
-        assertThat(true, is(buildDoc.contains("Builds object of") && buildDoc.contains(END_STRING)));
-    }
 
     /**
      * A private constructor is tested.
@@ -112,7 +79,7 @@ public final class JavaDocGenTest {
         String constructorDoc = getJavaDoc(CONSTRUCTOR, TEST_NAME, false, null);
         assertThat(true,
                    is(constructorDoc.contains("Creates an instance of ")
-                              && constructorDoc.contains("builder object of")
+                              && constructorDoc.contains("object value of")
                               && constructorDoc.contains("@param") && constructorDoc.contains("*/\n")));
     }
 
@@ -185,7 +152,8 @@ public final class JavaDocGenTest {
     public void setterGenerationTest() {
         String setterJavaDoc = getJavaDoc(SETTER_METHOD, TEST_NAME, false, null);
         assertThat(true,
-                   is(setterJavaDoc.contains("Returns the builder object of") && setterJavaDoc.contains(END_STRING)));
+                   is(setterJavaDoc.contains("Sets the attribute") &&
+                              setterJavaDoc.contains(END_STRING)));
     }
 
     /**

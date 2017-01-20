@@ -28,7 +28,6 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPE_CLASS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
 
 /**
  * Represents implementation of java code fragments temporary implementations.
@@ -196,20 +195,6 @@ public class TempJavaCodeFragmentFiles {
     }
 
     /**
-     * Adds build method for interface.
-     *
-     * @return build method for interface
-     * @throws IOException when fails to append to temporary file
-     */
-    public String addBuildMethodForInterface()
-            throws IOException {
-        if (beanTempFiles != null) {
-            return beanTempFiles.addBuildMethodForInterface();
-        }
-        throw new TranslatorException("build method only supported for bean class");
-    }
-
-    /**
      * Adds default constructor for class.
      *
      * @param modifier modifier for constructor.
@@ -220,9 +205,7 @@ public class TempJavaCodeFragmentFiles {
     public String addDefaultConstructor(String modifier, String toAppend)
             throws IOException {
         boolean isSuffix = false;
-        if (toAppend.equals(BUILDER)) {
-            isSuffix = true;
-        }
+
         if (typeTempFiles != null) {
             return typeTempFiles.addDefaultConstructor(modifier, toAppend,
                                                        isSuffix);
@@ -233,20 +216,6 @@ public class TempJavaCodeFragmentFiles {
         }
 
         throw new TranslatorException("default constructor should not be added");
-    }
-
-    /**
-     * Adds build method's implementation for class.
-     *
-     * @return build method implementation for class
-     * @throws IOException when fails to append to temporary file
-     */
-    public String addBuildMethodImpl()
-            throws IOException {
-        if (beanTempFiles != null) {
-            return beanTempFiles.addBuildMethodImpl();
-        }
-        throw new TranslatorException("build should not be added");
     }
 
     /**

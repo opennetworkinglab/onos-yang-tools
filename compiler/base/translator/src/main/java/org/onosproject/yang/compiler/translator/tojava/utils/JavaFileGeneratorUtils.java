@@ -45,8 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
@@ -96,8 +94,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SET_METHOD_PREFI
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.io.impl.CopyrightHeader.parseCopyrightHeader;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_CLASS;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILDER_INTERFACE;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.ENUM_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.EVENT;
@@ -443,12 +439,6 @@ public final class JavaFileGeneratorUtils {
                 appendHeaderContents(file, pkgString, importsList);
                 write(file, genType, DEFAULT_CLASS, curNode, className,
                       curNode.isOpTypeReq());
-                break;
-            case BUILDER_CLASS_MASK:
-                write(file, genType, BUILDER_CLASS, curNode, className, false);
-                break;
-            case BUILDER_INTERFACE_MASK:
-                write(file, genType, BUILDER_INTERFACE, curNode, className, false);
                 break;
             case GENERATE_SERVICE_AND_MANAGER:
                 appendHeaderContents(file, pkgString, importsList);

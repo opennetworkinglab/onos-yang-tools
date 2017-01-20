@@ -42,6 +42,7 @@ import java.util.Map;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
 import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.EIGHT_SPACE;
@@ -106,9 +107,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BITS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BOOLEAN_DATA_TYPE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILD;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER_LOWER_CASE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CAMEL_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CASE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS;
@@ -120,7 +118,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARE_TO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DECODE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
@@ -165,7 +162,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NOT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NULL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OBJ;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OF_CAPS;
@@ -176,11 +172,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_PARENTHESIS
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPERATION_TYPE_ATTRIBUTE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OTHER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OVERRIDE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIORITY_QUEUE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
@@ -218,7 +212,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VARIABLE_C;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ZERO;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.BUILD_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.CONSTRUCTOR;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CONSTRUCTOR;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.FROM_METHOD;
@@ -227,7 +220,6 @@ import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.OF_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.TYPE_CONSTRUCTOR;
-import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.generateForBuilderMethod;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.generateForGetMethodWithAttribute;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.generateForValidatorMethod;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
@@ -247,17 +239,6 @@ public final class MethodsGenerator {
      * Creates an instance of method generator.
      */
     private MethodsGenerator() {
-    }
-
-    /**
-     * Returns the methods strings for builder interface.
-     *
-     * @param name attribute name
-     * @return method string for builder interface
-     */
-    public static String parseBuilderInterfaceBuildMethodString(String name) {
-        return getJavaDoc(BUILD_METHOD, name, false, null) +
-                getBuildForInterface(name);
     }
 
     /**
@@ -354,18 +335,6 @@ public final class MethodsGenerator {
                                                      String modifierType) {
         return getJavaDoc(DEFAULT_CONSTRUCTOR, name, false, null)
                 + getDefaultConstructor(name, modifierType) + NEW_LINE;
-    }
-
-    /**
-     * Returns build method string.
-     *
-     * @param name   class name
-     * @param isRoot true if root node
-     * @return build string
-     */
-    public static String getBuildString(String name, boolean isRoot) {
-        return FOUR_SPACE_INDENTATION + OVERRIDE + NEW_LINE +
-                getBuild(name, isRoot);
     }
 
     /**
@@ -532,10 +501,12 @@ public final class MethodsGenerator {
                     .append(methodClose(FOUR_SPACE));
             return builder.toString();
         }
-        builder.append(methodSignature(name, EMPTY_STRING,
-                                       PUBLIC, name, getCapitalCase(className) +
-                                               BUILDER, type, CLASS_TYPE));
-        if (!isTypeNull && !isList) {
+        //Append method signature.
+        builder.append(methodSignature(name, EMPTY_STRING, PUBLIC, name,
+                                       VOID, type, CLASS_TYPE));
+
+        if (!isTypeNull && !isList &&
+                genType != GENERATE_TYPEDEF_CLASS && genType != GENERATE_UNION_CLASS) {
             builder.append(getLeafFlagSetString(name, VALUE_LEAF, EIGHT_SPACE_INDENTATION,
                                                 SET_METHOD_PREFIX)).append(signatureClose());
         } else {
@@ -544,7 +515,7 @@ public final class MethodsGenerator {
         //Append method body.
         builder.append(methodBody(SETTER, name, name,
                                   EIGHT_SPACE_INDENTATION, null, null,
-                                  true, null))
+                                  false, null))
                 //Append method close.
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
@@ -655,13 +626,12 @@ public final class MethodsGenerator {
                                                    String attrType,
                                                    int genType) {
         if (genType == GENERATE_SERVICE_AND_MANAGER) {
-            return methodSignature(getCapitalCase(attrName),
-                                   SET_METHOD_PREFIX,
-                                   null, attrName, VOID, attrType +
-                                           OP_PARAM, INTERFACE_TYPE);
+            return methodSignature(getCapitalCase(attrName), SET_METHOD_PREFIX,
+                                   null, attrName, VOID, attrType + OP_PARAM,
+                                   INTERFACE_TYPE);
         }
         return methodSignature(attrName, EMPTY_STRING, null,
-                               attrName, name + BUILDER, attrType, INTERFACE_TYPE);
+                               attrName, VOID, attrType, INTERFACE_TYPE);
     }
 
     /**
@@ -689,40 +659,6 @@ public final class MethodsGenerator {
     }
 
     /**
-     * Returns the build method strings for interface file.
-     *
-     * @param yangName name of the interface
-     * @return build method for interface
-     */
-    static String getBuildForInterface(String yangName) {
-        return methodSignature(BUILD, EMPTY_STRING, null, null,
-                               yangName, null, INTERFACE_TYPE);
-    }
-
-    /**
-     * Returns constructor string for impl class.
-     *
-     * @param yangName   class name
-     * @param isRootNode if root node
-     * @return constructor string
-     */
-    static String getConstructorStart(String yangName,
-                                      boolean isRootNode) {
-        StringBuilder builder = new StringBuilder(
-                getConstructorString(yangName));
-
-        String name = getCapitalCase(yangName);
-        String returnType = DEFAULT_CAPS + name;
-        if (isRootNode) {
-            returnType = name + OP_PARAM;
-        }
-        builder.append(methodSignature(
-                returnType, EMPTY_STRING, PROTECTED, BUILDER_LOWER_CASE + OBJECT,
-                null, name + BUILDER, CLASS_TYPE));
-        return builder.toString();
-    }
-
-    /**
      * Returns the constructor strings for class file.
      *
      * @param attr    attribute info
@@ -738,7 +674,7 @@ public final class MethodsGenerator {
                                   attrCaps, EIGHT_SPACE_INDENTATION, GET, null,
                                   false, null);
             default:
-                return methodBody(MethodBodyTypes.CONSTRUCTOR, attrName,
+                return methodBody(MethodBodyTypes.DEFAULT_CONSTRUCTOR, null,
                                   attrName, EIGHT_SPACE_INDENTATION, EMPTY_STRING,
                                   null, false, null);
         }
@@ -761,27 +697,6 @@ public final class MethodsGenerator {
         return methodSignature(rpcName, EMPTY_STRING, null,
                                inputVal, output, input, INTERFACE_TYPE) +
                 NEW_LINE;
-    }
-
-    /**
-     * Returns the build method strings for class file.
-     *
-     * @param yangName   class name
-     * @param isRootNode if root node
-     * @return build method string for class
-     */
-    static String getBuild(String yangName, boolean isRootNode) {
-        String type = DEFAULT_CAPS + yangName;
-        if (isRootNode) {
-            type = yangName + OP_PARAM;
-        }
-        return methodSignature(BUILD, EMPTY_STRING, PUBLIC, null,
-                               yangName, null,
-                               CLASS_TYPE) +
-                methodBody(MethodBodyTypes.BUILD, type, BUILD,
-                           EIGHT_SPACE_INDENTATION, EMPTY_STRING,
-                           null, false, null) +
-                methodClose(FOUR_SPACE);
     }
 
     /**
@@ -878,7 +793,7 @@ public final class MethodsGenerator {
     static String getToStringMethodClose() {
         return TWELVE_SPACE_INDENTATION + PERIOD + TO_STRING_METHOD +
                 brackets(OPEN_CLOSE_BRACKET, null, null) + signatureClose() +
-                methodClose(FOUR_SPACE);
+                methodClose(FOUR_SPACE) + NEW_LINE;
     }
 
     /**
@@ -1537,16 +1452,16 @@ public final class MethodsGenerator {
                     param.put(attr.getAttributeName() + KEYS, retType + KEYS);
                     param.put(attr.getAttributeName() + VALUE_CAPS, retType);
                     return multiAttrMethodSignature(methodName, null, null,
-                                                    className + BUILDER, param,
+                                                    className, param,
                                                     INTERFACE_TYPE);
                 default:
                     return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                                           className + BUILDER, retType,
+                                           className, retType,
                                            INTERFACE_TYPE);
             }
         }
         return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                               className + BUILDER, getReturnType(attr),
+                               className, getReturnType(attr),
                                INTERFACE_TYPE);
     }
 
@@ -1590,7 +1505,7 @@ public final class MethodsGenerator {
                     param.put(attr.getAttributeName() + VALUE_CAPS, retType);
                     builder.append(multiAttrMethodSignature(methodName,
                                                             null, PUBLIC,
-                                                            name + BUILDER, param,
+                                                            name, param,
                                                             CLASS_TYPE))
                             .append(getIfConditionForAddToListMethod(attr));
                     retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD +
@@ -1602,17 +1517,18 @@ public final class MethodsGenerator {
                     builder.append(methodSignature(methodName,
                                                    null, PUBLIC,
                                                    ADD_STRING + TO_CAPS,
-                                                   name + BUILDER, retType,
+                                                   name, retType,
                                                    CLASS_TYPE))
                             .append(getIfConditionForAddToListMethod(attr));
                     retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD + ADD_STRING +
                             OPEN_PARENTHESIS + ADD_STRING + TO_CAPS + CLOSE_PARENTHESIS;
+
             }
         } else {
             builder.append(methodSignature(ADD_STRING + TO_CAPS +
                                                    getCapitalCase(attrName),
                                            null, PUBLIC, ADD_STRING + TO_CAPS,
-                                           name + BUILDER, retType,
+                                           name, retType,
                                            CLASS_TYPE))
                     .append(getIfConditionForAddToListMethod(attr));
             retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD + ADD_STRING +
@@ -1624,6 +1540,7 @@ public final class MethodsGenerator {
                 .append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
+
     }
 
     // Returns if condition for add to list method.
@@ -1653,6 +1570,7 @@ public final class MethodsGenerator {
                 default:
                     type = ARRAY_LIST_INIT;
                     break;
+
             }
         } else {
             type = ARRAY_LIST_INIT;
@@ -1662,23 +1580,6 @@ public final class MethodsGenerator {
                 name + SPACE + EQUAL + SPACE +
                 NEW + SPACE + type + signatureClose() + methodClose(
                 EIGHT_SPACE);
-    }
-
-    /**
-     * Returns builder method for class.
-     *
-     * @param name name of class
-     * @return builder method for class
-     */
-    static String builderMethod(String name) {
-        return generateForBuilderMethod(name) +
-                methodSignature(BUILDER_LOWER_CASE,
-                                EMPTY_STRING, PUBLIC + SPACE +
-                                        STATIC, null, name + BUILDER, null, CLASS_TYPE) +
-                getReturnString(NEW + SPACE + name + BUILDER,
-                                EIGHT_SPACE_INDENTATION) +
-                brackets(OPEN_CLOSE_BRACKET, null, null) + signatureClose() +
-                methodClose(FOUR_SPACE);
     }
 
     /**

@@ -17,7 +17,6 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
-import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -28,8 +27,6 @@ import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaCodeFragmentFilesContainer;
 
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
@@ -43,7 +40,6 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_DIAMOND_WITH_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.brackets;
-import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getBuilderImplStringClassDef;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinition;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithExtends;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithImpl;
@@ -55,7 +51,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getSuffixedName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT_EVENT;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARABLE;
@@ -80,7 +75,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.STATIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SUBJECT;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.trimAtLast;
@@ -139,12 +133,8 @@ final class ClassDefinitionGenerator {
         switch (genFileTypes) {
             case INTERFACE_MASK:
                 return getInterfaceDefinition(yangName, curNode);
-            case BUILDER_CLASS_MASK:
-                return getBuilderClassDefinition(yangName, curNode);
             case DEFAULT_CLASS_MASK:
                 return getImplClassDefinition(yangName, curNode);
-            case BUILDER_INTERFACE_MASK:
-                return getBuilderInterfaceDefinition(yangName, curNode);
             case GENERATE_SERVICE_AND_MANAGER:
                 return getRpcInterfaceDefinition(yangName, curNode);
             case GENERATE_EVENT_CLASS:
@@ -188,48 +178,6 @@ final class ClassDefinitionGenerator {
             return clsDef;
         }
         return getDefaultDefinition(INTERFACE, yangName, PUBLIC);
-    }
-
-    /**
-     * Returns builder interface file class definition.
-     *
-     * @param yangName java class name, corresponding to which the builder
-     *                 class is being generated
-     * @return definition
-     */
-    private static String getBuilderInterfaceDefinition(String yangName,
-                                                        YangNode curNode) {
-        if (!(curNode instanceof YangCase) &&
-                !(curNode instanceof YangAugment)) {
-            String clsDef = getClassDefinitionForWhenExtended(
-                    curNode, yangName, BUILDER_INTERFACE_MASK);
-            if (clsDef != null) {
-                return clsDef;
-            }
-        }
-        return getDefaultDefinition(INTERFACE, getSuffixedName(yangName, BUILDER),
-                                    null);
-    }
-
-    /**
-     * Returns builder file class definition.
-     *
-     * @param yangName file name
-     * @return definition
-     */
-    private static String getBuilderClassDefinition(String yangName,
-                                                    YangNode curNode) {
-        String mod = getSpecificModifier(PUBLIC, STATIC);
-        String bName = getSuffixedName(yangName, BUILDER);
-        if (!(curNode instanceof YangCase)) {
-            String clsDef = getClassDefinitionForWhenExtended(curNode, yangName,
-                                                              BUILDER_CLASS_MASK);
-            if (clsDef != null) {
-                return clsDef;
-            }
-        }
-        return getDefaultDefinitionWithImpl(CLASS, bName, mod,
-                                            getBuilderImplStringClassDef(yangName));
     }
 
     /**
@@ -402,31 +350,6 @@ final class ClassDefinitionGenerator {
                             .append(SPACE).append(EXTEND).append(SPACE);
                     def = new StringBuilder(getDefinitionString(def.toString(),
                                                                 holder));
-                    break;
-                case BUILDER_INTERFACE_MASK:
-                    def.append(INTERFACE)
-                            .append(SPACE).append(yangName).append(BUILDER)
-                            .append(SPACE).append(EXTEND).append(SPACE);
-                    def = new StringBuilder(getDefinitionString(
-                            def.toString(), holder));
-                    break;
-                case BUILDER_CLASS_MASK:
-                    boolean isModelObject = false;
-                    for (JavaQualifiedTypeInfoTranslator info : holder.getExtendsList()) {
-                        if (info.getClassInfo().equals(MODEL_OBJECT)) {
-                            isModelObject = true;
-                        }
-                    }
-                    def.append(STATIC).append(SPACE).append(CLASS)
-                            .append(SPACE).append(yangName).append(BUILDER);
-                    if (!isModelObject) {
-                        def.append(SPACE).append(EXTEND).append(SPACE);
-                        def = new StringBuilder(getDefinitionString(def.toString(),
-                                                                    holder));
-                    }
-                    def.append(SPACE).append(IMPLEMENTS).append(SPACE)
-                            .append(yangName).append(PERIOD)
-                            .append(yangName).append(BUILDER);
                     break;
                 case DEFAULT_CLASS_MASK:
 

@@ -42,8 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Collections.sort;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_CLASS_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.BUILDER_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
@@ -54,11 +52,8 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ATTRIBUTES_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_FOR_TYPE_MASK;
-import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ENUM_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EQUALS_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.EVENT_ENUM_MASK;
@@ -89,14 +84,12 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGene
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_INT_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.ENUM_METHOD_STRING_VALUE;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.builderMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationsString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassFromString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassToString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getCompareToForKeyClass;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getConstructorStart;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEnumsConstructor;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEnumsOfValueMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
@@ -128,9 +121,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUt
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getTypeFiles;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER_CLASS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.BUILDER_INTERFACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
@@ -237,6 +227,9 @@ public final class JavaFileGenerator {
                 //Getter methods.
                 insertDataIntoJavaFile(file, getDataFromTempFileHandle(
                         GETTER_FOR_INTERFACE_MASK, getBeanFiles(curNode), path));
+
+                insertDataIntoJavaFile(file, getDataFromTempFileHandle(
+                        SETTER_FOR_INTERFACE_MASK, getBeanFiles(curNode), path));
             } catch (IOException e) {
                 throw new IOException(getErrorMsg(className, INTERFACE));
             }
@@ -248,161 +241,6 @@ public final class JavaFileGenerator {
         for (String method : methods) {
             insertDataIntoJavaFile(file, method);
         }
-        return file;
-    }
-
-    /**
-     * Returns generated builder interface file for current node.
-     *
-     * @param file        file
-     * @param curNode     current YANG node
-     * @param attrPresent if any attribute is present or not
-     * @return builder interface file
-     * @throws IOException when fails to write in file
-     */
-    public static File generateBuilderInterfaceFile(File file, YangNode curNode,
-                                                    boolean attrPresent)
-            throws IOException {
-
-        JavaFileInfoTranslator fileInfo =
-                ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-
-        boolean leavesPresent;
-        YangLeavesHolder leavesHolder;
-        if (curNode instanceof YangLeavesHolder &&
-                curNode.isOpTypeReq()) {
-            leavesHolder = (YangLeavesHolder) curNode;
-            leavesPresent = leavesPresent(leavesHolder);
-        } else {
-            leavesPresent = false;
-        }
-
-        String className = getCapitalCase(fileInfo.getJavaName());
-        String path;
-        if (curNode instanceof RpcNotificationContainer) {
-            path = fileInfo.getPluginConfig().getCodeGenDir() +
-                    fileInfo.getPackageFilePath();
-        } else {
-            path = fileInfo.getBaseCodeGenPath() +
-                    fileInfo.getPackageFilePath();
-        }
-
-        initiateJavaFileGeneration(file, BUILDER_INTERFACE_MASK, null, curNode,
-                                   className);
-        List<String> methods = new ArrayList<>();
-        if (attrPresent) {
-            try {
-                //Getter methods.
-                methods.add(getDataFromTempFileHandle(
-                        GETTER_FOR_INTERFACE_MASK,
-                        getBeanFiles(curNode), path));
-
-                //Setter methods.
-                methods.add(getDataFromTempFileHandle(
-                        SETTER_FOR_INTERFACE_MASK,
-                        getBeanFiles(curNode), path));
-
-                //Add to list method.
-                insertDataIntoJavaFile(file, getDataFromTempFileHandle(
-                        ADD_TO_LIST_INTERFACE_MASK, getBeanFiles(curNode), path));
-            } catch (IOException e) {
-                throw new IOException(getErrorMsg(className, BUILDER_INTERFACE));
-            }
-        }
-
-        //Add build method to builder interface file.
-        methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
-                            .getTempJavaCodeFragmentFiles()
-                            .addBuildMethodForInterface());
-
-        //Add getters and setters in builder interface.
-        for (String method : methods) {
-            insertDataIntoJavaFile(file, method);
-        }
-
-        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
-        return file;
-    }
-
-    /**
-     * Returns generated builder class file for current node.
-     *
-     * @param file        file
-     * @param curNode     current YANG node
-     * @param attrPresent if any attribute is present or not
-     * @return builder class file
-     * @throws IOException when fails to write in file
-     */
-    public static File generateBuilderClassFile(File file, YangNode curNode,
-                                                boolean attrPresent)
-            throws IOException {
-
-        JavaFileInfoTranslator fileInfo =
-                ((JavaFileInfoContainer) curNode).getJavaFileInfo();
-
-        boolean leavesPresent;
-        YangLeavesHolder leavesHolder;
-        if (curNode instanceof YangLeavesHolder) {
-            leavesHolder = (YangLeavesHolder) curNode;
-            leavesPresent = leavesPresent(leavesHolder);
-        } else {
-            leavesPresent = false;
-        }
-
-        String className = getCapitalCase(fileInfo.getJavaName());
-        String path;
-        if (curNode instanceof RpcNotificationContainer) {
-            path = fileInfo.getPluginConfig().getCodeGenDir() +
-                    fileInfo.getPackageFilePath();
-        } else {
-            path = fileInfo.getBaseCodeGenPath() +
-                    fileInfo.getPackageFilePath();
-        }
-
-        initiateJavaFileGeneration(file, BUILDER_CLASS_MASK, null, curNode,
-                                   className);
-        List<String> methods = new ArrayList<>();
-        if (attrPresent) {
-
-            //Add attribute strings.
-            try {
-                insertDataIntoJavaFile(file, getDataFromTempFileHandle(
-                        ATTRIBUTES_MASK, getBeanFiles(curNode), path));
-            } catch (IOException e) {
-                throw new IOException(getErrorMsg(className, BUILDER_CLASS));
-            }
-            try {
-                //Getter methods.
-                methods.add(getDataFromTempFileHandle(
-                        GETTER_FOR_CLASS_MASK, getBeanFiles(curNode), path));
-                // Setter methods.
-                methods.add(getDataFromTempFileHandle(
-                        SETTER_FOR_CLASS_MASK, getBeanFiles(curNode), path));
-
-                //Add to list impl method.
-                methods.add(getDataFromTempFileHandle(
-                        ADD_TO_LIST_IMPL_MASK, getBeanFiles(curNode), path));
-
-                insertDataIntoJavaFile(file, NEW_LINE);
-            } catch (IOException e) {
-                throw new IOException(getErrorMsg(className, BUILDER_CLASS));
-            }
-        } else {
-            insertDataIntoJavaFile(file, NEW_LINE);
-        }
-
-        // Add default constructor and build method impl.
-        methods.add(((TempJavaCodeFragmentFilesContainer) curNode)
-                            .getTempJavaCodeFragmentFiles()
-                            .addBuildMethodImpl());
-
-        methods.add(addDefaultConstructor(curNode, PUBLIC, BUILDER));
-
-        //Add methods in builder class.
-        for (String method : methods) {
-            insertDataIntoJavaFile(file, method);
-        }
-        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
         return file;
     }
 
@@ -557,20 +395,8 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, NEW_LINE);
         }
 
-        try {
-            //Constructor.
-            String constructor = getConstructorStart(className, rootNode) +
-                    getDataFromTempFileHandle(
-                            CONSTRUCTOR_IMPL_MASK, getBeanFiles(curNode), path)
-                    + methodClose(FOUR_SPACE);
-            methods.add(constructor);
-        } catch (IOException e) {
-            throw new IOException(getErrorMsg(className, IMPL_CLASS));
-        }
+        methods.add(addDefaultConstructor(curNode, PUBLIC, DEFAULT));
 
-        methods.add(addDefaultConstructor(curNode, PROTECTED, DEFAULT));
-
-        methods.add(builderMethod(className));
         if (leavesPresent) {
             methods.add(getIsValueLeafSet());
         }
@@ -621,6 +447,10 @@ public final class JavaFileGenerator {
             //Getter methods.
             methods.add(getDataFromTempFileHandle(
                     GETTER_FOR_CLASS_MASK, getBeanFiles(curNode), path));
+
+            //Getter methods.
+            methods.add(getDataFromTempFileHandle(
+                    SETTER_FOR_CLASS_MASK, getBeanFiles(curNode), path));
 
             // Hash code method.
             methods.add(getHashCodeMethodClose(
@@ -699,6 +529,10 @@ public final class JavaFileGenerator {
             //Getter methods.
             methods.add(getDataFromTempFileHandle(
                     GETTER_FOR_CLASS_MASK, getTypeFiles(curNode), path));
+
+            //Setter methods.
+            methods.add(getDataFromTempFileHandle(
+                    SETTER_FOR_CLASS_MASK, getTypeFiles(curNode), path));
 
             // Hash code method.
             methods.add(getHashCodeMethodClose(
@@ -842,6 +676,10 @@ public final class JavaFileGenerator {
             //Getter methods.
             methods.add(getDataFromTempFileHandle(
                     GETTER_FOR_CLASS_MASK, getTypeFiles(curNode), path));
+
+            //Setter methods.
+            methods.add(getDataFromTempFileHandle(
+                    SETTER_FOR_CLASS_MASK, getTypeFiles(curNode), path));
 
             //Hash code method.
             methods.add(getHashCodeMethodClose(

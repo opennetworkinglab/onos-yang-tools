@@ -27,16 +27,6 @@ public final class GeneratedJavaFileType {
     public static final int INTERFACE_MASK = 1;
 
     /**
-     * Builder interface file.
-     */
-    public static final int BUILDER_INTERFACE_MASK = 2;
-
-    /**
-     * Builder class file.
-     */
-    public static final int BUILDER_CLASS_MASK = 4;
-
-    /**
      * Impl class file.
      */
     public static final int DEFAULT_CLASS_MASK = 8;

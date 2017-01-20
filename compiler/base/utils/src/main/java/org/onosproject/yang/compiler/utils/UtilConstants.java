@@ -33,12 +33,6 @@ public final class UtilConstants {
             " * Represents the implementation of ";
 
     /**
-     * JavaDocs for builder class.
-     */
-    public static final String BUILDER_CLASS_JAVA_DOC =
-            " * Represents the builder implementation of ";
-
-    /**
      * JavaDocs for interface class.
      */
     public static final String INTERFACE_JAVA_DOC =
@@ -62,11 +56,6 @@ public final class UtilConstants {
      */
     public static final String EVENT_LISTENER_JAVA_DOC =
             " * Abstraction for event listener of ";
-
-    /**
-     * JavaDocs for builder interface class.
-     */
-    public static final String BUILDER_INTERFACE_JAVA_DOC = " * Builder for ";
 
     /**
      * JavaDocs for enum class.
@@ -115,7 +104,7 @@ public final class UtilConstants {
      * JavaDocs's description for setter method.
      */
     public static final String JAVA_DOC_SETTERS =
-            " * Returns the builder object of ";
+            " * Sets the attribute ";
 
     /**
      * JavaDocs's description for add to list method.
@@ -166,11 +155,6 @@ public final class UtilConstants {
      * JavaDocs's description for build method.
      */
     public static final String JAVA_DOC_BUILD = " * Builds object of ";
-
-    /**
-     * JavaDocs's statement for builder object.
-     */
-    public static final String BUILDER_OBJECT = "builder object of ";
 
     /**
      * JavaDocs's statement for rpc method.
@@ -247,11 +231,6 @@ public final class UtilConstants {
      * Static attribute for period.
      */
     public static final String ENTRY = "Entry";
-
-    /**
-     * Static attribute for period.
-     */
-    public static final String ENTRY_SET = "entrySet()";
 
     /**
      * Static attribute for compare to.
@@ -1249,16 +1228,6 @@ public final class UtilConstants {
     public static final String CLASS = "class";
 
     /**
-     * Static attribute for builder syntax.
-     */
-    public static final String BUILDER = "Builder";
-
-    /**
-     * Static attribute for builder syntax.
-     */
-    public static final String BUILDER_LOWER_CASE = "builder";
-
-    /**
      * Static attribute for service syntax.
      */
     public static final String SERVICE = "Service";
@@ -1352,16 +1321,6 @@ public final class UtilConstants {
      * For event subject file generation.
      */
     public static final String EVENT_SUBJECT_NAME_SUFFIX = "EventSubject";
-
-    /**
-     * Static attribute for build method syntax.
-     */
-    public static final String BUILD = "build";
-
-    /**
-     * Static attribute for build for filter in augment method syntax.
-     */
-    public static final String BUILD_FOR_FILTER = "buildForFilter";
 
     /**
      * Static attribute for object.
@@ -1733,16 +1692,6 @@ public final class UtilConstants {
      * Static attribute for rpc class.
      */
     public static final String RPC_CLASS = "rpc class";
-
-    /**
-     * Static attribute for builder class.
-     */
-    public static final String BUILDER_CLASS = "builder class";
-
-    /**
-     * Static attribute for builder interface.
-     */
-    public static final String BUILDER_INTERFACE = "builder interface";
 
     /**
      * Static attribute for bits.

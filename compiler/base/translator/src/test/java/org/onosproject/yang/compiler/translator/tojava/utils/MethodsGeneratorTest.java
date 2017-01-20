@@ -99,34 +99,6 @@ public final class MethodsGeneratorTest {
     }
 
     /**
-     * Test for build method for class.
-     */
-    @Test
-    public void getBuildTest() {
-        String method = MethodsGenerator.getBuild(CLASS_NAME, false);
-        assertThat(true, is(method.equals(
-                UtilConstants.FOUR_SPACE_INDENTATION + UtilConstants.PUBLIC + UtilConstants.SPACE + CLASS_NAME + UtilConstants.SPACE +
-                        UtilConstants.BUILD + UtilConstants.OPEN_PARENTHESIS + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SPACE +
-                        UtilConstants.OPEN_CURLY_BRACKET + UtilConstants.NEW_LINE + UtilConstants.EIGHT_SPACE_INDENTATION +
-                        UtilConstants.RETURN + UtilConstants.SPACE + UtilConstants.NEW + UtilConstants.SPACE + UtilConstants.DEFAULT_CAPS + CLASS_NAME +
-                        UtilConstants.OPEN_PARENTHESIS + UtilConstants.THIS + UtilConstants.CLOSE_PARENTHESIS +
-                        UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE + UtilConstants.FOUR_SPACE_INDENTATION +
-                        UtilConstants.CLOSE_CURLY_BRACKET + UtilConstants.NEW_LINE)));
-    }
-
-    /**
-     * Test for build method of interface.
-     */
-    @Test
-    public void getBuildForInterfaceTest() {
-        String method = MethodsGenerator.getBuildForInterface(CLASS_NAME);
-        assertThat(true, is(method.equals(
-                UtilConstants.FOUR_SPACE_INDENTATION + CLASS_NAME + UtilConstants.SPACE + UtilConstants.BUILD +
-                        UtilConstants.OPEN_PARENTHESIS + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SEMI_COLON +
-                        UtilConstants.NEW_LINE)));
-    }
-
-    /**
      * Test for check not null method.
      */
     @Test
@@ -136,34 +108,6 @@ public final class MethodsGeneratorTest {
                 UtilConstants.EIGHT_SPACE_INDENTATION + UtilConstants.CHECK_NOT_NULL_STRING +
                         UtilConstants.OPEN_PARENTHESIS + CLASS_NAME + UtilConstants.COMMA + UtilConstants.SPACE +
                         CLASS_NAME + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
-    }
-
-    /**
-     * Test case for constructor.
-     */
-    @Test
-    public void getConstructorTest() {
-        JavaAttributeInfo testAttr = getTestAttribute();
-        String method = MethodsGenerator.getConstructor(testAttr, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER
-        );
-        assertThat(true, is(method.contains(
-                ATTRIBUTE_NAME + UtilConstants.SPACE + UtilConstants.EQUAL + UtilConstants.SPACE +
-                        UtilConstants.BUILDER_LOWER_CASE + UtilConstants.OBJECT + UtilConstants.PERIOD +
-                        UtilConstants.GET_METHOD_PREFIX + CLASS_NAME + UtilConstants.OPEN_PARENTHESIS +
-                        UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SEMI_COLON)));
-    }
-
-    /**
-     * Test for constructor start method.
-     */
-    @Test
-    public void getConstructorStartTest() {
-        String method = MethodsGenerator.getConstructorStart(CLASS_NAME, false);
-        assertThat(true, is(method.contains(
-                UtilConstants.PROTECTED + UtilConstants.SPACE + UtilConstants.DEFAULT_CAPS + CLASS_NAME +
-                        UtilConstants.OPEN_PARENTHESIS + CLASS_NAME + UtilConstants.BUILDER + UtilConstants.SPACE +
-                        UtilConstants.BUILDER_LOWER_CASE + UtilConstants.OBJECT + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SPACE +
-                        UtilConstants.OPEN_CURLY_BRACKET)));
     }
 
     /**

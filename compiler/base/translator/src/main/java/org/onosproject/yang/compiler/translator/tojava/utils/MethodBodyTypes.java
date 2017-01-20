@@ -27,9 +27,6 @@ enum MethodBodyTypes {
     //Setter method body.
     SETTER,
 
-    //Build method body.
-    BUILD,
-
     //Constructor method body.
     CONSTRUCTOR,
 
