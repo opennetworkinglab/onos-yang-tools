@@ -37,7 +37,6 @@ public class DefaultYangModuleId implements YangModuleId {
      */
     public DefaultYangModuleId(String name, String rev) {
         checkNotNull(name);
-        checkNotNull(rev);
         moduleName = name;
         revision = rev;
     }

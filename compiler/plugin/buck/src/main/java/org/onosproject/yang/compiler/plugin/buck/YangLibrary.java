@@ -121,9 +121,10 @@ public class YangLibrary extends AbstractBuildRule {
      * @return generated sources directory
      */
     public Path getGenSrcsDirectory() {
-        File dir = new File(genSrcsDirectory.toString() + SLASH + YANG);
-        dir.mkdirs();
-        return genSrcsDirectory;
+        synchronized (YangLibrary.class) {
+            File dir = new File(genSrcsDirectory.toString() + SLASH + YANG);
+            dir.mkdirs();
+            return genSrcsDirectory;
+        }
     }
-
 }

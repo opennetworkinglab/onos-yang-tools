@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LIB;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LIB_PATH;
@@ -62,15 +63,17 @@ public class YangStep extends AbstractExecutionStep {
     public StepExecutionResult execute(ExecutionContext executionContext)
             throws IOException, InterruptedException {
 
-        List<File> sourceFiles = srcs.stream().map(Path::toFile)
-                .collect(Collectors.toList());
-        try {
-            new YangGenerator(sourceFiles, output.toString(), getJarPaths())
-                    .execute();
-            return StepExecutionResult.SUCCESS;
-        } catch (YangParsingException e) {
-            executionContext.getConsole().printErrorText(e.getMessage());
-            return StepExecutionResult.ERROR;
+        synchronized (YangStep.class) {
+            List<File> sourceFiles = srcs.stream().map(Path::toFile)
+                    .collect(Collectors.toList());
+            try {
+                new YangGenerator(sourceFiles, output.toString(), getJarPaths())
+                        .execute();
+                return StepExecutionResult.SUCCESS;
+            } catch (YangParsingException e) {
+                executionContext.getConsole().printErrorText(e.getMessage());
+                return StepExecutionResult.ERROR;
+            }
         }
     }
 
@@ -81,22 +84,34 @@ public class YangStep extends AbstractExecutionStep {
         UnflavoredBuildTarget uBt;
         if (deps != null) {
             for (BuildRule rule : deps) {
-                if (!rule.getBuildTarget().getFullyQualifiedName()
-                        .contains(LIB_PATH)) {
+                String name = rule.getBuildTarget().getFullyQualifiedName();
+                if (!name.contains(LIB_PATH)) {
                     builder = new StringBuilder();
-                    //build absolute path for jar file
-                    builder.append(filesystem.getRootPath().toString()).append(SLASH)
-                            .append(filesystem.getBuckPaths().getGenDir())
-                            .append(SLASH);
-                    uBt = rule.getBuildTarget().getUnflavoredBuildTarget();
-                    array = uBt.getBaseName().split(SLASH);
-                    for (int i = 2; i < array.length; i++) {
-                        builder.append(array[i]).append(SLASH);
+                    if (name.contains(COLON)) {
+                        //when you have prebuilt jar in your directory
+                        Path thisPath = rule.getPathToOutput();
+                        if (thisPath != null) {
+                            depJarPaths.add(thisPath.toString());
+                        }
+                    } else {
+                        //when dependent on other package
+                        //build absolute path for jar file
+                        builder.append(filesystem.getRootPath().toString()).append(SLASH)
+                                .append(filesystem.getBuckPaths().getGenDir())
+                                .append(SLASH);
+                        uBt = rule.getBuildTarget().getUnflavoredBuildTarget();
+                        array = uBt.getBaseName().split(SLASH);
+                        for (int i = 2; i < array.length; i++) {
+                            builder.append(array[i]).append(SLASH);
+                        }
+
+                        builder.append(LIB).append(uBt.getShortName())
+                                .append(OUT).append(SLASH)
+                                .append(uBt.getShortName()).append(PERIOD + JAR);
                     }
-                    builder.append(LIB).append(uBt.getShortName())
-                            .append(OUT).append(SLASH)
-                            .append(uBt.getShortName()).append(PERIOD + JAR);
-                    depJarPaths.add(builder.toString());
+                    if (builder.length() != 0) {
+                        depJarPaths.add(builder.toString());
+                    }
                 }
             }
         }

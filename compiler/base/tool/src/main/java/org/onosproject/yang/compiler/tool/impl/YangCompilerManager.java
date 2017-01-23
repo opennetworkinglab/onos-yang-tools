@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -75,6 +76,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class YangCompilerManager implements YangCompilerService {
 
     private static final Logger log = getLogger(YangCompilerManager.class);
+    private static final String DATE_FORMAT = "yyyy-mm-dd";
     private final YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
     private final YangLinker yangLinker = new YangLinkerManager();
     private final Set<YangNode> yangNodeSet = new HashSet<>();
@@ -87,17 +89,19 @@ public class YangCompilerManager implements YangCompilerService {
     @Override
     public YangCompiledOutput compileYangFiles(YangCompilationParam param)
             throws IOException, YangCompilerException {
+        synchronized (YangCompilerManager.class) {
 
-        YangPluginConfig config = new YangPluginConfig();
-        config.setCodeGenDir(param.getCodeGenDir().toString() + SLASH);
-        config.resourceGenDir(param.getMetadataGenDir().toString() +
-                                      SLASH);
+            YangPluginConfig config = new YangPluginConfig();
+            config.setCodeGenDir(param.getCodeGenDir().toString() + SLASH);
+            config.resourceGenDir(param.getMetadataGenDir().toString() +
+                                          SLASH);
 
-        processYangFiles(createYangFileInfoSet(param.getYangFiles()),
-                         dependentSchema(param.getDependentSchemas()), config);
+            processYangFiles(createYangFileInfoSet(param.getYangFiles()),
+                             dependentSchema(param.getDependentSchemas()), config);
 
-        return new DefaultYangCompiledOutput(
-                processYangModel(config.resourceGenDir()), genJavaPath);
+            return new DefaultYangCompiledOutput(
+                    processYangModel(config.resourceGenDir()), genJavaPath);
+        }
     }
 
     /**
@@ -125,8 +129,24 @@ public class YangCompilerManager implements YangCompilerService {
      * @return YANG module id for a given YANG module node
      */
     private YangModuleId processModuleId(YangNode module) {
-        return new DefaultYangModuleId(module.getName(), module.getRevision()
-                .getRevDate().toString());
+        String rev = getDateInStringFormat(module);
+        return new DefaultYangModuleId(module.getName(), rev);
+    }
+
+    /**
+     * Returns date in string format.
+     *
+     * @param schemaNode schema node
+     * @return date in string format
+     */
+    private String getDateInStringFormat(YangNode schemaNode) {
+        if (schemaNode != null) {
+            if (schemaNode.getRevision() != null) {
+                return new SimpleDateFormat(DATE_FORMAT)
+                        .format(schemaNode.getRevision().getRevDate());
+            }
+        }
+        return null;
     }
 
     /**
