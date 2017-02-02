@@ -16,24 +16,41 @@
 
 package org.onosproject.yang.runtime.api;
 
-import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.ResourceId;
+
+import java.util.List;
 
 /**
- * Representation of a context for decoding YANG models via serializers.
+ * Representation of annotated nodes information.
  */
-public interface YangSerializerContext {
+public interface AnnotatedNodeInfo {
 
     /**
-     * Provides information about whether node annotation is expected.
+     * Returns resource identifier of the annotated node.
      *
-     * @return true if node can be annotated, false otherwise
+     * @return resource identifier
      */
-    boolean isNodeAnnotated();
+    ResourceId resourceId();
 
     /**
-     * Returns schema context of root node "/".
+     * Sets resource identifier of the annotated node.
      *
-     * @return schema context provider
+     * @param id resource identifier
      */
-    SchemaContext getContext();
+    void resourceId(ResourceId id);
+
+    /**
+     * Returns annotations associated with the node.
+     *
+     * @return annotations
+     */
+    List<Annotation> annotations();
+
+    /**
+     * Adds annotation to a node.
+     *
+     * @param annotation annotation information
+     */
+    void addAnnotation(Annotation annotation);
 }
+

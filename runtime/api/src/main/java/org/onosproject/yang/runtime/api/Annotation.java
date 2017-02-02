@@ -16,24 +16,36 @@
 
 package org.onosproject.yang.runtime.api;
 
-import org.onosproject.yang.model.SchemaContext;
-
 /**
- * Representation of a context for decoding YANG models via serializers.
+ * Representation of annotated attribute.
  */
-public interface YangSerializerContext {
+public interface Annotation {
 
     /**
-     * Provides information about whether node annotation is expected.
+     * Returns name of an annotated attribute.
      *
-     * @return true if node can be annotated, false otherwise
+     * @return name of the attribute
      */
-    boolean isNodeAnnotated();
+    String name();
 
     /**
-     * Returns schema context of root node "/".
+     * Sets name of the annotated attribute.
      *
-     * @return schema context provider
+     * @param name of the attribute
      */
-    SchemaContext getContext();
+    void name(String name);
+
+    /**
+     * Returns value of the annotation.
+     *
+     * @return annotation value
+     */
+    String value();
+
+    /**
+     * Sets value of the annotation.
+     *
+     * @param value value of the annotation
+     */
+    void value(String value);
 }

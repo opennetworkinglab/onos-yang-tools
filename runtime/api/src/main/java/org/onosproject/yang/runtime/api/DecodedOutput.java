@@ -16,24 +16,39 @@
 
 package org.onosproject.yang.runtime.api;
 
-import org.onosproject.yang.model.SchemaContext;
+import java.util.List;
 
 /**
- * Representation of a context for decoding YANG models via serializers.
+ * Representation of parameters which are provided by serializers as decoding
+ * output.
  */
-public interface YangSerializerContext {
+public interface DecodedOutput {
 
     /**
-     * Provides information about whether node annotation is expected.
+     * Returns composite node.
      *
-     * @return true if node can be annotated, false otherwise
+     * @return composite node
      */
-    boolean isNodeAnnotated();
+    CompositeData getCompositeNode();
 
     /**
-     * Returns schema context of root node "/".
+     * Sets composite node.
      *
-     * @return schema context provider
+     * @param node composite node
      */
-    SchemaContext getContext();
+    void setCompositeNode(CompositeData node);
+
+    /**
+     * Returns annotated nodes information.
+     *
+     * @return annotated nodes information
+     */
+    List<AnnotatedNodeInfo> getAnnotatedNodesInfo();
+
+    /**
+     * Adds information about annotated node.
+     *
+     * @param info annotated node information
+     */
+    void addAnnotatedNodeInfo(AnnotatedNodeInfo info);
 }
