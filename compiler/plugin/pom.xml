@@ -34,6 +34,7 @@
     <modules>
         <module>maven</module>
         <module>buck</module>
+        <module>utils</module>
     </modules>
 
     <dependencies>
