@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,16 +48,24 @@ public abstract class DataNode {
          */
         MULTI_INSTANCE_LEAF_VALUE_NODE
     }
-
     /**
      * Type of node in data store.
      */
     protected Type type;
-
     /**
      * Identifies a node uniquely among its siblings.
      */
     protected NodeKey key;
+
+    /**
+     * Creates an instance of data node.
+     *
+     * @param builder data node builder
+     */
+    protected DataNode(Builder builder) {
+        type = builder.type;
+        key = builder.key;
+    }
 
     /**
      * Returns the type of node.
@@ -75,16 +83,6 @@ public abstract class DataNode {
      */
     public NodeKey key() {
         return key;
-    }
-
-    /**
-     * Creates an instance of data node.
-     *
-     * @param builder data node builder
-     */
-    protected DataNode(Builder builder) {
-        type = builder.type;
-        key = builder.key;
     }
 
     /**
@@ -117,6 +115,12 @@ public abstract class DataNode {
          * Node key builder.
          */
         protected NodeKey.NodeKeyBuilder keyBuilder;
+
+        /**
+         * Application related information, this enables application to use
+         * this builder as there work bench.
+         */
+        protected Object AppInfo;
 
         /**
          * Parent data node
@@ -278,6 +282,26 @@ public abstract class DataNode {
                 parent.addNode(build());
             }
             return parent;
+        }
+
+        /**
+         * Returns application information. This enables application to use
+         * this builder as there work bench.
+         *
+         * @return application information
+         */
+        public Object appInfo() {
+            return AppInfo;
+        }
+
+        /**
+         * Sets application information. This enables application to use
+         * this builder as there work bench.
+         *
+         * @param appInfo application related information
+         */
+        public void appInfo(Object appInfo) {
+            AppInfo = appInfo;
         }
     }
 }

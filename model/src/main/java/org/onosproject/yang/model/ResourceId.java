@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,15 @@ public class ResourceId {
     }
 
     /**
+     * Retrieves a new resource builder.
+     *
+     * @return resource builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
      * Returns the list of node key used to uniquely identify the branch in the
      * logical tree starting from root.
      *
@@ -56,15 +65,6 @@ public class ResourceId {
      */
     public List<NodeKey> nodeKeys() {
         return nodeKeyList;
-    }
-
-    /**
-     * Retrieves a new resource builder.
-     *
-     * @return resource builder
-     */
-    public static Builder builder() {
-        return new Builder();
     }
 
     @Override
@@ -94,6 +94,12 @@ public class ResourceId {
      * Builder to construct resource identifier.
      */
     public static class Builder {
+
+        /**
+         * Application related information, this enables application to use
+         * this builder as there work bench.
+         */
+        protected Object AppInfo;
 
         private List<NodeKey> nodeKeyList = new LinkedList<>();
         private NodeKey.NodeKeyBuilder curKeyBuilder = null;
@@ -177,6 +183,26 @@ public class ResourceId {
             checkNotNull(curKeyBuilder, NO_KEY_SET);
             nodeKeyList.add(curKeyBuilder.build());
             return new ResourceId(this);
+        }
+
+        /**
+         * Returns application information. This enables application to use
+         * this builder as there work bench.
+         *
+         * @return application information
+         */
+        public Object appInfo() {
+            return AppInfo;
+        }
+
+        /**
+         * Sets application information. This enables application to use
+         * this builder as there work bench.
+         *
+         * @param appInfo application related information
+         */
+        public void appInfo(Object appInfo) {
+            AppInfo = appInfo;
         }
     }
 }
