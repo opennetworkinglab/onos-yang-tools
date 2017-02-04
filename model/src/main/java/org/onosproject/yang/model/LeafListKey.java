@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,17 @@ public class LeafListKey extends NodeKey<LeafListKey>
      */
     String asString() {
         return val.toString();
+    }
+
+    /**
+     * Creates and returns a deep copy of this object.
+     *
+     * @return cloned copy
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the {@code Cloneable} interface
+     */
+    public LeafListKey clone() throws CloneNotSupportedException {
+        return (LeafListKey) super.clone();
     }
 
     @Override

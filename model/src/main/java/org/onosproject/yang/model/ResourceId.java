@@ -67,6 +67,17 @@ public class ResourceId {
         return nodeKeyList;
     }
 
+    /**
+     * Returns resource identifier builder for a given resource identifier.
+     * It contains all the attributes from the resource identifier. It is to
+     * provide mutability of resource identifier using builder pattern.
+     *
+     * @return data node builder
+     */
+    public Builder copyBuilder() throws CloneNotSupportedException {
+        return new Builder(this);
+    }
+
     @Override
     public int hashCode() {
         return hash(nodeKeyList);
@@ -101,8 +112,55 @@ public class ResourceId {
          */
         protected Object AppInfo;
 
-        private List<NodeKey> nodeKeyList = new LinkedList<>();
+        private List<NodeKey> nodeKeyList;
         private NodeKey.NodeKeyBuilder curKeyBuilder = null;
+
+        /**
+         * Creates an instance of resource identifier builder.
+         */
+        public Builder() {
+            nodeKeyList = new LinkedList<>();
+        }
+
+        /**
+         * Creates an instance of resource identifier builder. This is used
+         * in scenario when builder is required from a given resource
+         * identifier.
+         *
+         * @param id old resource identifier
+         */
+        public Builder(ResourceId id) throws CloneNotSupportedException {
+            nodeKeyList = new LinkedList<>();
+            for (NodeKey key : id.nodeKeyList) {
+                nodeKeyList.add(key.clone());
+            }
+        }
+
+        /**
+         * Appends a given resource id to current builder.
+         *
+         * @param id resource identifier to be appended
+         * @return builder
+         */
+        public Builder append(ResourceId id) throws CloneNotSupportedException {
+            processCurKey();
+            curKeyBuilder = null;
+            Builder ob = id.copyBuilder();
+            nodeKeyList.addAll(ob.nodeKeyList);
+            return this;
+        }
+
+        /**
+         * Validates, build and add current key.
+         */
+        private void processCurKey() {
+            if (curKeyBuilder != null) {
+                if (curKeyBuilder instanceof LeafListKey.LeafListKeyBuilder) {
+                    throw new ModelException(LEAF_IS_TERMINAL);
+                }
+                nodeKeyList.add(curKeyBuilder.build());
+            }
+        }
 
         /**
          * Adds the descendent node's schema identity.
@@ -112,16 +170,9 @@ public class ResourceId {
          * @return updated builder pointing to the specified schema location
          */
         public Builder addBranchPointSchema(String name, String nameSpace) {
-            if (curKeyBuilder != null) {
-                if (curKeyBuilder instanceof LeafListKey.LeafListKeyBuilder) {
-                    throw new ModelException(LEAF_IS_TERMINAL);
-                }
-                nodeKeyList.add(curKeyBuilder.build());
-            }
-
+            processCurKey();
             curKeyBuilder = new NodeKey.NodeKeyBuilder();
             curKeyBuilder.schemaId(name, nameSpace);
-
             return this;
         }
 

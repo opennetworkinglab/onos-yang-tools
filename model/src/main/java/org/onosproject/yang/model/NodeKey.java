@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.onosproject.yang.model;
 
 import java.util.Objects;
@@ -28,7 +27,7 @@ import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
  * Abstraction of an entity which identifies a node uniquely among its
  * siblings.
  */
-public class NodeKey<E extends NodeKey> implements Comparable<E> {
+public class NodeKey<E extends NodeKey> implements Comparable<E>, Cloneable {
 
     protected SchemaId schemaId;
 
@@ -39,6 +38,15 @@ public class NodeKey<E extends NodeKey> implements Comparable<E> {
      */
     protected NodeKey(NodeKeyBuilder builder) {
         schemaId = builder.schemaId;
+    }
+
+    /**
+     * Returns node key builder.
+     *
+     * @return node key builder
+     */
+    public static NodeKeyBuilder builder() {
+        return new NodeKeyBuilder();
     }
 
     /**
@@ -55,15 +63,6 @@ public class NodeKey<E extends NodeKey> implements Comparable<E> {
     public int compareTo(NodeKey o) {
         checkNotNull(o);
         return schemaId.compareTo(o.schemaId());
-    }
-
-    /**
-     * Returns node key builder.
-     *
-     * @return node key builder
-     */
-    public static NodeKeyBuilder builder() {
-        return new NodeKeyBuilder();
     }
 
     @Override
@@ -90,6 +89,19 @@ public class NodeKey<E extends NodeKey> implements Comparable<E> {
         return toStringHelper(getClass())
                 .add("schemaId", schemaId)
                 .toString();
+    }
+
+    /**
+     * Creates and returns a deep copy of this object.
+     *
+     * @return cloned copy
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the {@code Cloneable} interface
+     */
+    public NodeKey clone() throws CloneNotSupportedException {
+        NodeKey clonedKey = (NodeKey) super.clone();
+        clonedKey.schemaId = schemaId.clone();
+        return clonedKey;
     }
 
     /**

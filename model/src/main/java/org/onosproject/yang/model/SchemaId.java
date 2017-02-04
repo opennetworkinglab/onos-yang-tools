@@ -26,7 +26,7 @@ import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
  * Representation of an entity which identifies a schema node in the schema /
  * data tree.
  */
-public class SchemaId implements Comparable<SchemaId> {
+public class SchemaId implements Comparable<SchemaId>, Cloneable {
 
     private String name;
     private String nameSpace;
@@ -47,7 +47,7 @@ public class SchemaId implements Comparable<SchemaId> {
      *
      * @return node name
      */
-    String name() {
+    public String name() {
         return name;
     }
 
@@ -57,8 +57,19 @@ public class SchemaId implements Comparable<SchemaId> {
      *
      * @return node's namespace
      */
-    String namespace() {
+    public String namespace() {
         return nameSpace;
+    }
+
+    /**
+     * Creates and returns a deep copy of this object.
+     *
+     * @return cloned copy
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the {@code Cloneable} interface
+     */
+    public SchemaId clone() throws CloneNotSupportedException {
+        return (SchemaId) super.clone();
     }
 
     @Override

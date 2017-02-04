@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 
 package org.onosproject.yang.model;
 
@@ -50,6 +49,23 @@ public class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
      */
     List<KeyLeaf> keyLeafs() {
         return keyLeafs;
+    }
+
+    /**
+     * Creates and returns a deep copy of this object.
+     *
+     * @return cloned copy
+     * @throws CloneNotSupportedException if the object's class does not
+     *                                    support the {@code Cloneable} interface
+     */
+    public ListKey clone() throws CloneNotSupportedException {
+        ListKey clonedListKey = (ListKey) super.clone();
+        List<KeyLeaf> clonedKeyLeafs = new LinkedList<>();
+        for (KeyLeaf leaf : keyLeafs) {
+            clonedKeyLeafs.add(leaf.clone());
+        }
+        clonedListKey.keyLeafs = clonedKeyLeafs;
+        return clonedListKey;
     }
 
     public int compareTo(ListKey o) {
