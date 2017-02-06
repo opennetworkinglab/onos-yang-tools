@@ -47,6 +47,8 @@ public interface YangRuntimeService {
      * node information
      * @throws YangRuntimeException when fails to perform decode operation
      */
+    // FIXME: This needs to be revised for symmetry with encode and mutability
+    // FIXME: Entities exchanged across this boundary ought not to be mutable
     DecodedOutput decode(CompositeStream external, String dataFormat,
                          boolean nodeAnnotated);
 
@@ -76,6 +78,7 @@ public interface YangRuntimeService {
      * configuration data
      * @throws YangRuntimeException when fails to perform encode operation
      */
+    // FIXME: Entities exchanged across this boundary ought not to be mutable
     CompositeStream encode(CompositeData internal, String dataFormat,
                            List<AnnotatedNodeInfo> info);
 }
