@@ -1804,7 +1804,7 @@ public final class UtilConstants {
      */
     public static final String CAMEL_CLASS = "Class";
 
-	/*
+    /**
      * Default meta data path.
      */
     public static final String DEFAULT_JAR_RES_PATH = SLASH + TEMP + SLASH +

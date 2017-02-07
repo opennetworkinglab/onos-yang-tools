@@ -120,7 +120,8 @@ public class YangLibraryDescription
                                 .add(yangLib)
 //                                .addAll(deps)
                                 //FIXME remove when we figure out compile time deps
-                                .addAll((args.deps.or(ImmutableSortedSet.<BuildTarget>of())).stream().map(resolver::getRule).collect(Collectors.toList()))
+                                .addAll((args.deps.or(ImmutableSortedSet.<BuildTarget>of())).
+                                        stream().map(resolver::getRule).collect(Collectors.toList()))
 //                                .addAll(BuildRules.getExportedRules(deps))
                                 .addAll(pathResolver.filterBuildRuleInputs(javacOptions.getInputs(pathResolver)))
                                 .build()),

@@ -283,7 +283,8 @@ public final class TypeListener {
                                        TypeStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, ListenerErrorType.MISSING_CURRENT_HOLDER, TYPE_DATA, ctx.string().getText(), EXIT);
+        checkStackIsNotEmpty(listener, ListenerErrorType.MISSING_CURRENT_HOLDER, TYPE_DATA,
+                             ctx.string().getText(), EXIT);
 
         Parsable parsableType = listener.getParsedDataStack().pop();
         if (!(parsableType instanceof YangType)) {
@@ -304,7 +305,8 @@ public final class TypeListener {
             DataModelUtils.addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
             throw new ParserException(constructExtendedListenerErrorMessage(ListenerErrorType.UNHANDLED_PARSED_DATA,
-                                                                            TYPE_DATA, ctx.string().getText(), ENTRY, e.getMessage()));
+                                                                            TYPE_DATA, ctx.string().getText(),
+                                                                            ENTRY, e.getMessage()));
         }
     }
 

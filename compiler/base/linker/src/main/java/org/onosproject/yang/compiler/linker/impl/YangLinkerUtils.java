@@ -112,7 +112,8 @@ public final class YangLinkerUtils {
     }
 
     /**
-     * Detects collision between target nodes leaf/leaf-list or child node with augmented leaf/leaf-list or child node.
+     * Detects collision between target nodes leaf/leaf-list or child node with
+     * augmented leaf/leaf-list or child node.
      *
      * @param targetNode target node
      * @param augment    augment node
@@ -357,8 +358,8 @@ public final class YangLinkerUtils {
     }
 
     /**
-     * Detects collision between target nodes and its all leaf/leaf-list or child node with augmented leaf/leaf-list or
-     * child node.
+     * Detects collision between target nodes and its all leaf/leaf-list or child
+     * node with augmented leaf/leaf-list or child node.
      *
      * @param targetNode target node
      * @param augment    augment node
@@ -442,8 +443,8 @@ public final class YangLinkerUtils {
             return nodeIdentifier;
         } else {
             throw new LinkerException("YANG file error : " +
-                                              getYangConstructType(yangConstruct) + " name " + nodeIdentifierString +
-                                              " is not valid.");
+                                              getYangConstructType(yangConstruct) + " name " +
+                                              nodeIdentifierString + " is not valid.");
         }
     }
 
@@ -637,7 +638,8 @@ public final class YangLinkerUtils {
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
                             new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
-                                                                        identityRef.getLineNumber(), identityRef.getCharPosition());
+                                                                        identityRef.getLineNumber(),
+                                                                        identityRef.getCharPosition());
                     try {
                         addResolutionInfo(resolutionInfo);
                     } catch (DataModelException e) {
@@ -670,7 +672,8 @@ public final class YangLinkerUtils {
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
                             new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
-                                                                        identityRef.getLineNumber(), identityRef.getCharPosition());
+                                                                        identityRef.getLineNumber(),
+                                                                        identityRef.getCharPosition());
                     try {
                         addResolutionInfo(resolutionInfo);
                     } catch (DataModelException e) {

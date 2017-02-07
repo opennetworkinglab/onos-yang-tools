@@ -24,6 +24,8 @@ import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
+
 /**
  * Test case for testing listener validation util.
  */
@@ -39,7 +41,9 @@ public class ListenerValidationTest {
     @Test
     public void validateStackIsNotEmptyForEmptyStack() {
 
-        String expectedError = ListenerErrorMessageConstruction.constructListenerErrorMessage(ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        String expectedError = constructListenerErrorMessage(ListenerErrorType.MISSING_HOLDER,
+                                                             YangConstructType.YANGBASE_DATA,
+                                                             "", ListenerErrorLocation.EXIT);
 
         // Get the exception occurred during parsing.
         thrown.expect(ParserException.class);
@@ -48,7 +52,8 @@ public class ListenerValidationTest {
         // Create test walker and assign test error to it.
         TreeWalkListener testWalker = new TreeWalkListener();
 
-        ListenerValidation.checkStackIsNotEmpty(testWalker, ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        ListenerValidation.checkStackIsNotEmpty(testWalker, ListenerErrorType.MISSING_HOLDER,
+                                                YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
     }
 
     /**
@@ -65,7 +70,8 @@ public class ListenerValidationTest {
         YangRevision tmpNode = new YangRevision();
         testWalker.getParsedDataStack().push(tmpNode);
 
-        ListenerValidation.checkStackIsNotEmpty(testWalker, ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        ListenerValidation.checkStackIsNotEmpty(testWalker, ListenerErrorType.MISSING_HOLDER,
+                                                YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
     }
 
     /**
@@ -75,7 +81,9 @@ public class ListenerValidationTest {
     @Test
     public void validateStackIsEmptyForNonEmptyStack() {
 
-        String expectedError = ListenerErrorMessageConstruction.constructListenerErrorMessage(ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        String expectedError = constructListenerErrorMessage(ListenerErrorType.MISSING_HOLDER,
+                                                             YangConstructType.YANGBASE_DATA,
+                                                             "", ListenerErrorLocation.EXIT);
 
         // Get the exception occurred during parsing.
         thrown.expect(ParserException.class);
@@ -88,7 +96,8 @@ public class ListenerValidationTest {
         YangRevision tmpNode = new YangRevision();
         testWalker.getParsedDataStack().push(tmpNode);
 
-        ListenerValidation.checkStackIsEmpty(testWalker, ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        ListenerValidation.checkStackIsEmpty(testWalker, ListenerErrorType.MISSING_HOLDER,
+                                             YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
     }
 
     /**
@@ -101,6 +110,7 @@ public class ListenerValidationTest {
         // Create test walker and assign test error to it.
         TreeWalkListener testWalker = new TreeWalkListener();
 
-        ListenerValidation.checkStackIsEmpty(testWalker, ListenerErrorType.MISSING_HOLDER, YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
+        ListenerValidation.checkStackIsEmpty(testWalker, ListenerErrorType.MISSING_HOLDER,
+                                             YangConstructType.YANGBASE_DATA, "", ListenerErrorLocation.EXIT);
     }
 }

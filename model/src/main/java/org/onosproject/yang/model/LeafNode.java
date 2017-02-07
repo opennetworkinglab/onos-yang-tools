@@ -83,7 +83,7 @@ public final class LeafNode extends DataNode {
      * builder will be used both to create leaf node from scratch or from a
      * given leaf node.
      */
-    public final static class Builder extends DataNode.Builder<Builder> {
+    public static final class Builder extends DataNode.Builder<Builder> {
 
         /**
          * Leaf node value.

@@ -61,10 +61,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.translator.tojava.YangDataModelFactory.getYangEnumerationNode;
 
@@ -157,7 +154,8 @@ public final class EnumerationListener {
                 // TODO deviate.
                 default:
                     throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                                                                            ((YangType<?>) typeData).getDataTypeName(), ENTRY));
+                                                                            ((YangType<?>) typeData).getDataTypeName(),
+                                                                            ENTRY));
             }
             listener.getParsedDataStack().push(typeData);
             listener.getParsedDataStack().push(enumerationNode);

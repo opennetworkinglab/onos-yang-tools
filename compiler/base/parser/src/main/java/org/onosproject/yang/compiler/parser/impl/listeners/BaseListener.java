@@ -21,12 +21,10 @@ import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.linker.impl.YangResolutionInfoImpl;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.addResolutionInfo;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.BASE_DATA;
@@ -35,9 +33,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidNodeIdentifier;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
@@ -118,7 +114,8 @@ public final class BaseListener {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
             throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                                                            BASE_DATA, ctx.string().getText(), EXIT, e.getMessage()));
+                                                                            BASE_DATA, ctx.string().getText(),
+                                                                            EXIT, e.getMessage()));
         }
     }
 }

@@ -310,8 +310,7 @@ public class YangXpathLinkerTest {
                 targetNodeName = augment.getTargetNode().get(
                         augment.getTargetNode().size() - 1).getNodeIdentifier()
                         .getName();
-                targetNode = linker.processXpathLinking
-                        (augment.getTargetNode(), node, AUGMENT_LINKING);
+                targetNode = linker.processXpathLinking(augment.getTargetNode(), node, AUGMENT_LINKING);
             }
         }
 

@@ -118,8 +118,7 @@ public final class JavaIdentifierSyntax {
 
         ArrayList<String> pkgArr = new ArrayList<>();
         nameSpace = nameSpace.replace(QUOTES, EMPTY_STRING);
-        String properNameSpace = nameSpace.replaceAll
-                (REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+        String properNameSpace = nameSpace.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
         String[] nameSpaceArr = properNameSpace.split(COLON);
 
         Collections.addAll(pkgArr, nameSpaceArr);

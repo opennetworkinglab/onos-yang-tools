@@ -19,7 +19,6 @@ package org.onosproject.yang.compiler.utils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.onosproject.yang.compiler.utils.UtilConstants;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

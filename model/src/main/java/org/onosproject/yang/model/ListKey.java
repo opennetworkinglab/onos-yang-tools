@@ -26,7 +26,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  * Represents an entity which identifies a unique branching node
  * corresponding to a multi instance schema definition.
  */
-public class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
+public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
 
     private List<KeyLeaf> keyLeafs;
 

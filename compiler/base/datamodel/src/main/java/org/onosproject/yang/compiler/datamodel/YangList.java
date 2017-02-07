@@ -650,7 +650,8 @@ public abstract class YangList
             for (YangLeafList leafList : leafLists) {
                 if (leafList.isConfig()) {
                     throw new DataModelException("If a list has \"config\" set to \"false\", no node underneath " +
-                                                         "it can have \"config\" set to \"true\"." + getName() + " in " +
+                                                         "it can have \"config\" set to \"true\"." +
+                                                         getName() + " in " +
                                                          getLineNumber() + " at " +
                                                          getCharPosition() +
                                                          " in " + getFileName() + "\"");

@@ -171,9 +171,8 @@ public final class DeviationListener {
         if (listener.getParsedDataStack().peek() instanceof YangDeviation) {
             listener.getParsedDataStack().pop();
         } else {
-            throw new ParserException(constructListenerErrorMessage
-                                              (MISSING_CURRENT_HOLDER, DEVIATION_DATA,
-                                               ctx.deviation().getText(), EXIT));
+            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, DEVIATION_DATA,
+                                                                    ctx.deviation().getText(), EXIT));
         }
     }
 

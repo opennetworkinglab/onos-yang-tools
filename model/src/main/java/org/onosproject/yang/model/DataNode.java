@@ -100,7 +100,7 @@ public abstract class DataNode {
      *
      * @param <B> type of data node builder
      */
-    public static abstract class Builder<B extends Builder<B>> {
+    public abstract static class Builder<B extends Builder<B>> {
 
         /**
          * Type of node in data store.
@@ -121,7 +121,7 @@ public abstract class DataNode {
          * Application related information, this enables application to use
          * this builder as there work bench.
          */
-        protected Object AppInfo;
+        protected Object appInfo;
 
         /**
          * Parent data node.
@@ -292,7 +292,7 @@ public abstract class DataNode {
          * @return application information
          */
         public Object appInfo() {
-            return AppInfo;
+            return appInfo;
         }
 
         /**
@@ -302,7 +302,7 @@ public abstract class DataNode {
          * @param appInfo application related information
          */
         public void appInfo(Object appInfo) {
-            AppInfo = appInfo;
+            this.appInfo = appInfo;
         }
     }
 }

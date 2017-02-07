@@ -19,7 +19,6 @@ package org.onosproject.yang.compiler.utils.io.impl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.onosproject.yang.compiler.utils.io.impl.CopyrightHeader;
 
 import java.io.File;
 import java.io.FileInputStream;

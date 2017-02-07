@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.getJavaAttributeDefinition;
 
 /**
  * Unit test cases for java code snippet generator.
@@ -70,7 +71,9 @@ public class JavaCodeSnippetGenTest {
 
         String imports = JavaCodeSnippetGen.getImportText(importInfo);
 
-        assertThat(true, is(imports.equals(UtilConstants.IMPORT + PKG_INFO + UtilConstants.PERIOD + CLASS_INFO + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
+        assertThat(true, is(imports.equals(UtilConstants.IMPORT + PKG_INFO +
+                                                   UtilConstants.PERIOD + CLASS_INFO +
+                                                   UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
     }
 
     /**
@@ -78,27 +81,37 @@ public class JavaCodeSnippetGenTest {
      */
     @Test
     public void testForJavaAttributeInfo() {
-
-        String attributeWithoutTypePkg = JavaCodeSnippetGen.getJavaAttributeDefinition(null, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
-                                                                                       false, UtilConstants.PRIVATE, null);
+        String attributeWithoutTypePkg =
+                getJavaAttributeDefinition(null, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
+                                           false, UtilConstants.PRIVATE, null);
         assertThat(true, is(attributeWithoutTypePkg.contains(
-                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE + YANG_NAME + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
+                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.STRING_DATA_TYPE +
+                        UtilConstants.SPACE + YANG_NAME + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
 
-        String attributeWithTypePkg = JavaCodeSnippetGen.getJavaAttributeDefinition(UtilConstants.JAVA_LANG, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
-                                                                                    false, UtilConstants.PRIVATE, null);
-        assertThat(true, is(attributeWithTypePkg.contains(UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.JAVA_LANG + UtilConstants.PERIOD
-                                                                  + UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE + YANG_NAME + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
+        String attributeWithTypePkg =
+                getJavaAttributeDefinition(UtilConstants.JAVA_LANG, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
+                                           false, UtilConstants.PRIVATE, null);
+        assertThat(true, is(attributeWithTypePkg.contains(UtilConstants.PRIVATE + UtilConstants.SPACE +
+                                                                  UtilConstants.JAVA_LANG + UtilConstants.PERIOD +
+                                                                  UtilConstants.STRING_DATA_TYPE +
+                                                                  UtilConstants.SPACE + YANG_NAME +
+                                                                  UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
 
-        String attributeWithListPkg = JavaCodeSnippetGen.getJavaAttributeDefinition(UtilConstants.JAVA_LANG, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
-                                                                                    true, UtilConstants.PRIVATE, null);
+        String attributeWithListPkg =
+                getJavaAttributeDefinition(UtilConstants.JAVA_LANG, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
+                                           true, UtilConstants.PRIVATE, null);
         assertThat(true, is(attributeWithListPkg.contains(
-                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.LIST + UtilConstants.DIAMOND_OPEN_BRACKET + UtilConstants.JAVA_LANG + UtilConstants.PERIOD + UtilConstants.STRING_DATA_TYPE
-                        + UtilConstants.DIAMOND_CLOSE_BRACKET + UtilConstants.SPACE + YANG_NAME)));
+                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.LIST +
+                        UtilConstants.DIAMOND_OPEN_BRACKET + UtilConstants.JAVA_LANG +
+                        UtilConstants.PERIOD + UtilConstants.STRING_DATA_TYPE +
+                        UtilConstants.DIAMOND_CLOSE_BRACKET + UtilConstants.SPACE + YANG_NAME)));
 
-        String attributeWithListWithoutPkg = JavaCodeSnippetGen.getJavaAttributeDefinition(null, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
-                                                                                           true, UtilConstants.PRIVATE, null);
+        String attributeWithListWithoutPkg =
+                getJavaAttributeDefinition(null, UtilConstants.STRING_DATA_TYPE, YANG_NAME,
+                                           true, UtilConstants.PRIVATE, null);
         assertThat(true, is(attributeWithListWithoutPkg.contains(
-                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.LIST + UtilConstants.DIAMOND_OPEN_BRACKET + UtilConstants.STRING_DATA_TYPE + UtilConstants.DIAMOND_CLOSE_BRACKET + UtilConstants.SPACE
-                        + YANG_NAME)));
+                UtilConstants.PRIVATE + UtilConstants.SPACE + UtilConstants.LIST +
+                        UtilConstants.DIAMOND_OPEN_BRACKET + UtilConstants.STRING_DATA_TYPE +
+                        UtilConstants.DIAMOND_CLOSE_BRACKET + UtilConstants.SPACE + YANG_NAME)));
     }
 }

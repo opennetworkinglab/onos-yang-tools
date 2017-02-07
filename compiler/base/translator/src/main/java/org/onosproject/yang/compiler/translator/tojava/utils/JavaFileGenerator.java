@@ -839,10 +839,9 @@ public final class JavaFileGenerator {
                 getGetter(INT, className, GENERATE_ENUM_CLASS) + NEW_LINE);
 
         if (!enumFile.isEnumClass()) {
-            insertDataIntoJavaFile(file, getBitSetEnumClassFromString
-                    (getCapitalCase(className)));
-            insertDataIntoJavaFile(file, getBitSetEnumClassToString(
-                    getCapitalCase(className), (YangEnumeration) curNode));
+            insertDataIntoJavaFile(file, getBitSetEnumClassFromString(getCapitalCase(className)));
+            insertDataIntoJavaFile(file, getBitSetEnumClassToString(getCapitalCase(className),
+                                                                    (YangEnumeration) curNode));
         } else {
             insertDataIntoJavaFile(file, getToStringForEnumClass());
         }

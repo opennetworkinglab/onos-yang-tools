@@ -41,6 +41,10 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapital
  */
 public final class RuntimeHelper {
 
+    // Forbid construction.
+    private RuntimeHelper() {
+    }
+
     /**
      * Returns YANG model for given generated class.
      *

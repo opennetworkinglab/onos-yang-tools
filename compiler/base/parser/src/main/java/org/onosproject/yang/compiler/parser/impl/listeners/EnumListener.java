@@ -66,7 +66,6 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.ENUM_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.EnumStatementContext;
@@ -74,10 +73,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.DUPLICATE_ENTRY;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
@@ -152,9 +148,11 @@ public final class EnumListener {
 
                         for (YangEnum curEnum : yangEnumeration.getEnumSet()) {
                             if (curEnum.getValue() == Integer.MAX_VALUE) {
-                                ParserException parserException = new ParserException("YANG file error : "
-                                                                                              + "An enum value MUST be specified for enum substatements following the one"
-                                                                                              + "with the current highest value");
+                                ParserException parserException =
+                                        new ParserException("YANG file error : An enum value MUST be " +
+                                                                    "specified for enum substatements " +
+                                                                    "following the one with the current " +
+                                                                    "highest value");
                                 parserException.setLine(ctx.getStart().getLine());
                                 parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                                 throw parserException;
@@ -171,8 +169,10 @@ public final class EnumListener {
                     try {
                         yangEnumeration.addEnumInfo((YangEnum) tmpEnumNode);
                     } catch (DataModelException e) {
-                        ParserException parserException = new ParserException(constructExtendedListenerErrorMessage(
-                                DUPLICATE_ENTRY, ENUM_DATA, ctx.string().getText(), EXIT, e.getMessage()));
+                        ParserException parserException =
+                                new ParserException(constructExtendedListenerErrorMessage(DUPLICATE_ENTRY, ENUM_DATA,
+                                                                                          ctx.string().getText(), EXIT,
+                                                                                          e.getMessage()));
                         parserException.setLine(ctx.getStart().getLine());
                         parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
                         throw parserException;

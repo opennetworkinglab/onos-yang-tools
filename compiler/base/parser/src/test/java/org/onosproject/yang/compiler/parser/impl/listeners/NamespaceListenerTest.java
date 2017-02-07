@@ -39,7 +39,6 @@ public class NamespaceListenerTest {
      */
     @Test(expected = ParserException.class)
     public void processNamespaceWithInvalidSpaces() throws IOException, ParserException {
-
         YangNode node = manager.getDataModel("src/test/resources/NamespaceWithInvalidSpaces.yang");
     }
 
@@ -48,12 +47,10 @@ public class NamespaceListenerTest {
      */
     @Test()
     public void processNamespaceInDoubleQuotes() throws IOException, ParserException {
-
         YangNode node = manager.getDataModel("src/test/resources/NamespaceInDoubleQuotes.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getModuleNamespace(), is
-                ("urn:ietf:params:xml:ns:yang:ietf-ospf"));
+        assertThat(((YangModule) node).getModuleNamespace(), is("urn:ietf:params:xml:ns:yang:ietf-ospf"));
     }
 
     /**
@@ -61,7 +58,6 @@ public class NamespaceListenerTest {
      */
     @Test()
     public void processNamespaceWithoutQuotes() throws IOException, ParserException {
-
         YangNode node = manager.getDataModel("src/test/resources/NamespaceWithoutQuotes.yang");
 
         // Checks for the version value in data model tree.
@@ -73,7 +69,6 @@ public class NamespaceListenerTest {
      */
     @Test(expected = ParserException.class)
     public void processNamespaceDualEntry() throws IOException, ParserException {
-
         YangNode node = manager.getDataModel("src/test/resources/NamespaceDualEntry.yang");
     }
 
@@ -82,7 +77,6 @@ public class NamespaceListenerTest {
      */
     @Test(expected = ParserException.class)
     public void processNamespaceNoEntryTest() throws IOException, ParserException {
-
         YangNode node = manager.getDataModel("src/test/resources/NamespaceNoEntryTest.yang");
     }
 }

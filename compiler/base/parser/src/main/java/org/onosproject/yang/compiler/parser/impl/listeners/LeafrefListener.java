@@ -22,7 +22,6 @@ import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.linker.impl.YangResolutionInfoImpl;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
@@ -36,10 +35,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*
@@ -137,8 +133,9 @@ public final class LeafrefListener {
                 leafRef.setParentNode((YangNode) parentNodeOfLeaf);
                 if (listener.getGroupingDepth() == 0) {
                     // Add resolution information to the list.
-                    YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangLeafRef>(leafRef,
-                                                                                                    (YangNode) parentNodeOfLeaf, errorLine, errorPosition);
+                    YangResolutionInfoImpl resolutionInfo =
+                            new YangResolutionInfoImpl<YangLeafRef>(leafRef, (YangNode) parentNodeOfLeaf,
+                                                                    errorLine, errorPosition);
                     addToResolutionList(resolutionInfo);
                 } else {
                     leafRef.setInGrouping(true);
@@ -163,8 +160,9 @@ public final class LeafrefListener {
 
                 if (listener.getGroupingDepth() == 0) {
                     // Add resolution information to the list.
-                    YangResolutionInfoImpl resolutionInfoImpl = new YangResolutionInfoImpl<YangLeafRef>(leafRef,
-                                                                                                        (YangNode) parentNodeOfLeafList, errorLine, errorPosition);
+                    YangResolutionInfoImpl resolutionInfoImpl =
+                            new YangResolutionInfoImpl<YangLeafRef>(leafRef, (YangNode) parentNodeOfLeafList,
+                                                                    errorLine, errorPosition);
                     addToResolutionList(resolutionInfoImpl);
                 } else {
                     leafRef.setInGrouping(true);

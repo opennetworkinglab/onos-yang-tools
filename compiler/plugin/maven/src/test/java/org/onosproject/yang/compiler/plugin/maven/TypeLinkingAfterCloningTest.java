@@ -461,6 +461,18 @@ public class TypeLinkingAfterCloningTest {
                 .getNextSibling().getNextSibling().getNextSibling()
                 .getNextSibling().getNextSibling();
 
+        validateList1(list);
+        validateList2(list);
+    }
+
+    private void validateList1(YangList list) {
+        YangUnion union2;
+        Iterator<YangType<?>> unionTypeItr2;
+        YangUnion union3;
+        Iterator<YangType<?>> unionTypeItr3;
+        YangDerivedInfo derivedInfo;
+        YangTypeDef typeDef;
+        Iterator<YangType<?>> typeDefItr;
         Iterator<YangLeaf> leafItr = list.getListOfLeaf().listIterator();
         YangLeaf leafInfo = leafItr.next();
 
@@ -549,9 +561,17 @@ public class TypeLinkingAfterCloningTest {
                 FIRST, FIRST, USABILITY_SYS_LOG, TYPEDEF, CORRECT),
                    idRef.getBaseIdentity().getName(),
                    is(USABILITY_SYS_LOG));
+    }
 
-        YangContainer container = (YangContainer) list.getChild()
-                .getNextSibling().getNextSibling();
+    private void validateList2(YangList list) {
+        YangUnion union2;
+        Iterator<YangType<?>> unionTypeItr2;
+        YangUnion union3;
+        Iterator<YangType<?>> unionTypeItr3;
+        YangDerivedInfo derivedInfo;
+        YangTypeDef typeDef;
+        Iterator<YangType<?>> typeDefItr;
+        YangContainer container = (YangContainer) list.getChild().getNextSibling().getNextSibling();
 
         Iterator<YangLeafList> leafListItr = container.getListOfLeafList()
                 .listIterator();

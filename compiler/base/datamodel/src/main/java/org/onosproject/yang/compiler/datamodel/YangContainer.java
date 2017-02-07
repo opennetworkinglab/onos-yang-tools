@@ -432,7 +432,8 @@ public abstract class YangContainer
             for (YangLeaf leaf : leaves) {
                 if (leaf.isConfig()) {
                     throw new DataModelException("If a container has \"config\" set to \"false\", no node underneath " +
-                                                         "it can have \"config\" set to \"true\"." + getName() + " in " +
+                                                         "it can have \"config\" set to \"true\"." +
+                                                         getName() + " in " +
                                                          getLineNumber() + " at " +
                                                          getCharPosition() +
                                                          " in " + getFileName() + "\"");

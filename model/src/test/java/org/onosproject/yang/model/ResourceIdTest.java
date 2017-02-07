@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test resource id
+ * Test resource ID.
  */
 
 public class ResourceIdTest {

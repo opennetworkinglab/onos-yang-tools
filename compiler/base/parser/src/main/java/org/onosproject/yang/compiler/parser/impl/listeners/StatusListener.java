@@ -19,15 +19,9 @@ package org.onosproject.yang.compiler.parser.impl.listeners;
 import org.onosproject.yang.compiler.datamodel.YangStatus;
 import org.onosproject.yang.compiler.datamodel.YangStatusType;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
-import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.STATUS_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;

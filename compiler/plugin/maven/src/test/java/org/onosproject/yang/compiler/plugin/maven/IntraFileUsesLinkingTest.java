@@ -356,7 +356,8 @@ public class IntraFileUsesLinkingTest {
         //validate end point uses
         assertThat(grouping.getNextSibling() instanceof YangUses, is(true));
         assertThat(grouping.getNextSibling().getNextSibling().getNextSibling().getNextSibling()
-                           .getNextSibling().getNextSibling().getNextSibling().getNextSibling() instanceof YangContainer,
+                           .getNextSibling().getNextSibling().getNextSibling()
+                           .getNextSibling() instanceof YangContainer,
                    is(true));
         container = (YangContainer) grouping.getNextSibling().getNextSibling().getNextSibling().getNextSibling()
                 .getNextSibling().getNextSibling().getNextSibling().getNextSibling();
@@ -374,9 +375,8 @@ public class IntraFileUsesLinkingTest {
             throws IOException, ParserException {
 
         thrown.expect(ParserException.class);
-        thrown.expectMessage(
-                "YANG File Error: Identifier collision detected in uses as " +
-                        "\"failure in 10 at 13 in src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
+        thrown.expectMessage("YANG File Error: Identifier collision detected in uses as \"failure in 10 at 13 in " +
+                                     "src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
         YangNode node = manager
                 .getDataModel("src/test/resources/SelfResolutionGroupingHavingSameUsesManyTimes.yang");
     }
@@ -389,9 +389,8 @@ public class IntraFileUsesLinkingTest {
     public void processSelfResolutionRpcWithOneTypedefAndTwoGroupingUnderDifferentNode()
             throws IOException, ParserException {
 
-        YangNode node = manager
-                .getDataModel(
-                        "src/test/resources/SelfResolutionRpcWithOneTypedefAndTwoGroupingUnderDifferentNode.yang");
+        String y = "src/test/resources/SelfResolutionRpcWithOneTypedefAndTwoGroupingUnderDifferentNode.yang";
+        YangNode node = manager.getDataModel(y);
 
         // Check whether the data model tree returned is of type module.
         assertThat((node instanceof YangModule), is(true));

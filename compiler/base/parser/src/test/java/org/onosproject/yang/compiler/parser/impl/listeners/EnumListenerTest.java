@@ -111,7 +111,7 @@ public class EnumListenerTest {
     public void processEnumMaxNextValue() throws IOException, ParserException {
         thrown.expect(ParserException.class);
         thrown.expectMessage("YANG file error : "
-                + "An enum value MUST be specified for enum substatements following the one"
+                + "An enum value MUST be specified for enum substatements following the one "
                 + "with the current highest value");
         YangNode node = manager.getDataModel("src/test/resources/EnumMaxNextValue.yang");
     }

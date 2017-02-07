@@ -56,6 +56,10 @@ public final class YangApacheUtils {
     private static final String ONOS = "org.onosproject";
     private static final Logger log = getLogger(YangApacheUtils.class);
 
+    // Forbid construction.
+    private YangApacheUtils() {
+    }
+
     /**
      * Returns YANG model for generated module class.
      *

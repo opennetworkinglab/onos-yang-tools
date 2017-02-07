@@ -38,13 +38,11 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYan
  */
 public class YangJavaModelUtilsTest {
 
-
-    private final YangCompilerManager utilManager =
-            new YangCompilerManager();
+    private final YangCompilerManager utilManager = new YangCompilerManager();
 
     @Test
-    public void isRootNodeContainsOnlyAugmentTest() throws IOException,
-            ParserException, MojoExecutionException {
+    public void isRootNodeContainsOnlyAugmentTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyaugment";
 
         Set<Path> paths = new HashSet<>();
@@ -68,8 +66,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredOnlyLeafTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredOnlyLeafTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyleaf";
 
         Set<Path> paths = new HashSet<>();
@@ -90,8 +88,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredOnlyLeafListTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredOnlyLeafListTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlyleaflist";
 
         Set<Path> paths = new HashSet<>();
@@ -112,8 +110,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredOnlyGroupingTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredOnlyGroupingTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlygrouping";
 
         Set<Path> paths = new HashSet<>();
@@ -138,8 +136,8 @@ public class YangJavaModelUtilsTest {
 
 
     @Test
-    public void isRootNodeCodeGenRequiredOnlyTypeDefTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredOnlyTypeDefTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/onlytypdef";
 
         Set<Path> paths = new HashSet<>();
@@ -163,8 +161,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredNoGenTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredNoGenTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/nogen";
 
         Set<Path> paths = new HashSet<>();
@@ -185,8 +183,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredMixedTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredMixedTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/mixed";
 
         Set<Path> paths = new HashSet<>();
@@ -210,8 +208,8 @@ public class YangJavaModelUtilsTest {
     }
 
     @Test
-    public void isRootNodeCodeGenRequiredTypedefGroupingTest() throws IOException
-            , ParserException, MojoExecutionException {
+    public void isRootNodeCodeGenRequiredTypedefGroupingTest()
+            throws IOException, ParserException, MojoExecutionException {
         String searchDir = "src/test/resources/rootNode/typedefgrouping";
 
         Set<Path> paths = new HashSet<>();

@@ -28,9 +28,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.DE
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 
@@ -118,9 +116,8 @@ public final class DeviateAddListener {
         if (listener.getParsedDataStack().peek() instanceof YangDeviateAdd) {
             listener.getParsedDataStack().pop();
         } else {
-            throw new ParserException(constructListenerErrorMessage
-                                              (MISSING_CURRENT_HOLDER, DEVIATE_ADD,
-                                               null, EXIT));
+            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, DEVIATE_ADD,
+                                                                    null, EXIT));
         }
     }
 }

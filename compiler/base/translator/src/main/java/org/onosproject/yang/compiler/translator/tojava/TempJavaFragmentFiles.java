@@ -257,7 +257,7 @@ public class TempJavaFragmentFiles {
     private static final String KEY_CLASS_FILE_NAME_SUFFIX = KEYS;
 
     /**
-     * Current attributes YANG node
+     * Current attributes YANG node.
      */
     private YangNode attrNode;
 

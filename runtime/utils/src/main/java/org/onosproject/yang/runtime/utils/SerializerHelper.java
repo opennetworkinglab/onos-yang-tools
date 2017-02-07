@@ -23,6 +23,10 @@ import static org.onosproject.yang.model.DataNode.Builder;
  */
 public final class SerializerHelper {
 
+    // Forbid construction.
+    private SerializerHelper() {
+    }
+
     /**
      * Initializes resource identifier builder with YANG serializer context
      * information.

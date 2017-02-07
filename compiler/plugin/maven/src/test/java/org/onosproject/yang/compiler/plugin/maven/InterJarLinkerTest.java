@@ -281,8 +281,7 @@ public class InterJarLinkerTest {
             dir.delete();
         }
         dir.mkdirs();
-        FileOutputStream fileOutputStream = new FileOutputStream
-                (serFileDirPath + YANG_META_DATA);
+        FileOutputStream fileOutputStream = new FileOutputStream(serFileDirPath + YANG_META_DATA);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
         objectOutputStream.writeObject(utilManager.getYangNodeSet());
         objectOutputStream.close();

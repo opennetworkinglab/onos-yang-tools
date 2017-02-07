@@ -116,7 +116,8 @@ public final class BitsListener {
                 // TODO typedef, union, deviate.
                 default:
                     throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, TYPE_DATA,
-                                                                            ((YangType<?>) typeData).getDataTypeName(), ENTRY));
+                                                                            ((YangType<?>) typeData).getDataTypeName(),
+                                                                            ENTRY));
             }
             listener.getParsedDataStack().push(typeData);
             listener.getParsedDataStack().push(bitsNode);

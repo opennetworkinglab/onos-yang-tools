@@ -62,8 +62,10 @@ public final class JavaCodeGeneratorUtil {
             if (curTraversal != PARENT) {
                 if (!(codeGenNode instanceof JavaCodeGenerator)) {
                     throw new TranslatorException("Unsupported node to generate code " +
-                                                          codeGenNode.getName() + " in " + codeGenNode.getLineNumber() + " at "
-                                                          + codeGenNode.getCharPosition() + " in " + codeGenNode.getFileName());
+                                                          codeGenNode.getName() + " in " +
+                                                          codeGenNode.getLineNumber() + " at " +
+                                                          codeGenNode.getCharPosition() + " in " +
+                                                          codeGenNode.getFileName());
                 }
                 try {
                     generateCodeEntry(codeGenNode, yangPlugin, rootNode);

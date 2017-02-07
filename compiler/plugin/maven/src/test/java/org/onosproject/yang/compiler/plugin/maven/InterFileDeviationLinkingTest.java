@@ -177,8 +177,8 @@ public class InterFileDeviationLinkingTest {
         assertThat(lisfOfLeaf.isEmpty(), is(true));
         assertThat(deviationValid.getNextSibling(), nullValue());
 
-        assertThat(testValid.getYangSchemaNodeIdentifier(), is
-                (deviationValid.getYangSchemaNodeIdentifier()));
+        assertThat(testValid.getYangSchemaNodeIdentifier(),
+                   is(deviationValid.getYangSchemaNodeIdentifier()));
 
         JavaFileInfoTranslator deviateJavaFile = ((JavaFileInfoContainer)
                 deviationValid).getJavaFileInfo();

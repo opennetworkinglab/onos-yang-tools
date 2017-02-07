@@ -31,10 +31,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidIdentifier;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.translator.tojava.YangDataModelFactory.getYangIdentityNode;
@@ -91,8 +88,9 @@ public final class IdentityListener {
             try {
                 curNode.addChild(identity);
             } catch (DataModelException e) {
-                throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                                                                IDENTITY_DATA, ctx.identifier().getText(), ENTRY, e.getMessage()));
+                throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA, IDENTITY_DATA,
+                                                                                ctx.identifier().getText(), ENTRY,
+                                                                                e.getMessage()));
             }
             // Push identity node to the stack.
             listener.getParsedDataStack().push(identity);

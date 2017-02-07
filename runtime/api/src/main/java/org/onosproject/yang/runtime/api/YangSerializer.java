@@ -16,11 +16,9 @@
 
 package org.onosproject.yang.runtime.api;
 
-import org.onosproject.yang.model.DataNode;
-
 /**
  * Abstraction of entity capable of encoding and decoding arbitrary
- * {@link DataNode} structures, which are in-memory representations of
+ * {@link org.onosproject.yang.model.DataNode} structures, which are in-memory representations of
  * YANG models, to and from various external representations, e.g. XML, JSON.
  * <p>
  * This interface is not intended for use by applications, but rather only

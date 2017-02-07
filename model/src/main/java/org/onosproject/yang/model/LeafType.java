@@ -113,7 +113,7 @@ public enum LeafType {
     RESOURCE_IDENTIFIER,
 
     /**
-     * The identityref type is used to reference an existing identity
+     * The identityref type is used to reference an existing identity.
      */
     IDENTITY_REF,
 

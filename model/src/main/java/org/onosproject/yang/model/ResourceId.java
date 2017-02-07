@@ -32,7 +32,7 @@ import static org.onosproject.yang.model.ModelConstants.NO_KEY_SET;
  * hierarchy to reach a resource in the instance tree.
  */
 
-public class ResourceId {
+public final class ResourceId {
 
     /**
      * List of node keys.
@@ -111,7 +111,7 @@ public class ResourceId {
          * Application related information, this enables application to use
          * this builder as there work bench.
          */
-        protected Object AppInfo;
+        protected Object appInfo;
 
         private List<NodeKey> nodeKeyList;
         private NodeKey.NodeKeyBuilder curKeyBuilder = null;
@@ -246,7 +246,7 @@ public class ResourceId {
          * @return application information
          */
         public Object appInfo() {
-            return AppInfo;
+            return appInfo;
         }
 
         /**
@@ -256,7 +256,7 @@ public class ResourceId {
          * @param appInfo application related information
          */
         public void appInfo(Object appInfo) {
-            AppInfo = appInfo;
+            this.appInfo = appInfo;
         }
     }
 }

@@ -420,8 +420,7 @@ public class TempJavaTypeFragmentFiles
         }
 
         if ((getGeneratedTempFiles() & CONSTRUCTOR_FOR_TYPE_MASK) != 0) {
-            addTypeConstructor(javaAttributeInfo, types.indexOf
-                    (javaAttributeInfo.getAttributeType()));
+            addTypeConstructor(javaAttributeInfo, types.indexOf(javaAttributeInfo.getAttributeType()));
         }
     }
 
@@ -527,8 +526,8 @@ public class TempJavaTypeFragmentFiles
     private void addFromStringMethod(JavaAttributeInfo newAttrInfo, YangPluginConfig pluginConfig)
             throws IOException {
 
-        JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString = getQualifiedInfoOfFromString(newAttrInfo,
-                                                                                                 pluginConfig.getConflictResolver());
+        JavaQualifiedTypeInfoTranslator qualifiedInfoOfFromString =
+                getQualifiedInfoOfFromString(newAttrInfo, pluginConfig.getConflictResolver());
             /*
              * Create a new java attribute info with qualified information of
              * wrapper classes.

@@ -59,7 +59,7 @@ public interface LocationInfo {
     String getFileName();
 
     /**
-     * Sets YANG file name
+     * Sets YANG file name.
      *
      * @param name YANG file name
      */

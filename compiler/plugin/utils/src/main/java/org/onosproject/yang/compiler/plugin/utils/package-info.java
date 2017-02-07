@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Laboratory
+ * Copyright 2017-present Open Networking Laboratory
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.model;
-
 /**
- * Constants used in model package.
+ * Build plugin utilities for compiling YANG models.
  */
-final class ModelConstants {
-    static final String INCOMPLETE_SCHEMA_INFO = "Schema info is not complete";
-    static final String LEAF_IS_TERMINAL = "Leaf must be the terminal node";
-    static final String NON_KEY_LEAF = "Leaf list is not a key of list";
-    static final String NO_KEY_SET = "Resource Identifier is empty";
-
-    // Forbid construction.
-    private ModelConstants() {
-    }
-}
+package org.onosproject.yang.compiler.plugin.utils;

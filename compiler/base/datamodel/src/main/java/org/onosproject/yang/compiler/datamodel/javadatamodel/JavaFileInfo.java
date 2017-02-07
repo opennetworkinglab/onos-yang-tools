@@ -38,7 +38,7 @@ public class JavaFileInfo
     protected String pkg;
 
     /**
-     * Java attribute name;
+     * Java attribute name.
      */
     protected String javaAttributeName;
 

@@ -20,7 +20,6 @@ import org.onosproject.yang.compiler.datamodel.YangContainer;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.CONTAINER_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PRESENCE_DATA;

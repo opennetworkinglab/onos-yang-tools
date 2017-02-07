@@ -32,9 +32,8 @@ import java.io.IOException;
 public final class NotificationTranslatorTest {
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
-    private final static String YANG = "src/test/resources/NotificationTest" +
-            ".yang";
-    private final static String DIR = "target/notificationTranslator/";
+    private static final String YANG = "src/test/resources/NotificationTest.yang";
+    private static final String DIR = "target/notificationTranslator/";
 
     /**
      * Checks union translation should not result in any exception.

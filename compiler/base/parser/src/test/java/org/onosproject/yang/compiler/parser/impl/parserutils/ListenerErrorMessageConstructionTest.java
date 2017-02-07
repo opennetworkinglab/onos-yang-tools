@@ -21,6 +21,8 @@ import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
 
 /**
  * Test case for testing listener error message construction util.
@@ -34,11 +36,14 @@ public class ListenerErrorMessageConstructionTest {
     public void checkErrorMsgConstructionWithName() {
 
         // Create an test error message
-        String testErrorMessage = ListenerErrorMessageConstruction.constructListenerErrorMessage(ListenerErrorType.INVALID_HOLDER, YangConstructType.CONTACT_DATA, "Test Instance", ListenerErrorLocation.ENTRY);
+        String testErrorMessage = constructListenerErrorMessage(ListenerErrorType.INVALID_HOLDER,
+                                                                YangConstructType.CONTACT_DATA,
+                                                                "Test Instance",
+                                                                ListenerErrorLocation.ENTRY);
 
         // Check message.
         assertThat(testErrorMessage, is("Internal parser error detected: Invalid holder for contact "
-                + "\"Test Instance\" before processing."));
+                                                + "\"Test Instance\" before processing."));
     }
 
     /**
@@ -48,12 +53,15 @@ public class ListenerErrorMessageConstructionTest {
     public void checkErrorMsgConstructionWithoutName() {
 
         // Create an test error message
-        String testErrorMessage = ListenerErrorMessageConstruction.constructListenerErrorMessage(ListenerErrorType.INVALID_HOLDER, YangConstructType.CONTACT_DATA, "Test Instance", ListenerErrorLocation.ENTRY);
+        String testErrorMessage = constructListenerErrorMessage(ListenerErrorType.INVALID_HOLDER,
+                                                                YangConstructType.CONTACT_DATA,
+                                                                "Test Instance",
+                                                                ListenerErrorLocation.ENTRY);
 
         // Check message.
         assertThat(testErrorMessage,
                    is("Internal parser error detected: Invalid holder for contact \"Test Instance\""
-                           + " before processing."));
+                              + " before processing."));
     }
 
     /**
@@ -64,14 +72,16 @@ public class ListenerErrorMessageConstructionTest {
     public void checkExtendedErrorMsgConstructionWithName() {
 
         // Create an test error message
-        String testErrorMessage = ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage(ListenerErrorType.INVALID_HOLDER, YangConstructType.CONTACT_DATA,
-                                                                                                         "Test Instance", ListenerErrorLocation.ENTRY,
-                                                                                                         "Extended Information");
+        String testErrorMessage = constructExtendedListenerErrorMessage(ListenerErrorType.INVALID_HOLDER,
+                                                                        YangConstructType.CONTACT_DATA,
+                                                                        "Test Instance",
+                                                                        ListenerErrorLocation.ENTRY,
+                                                                        "Extended Information");
 
         // Check message.
         assertThat(testErrorMessage,
                    is("Internal parser error detected: Invalid holder for contact \"Test Instance\""
-                           + " before processing.\n" + "Error Information: Extended Information"));
+                              + " before processing.\n" + "Error Information: Extended Information"));
     }
 
     /**
@@ -82,11 +92,14 @@ public class ListenerErrorMessageConstructionTest {
     public void checkExtendedErrorMsgConstructionWithoutName() {
 
         // Create an test error message
-        String testErrorMessage = ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage(ListenerErrorType.INVALID_HOLDER, YangConstructType.CONTACT_DATA, "", ListenerErrorLocation.ENTRY,
-                                                                                                         "Extended Information");
+        String testErrorMessage = constructExtendedListenerErrorMessage(ListenerErrorType.INVALID_HOLDER,
+                                                                        YangConstructType.CONTACT_DATA,
+                                                                        "", ListenerErrorLocation.ENTRY,
+                                                                        "Extended Information");
 
         // Check message.
-        assertThat(testErrorMessage, is("Internal parser error detected: Invalid holder for contact"
-                + " before processing.\n" + "Error Information: Extended Information"));
+        assertThat(testErrorMessage,
+                   is("Internal parser error detected: Invalid holder for contact before processing.\n" +
+                              "Error Information: Extended Information"));
     }
 }

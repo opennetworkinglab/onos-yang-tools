@@ -1125,7 +1125,8 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterOrderedByStatement(OrderedByStatementContext ctx) {
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx, UtilConstants.CURRENTLY_UNSUPPORTED, getFileName());
+        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx,
+                                                    UtilConstants.CURRENTLY_UNSUPPORTED, getFileName());
     }
 
     @Override
@@ -1312,7 +1313,8 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void enterAnyxmlStatement(AnyxmlStatementContext ctx) {
         increaseUnsupportedYangConstructDepth();
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx, UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
+        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx,
+                                                    UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override
@@ -1333,7 +1335,8 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void enterRefineStatement(RefineStatementContext ctx) {
         increaseUnsupportedYangConstructDepth();
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx, UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
+        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx,
+                                                    UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
     }
 
     @Override

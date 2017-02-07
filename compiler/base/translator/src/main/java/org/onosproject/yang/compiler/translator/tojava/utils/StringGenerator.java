@@ -1025,8 +1025,7 @@ public final class StringGenerator {
                                         String name2) {
         StringBuilder builder = new StringBuilder();
         builder.append(type).append(DIAMOND_OPEN_BRACKET).append(name1)
-                .append(COMMA).append(SPACE).append(name2).append
-                (DIAMOND_CLOSE_BRACKET);
+                .append(COMMA).append(SPACE).append(name2).append(DIAMOND_CLOSE_BRACKET);
         return builder.toString();
     }
 
@@ -1094,7 +1093,7 @@ public final class StringGenerator {
     }
 
     /**
-     * Returns string builder attribute string;
+     * Returns string builder attribute string.
      *
      * @param init  first param to be appended to string builder
      * @param space indentation space
@@ -1146,7 +1145,7 @@ public final class StringGenerator {
     }
 
     /**
-     * Returns for loop string
+     * Returns for loop string.
      *
      * @param space indentation
      * @param type  data type

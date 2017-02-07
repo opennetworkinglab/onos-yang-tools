@@ -149,7 +149,8 @@ public final class JavaIdentifierSyntaxTest {
         conflictResolver.setPrefixForIdentifier(null);
         String rootPackage = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                              + UtilConstants.PERIOD + CHILD_WITH_PERIOD + UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
+                                              + UtilConstants.PERIOD + CHILD_WITH_PERIOD +
+                                              UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
     }
 
     /**
@@ -173,19 +174,23 @@ public final class JavaIdentifierSyntaxTest {
             throws ParseException {
         conflictResolver.setPrefixForIdentifier(VALID_PREFIX);
         String rootPackage = getRootPackage((byte) 1, INVALID_NAME_SPACE1, getYangRevision(DATE1), conflictResolver);
-        assertThat(rootPackage.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                              + UtilConstants.PERIOD + VALID_NAME_SPACE1 + UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
+        assertThat(rootPackage.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER +
+                                              UtilConstants.PERIOD + VALID_NAME_SPACE1 +
+                                              UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
         conflictResolver.setPrefixForIdentifier(null);
         String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage1.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE2 + UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
+                                               + UtilConstants.PERIOD + VALID_NAME_SPACE2 + UtilConstants.PERIOD
+                                               + DATE_WITH_REV1), is(true));
         String rootPackage2 = getRootPackage((byte) 1, INVALID_NAME_SPACE3, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage2.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE4 + UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
+                                               + UtilConstants.PERIOD + VALID_NAME_SPACE4 + UtilConstants.PERIOD
+                                               + DATE_WITH_REV1), is(true));
         conflictResolver.setPrefixForIdentifier(INVALID_PREFIX1);
         String rootPackage3 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage3.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE3 + UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
+                                               + UtilConstants.PERIOD + VALID_NAME_SPACE3 + UtilConstants.PERIOD
+                                               + DATE_WITH_REV1), is(true));
     }
 
     /**
@@ -197,8 +202,8 @@ public final class JavaIdentifierSyntaxTest {
         Date date = simpleDateFormat.parse(DATE2);
         String rootPkgWithRev = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE2), null);
         assertThat(rootPkgWithRev.equals(
-                UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER + UtilConstants.PERIOD + CHILD_WITH_PERIOD + UtilConstants.PERIOD + DATE_WITH_REV2),
-                   is(true));
+                UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER + UtilConstants.PERIOD +
+                        CHILD_WITH_PERIOD + UtilConstants.PERIOD + DATE_WITH_REV2), is(true));
     }
 
     /**

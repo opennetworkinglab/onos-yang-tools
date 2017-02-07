@@ -152,14 +152,10 @@ public class TempJavaEventFragmentFiles
         addGeneratedTempFile(EVENT_SUBJECT_SETTER_MASK);
 
         eventEnumTempFileHandle = getTemporaryFileHandle(EVENT_ENUM_FILE_NAME);
-        eventMethodTempFileHandle = getTemporaryFileHandle(
-                EVENT_METHOD_FILE_NAME);
-        eventSubjectAttributeTempFileHandle = getTemporaryFileHandle
-                (EVENT_SUBJECT_ATTRIBUTE_FILE_NAME);
-        eventSubjectGetterTempFileHandle = getTemporaryFileHandle(
-                EVENT_SUBJECT_GETTER_FILE_NAME);
-        eventSubjectSetterTempFileHandle = getTemporaryFileHandle(
-                EVENT_SUBJECT_SETTER_FILE_NAME);
+        eventMethodTempFileHandle = getTemporaryFileHandle(EVENT_METHOD_FILE_NAME);
+        eventSubjectAttributeTempFileHandle = getTemporaryFileHandle(EVENT_SUBJECT_ATTRIBUTE_FILE_NAME);
+        eventSubjectGetterTempFileHandle = getTemporaryFileHandle(EVENT_SUBJECT_GETTER_FILE_NAME);
+        eventSubjectSetterTempFileHandle = getTemporaryFileHandle(EVENT_SUBJECT_SETTER_FILE_NAME);
     }
 
     /**

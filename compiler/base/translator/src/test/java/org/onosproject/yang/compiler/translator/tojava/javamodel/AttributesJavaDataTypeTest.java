@@ -141,7 +141,8 @@ public class AttributesJavaDataTypeTest {
      */
     @Test
     public void testForTypeDef() throws DataModelException {
-        test = AttributesJavaDataType.getJavaImportPackage(getStubExtendedInfo(getStubYangType(TYPE_DEF)), false, pluginConfig);
+        test = AttributesJavaDataType.getJavaImportPackage(getStubExtendedInfo(getStubYangType(TYPE_DEF)),
+                                                           false, pluginConfig);
         assertThat(true, is(test.equals(TYPE_DEF_PKG)));
     }
 

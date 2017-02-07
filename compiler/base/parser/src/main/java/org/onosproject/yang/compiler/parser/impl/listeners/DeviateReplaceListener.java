@@ -27,9 +27,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.DE
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*
@@ -92,11 +90,8 @@ public final class DeviateReplaceListener {
             curNode.addDeviateReplace(deviationReplace);
             listener.getParsedDataStack().push(deviationReplace);
         } else {
-            throw new ParserException(constructListenerErrorMessage
-                                              (INVALID_HOLDER,
-                                               DEVIATE_REPLACE,
-                                               null,
-                                               ENTRY));
+            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, DEVIATE_REPLACE,
+                                                                    null, ENTRY));
         }
     }
 
@@ -117,9 +112,8 @@ public final class DeviateReplaceListener {
         if (listener.getParsedDataStack().peek() instanceof YangDeviateReplace) {
             listener.getParsedDataStack().pop();
         } else {
-            throw new ParserException(constructListenerErrorMessage
-                                              (MISSING_CURRENT_HOLDER, DEVIATE_REPLACE,
-                                               null, EXIT));
+            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, DEVIATE_REPLACE,
+                                                                    null, EXIT));
         }
     }
 }

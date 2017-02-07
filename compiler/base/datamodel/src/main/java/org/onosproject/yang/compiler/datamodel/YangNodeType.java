@@ -115,7 +115,7 @@ public enum YangNodeType {
     IDENTITYREF_NODE,
 
     /**
-     * Deviation node
+     * Deviation node.
      */
     DEVIATION_NODE
 }

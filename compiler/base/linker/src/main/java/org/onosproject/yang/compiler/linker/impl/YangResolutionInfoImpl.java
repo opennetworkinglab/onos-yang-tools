@@ -253,9 +253,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                     if (resolvable.getResolvableStatus() == UNRESOLVED) {
                         // If current entity is still not resolved, then
                         // linking/resolution has failed.
-                        DataModelException ex =
-                                new DataModelException
-                                        (getErrorInfoForLinker(resolvable));
+                        DataModelException ex = new DataModelException(getErrorInfoForLinker(resolvable));
                         ex.setLine(getLineNumber());
                         ex.setCharPosition(getCharPosition());
                         throw ex;
@@ -778,8 +776,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             throws DataModelException {
         T entity = getCurEntityToResolveFromStack();
         if (entity instanceof YangType) {
-            return node.getName().contentEquals(((YangType<?>) entity)
-                                                        .getDataTypeName());
+            return node.getName().contentEquals(((YangType<?>) entity).getDataTypeName());
         }
         if (entity instanceof YangUses) {
             return node.getName().contentEquals(((YangUses) entity).getName());
@@ -788,15 +785,14 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             return isFeatureDefinedInNode(node);
         }
         if (entity instanceof YangBase) {
-            return node.getName().contentEquals(((
-                    YangBase) entity).getBaseIdentifier().getName());
+            return node.getName().contentEquals(((YangBase) entity).getBaseIdentifier().getName());
         }
         if (entity instanceof YangIdentityRef) {
             return node.getName().contentEquals(((YangIdentityRef) entity).getName());
         }
-        throw new DataModelException(getErrorMsg(
-                INVALID_RESOLVED_ENTITY, node.getName(), node.getLineNumber(),
-                node.getCharPosition(), node.getFileName()));
+        throw new DataModelException(getErrorMsg(INVALID_RESOLVED_ENTITY, node.getName(),
+                                                 node.getLineNumber(), node.getCharPosition(),
+                                                 node.getFileName()));
     }
 
     private boolean isFeatureDefinedInNode(YangNode node) {
@@ -828,8 +824,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             throws DataModelException {
         T entity = getCurEntityToResolveFromStack();
         if (entity instanceof YangType) {
-            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) ((
-                    YangType<?>) entity).getDataTypeExtendedInfo();
+            YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) ((YangType<?>) entity).getDataTypeExtendedInfo();
             derivedInfo.setReferredTypeDef((YangTypeDef) refNode);
         } else if (entity instanceof YangUses) {
             ((YangUses) entity).setRefGroup((YangGrouping) refNode);

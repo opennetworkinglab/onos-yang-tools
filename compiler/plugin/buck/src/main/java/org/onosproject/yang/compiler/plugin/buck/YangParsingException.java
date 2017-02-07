@@ -25,7 +25,7 @@ public class YangParsingException extends Exception {
      * Creates a YangParsingException based on another exception.
      * @param t exception from the parser
      */
-    public YangParsingException (Throwable t) {
+    public YangParsingException(Throwable t) {
         super(t);
     }
 

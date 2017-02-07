@@ -534,7 +534,7 @@ public abstract class YangLeafList extends DefaultLocationInfo
     }
 
     /**
-     * Retrieve the name of leaf list
+     * Retrieve the name of leaf list.
      *
      * @return leaf list name
      */

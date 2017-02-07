@@ -24,7 +24,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  * Representation of an entity which identifies a uniquely branching
  * leaf-list entry corresponding to a multi instance leaf schema.
  */
-public class LeafListKey extends NodeKey<LeafListKey>
+public final class LeafListKey extends NodeKey<LeafListKey>
         implements Comparable<LeafListKey> {
     private Object val;
 

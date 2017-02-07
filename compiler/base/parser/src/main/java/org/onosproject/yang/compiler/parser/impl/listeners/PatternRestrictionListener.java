@@ -111,9 +111,10 @@ public final class PatternRestrictionListener {
 
         if (type.getDataType() != YangDataTypes.STRING && type.getDataType() != YangDataTypes.DERIVED) {
 
-            ParserException parserException = new ParserException("YANG file error : " +
-                                                                          getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
-                                                                          " can be used to restrict the built-in type string or types derived from string.");
+            ParserException parserException =
+                    new ParserException("YANG file error : " + getYangConstructType(PATTERN_DATA) + " name " +
+                                                ctx.string().getText() + " can be used to restrict the built-in " +
+                                                "type string or types derived from string.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;
@@ -191,9 +192,9 @@ public final class PatternRestrictionListener {
         try {
             Pattern.compile(compile);
         } catch (PatternSyntaxException exception) {
-            ParserException parserException = new ParserException("YANG file error : " +
-                                                                          getYangConstructType(PATTERN_DATA) + " name " + ctx.string().getText() +
-                                                                          " is not a valid regular expression");
+            ParserException parserException =
+                    new ParserException("YANG file error : " + getYangConstructType(PATTERN_DATA) + " name " +
+                                                ctx.string().getText() + " is not a valid regular expression");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
             throw parserException;

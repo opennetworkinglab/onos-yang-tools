@@ -32,6 +32,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.*;
 
 /**
  * Unit tests for generated methods from the file type.
@@ -107,7 +108,8 @@ public final class MethodsGeneratorTest {
         assertThat(true, is(method.equals(
                 UtilConstants.EIGHT_SPACE_INDENTATION + UtilConstants.CHECK_NOT_NULL_STRING +
                         UtilConstants.OPEN_PARENTHESIS + CLASS_NAME + UtilConstants.COMMA + UtilConstants.SPACE +
-                        CLASS_NAME + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SEMI_COLON + UtilConstants.NEW_LINE)));
+                        CLASS_NAME + UtilConstants.CLOSE_PARENTHESIS + UtilConstants.SEMI_COLON +
+                        UtilConstants.NEW_LINE)));
     }
 
     /**
@@ -132,8 +134,8 @@ public final class MethodsGeneratorTest {
         assertThat(true, is(method.equals(
                 UtilConstants.TWELVE_SPACE_INDENTATION + UtilConstants.PERIOD + UtilConstants.ADD_STRING +
                         UtilConstants.OPEN_PARENTHESIS + UtilConstants.QUOTES + testAttr.getAttributeName() +
-                        UtilConstants.QUOTES + UtilConstants.COMMA + UtilConstants.SPACE + testAttr.getAttributeName() +
-                        UtilConstants.CLOSE_PARENTHESIS)));
+                        UtilConstants.QUOTES + UtilConstants.COMMA + UtilConstants.SPACE +
+                        testAttr.getAttributeName() + UtilConstants.CLOSE_PARENTHESIS)));
     }
 
     /**
@@ -154,8 +156,9 @@ public final class MethodsGeneratorTest {
     @Test
     public void getGetterForClassTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
-        String method = MethodsGenerator.getGetterForClass(testAttr, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
-        assertThat(true, is(method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.STRING_DATA_TYPE +
+        String method = getGetterForClass(testAttr, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
+        assertThat(true, is(method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE +
+                                                    UtilConstants.STRING_DATA_TYPE +
                                                     UtilConstants.SPACE + UtilConstants.GET_METHOD_PREFIX)));
     }
 
@@ -164,8 +167,8 @@ public final class MethodsGeneratorTest {
      */
     @Test
     public void getGetterForInterfaceTest() {
-        String method = MethodsGenerator.getGetterForInterface(CLASS_NAME, UtilConstants.STRING_DATA_TYPE, false,
-                                                               GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER, null);
+        String method = getGetterForInterface(CLASS_NAME, UtilConstants.STRING_DATA_TYPE, false,
+                                              GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER, null);
         assertThat(true, is(method.contains(UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE +
                                                     UtilConstants.GET_METHOD_PREFIX)));
     }
@@ -176,10 +179,10 @@ public final class MethodsGeneratorTest {
     @Test
     public void getSetterForClassTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
-        String method = MethodsGenerator.getSetterForClass(testAttr, CLASS_NAME,
-                                                           GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
+        String method = getSetterForClass(testAttr, CLASS_NAME, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
         assertThat(true, is(
-                method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.VOID + UtilConstants.SPACE + UtilConstants.SET_METHOD_PREFIX +
+                method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.VOID +
+                                        UtilConstants.SPACE + UtilConstants.SET_METHOD_PREFIX +
                                         CLASS_NAME + UtilConstants.OPEN_PARENTHESIS +
                                         UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE +
                                         ATTRIBUTE_NAME)));
@@ -190,11 +193,11 @@ public final class MethodsGeneratorTest {
      */
     @Test
     public void getSetterForInterfaceTest() {
-        String method = MethodsGenerator.getSetterForInterface(CLASS_NAME, UtilConstants.STRING_DATA_TYPE,
-                                                               CLASS_NAME, false,
-                                                               GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER, null);
-        assertThat(true, is(method.contains(UtilConstants.VOID + UtilConstants.SPACE + UtilConstants.SET_METHOD_PREFIX +
-                                                    CLASS_NAME)));
+        String method = getSetterForInterface(CLASS_NAME, UtilConstants.STRING_DATA_TYPE,
+                                              CLASS_NAME, false,
+                                              GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER, null);
+        assertThat(true, is(method.contains(UtilConstants.VOID + UtilConstants.SPACE +
+                                                    UtilConstants.SET_METHOD_PREFIX + CLASS_NAME)));
     }
 
     /**
@@ -205,8 +208,9 @@ public final class MethodsGeneratorTest {
         JavaAttributeInfo testAttr = getTestAttribute();
         String method = MethodsGenerator.getOfMethodStringAndJavaDoc(testAttr, CLASS_NAME);
         assertThat(true, is(method.contains(
-                UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.STATIC + UtilConstants.SPACE + CLASS_NAME + UtilConstants.SPACE + UtilConstants.OF +
-                        UtilConstants.OPEN_PARENTHESIS + UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE + UtilConstants.VALUE +
+                UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.STATIC + UtilConstants.SPACE + CLASS_NAME +
+                        UtilConstants.SPACE + UtilConstants.OF + UtilConstants.OPEN_PARENTHESIS +
+                        UtilConstants.STRING_DATA_TYPE + UtilConstants.SPACE + UtilConstants.VALUE +
                         UtilConstants.CLOSE_PARENTHESIS)));
     }
 
@@ -217,8 +221,8 @@ public final class MethodsGeneratorTest {
     public void getSetterForTypeDefClassTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
         String method = MethodsGenerator.getSetterForTypeDefClass(testAttr);
-        assertThat(true, is(method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.VOID + UtilConstants.SPACE +
-                                                    UtilConstants.SET_METHOD_PREFIX)));
+        assertThat(true, is(method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.VOID +
+                                                    UtilConstants.SPACE + UtilConstants.SET_METHOD_PREFIX)));
     }
 
     /**

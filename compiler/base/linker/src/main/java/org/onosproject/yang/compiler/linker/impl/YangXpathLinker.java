@@ -187,9 +187,8 @@ public class YangXpathLinker<T> {
      * @return target node
      */
     private YangNode getTargetNodeWhenPathSizeIsOne(List<YangAtomicPath> paths) {
-        if (paths.get(0).getNodeIdentifier().getPrefix() != null
-                && !paths.get(0).getNodeIdentifier().getPrefix().equals
-                (getRootsPrefix(rootNode))) {
+        if (paths.get(0).getNodeIdentifier().getPrefix() != null &&
+                !paths.get(0).getNodeIdentifier().getPrefix().equals(getRootsPrefix(rootNode))) {
             return getImportedNode(rootNode, paths.get(0).getNodeIdentifier());
         }
         return rootNode;

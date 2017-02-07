@@ -121,7 +121,9 @@ public final class NotificationListener {
                 curNode.addChild(notification);
             } catch (DataModelException e) {
                 throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                                                                NOTIFICATION_DATA, ctx.identifier().getText(), ENTRY, e.getMessage()));
+                                                                                NOTIFICATION_DATA,
+                                                                                ctx.identifier().getText(),
+                                                                                ENTRY, e.getMessage()));
             }
             listener.getParsedDataStack().push(notification);
         } else {

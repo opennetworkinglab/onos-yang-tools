@@ -824,8 +824,7 @@ public final class YangIoUtils {
             prefixForIdentifier = conflictResolver.getPrefixForIdentifier();
         }
         if (prefixForIdentifier != null) {
-            prefixForIdentifier = prefixForIdentifier.replaceAll
-                    (REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+            prefixForIdentifier = prefixForIdentifier.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
             String[] strArray = prefixForIdentifier.split(COLON);
             try {
                 if (strArray[0].isEmpty()) {

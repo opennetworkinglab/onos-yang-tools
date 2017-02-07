@@ -50,9 +50,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidNodeIdentifier;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
@@ -123,8 +121,8 @@ public final class IfFeatureListener {
         int errorLine = ctx.getStart().getLine();
         int errorPosition = ctx.getStart().getCharPositionInLine();
         YangResolutionInfoImpl resolutionInfo = new YangResolutionInfoImpl<YangIfFeature>(ifFeature,
-                                                                                          (YangNode) parentNode, errorLine,
-                                                                                          errorPosition);
+                                                                                          (YangNode) parentNode,
+                                                                                          errorLine, errorPosition);
         addToResolutionList(resolutionInfo, ctx);
     }
 
@@ -141,7 +139,8 @@ public final class IfFeatureListener {
             addResolutionInfo(resolutionInfo);
         } catch (DataModelException e) {
             throw new ParserException(constructExtendedListenerErrorMessage(UNHANDLED_PARSED_DATA,
-                                                                            IF_FEATURE_DATA, ctx.string().getText(), EXIT, e.getMessage()));
+                                                                            IF_FEATURE_DATA, ctx.string().getText(),
+                                                                            EXIT, e.getMessage()));
         }
     }
 }
