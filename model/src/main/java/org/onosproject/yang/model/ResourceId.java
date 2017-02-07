@@ -73,6 +73,7 @@ public class ResourceId {
      * provide mutability of resource identifier using builder pattern.
      *
      * @return data node builder
+     * @throws CloneNotSupportedException when clone is not supported
      */
     public Builder copyBuilder() throws CloneNotSupportedException {
         return new Builder(this);
@@ -128,6 +129,7 @@ public class ResourceId {
          * identifier.
          *
          * @param id old resource identifier
+         * @throws CloneNotSupportedException when clone is not supported
          */
         public Builder(ResourceId id) throws CloneNotSupportedException {
             nodeKeyList = new LinkedList<>();
@@ -141,6 +143,7 @@ public class ResourceId {
          *
          * @param id resource identifier to be appended
          * @return builder
+         * @throws CloneNotSupportedException when clone is not supported
          */
         public Builder append(ResourceId id) throws CloneNotSupportedException {
             processCurKey();

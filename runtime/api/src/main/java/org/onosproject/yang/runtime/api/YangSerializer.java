@@ -18,8 +18,6 @@ package org.onosproject.yang.runtime.api;
 
 import org.onosproject.yang.model.DataNode;
 
-import java.util.List;
-
 /**
  * Abstraction of entity capable of encoding and decoding arbitrary
  * {@link DataNode} structures, which are in-memory representations of
@@ -51,7 +49,7 @@ public interface YangSerializer {
      * <p>
      * Also protocols like NETCONF will have decorations around the input stream
      * which will be reported back to protocol in output. Produced
-     * annotations will be in order of preorder traversal.
+     * annotations will be in order of pre-order traversal.
      *
      * @param external composite input stream carrying external
      *                 representation of configuration data
@@ -60,7 +58,7 @@ public interface YangSerializer {
      * node information
      * @throws YangRuntimeException when fails to perform decode operation
      */
-    DecodedOutput decode(CompositeStream external, YangSerializerContext context);
+    CompositeData decode(CompositeStream external, YangSerializerContext context);
 
     /**
      * Encodes the internal in-memory representation of a configuration model
@@ -78,14 +76,14 @@ public interface YangSerializer {
      * form of body without URI.
      * <p>
      * Also protocols like NETCONF would like to provide additional
-     * decorations for the node. These decoration should be in preorder
+     * decorations for the node. These decoration should be in pre-order
      * traversal order.
      *
      * @param internal in-memory representation of configuration data
-     * @param info     decorated node information
+     * @param context  YANG serializer context
      * @return input stream carrying external representation of
      * configuration data
      * @throws YangRuntimeException when fails to perform decode operation
      */
-    CompositeStream encode(CompositeData internal, List<AnnotatedNodeInfo> info);
+    CompositeStream encode(CompositeData internal, YangSerializerContext context);
 }

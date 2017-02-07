@@ -48,6 +48,7 @@ public abstract class DataNode {
          */
         MULTI_INSTANCE_LEAF_VALUE_NODE
     }
+
     /**
      * Type of node in data store.
      */
@@ -123,7 +124,7 @@ public abstract class DataNode {
         protected Object AppInfo;
 
         /**
-         * Parent data node
+         * Parent data node.
          */
         protected InnerNode.Builder parent;
 

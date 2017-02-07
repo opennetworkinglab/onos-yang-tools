@@ -17,7 +17,7 @@
 package org.onosproject.yang.runtime.api;
 
 /**
- * Representation of annotated attribute.
+ * Abstraction of an entity that represents annotated attribute.
  */
 public interface Annotation {
 
@@ -29,23 +29,9 @@ public interface Annotation {
     String name();
 
     /**
-     * Sets name of the annotated attribute.
-     *
-     * @param name of the attribute
-     */
-    void name(String name);
-
-    /**
      * Returns value of the annotation.
      *
      * @return annotation value
      */
     String value();
-
-    /**
-     * Sets value of the annotation.
-     *
-     * @param value value of the annotation
-     */
-    void value(String value);
 }

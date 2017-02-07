@@ -16,42 +16,54 @@
 
 package org.onosproject.yang.runtime.api;
 
-import org.onosproject.yang.model.DataNode;
-import org.onosproject.yang.model.ResourceId;
-
 import java.util.List;
 
 /**
- * Representation of an entity which is comprised of composite data having
- * resource identifier with list of data node.
+ * Abstraction of an entity that is composition of resource data and
+ * associated annotations information.
  */
 public interface CompositeData {
 
     /**
-     * Returns list of data nodes.
+     * Returns resource node.
      *
-     * @return list of data nodes
+     * @return resource node
      */
-    List<DataNode> dataNodes();
+    ResourceData resourceData();
 
     /**
-     * Adds a data node.
+     * Returns annotated nodes information.
      *
-     * @param node data node
+     * @return annotated nodes information
      */
-    void addDataNode(DataNode node);
+    List<AnnotatedNodeInfo> annotatedNodesInfo();
 
     /**
-     * Returns resource identifier.
-     *
-     * @return resource identifier
+     * Abstraction of an entity that represents builder of composite data.
      */
-    ResourceId resourceId();
+    interface Builder {
 
-    /**
-     * Sets resource identifier.
-     *
-     * @param identifier resource identifier
-     */
-    void resourceId(ResourceId identifier);
+        /**
+         * Sets resource node.
+         *
+         * @param node resource node
+         * @return builder
+         */
+        Builder resourceData(ResourceData node);
+
+        /**
+         * Adds information about annotated node.
+         *
+         * @param info annotated node information
+         * @return builder
+         */
+        Builder addAnnotatedNodeInfo(AnnotatedNodeInfo info);
+
+        /**
+         * Builds an instance of decoded output.
+         *
+         * @return decoded output
+         */
+        CompositeData build();
+    }
 }

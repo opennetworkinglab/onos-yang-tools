@@ -16,8 +16,6 @@
 
 package org.onosproject.yang.runtime.api;
 
-import java.util.List;
-
 /**
  * Service for encoding and decoding between internal and external model
  * representations.
@@ -37,20 +35,16 @@ public interface YangRuntimeService {
      * <p>
      * Also protocols like NETCONF will have decorations around the input stream
      * which will be reported back to protocol in output. Produced
-     * annotations will be in order of preorder traversal.
+     * annotations will be in order of pre-order traversal.
      *
-     * @param external      composite input stream carrying external
-     *                      representation of configuration data
-     * @param dataFormat    data format of the provided external representation
-     * @param nodeAnnotated true if annotations are expected, false otherwise
+     * @param external   composite input stream carrying external
+     *                   representation of configuration data
+     * @param dataFormat data format of the provided external representation
      * @return in-memory representation of configuration data with decorated
      * node information
      * @throws YangRuntimeException when fails to perform decode operation
      */
-    // FIXME: This needs to be revised for symmetry with encode and mutability
-    // FIXME: Entities exchanged across this boundary ought not to be mutable
-    DecodedOutput decode(CompositeStream external, String dataFormat,
-                         boolean nodeAnnotated);
+    CompositeData decode(CompositeStream external, String dataFormat);
 
     /**
      * Encodes the internal in-memory representation of a configuration model
@@ -68,17 +62,14 @@ public interface YangRuntimeService {
      * form of body without URI.
      * <p>
      * Also protocols like NETCONF would like to provide additional
-     * decorations for the node. These decoration should be in preorder
+     * decorations for the node. These decoration should be in pre-order
      * traversal order.
      *
      * @param internal   in-memory representation of configuration data
      * @param dataFormat expected data format of the external representation
-     * @param info       decorated node information
      * @return input stream carrying external representation of
      * configuration data
      * @throws YangRuntimeException when fails to perform encode operation
      */
-    // FIXME: Entities exchanged across this boundary ought not to be mutable
-    CompositeStream encode(CompositeData internal, String dataFormat,
-                           List<AnnotatedNodeInfo> info);
+    CompositeStream encode(CompositeData internal, String dataFormat);
 }

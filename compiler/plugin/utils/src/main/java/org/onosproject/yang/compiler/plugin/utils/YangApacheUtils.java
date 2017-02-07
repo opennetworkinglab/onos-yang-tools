@@ -92,11 +92,12 @@ public final class YangApacheUtils {
     /**
      * Returns YANG model for application.
      *
-     * @param path path for metadata file
+     * @param path     path for metadata file
+     * @param curNodes curNodes YANG nodes
      * @return YANG model
      */
-    public static YangModel processYangModel(String path, List<YangNode>
-            curNodes) {
+    public static YangModel processYangModel(String path,
+                                             List<YangNode> curNodes) {
         DefaultYangModel model = new DefaultYangModel();
         YangModuleId id;
         for (YangSchemaNode node : curNodes) {

@@ -16,58 +16,56 @@
 
 package org.onosproject.yang.runtime.api;
 
+import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 
 import java.util.List;
 
 /**
- * Abstraction of an entity that represents annotated nodes information.
+ * Abstraction of an entity that is representation of resource data.
  */
-public interface AnnotatedNodeInfo {
+public interface ResourceData {
 
     /**
-     * Returns resource identifier of the annotated node.
+     * Returns list of data nodes.
+     *
+     * @return list of data nodes
+     */
+    List<DataNode> dataNodes();
+
+    /**
+     * Returns resource identifier.
      *
      * @return resource identifier
      */
     ResourceId resourceId();
 
     /**
-     * Returns annotations associated with the node.
-     *
-     * @return annotations
-     */
-    List<Annotation> annotations();
-
-    /**
-     * Abstraction of an entity that represents builder of annotated node
-     * information.
+     * Abstraction of an entity that represents builder of composite data.
      */
     interface Builder {
 
-
         /**
-         * Sets resource identifier of the annotated node.
+         * Adds a data node.
          *
-         * @param id resource identifier
+         * @param node data node
          * @return builder
          */
-        Builder resourceId(ResourceId id);
+        Builder addDataNode(DataNode node);
 
         /**
-         * Adds annotation to a node.
+         * Sets resource identifier.
          *
-         * @param annotation annotation information
+         * @param identifier resource identifier
          * @return builder
          */
-        Builder addAnnotation(Annotation annotation);
+        Builder resourceId(ResourceId identifier);
 
         /**
-         * Builds an instance of annotated node information.
+         * Builds an instance of composite data.
          *
-         * @return annotated node info
+         * @return composite data
          */
-        AnnotatedNodeInfo build();
+        CompositeStream build();
     }
 }
-

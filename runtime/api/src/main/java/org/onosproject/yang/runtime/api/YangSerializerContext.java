@@ -24,13 +24,6 @@ import org.onosproject.yang.model.SchemaContext;
 public interface YangSerializerContext {
 
     /**
-     * Provides information about whether node annotation is expected.
-     *
-     * @return true if node can be annotated, false otherwise
-     */
-    boolean isNodeAnnotated();
-
-    /**
      * Returns schema context of root node "/".
      *
      * @return schema context provider

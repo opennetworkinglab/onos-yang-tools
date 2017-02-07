@@ -19,8 +19,8 @@ package org.onosproject.yang.runtime.api;
 import java.io.InputStream;
 
 /**
- * Representation of composite stream comprising of resource identifier and
- * its data.
+ * Abstraction of an entity that is composition of resource identifier and
+ * data.
  */
 public interface CompositeStream {
 
@@ -28,16 +28,9 @@ public interface CompositeStream {
      * Retrieves the resource identifier stream on which the operation is being
      * performed.
      *
-     * @return string representation of the resource being identified
+     * @return uri as per RFC 3986
      */
     String resourceId();
-
-    /**
-     * Sets resource identifier on which operation is to be performed.
-     *
-     * @param uri resource identifier string as per RFC 3986
-     */
-    void resourceId(String uri);
 
     /**
      * Retrieves the resource data stream in the protocol encoding format.
@@ -45,11 +38,4 @@ public interface CompositeStream {
      * @return resource data
      */
     InputStream resourceData();
-
-    /**
-     * Sets resource data stream in the protocol encoding format.
-     *
-     * @param stream resource data
-     */
-    void resourceData(InputStream stream);
 }
