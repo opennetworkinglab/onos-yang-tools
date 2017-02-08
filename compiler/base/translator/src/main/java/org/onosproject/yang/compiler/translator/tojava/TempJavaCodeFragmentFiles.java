@@ -24,8 +24,10 @@ import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import java.io.IOException;
 
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_RPC_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_COMMAND_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPE_CLASS;
 
@@ -62,6 +64,16 @@ public class TempJavaCodeFragmentFiles {
     private TempJavaEventFragmentFiles eventTempFiles;
 
     /**
+     * Has the temporary files required for RPC generated classes.
+     */
+    private TempJavaRpcFragmentFiles rpcTempFiles;
+
+    /**
+     * Has the temporary files required for RPC command generated classes.
+     */
+    private TempJavaRpcCommandFragmentFiles rpcCommandTempFiles;
+
+    /**
      * Creates an instance of temporary java code fragment.
      *
      * @param javaFileInfo generated java file info
@@ -89,6 +101,14 @@ public class TempJavaCodeFragmentFiles {
 
         if ((genType & GENERATE_ALL_EVENT_CLASS_MASK) != 0) {
             eventTempFiles = new TempJavaEventFragmentFiles(javaFileInfo);
+        }
+
+        if ((genType & GENERATE_ALL_RPC_CLASS_MASK) != 0) {
+            rpcTempFiles = new TempJavaRpcFragmentFiles(javaFileInfo);
+        }
+
+        if ((genType & GENERATE_RPC_COMMAND_CLASS) != 0) {
+            rpcCommandTempFiles = new TempJavaRpcCommandFragmentFiles(javaFileInfo);
         }
     }
 
@@ -139,6 +159,24 @@ public class TempJavaCodeFragmentFiles {
     }
 
     /**
+     * Retrieves the temp file handle for RPC file generation.
+     *
+     * @return temp file handle for RPC file generation
+     */
+    public TempJavaRpcFragmentFiles getRpcFragmentFiles() {
+        return rpcTempFiles;
+    }
+
+    /**
+     * Retrieves the temp file handle for RPC command file generation.
+     *
+     * @return temp file handle for RPC command file generation
+     */
+    public TempJavaRpcCommandFragmentFiles getRpcCommandTempFiles() {
+        return rpcCommandTempFiles;
+    }
+
+    /**
      * Constructs java code exit.
      *
      * @param fileType generated file type
@@ -178,6 +216,20 @@ public class TempJavaCodeFragmentFiles {
          */
         if (fileType == GENERATE_ENUM_CLASS) {
             enumTempFiles.generateJavaFile(GENERATE_ENUM_CLASS, curNode);
+        }
+
+        /*
+         * Creates RPC files.
+         */
+        if (fileType == GENERATE_ALL_RPC_CLASS_MASK) {
+            rpcTempFiles.generateJavaFile(GENERATE_ALL_RPC_CLASS_MASK, curNode);
+        }
+
+        /*
+         * Creates RPC command file.
+         */
+        if (fileType == GENERATE_RPC_COMMAND_CLASS) {
+            rpcCommandTempFiles.generateJavaFile(GENERATE_RPC_COMMAND_CLASS, curNode);
         }
     }
 
@@ -247,6 +299,14 @@ public class TempJavaCodeFragmentFiles {
 
         if (eventTempFiles != null) {
             eventTempFiles.freeTemporaryResources(isErrorOccurred);
+        }
+
+        if (rpcTempFiles != null) {
+            rpcTempFiles.freeTemporaryResources(isErrorOccurred);
+        }
+
+        if (rpcCommandTempFiles != null) {
+            rpcCommandTempFiles.freeTemporaryResources(isErrorOccurred);
         }
     }
 }

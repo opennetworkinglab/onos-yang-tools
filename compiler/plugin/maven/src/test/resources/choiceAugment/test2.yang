@@ -11,7 +11,7 @@ module test1 {
        reference "";
     }
 
-    rpc rpc-input-output {
+     rpc rpc-input-output {
        input {
             leaf leaf1 {
                  type int32;

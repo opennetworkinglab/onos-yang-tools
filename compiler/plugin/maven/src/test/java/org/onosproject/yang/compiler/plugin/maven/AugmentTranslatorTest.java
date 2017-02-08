@@ -123,7 +123,6 @@ public class AugmentTranslatorTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-        YangPluginConfig.compileCode(COMP);
         deleteDirectory(DIR);
     }
 
@@ -151,7 +150,6 @@ public class AugmentTranslatorTest {
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
         yangPluginConfig.setCodeGenDir(DIR);
         utilManager.translateToJava(yangPluginConfig);
-        YangPluginConfig.compileCode(COMP);
         deleteDirectory(DIR);
     }
 }

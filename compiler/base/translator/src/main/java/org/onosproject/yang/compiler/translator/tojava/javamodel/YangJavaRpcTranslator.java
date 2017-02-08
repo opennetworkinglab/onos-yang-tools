@@ -34,7 +34,9 @@ import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import java.io.IOException;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.updatePackageInfo;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateCodeOfNode;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateJava;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.FAIL_AT_EXIT;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_CHILD_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_PARENT_NODE;
@@ -59,6 +61,7 @@ public class YangJavaRpcTranslator
      */
     public YangJavaRpcTranslator() {
         setJavaFileInfo(new JavaFileInfoTranslator());
+        getJavaFileInfo().setGeneratedFileTypes(GENERATE_RPC_COMMAND_CLASS);
     }
 
     /**
@@ -107,8 +110,17 @@ public class YangJavaRpcTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
 
-        // Add package information for rpc and create corresponding folder.
-        updatePackageInfo(this, yangPlugin);
+        // Add package information for RPC and create corresponding folder.
+        try {
+            generateCodeOfNode(this, yangPlugin);
+        } catch (IOException e) {
+            throw new TranslatorException(
+                    "Failed to prepare generate code entry for RPC node " +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition()
+                            + " in " + getFileName() + " " + e.getLocalizedMessage());
+        }
     }
 
     /**
@@ -174,6 +186,16 @@ public class YangJavaRpcTranslator
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
                                                       e.getLocalizedMessage()));
         }
-        // No file will be generated during RPC exit.
+
+        // generate RPC command file
+        try {
+            generateJava(GENERATE_RPC_COMMAND_CLASS, this);
+        } catch (IOException e) {
+            throw new TranslatorException("Failed to generate code for RPC node " +
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+        }
     }
 }

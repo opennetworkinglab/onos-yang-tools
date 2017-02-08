@@ -34,12 +34,17 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_KEY_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_EXTENDED_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_HANDLER_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_REGISTER_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_DIAMOND_WITH_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.brackets;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getAbstractClassDefinitionWithExtends;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinition;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithExtends;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinitionWithImpl;
@@ -53,8 +58,10 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT_EVENT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
+import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARABLE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ENUM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ERROR_MSG_JAVA_IDENTITY;
@@ -73,9 +80,14 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.REGISTER_RPC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_COMMAND;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COMMAND;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SUBJECT;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.trimAtLast;
 
@@ -148,6 +160,14 @@ final class ClassDefinitionGenerator {
                 return getClassDefinition(yangName);
             case GENERATE_IDENTITY_CLASS:
                 return getIdentityClassDefinition(yangName, curNode);
+            case GENERATE_RPC_HANDLER_CLASS:
+                return getRpcHandlerClassDefinition();
+            case GENERATE_RPC_REGISTER_CLASS:
+                return getRpcRegisterClassDefination();
+            case GENERATE_RPC_COMMAND_CLASS:
+                return getRpcCommandClassDefination(curNode);
+            case GENERATE_RPC_EXTENDED_COMMAND_CLASS:
+                return getRpcExtendedCommandClassDefination();
             default:
                 return null;
         }
@@ -428,5 +448,46 @@ final class ClassDefinitionGenerator {
         }
         def = builder.toString();
         return trimAtLast(def, COMMA);
+    }
+
+    /**
+     * Returns RPC handler class definition.
+     *
+     * @return RPC handler class definition
+     */
+    private static String getRpcHandlerClassDefinition() {
+        return getDefinitionWithImplements(CLASS, DEFAULT_RPC_HANDLER,
+                                           PUBLIC, RPC_HANDLER);
+    }
+
+    /**
+     * Returns register RPC class definition.
+     *
+     * @return register RPC class definition
+     */
+    private static String getRpcRegisterClassDefination() {
+        return getDefaultDefinition(CLASS, REGISTER_RPC, PUBLIC);
+    }
+
+    /**
+     * Returns RPC command class definition.
+     *
+     * @return RPC command class definition
+     */
+    private static String getRpcCommandClassDefination(YangNode yangNode) {
+        String className = getCapitalCase(getCamelCase(
+                yangNode.getJavaClassNameOrBuiltInType(), null)) + COMMAND;
+        return getDefaultDefinitionWithExtends(CLASS, className,
+                                               PUBLIC, RPC_EXTENDED_COMMAND);
+    }
+
+    /**
+     * Returns extended RPC command class definition.
+     *
+     * @return extended RPC command class definition
+     */
+    private static String getRpcExtendedCommandClassDefination() {
+        return getAbstractClassDefinitionWithExtends(CLASS, RPC_EXTENDED_COMMAND,
+                                                     PUBLIC, RPC_COMMAND);
     }
 }

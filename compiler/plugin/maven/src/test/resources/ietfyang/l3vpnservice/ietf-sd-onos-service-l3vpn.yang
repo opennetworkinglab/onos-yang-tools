@@ -112,7 +112,7 @@
 
 
 
-     rpc create-l3vpn-instance {
+     /*rpc create-l3vpn-instance {
        description "Create l3vpn instance." ;
        input {
          container l3vpn-instance {
@@ -312,5 +312,5 @@
                }
              }
        }
-     }
+     } */
    }

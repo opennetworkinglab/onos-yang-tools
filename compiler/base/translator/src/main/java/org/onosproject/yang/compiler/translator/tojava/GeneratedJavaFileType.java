@@ -94,6 +94,33 @@ public final class GeneratedJavaFileType {
     public static final int GENERATE_KEY_CLASS = 4096;
 
     /**
+     * Default RPC handler class.
+     */
+    public static final int GENERATE_RPC_HANDLER_CLASS = 8192;
+
+    /**
+     * Register RPC class.
+     */
+    public static final int GENERATE_RPC_REGISTER_CLASS = 16384;
+
+    /**
+     * RPC command class.
+     */
+    public static final int GENERATE_RPC_COMMAND_CLASS = 32768;
+
+    /**
+     * Extended RPC command class.
+     */
+    public static final int GENERATE_RPC_EXTENDED_COMMAND_CLASS = 65536;
+
+    /**
+     * Java classes for RPC.
+     */
+    public static final int GENERATE_ALL_RPC_CLASS_MASK =
+            GENERATE_RPC_HANDLER_CLASS | GENERATE_RPC_REGISTER_CLASS
+                    | GENERATE_RPC_EXTENDED_COMMAND_CLASS;
+
+    /**
      * Creates an instance of generate java file type.
      */
     private GeneratedJavaFileType() {

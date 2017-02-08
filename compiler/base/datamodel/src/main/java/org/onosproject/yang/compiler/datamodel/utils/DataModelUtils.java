@@ -34,6 +34,7 @@ import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangIfFeature;
 import org.onosproject.yang.compiler.datamodel.YangImport;
+import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
@@ -46,6 +47,7 @@ import org.onosproject.yang.compiler.datamodel.YangMust;
 import org.onosproject.yang.compiler.datamodel.YangMustHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
+import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
@@ -1216,6 +1218,40 @@ public final class DataModelUtils {
                     return leafList;
                 }
             }
+        }
+        return null;
+    }
+
+    /**
+     * Searches for input in given RPC node.
+     *
+     * @return input node
+     */
+    public static YangNode findRpcInput(YangNode rpc) {
+        YangNode child = rpc.getChild();
+        while (child != null) {
+            if (!(child instanceof YangInput)) {
+                child = child.getNextSibling();
+                continue;
+            }
+            return child;
+        }
+        return null;
+    }
+
+    /**
+     * Searches for output in given RPC node.
+     *
+     * @return output node
+     */
+    public static YangNode findRpcOutput(YangNode rpc) {
+        YangNode child = rpc.getChild();
+        while (child != null) {
+            if (!(child instanceof YangOutput)) {
+                child = child.getNextSibling();
+                continue;
+            }
+            return child;
         }
         return null;
     }

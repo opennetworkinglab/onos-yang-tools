@@ -29,6 +29,7 @@ import org.onosproject.yang.compiler.datamodel.YangGrouping;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
+import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
@@ -275,7 +276,8 @@ public final class YangJavaModelUtils {
              */
             translator.getEnumTempFiles()
                     .addEnumAttributeToTempFiles((YangNode) info, config);
-        } else if (!(info instanceof YangChoice)) {
+        } else if (!(info instanceof YangChoice) && !(info instanceof
+                YangRpc)) {
             /*Do nothing, only the interface needs to be generated for choice*/
             throw new TranslatorException(
                     getErrorMsgForCodeGenerator(INVALID_TRANSLATION_NODE, info));

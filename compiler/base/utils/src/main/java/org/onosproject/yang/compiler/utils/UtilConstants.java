@@ -1815,6 +1815,162 @@ public final class UtilConstants {
      */
     public static final String YANG_META_DATA = "YangMetaData.ser";
 
+    /**
+     * Static attribute for concurrent import package.
+     */
+    public static final String JAVA_UTIL_CONCURRENT_PKG = "java.util" +
+            ".concurrent";
+
+    /**
+     * Static attribute for config import package.
+     */
+    public static final String CONFIG_PKG = "org.onosproject.config";
+
+    /**
+     * Static attribute for model import package.
+     */
+    public static final String MODEL_PKG = "org.onosproject.yang.model";
+
+    /**
+     * Static attribute for RPC execution status import package.
+     */
+    public static final String RPC_OUTPUT_STATUS_PKG = "org.onosproject.config" +
+            ".RpcOutput.Status";
+
+    /**
+     * Static param for model converter.
+     */
+    public static final String MODEL_CONVERTER = "ModelConverter";
+
+    /**
+     * Static param for resource id.
+     */
+    public static final String RESOURCE_ID = "ResourceId";
+
+    /**
+     * Static param for dynamic config service.
+     */
+    public static final String DYNAMIC_CONFIG_SERVICE = "DynamicConfigService";
+
+    /**
+     * Static param for RPC handler.
+     */
+    public static final String RPC_HANDLER = "RpcHandler";
+
+    /**
+     * Static param for RPC command.
+     */
+    public static final String RPC_COMMAND = "RpcCommand";
+
+    /**
+     * Static param for RPC input.
+     */
+    public static final String RPC_INPUT = "RpcInput";
+
+    /**
+     * Static param for RPC output.
+     */
+    public static final String RPC_OUTPUT = "RpcOutput";
+
+    /**
+     * Static param for RPC success.
+     */
+    public static final String RPC_SUCCESS = "RPC_SUCCESS";
+
+    /**
+     * Static param for RPC executer.
+     */
+    public static final String RPC_EXECUTER = "RpcExecuter";
+
+    /**
+     * Static attribute for extends.
+     */
+    public static final String EXTENDS = "extends";
+
+    /**
+     * Static attribute for super.
+     */
+    public static final String SUPER = "super";
+
+    /**
+     * Static attribute for linked list.
+     */
+    public static final String LINKED_LIST = "LinkedList";
+
+    /**
+     * Static attribute for data node.
+     */
+    public static final String DATA_NODE = "DataNode";
+
+    /**
+     * Static attribute for executor service.
+     */
+    public static final String EXECUTOR_SERVICE = "ExecutorService";
+
+    /**
+     * Static attribute for executors.
+     */
+    public static final String EXECUTORS = "Executors";
+
+    /**
+     * Static attribute for default RPC handler.
+     */
+    public static final String DEFAULT_RPC_HANDLER = "DefaultRpcHandler";
+
+    /**
+     * Static attribute for RPC extended command.
+     */
+    public static final String RPC_EXTENDED_COMMAND = "RpcExtendedCommand";
+
+    /**
+     * Static attribute for register RPC.
+     */
+    public static final String REGISTER_RPC = "RegisterRpc";
+
+    /**
+     * JavaDocs's description for RPC handler.
+     */
+    public static final String JAVA_DOC_RPC_HANDLER = "RPC handler";
+
+    /**
+     * JavaDocs's description for register RPC.
+     */
+    public static final String JAVA_DOC_REGISTER_RPC = "register RPC";
+
+    /**
+     * JavaDocs's description for RPC executer.
+     */
+    public static final String JAVA_DOC_RPC_EXECUTER = "Runnable capable of " +
+            "invoking the appropriate RPC command's execute method";
+
+    public static final String JAVA_DOC_RPC_EXTENDED_CMD = "* Abstract " +
+            "implementation of an RPC extended command";
+
+    public static final String COMMAND = "Command";
+
+    public static final String REGISTER_RPC_JAVADOC = "    * Registers RPC " +
+            "handler with dynamic config service";
+
+    public static final String CREATE_RPC_CMD_JAVADOC = "    * Creates RPC " +
+            "command for all the RPC";
+
+    public static final String RPC_EXECUTER_JAVADOC = "    * Runnable " +
+            "capable of invoking the appropriate RPC command's execute method";
+
+    public static final String RUNNABLE = "Runnable";
+
+    public static final String RUN = "run";
+
+    public static final String BUILDER = "Builder";
+
+    public static final String BUILD = "build";
+
+    public static final String ADD_BRANCH_POINT_SCHEMA = "addBranchPointSchema";
+
+    public static final String CREATE_MODEL = "createModel";
+
+    public static final String CREATE_DATA_NODE = "createDataNode";
+
     // No instantiation.
     private UtilConstants() {
     }

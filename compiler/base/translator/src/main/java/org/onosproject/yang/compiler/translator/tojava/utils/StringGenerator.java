@@ -26,6 +26,8 @@ import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +47,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.APP_INSTANCE;
@@ -129,6 +132,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT_MIN_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.STATIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_BUILDER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_BUILDER_VAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.THIS;
@@ -386,9 +390,13 @@ public final class StringGenerator {
     /**
      * Returns value assignment.
      *
+     * @param param       variable to which value to be assigned
+     * @param value       value to be assigned
+     * @param indentation indentation of the statement
      * @return value assignment
      */
-    static String valueAssign(String param, String value, String indentation) {
+    public static String valueAssign(String param, String value, String
+            indentation) {
         return indentation + param + SPACE + EQUAL + SPACE + value +
                 signatureClose();
     }
@@ -484,13 +492,15 @@ public final class StringGenerator {
      * @param methodReturnType method's return type
      * @param params           parameters
      * @param type             type of method
+     * @param space            indentation of method
      * @return method signature for multi attribute methods
      */
-    static String multiAttrMethodSignature(String methodName, String
+    public static String multiAttrMethodSignature(String methodName, String
             prefix, String modifier, String methodReturnType,
-                                           Map<String, String> params,
-                                           MethodClassTypes type) {
-        StringBuilder methodBuilder = new StringBuilder(FOUR_SPACE_INDENTATION);
+                                                  Map<String, String> params,
+                                                  MethodClassTypes type,
+                                                  String space) {
+        StringBuilder methodBuilder = new StringBuilder(space);
         String method = EMPTY_STRING;
         if (modifier != null) {
             method = modifier + SPACE;
@@ -533,7 +543,7 @@ public final class StringGenerator {
      * @param type             method class type
      * @return method signature for interface and implementation classes
      */
-    static String methodSignature(
+    public static String methodSignature(
             String methodName, String prefix, String modifier, String paraVal,
             String methodReturnType, String paraReturnType,
             MethodClassTypes type) {
@@ -965,10 +975,10 @@ public final class StringGenerator {
      * @param impl      implements class name
      * @return class definition
      */
-    static String getDefaultDefinitionWithImpl(String classType,
-                                               String name, String
-                                                       modifier,
-                                               String impl) {
+    public static String getDefaultDefinitionWithImpl(String classType,
+                                                      String name,
+                                                      String modifier,
+                                                      String impl) {
         String mod = EMPTY_STRING;
         if (modifier != null) {
             mod = modifier + SPACE;
@@ -1153,8 +1163,8 @@ public final class StringGenerator {
      * @param data  data variable/collection
      * @return for loop string
      */
-    static String getForLoopString(String space, String type, String var,
-                                   String data) {
+    public static String getForLoopString(String space, String type, String var,
+                                          String data) {
         return space + FOR + SPACE + OPEN_PARENTHESIS + type + SPACE + var +
                 SPACE + COLON + SPACE + data + CLOSE_PARENTHESIS +
                 methodSignatureClose(CLASS_TYPE);
@@ -1251,4 +1261,91 @@ public final class StringGenerator {
     static String getQualifiedString(String pkg, String cls) {
         return pkg + PERIOD + cls;
     }
+
+    /**
+     * Returns new instance string.
+     *
+     * @param className  class name
+     * @param space      indentation
+     * @param parameters parameters for constructor
+     * @return new instance string
+     */
+    public static String createNewInstance(String className, String space,
+                                           List<String> parameters) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(space).append(NEW).append(SPACE).append(className)
+                .append(OPEN_PARENTHESIS);
+
+        if (parameters != null && !parameters.isEmpty()) {
+            Iterator<String> iterator = parameters.iterator();
+            while (iterator.hasNext()) {
+                builder.append(iterator.next());
+                if (iterator.hasNext()) {
+                    builder.append(COMMA).append(SPACE);
+                }
+            }
+        }
+
+        builder.append(CLOSE_PARENTHESIS);
+        return builder.toString();
+    }
+
+    /**
+     * Returns variable declaration string.
+     *
+     * @param varName  name of variable
+     * @param varType  type of variable
+     * @param space    indentation of the statement
+     * @param modifier modifier name
+     * @return return variable declaration string
+     */
+    public static String getVariableDeclaration(String varName, String varType,
+                                                String space, String modifier) {
+        StringBuilder builder = new StringBuilder(space);
+        if (modifier != null) {
+            builder.append(modifier).append(SPACE);
+        }
+        builder.append(varType).append(SPACE)
+                .append(varName).append(SEMI_COLON).append(NEW_LINE);
+
+        return builder.toString();
+    }
+
+    /**
+     * Returns abstract class definition for java file when extends a
+     * interface.
+     *
+     * @param classType class type
+     * @param name      name of class
+     * @param modifier  modifier for class
+     * @param extend    extends class name
+     * @return abstract class definition
+     */
+    static String getAbstractClassDefinitionWithExtends(String classType,
+                                                        String name, String
+                                                                modifier,
+                                                        String extend) {
+        String mod = EMPTY_STRING;
+        if (modifier != null) {
+            mod = modifier + SPACE;
+        }
+        return mod + ABSTRACT + SPACE + classType + SPACE + name + SPACE +
+                EXTEND + SPACE
+                + extend + defCloseString();
+    }
+
+    /**
+     * Returns static import string.
+     *
+     * @param pkg package
+     * @param cls class
+     * @return static import string
+     */
+    public static String getStaticImportString(String pkg, String cls) {
+        StringBuilder builder = new StringBuilder()
+                .append(IMPORT).append(STATIC).append(SPACE)
+                .append(pkg).append(PERIOD).append(cls).append(signatureClose());
+        return builder.toString();
+    }
+
 }

@@ -52,6 +52,10 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_KEY_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_EXTENDED_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_HANDLER_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_REGISTER_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
@@ -100,6 +104,10 @@ import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.EVENT_LISTENER;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.EVENT_SUBJECT_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.INTERFACE;
+import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.REGISTER_RPC;
+import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.RPC_COMMAND;
+import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.RPC_EXTENDED_CMD;
+import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.RPC_INTERFACE;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
@@ -460,6 +468,21 @@ public final class JavaFileGeneratorUtils {
                 appendHeaderContents(file, pkgString, importsList);
                 write(file, genType, EVENT_SUBJECT_CLASS, curNode, className, false);
                 break;
+            case GENERATE_RPC_HANDLER_CLASS:
+                appendHeaderContents(file, pkgString, importsList);
+                write(file, genType, RPC_HANDLER, curNode, className, false);
+                break;
+            case GENERATE_RPC_REGISTER_CLASS:
+                appendHeaderContents(file, pkgString, importsList);
+                write(file, genType, REGISTER_RPC, curNode, className, false);
+                break;
+            case GENERATE_RPC_COMMAND_CLASS:
+                appendHeaderContents(file, pkgString, importsList);
+                write(file, genType, RPC_COMMAND, curNode, className, false);
+                break;
+            case GENERATE_RPC_EXTENDED_COMMAND_CLASS:
+                appendHeaderContents(file, pkgString, importsList);
+                write(file, genType, RPC_EXTENDED_CMD, curNode, className, false);
             default:
                 break;
         }
@@ -564,8 +587,9 @@ public final class JavaFileGeneratorUtils {
     private static void write(File file, int genType, JavaDocType javaDocType,
                               YangNode curNode, String fileName, boolean isForClass)
             throws IOException {
-        insertDataIntoJavaFile(file, getJavaDoc(javaDocType, fileName,
-                                                isForClass, null));
+        insertDataIntoJavaFile(file, getJavaDoc(
+                javaDocType, curNode.getJavaClassNameOrBuiltInType(), isForClass,
+                null));
         insertDataIntoJavaFile(file, generateClassDefinition(genType,
                                                              fileName, curNode));
     }

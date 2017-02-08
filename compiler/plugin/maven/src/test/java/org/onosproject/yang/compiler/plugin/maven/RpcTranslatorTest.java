@@ -18,11 +18,11 @@ package org.onosproject.yang.compiler.plugin.maven;
 
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
-import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,6 @@ public final class RpcTranslatorTest {
 
         JavaCodeGeneratorUtil.generateJavaCode(node, yangPluginConfig);
         String dir1 = System.getProperty("user.dir") + File.separator + dir;
-        YangPluginConfig.compileCode(dir1);
         YangIoUtils.deleteDirectory(dir);
     }
     // TODO enhance the test cases, after having a framework of translator test.

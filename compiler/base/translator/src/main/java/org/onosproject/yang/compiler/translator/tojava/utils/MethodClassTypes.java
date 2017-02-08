@@ -19,7 +19,7 @@ package org.onosproject.yang.compiler.translator.tojava.utils;
 /**
  * Represents java method types for classes.
  */
-enum MethodClassTypes {
+public enum MethodClassTypes {
 
     //Method for interface files.
     INTERFACE_TYPE,

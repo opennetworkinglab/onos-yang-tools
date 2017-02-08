@@ -48,6 +48,10 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_LISTENER_INTERFACE;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_SUBJECT_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_KEY_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_EXTENDED_COMMAND_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_HANDLER_CLASS;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_RPC_REGISTER_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
@@ -72,6 +76,10 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.SETTER_FOR_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.TO_STRING_IMPL_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles.getListOfAttributesForKey;
+import static org.onosproject.yang.compiler.translator.tojava.TempJavaRpcCommandFragmentFiles.getRpcCommandContents;
+import static org.onosproject.yang.compiler.translator.tojava.TempJavaRpcFragmentFiles.getRegisterRpcContents;
+import static org.onosproject.yang.compiler.translator.tojava.TempJavaRpcFragmentFiles.getRpcExtendedCommandContents;
+import static org.onosproject.yang.compiler.translator.tojava.TempJavaRpcFragmentFiles.getRpcHandlerContents;
 import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.FOUR_SPACE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.addStaticAttributeIntRange;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.addStaticAttributeLongRange;
@@ -123,8 +131,10 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUt
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
+import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ENUM_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_CLASS;
@@ -142,7 +152,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.REGISTER_RPC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_CLASS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE_METHOD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TYPEDEF_CLASS;
@@ -1036,5 +1048,92 @@ public final class JavaFileGenerator {
     private static boolean leavesPresent(YangLeavesHolder holder) {
         return holder.getListOfLeaf() != null &&
                 !holder.getListOfLeaf().isEmpty();
+    }
+
+    /**
+     * Generates RPC handler file.
+     *
+     * @param file    generated file
+     * @param curNode current YANG node
+     * @param imports imports for file
+     * @return rpc class file
+     * @throws IOException when fails to generate class file
+     */
+    public static File generateRpcHandler(File file, YangNode curNode,
+                                          List<String> imports)
+            throws IOException {
+        initiateJavaFileGeneration(file, GENERATE_RPC_HANDLER_CLASS, imports,
+                                   curNode, DEFAULT_RPC_HANDLER);
+
+        insertDataIntoJavaFile(file, getRpcHandlerContents());
+
+        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
+
+        return validateLineLength(file);
+    }
+
+    /**
+     * Generates RPC extended command file.
+     *
+     * @param file    generated file
+     * @param curNode current YANG node
+     * @param imports imports for file
+     * @throws IOException when fails to generate class file
+     */
+    public static File generateRpcExtendedCommand(File file, YangNode curNode,
+                                                  List<String> imports)
+            throws IOException {
+        initiateJavaFileGeneration(file, GENERATE_RPC_EXTENDED_COMMAND_CLASS, imports,
+                                   curNode, RPC_EXTENDED_COMMAND);
+
+        insertDataIntoJavaFile(file, getRpcExtendedCommandContents());
+
+        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
+
+        return validateLineLength(file);
+    }
+
+    /**
+     * Generates RPC command file.
+     *
+     * @param file    generated file
+     * @param curNode current YANG node
+     * @param imports imports for file
+     * @throws IOException when fails to generate class file
+     */
+    public static File generateRpcCommand(File file, YangNode curNode,
+                                          List<String> imports)
+            throws IOException {
+        String className = getCapitalCase(getCamelCase(
+                curNode.getJavaClassNameOrBuiltInType(), null)) + COMMAND;
+        initiateJavaFileGeneration(file, GENERATE_RPC_COMMAND_CLASS, imports,
+                                   curNode, className);
+
+        insertDataIntoJavaFile(file, getRpcCommandContents(curNode));
+
+        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
+
+        return validateLineLength(file);
+    }
+
+    /**
+     * Generates register RPC file.
+     *
+     * @param file    generated file
+     * @param curNode current YANG node
+     * @param imports imports for file
+     * @throws IOException when fails to generate class file
+     */
+    public static File generateRegisterRpc(File file, YangNode curNode,
+                                           List<String> imports)
+            throws IOException {
+        initiateJavaFileGeneration(file, GENERATE_RPC_REGISTER_CLASS, imports,
+                                   curNode, REGISTER_RPC);
+
+        insertDataIntoJavaFile(file, getRegisterRpcContents(curNode));
+
+        insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
+
+        return validateLineLength(file);
     }
 }

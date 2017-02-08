@@ -39,8 +39,12 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_GETTERS
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_MANAGER_SETTERS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_OF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_PARAM;
+import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_REGISTER_RPC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_RETURN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_RPC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_RPC_EXECUTER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_RPC_EXTENDED_CMD;
+import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_SETTERS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_DOC_SETTERS_COMMON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
@@ -154,6 +158,23 @@ public final class JavaDocGen {
             }
             case ADD_TO_LIST: {
                 return generateForAddToList(name, compilerAnnotation);
+            }
+            case RPC_HANDLER: {
+                return generateForClass(JAVA_DOC_RPC_HANDLER);
+            }
+            case RPC_COMMAND: {
+                return generateForClass(name);
+            }
+            case REGISTER_RPC: {
+                return generateForClass(JAVA_DOC_REGISTER_RPC);
+            }
+            case RPC_EXECUTER: {
+                return getJavaDocWithoutParam(JAVA_DOC_RPC_EXECUTER,
+                                              EMPTY_STRING);
+            }
+            case RPC_EXTENDED_CMD: {
+                return getJavaDocWithoutParam(JAVA_DOC_RPC_EXTENDED_CMD,
+                                              EMPTY_STRING);
             }
             default: {
                 return generateForConstructors(name);
@@ -416,6 +437,17 @@ public final class JavaDocGen {
                                          EMPTY_STRING, isForDefaultClass);
     }
 
+    /**
+     * Generates javaDocs for the impl class.
+     *
+     * @param className class name
+     * @return javaDocs javadocs in string
+     */
+    private static String generateForClass(String className) {
+        return NEW_LINE + JAVA_DOC_FIRST_LINE + IMPL_CLASS_JAVA_DOC +
+                className + PERIOD + NEW_LINE + JAVA_DOC_END_LINE;
+    }
+
     private static String addFlagJavaDoc() {
         return " *\n" +
                 " * <p>\n" +
@@ -660,6 +692,107 @@ public final class JavaDocGen {
         return FOUR_SPACE_INDENTATION + JAVA_DOC_END_LINE;
     }
 
+    /**
+     * Returns data in javadoc format.
+     *
+     * @param data  content of javadoc
+     * @param space indendation for javadoc
+     * @return data in javadoc format
+     */
+    public static String getJavaDocWithoutParam(String data, String space) {
+        StringBuilder builder = new StringBuilder(NEW_LINE);
+        builder.append(space).append(JAVA_DOC_FIRST_LINE).append(SPACE)
+                .append(data).append(PERIOD).append(NEW_LINE)
+                .append(space).append(JAVA_DOC_END_LINE);
+        return builder.toString();
+    }
+
+    /**
+     * Returns javadoc for RPC executer constructor.
+     *
+     * @return javadoc for RPC executer constructor
+     */
+    public static String getJavaDocForRpcExecuterConstructor() {
+        return "\n        /**\n" +
+                "         * Constructs a RPC executor for the given msg id, RPC command and\n" +
+                "         * RPC input.\n" +
+                "         *\n" +
+                "         * @param msgId msgId of the RPC message to be executed\n" +
+                "         * @param cmd RPC command to be executed\n" +
+                "         * @param input input data to the RPC command\n" +
+                "         */";
+    }
+
+    /**
+     * Returns javadoc for RPC command constructor.
+     *
+     * @return javadoc for RPC command constructor
+     */
+    public static String getJavaDocForRpcCommandConstructor(String rpcName) {
+        return "    /**\n" +
+                "     * Constructs a " + rpcName + " command for the given " +
+                "cmd id, model converter,\n     * application service.\n     *\n" +
+                "     * @param cmdId identifier of RPC command\n" +
+                "     * @param modelConverter model converter for convertion\n" +
+                "     * @param allService application service\n     */";
+    }
+
+    /**
+     * Returns javadoc for RPC extended command constructor.
+     *
+     * @return javadoc for RPC extended command constructor
+     */
+    public static String getJavaDocForRpcExtendedCommandConstructor() {
+        return "    /**\n" +
+                "     * Creates an instance of RPC extended command.\n" +
+                "     *\n" +
+                "     * @param cmdId of RPC command\n" +
+                "     */";
+    }
+
+    /**
+     * Returns javadoc for RPC extended command execute method.
+     *
+     * @return javadoc for RPC extended command execute method
+     */
+    public static String getJavaDocForExtendedExecuteMethod() {
+        return "    /**\n" +
+                "     * Executes the RPC command.\n" +
+                "     *\n" +
+                "     * @param input input data to the RPC command\n" +
+                "     * @param msgId of the RPC message to be executed\n" +
+                "     */";
+    }
+
+    /**
+     * Returns javadoc for execute method.
+     *
+     * @return javadoc for execute method
+     */
+    public static String getJavaDocForExecuteMethod() {
+        return "    /**\n" +
+                "     * Executes the RPC command.\n" +
+                "     *\n" +
+                "     * @param rpcInput input data to the RPC command\n" +
+                "     * @param msgId msgId of the RPC message to be executed\n" +
+                "     */";
+    }
+
+    /**
+     * Returns javadoc for register RPC constructor.
+     *
+     * @return javadoc for register RPC constructor
+     */
+    public static String getJavadocForRegisterRpcConstructor() {
+        return "    /**\n" +
+                "     * Constructs a register rpc for the given store service, mode converter and\n" +
+                "     * application service.\n" +
+                "     *\n" +
+                "     * @param store dynamic config service\n" +
+                "     * @param modelConverter model converter for convertion\n" +
+                "     * @param allService application service\n" +
+                "     */";
+    }
 
     /**
      * JavaDocs types.
@@ -775,5 +908,30 @@ public final class JavaDocGen {
          * For add to list.
          */
         ADD_TO_LIST,
+
+        /**
+         * For RPC handler.
+         */
+        RPC_HANDLER,
+
+        /**
+         * For RPC command.
+         */
+        RPC_COMMAND,
+
+        /**
+         * For register RPC.
+         */
+        REGISTER_RPC,
+
+        /**
+         * For RPC executer.
+         */
+        RPC_EXECUTER,
+
+        /**
+         * For RPC extended command.
+         */
+        RPC_EXTENDED_CMD
     }
 }

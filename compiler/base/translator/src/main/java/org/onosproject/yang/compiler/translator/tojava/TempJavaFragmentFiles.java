@@ -250,7 +250,6 @@ public class TempJavaFragmentFiles {
      */
     private static final String INTERFACE_FILE_NAME_SUFFIX = EMPTY_STRING;
 
-
     /**
      * File name for list key class file name suffix.
      */
@@ -1639,7 +1638,6 @@ public class TempJavaFragmentFiles {
                         getJavaFileHandle(getJavaClassName(
                                 KEY_CLASS_FILE_NAME_SUFFIX));
                 generateKeyClassFile(keyClassJavaFileHandle, curNode);
-
             }
         }
         //Close all the file handles.
@@ -1804,5 +1802,4 @@ public class TempJavaFragmentFiles {
     public void setAttrNode(YangNode attrNode) {
         this.attrNode = attrNode;
     }
-
 }

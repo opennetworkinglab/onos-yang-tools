@@ -93,6 +93,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.methodSignatureClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.valueAssign;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_AUGMENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
@@ -1208,7 +1209,7 @@ public final class MethodsGenerator {
         map.put(SCHEMA_NAME, STRING_DATA_TYPE);
         builder.append(multiAttrMethodSignature(className, EMPTY_STRING,
                                                 EMPTY_STRING, null,
-                                                map, CLASS_TYPE))
+                                                map, CLASS_TYPE, FOUR_SPACE_INDENTATION))
                 .append(methodBody(SETTER, clsName, EMPTY_STRING,
                                    EIGHT_SPACE_INDENTATION, EMPTY_STRING,
                                    EMPTY_STRING, false, null))
@@ -1388,7 +1389,7 @@ public final class MethodsGenerator {
         map.put(VALUE, newType);
         builder.append(multiAttrMethodSignature(VALIDATE_RANGE, EMPTY_STRING,
                                                 PRIVATE, BOOLEAN_DATA_TYPE, map,
-                                                CLASS_TYPE));
+                                                CLASS_TYPE, FOUR_SPACE_INDENTATION));
         if (type.contentEquals(BIG_INTEGER)) {
             //Create new instance of big integer.
             builder.append(getNewInstance(BIG_INTEGER, var, EIGHT_SPACE_INDENTATION,
@@ -1453,7 +1454,8 @@ public final class MethodsGenerator {
                     param.put(attr.getAttributeName() + VALUE_CAPS, retType);
                     return multiAttrMethodSignature(methodName, null, null,
                                                     className, param,
-                                                    INTERFACE_TYPE);
+                                                    INTERFACE_TYPE,
+                                                    FOUR_SPACE_INDENTATION);
                 default:
                     return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
                                            className, retType,
@@ -1506,7 +1508,8 @@ public final class MethodsGenerator {
                     builder.append(multiAttrMethodSignature(methodName,
                                                             null, PUBLIC,
                                                             name, param,
-                                                            CLASS_TYPE))
+                                                            CLASS_TYPE,
+                                                            FOUR_SPACE_INDENTATION))
                             .append(getIfConditionForAddToListMethod(attr));
                     retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD +
                             PUT + getOpenCloseParaWithValue(
@@ -1928,6 +1931,30 @@ public final class MethodsGenerator {
         }
         builder.append(getReturnString(NEG_ONE, EIGHT_SPACE_INDENTATION))
                 .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        return builder.toString();
+    }
+
+    /**
+     * Returns parameterisied constructor string.
+     *
+     * @param name         class name
+     * @param modifierType modifier type
+     * @param params       parameters for constrcutors
+     * @return parameterisied constructor method string
+     */
+    public static String getParaMeterisiedConstructor(String name,
+                                                      String modifierType,
+                                                      Map<String, String> params,
+                                                      String space) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(multiAttrMethodSignature(name, null, modifierType, null,
+                                                params, CLASS_TYPE, space));
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.append(valueAssign(THIS + PERIOD + entry.getKey(),
+                                       entry.getKey(), space + FOUR_SPACE_INDENTATION));
+        }
+
+        builder.append(space).append(CLOSE_CURLY_BRACKET).append(NEW_LINE);
         return builder.toString();
     }
 }

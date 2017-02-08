@@ -64,7 +64,8 @@ choice name {
              }
          }
    }
-    rpc r {
+
+    /* rpc r {
         input {
            choice name {
              case a {
@@ -93,9 +94,9 @@ choice name {
              }
          }
         }
-     }
+     }*/
 
-     augment /name {
+     /*augment /name {
         choice name {
              case a {
                  leaf udp {
@@ -152,6 +153,6 @@ choice name {
                           }
                       }
                   }
-     }
+     } */
 
 }

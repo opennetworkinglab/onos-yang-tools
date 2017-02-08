@@ -9,21 +9,19 @@ module port-pair {
      grouping port-pair {
         container  port-pair {
 
-        	leaf name {
-           	    type string;
-        	}
+            leaf name {
+               type string;
+            }
 
-        	
-        	leaf description {
-            	    type string;
-        	}
-
-   	}
+            leaf description {
+               type string;
+            }
+        }
     }
    
-    rpc get-port-pair {
+    /* rpc get-port-pair {
       output {
           uses port-pair;
       }
-    }
+    } */
 }

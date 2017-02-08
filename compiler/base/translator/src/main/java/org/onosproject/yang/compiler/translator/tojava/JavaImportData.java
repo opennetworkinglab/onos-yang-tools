@@ -23,24 +23,41 @@ import java.util.TreeSet;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSortedSet;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getStaticImportString;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT_EVENT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ARRAY_LIST_IMPORT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BITSET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLLECTION_IMPORTS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.CONFIG_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DATA_NODE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DYNAMIC_CONFIG_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_LISTENER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EXECUTORS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EXECUTOR_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_MATH;
+import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_CONCURRENT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_REGEX_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.LINKED_LIST;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LIST;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LISTENER_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_CONVERTER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ONOS_EVENT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PATTERN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUEUE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RESOURCE_ID;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_COMMAND;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_HANDLER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT_STATUS_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SUCCESS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET;
 
 /**
@@ -265,7 +282,7 @@ public class JavaImportData {
      *
      * @return import for list attribute
      */
-    private String getImportForList() {
+    public String getImportForList() {
         return getImportString(COLLECTION_IMPORTS, LIST);
     }
 
@@ -331,4 +348,113 @@ public class JavaImportData {
     public String getBigIntegerImport() {
         return getImportString(JAVA_MATH, BIG_INTEGER);
     }
+
+    /**
+     * Returns import for executor service.
+     *
+     * @return import for executor service
+     */
+    public String getExecutorServiceImport() {
+        return getImportString(JAVA_UTIL_CONCURRENT_PKG, EXECUTOR_SERVICE);
+    }
+
+    /**
+     * Returns import for executor.
+     *
+     * @return import for executor
+     */
+    public String getExecutorsImport() {
+        return getImportString(JAVA_UTIL_CONCURRENT_PKG, EXECUTORS);
+    }
+
+    /**
+     * Returns import for RPC command.
+     *
+     * @return import for RPC command
+     */
+    public String getImportForRpcCommand() {
+        return getImportString(CONFIG_PKG, RPC_COMMAND);
+    }
+
+    /**
+     * Returns import for RPC handler.
+     *
+     * @return import for RPC handler
+     */
+    public String getImportForRpcHandler() {
+        return getImportString(CONFIG_PKG, RPC_HANDLER);
+    }
+
+    /**
+     * Returns import for dynamic store service.
+     *
+     * @return import for dynamic store service
+     */
+    public String getImportForDynamicStoreService() {
+        return getImportString(CONFIG_PKG, DYNAMIC_CONFIG_SERVICE);
+    }
+
+    /**
+     * Returns import for data node.
+     *
+     * @return import for data node
+     */
+    public String getImportForDataNode() {
+        return getImportString(MODEL_PKG, DATA_NODE);
+    }
+
+    /**
+     * Returns import for RPC success.
+     *
+     * @return import for RPC success
+     */
+    public String getImportForRpcSuccess() {
+        return getStaticImportString(RPC_OUTPUT_STATUS_PKG, RPC_SUCCESS);
+    }
+
+    /**
+     * Returns import for RPC input.
+     *
+     * @return import for RPC input
+     */
+    public String getImportForRpcInput() {
+        return getImportString(CONFIG_PKG, RPC_INPUT);
+    }
+
+    /**
+     * Returns import for RPC output.
+     *
+     * @return import for RPC output
+     */
+    public String getImportForRpcOutput() {
+        return getImportString(CONFIG_PKG, RPC_OUTPUT);
+    }
+
+    /**
+     * Returns import for model converter.
+     *
+     * @return import for model converter
+     */
+    public String getImportForModelConverter() {
+        return getImportString(MODEL_PKG, MODEL_CONVERTER);
+    }
+
+    /**
+     * Returns import for resource id.
+     *
+     * @return import for resource id
+     */
+    public String getImportForResourceId() {
+        return getImportString(MODEL_PKG, RESOURCE_ID);
+    }
+
+    /**
+     * Returns import for linked list attribute.
+     *
+     * @return import for linked list attribute
+     */
+    public String getImportForLinkedList() {
+        return getImportString(COLLECTION_IMPORTS, LINKED_LIST);
+    }
+
 }
