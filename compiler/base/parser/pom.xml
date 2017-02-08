@@ -21,11 +21,11 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-compiler-base</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.12-b1</version>
     </parent>
 
     <artifactId>onos-yang-compiler-parser</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.12-b1</version>
     <packaging>jar</packaging>
 
     <dependencies>
