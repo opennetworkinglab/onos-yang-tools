@@ -84,7 +84,11 @@ public interface YangLeavesHolder extends LocationInfo {
     /**
      * Adds namespace for leafs and leaf-list, this is used in case of
      * submodule.
-     *
      */
     void setLeafNameSpaceAndAddToParentSchemaMap();
+
+    /**
+     * Adds the parent context for leafs and leaf-list.
+     */
+    void setLeafParentContext();
 }

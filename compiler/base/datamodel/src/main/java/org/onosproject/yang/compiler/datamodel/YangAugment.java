@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 
 /*-
  * Reference RFC 6020.
@@ -409,6 +410,18 @@ public abstract class YangAugment
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
+        }
+    }
+
     /**
      * Returns the textual reference.
      *
@@ -525,7 +538,6 @@ public abstract class YangAugment
     @Override
     public void setResolvableStatus(ResolvableStatus resolvableStatus) {
         this.resolvableStatus = resolvableStatus;
-
     }
 
     @Override

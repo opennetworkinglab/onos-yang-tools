@@ -17,67 +17,53 @@
 package org.onosproject.yang.model;
 
 /**
- * Representation of leaf's type.
+ * Represents mapping of java data types with corresponding yang leaf's data
+ * type.
  */
 public enum LeafType {
 
     /**
-     * Represents JAVA short.
-     */
-    SHORT,
-
-    /**
-     * Represents JAVA int.
-     */
-    INT,
-
-    /**
-     * Represents JAVA long.
-     */
-    LONG,
-
-    /**
-     * Represents JAVA float.
-     */
-    FLOAT,
-
-    /**
-     * Represents JAVA double.
-     */
-    DOUBLE,
-
-    /**
-     * Represents JAVA boolean.
-     */
-    BOOLEAN,
-
-    /**
-     * Represents JAVA char.
-     */
-    CHAR,
-
-    /**
-     * Represents JAVA byte.
+     * Represents INT8.
      */
     BYTE,
 
     /**
-     * Represents JAVA string.
+     * Represents INT16, UINT8.
+     */
+    SHORT,
+
+    /**
+     * Represents UINT16, INT32.
+     */
+    INT,
+
+    /**
+     * Represents UINT32, INT64.
+     */
+    LONG,
+
+    /**
+     * Represents BOOLEAN, EMPTY.
+     */
+    BOOLEAN,
+
+    /**
+     * Represents BITS, IDENTITYREF, ENUMERATION, STRING.
      */
     STRING,
 
     /**
-     * Represents JAVA big integer.
+     * Represents UINT64.
      */
     BIG_INTEGER,
 
     /**
-     * Represents JAVA enum type.
+     * Represents BASE64.
      */
-    ENUM,
+    BYTE_ARRAY,
 
     /**
-     * Represents big decimal.
+     * Represents DECIMAL64.
      * The decimal64 type represents a subset of the real numbers, which can
      * be represented by decimal numerals. The value space of decimal64 is
      * the set of numbers that can be obtained by multiplying a 64-bit
@@ -88,44 +74,7 @@ public enum LeafType {
     BIG_DECIMAL,
 
     /**
-     * Represents binary. The binary type represents any binary data,
-     * i.e., a sequence of octets.
+     * Represents union.
      */
-    BINARY,
-
-    /**
-     * Represents bits. The bits type represents a bit set.  That
-     * is, a bits value is a set of flags identified by small integer
-     * position numbers starting at 0. Each bit number has an assigned name.
-     */
-    BITS,
-
-    /**
-     * Represents union type. The union type represents a value that
-     * corresponds to one of its member types.
-     */
-    UNION,
-
-    /**
-     * The resource identifier type is used to uniquely identify a
-     * particular instance node in the data tree.
-     */
-    RESOURCE_IDENTIFIER,
-
-    /**
-     * The identityref type is used to reference an existing identity.
-     */
-    IDENTITY_REF,
-
-    /**
-     * The leafref type is used to reference a particular leaf instance in
-     * the data tree.
-     */
-    LEAF_REF,
-
-    /**
-     * The empty type represents a leaf that does not have any
-     * value, it conveys information by its presence or absence.
-     */
-    EMPTY
+    UNION
 }

@@ -31,6 +31,7 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.ListIterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,7 +68,7 @@ public class ListListenerTest {
         YangList yangList = (YangList) yangNode.getChild();
         assertThat(yangList.getName(), is("valid"));
 
-        ListIterator<String> keyList = yangList.getKeyList().listIterator();
+        Iterator<String> keyList = yangList.getKeyList().iterator();
         assertThat(keyList.next(), is("invalid-interval"));
     }
 

@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -26,7 +27,7 @@ import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
  * Representation of an entity which identifies a schema node in the schema /
  * data tree.
  */
-public class SchemaId implements Comparable<SchemaId>, Cloneable {
+public class SchemaId implements Comparable<SchemaId>, Cloneable, Serializable {
 
     private String name;
     private String nameSpace;
@@ -36,7 +37,6 @@ public class SchemaId implements Comparable<SchemaId>, Cloneable {
 
     public SchemaId(String name, String nameSpace) {
         checkNotNull(name, INCOMPLETE_SCHEMA_INFO);
-        checkNotNull(nameSpace, INCOMPLETE_SCHEMA_INFO);
         this.name = name;
         this.nameSpace = nameSpace;
     }

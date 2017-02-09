@@ -16,8 +16,10 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
 import org.onosproject.yang.compiler.datamodel.YangInput;
+import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeType;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
@@ -70,6 +72,10 @@ public final class JavaCodeGeneratorUtil {
                 try {
                     generateCodeEntry(codeGenNode, yangPlugin, rootNode);
                     codeGenNode.setNameSpaceAndAddToParentSchemaMap();
+                    if (codeGenNode instanceof YangLeavesHolder ||
+                            codeGenNode instanceof SchemaDataNode) {
+                        codeGenNode.setParentContext();
+                    }
                 } catch (InvalidNodeForTranslatorException e) {
                     if (codeGenNode.getNextSibling() != null) {
                         curTraversal = SIBILING;

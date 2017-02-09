@@ -33,6 +33,7 @@ import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.C
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.NOTIFICATION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.NOTIFICATION_DATA;
 
 /*
@@ -310,6 +311,18 @@ public abstract class YangNotification
         // Add namespace for all leaf list.
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
+        }
+    }
+
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
         }
     }
 

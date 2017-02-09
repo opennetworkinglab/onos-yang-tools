@@ -17,6 +17,8 @@
 package org.onosproject.yang.compiler.datamodel.utils;
 
 import org.onosproject.yang.compiler.datamodel.CollisionDetector;
+import org.onosproject.yang.compiler.datamodel.DefaultYangNamespace;
+import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangBase;
@@ -52,6 +54,7 @@ import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
 import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
@@ -59,6 +62,8 @@ import org.onosproject.yang.compiler.datamodel.YangUnits;
 import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
+import org.onosproject.yang.model.LeafType;
+import org.onosproject.yang.model.SchemaId;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,10 +91,20 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTI
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_AUGMENT_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.ENUMERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UNION;
+import static org.onosproject.yang.model.LeafType.BIG_DECIMAL;
+import static org.onosproject.yang.model.LeafType.BIG_INTEGER;
+import static org.onosproject.yang.model.LeafType.BOOLEAN;
+import static org.onosproject.yang.model.LeafType.BYTE;
+import static org.onosproject.yang.model.LeafType.BYTE_ARRAY;
+import static org.onosproject.yang.model.LeafType.INT;
+import static org.onosproject.yang.model.LeafType.LONG;
+import static org.onosproject.yang.model.LeafType.SHORT;
+import static org.onosproject.yang.model.LeafType.STRING;
 
 /**
  * Represents utilities for data model tree.
@@ -98,6 +113,9 @@ public final class DataModelUtils {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     private static final String SLASH = File.separator;
+    public static final String FMT_NOT_EXIST =
+            "Requested %s is not child in %s.";
+    private static final String E_DATATYPE = "Data type not supported.";
 
     /**
      * Creates a new data model tree utility.
@@ -1225,6 +1243,7 @@ public final class DataModelUtils {
     /**
      * Searches for input in given RPC node.
      *
+     * @param rpc yang node
      * @return input node
      */
     public static YangNode findRpcInput(YangNode rpc) {
@@ -1242,6 +1261,7 @@ public final class DataModelUtils {
     /**
      * Searches for output in given RPC node.
      *
+     * @param rpc yang node
      * @return output node
      */
     public static YangNode findRpcOutput(YangNode rpc) {
@@ -1254,5 +1274,108 @@ public final class DataModelUtils {
             return child;
         }
         return null;
+    }
+
+    /**
+     * Returns the parent data node schema context for given yang node.
+     *
+     * @param node yang node
+     * @return yang node
+     */
+    public static YangNode getParentSchemaContext(YangNode node) {
+        while (!(node instanceof SchemaDataNode) && node != null) {
+            if (node.getYangSchemaNodeType() == YANG_AUGMENT_NODE) {
+                node = ((YangAugment) node).getAugmentedNode();
+                continue;
+            }
+            node = node.getParent();
+        }
+        return node;
+    }
+
+    /**
+     * Returns the yang schema node identifier from provided schema id.
+     *
+     * @param schemaId schema id
+     * @param ns       namespace of parent node
+     * @return yang schema node identifier
+     */
+    public static YangSchemaNodeIdentifier getNodeIdFromSchemaId(
+            SchemaId schemaId, String ns) {
+        String namespace = schemaId.namespace();
+
+        if (namespace == null) {
+            namespace = ns;
+        }
+        DefaultYangNamespace nameSpace = new DefaultYangNamespace(namespace);
+        YangSchemaNodeIdentifier id = new YangSchemaNodeIdentifier();
+        id.setName(schemaId.name());
+        id.setNameSpace(nameSpace);
+        return id;
+    }
+
+    /**
+     * Returns the error string by filling the parameters in the given
+     * formatted error string.
+     *
+     * @param fmt    error format string
+     * @param params parameters to be filled in formatted string
+     * @return error string
+     */
+    public static String errorMsg(String fmt, Object... params) {
+        return String.format(fmt, params);
+    }
+
+    /**
+     * Returns the yang leaf type for corresponding supplied data type.
+     *
+     * @param type     YANG type
+     * @param dataType YANG data type
+     * @return leaf type
+     */
+    public static LeafType getLeafTypeByDataType(YangType type,
+                                                 YangDataTypes dataType) {
+
+        switch (dataType) {
+            case BITS:
+            case ENUMERATION:
+            case IDENTITYREF:
+            case STRING:
+                return STRING;
+            case BOOLEAN:
+            case EMPTY:
+                return BOOLEAN;
+            case DECIMAL64:
+                return BIG_DECIMAL;
+            case INT8:
+                return BYTE;
+            case INT16:
+            case UINT8:
+                return SHORT;
+            case INT32:
+            case UINT16:
+                return INT;
+            case INT64:
+            case UINT32:
+                return LONG;
+            case UINT64:
+                return BIG_INTEGER;
+            case BINARY:
+                return BYTE_ARRAY;
+            case DERIVED:
+                return getLeafTypeByDataType(type, ((YangDerivedInfo) type
+                        .getDataTypeExtendedInfo()).getEffectiveBuiltInType());
+            case LEAFREF:
+                return getLeafTypeByDataType(type, ((YangLeafRef) type
+                        .getDataTypeExtendedInfo()).getEffectiveDataType()
+                        .getDataType());
+            case INSTANCE_IDENTIFIER:
+                return STRING;
+            case UNION:
+                return LeafType.UNION;
+
+            default:
+                throw new IllegalArgumentException(E_DATATYPE);
+        }
     }
 }

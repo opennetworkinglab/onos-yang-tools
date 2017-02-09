@@ -19,19 +19,28 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.SingleInstanceNodeContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.INPUT_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.INPUT;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.INPUT_DATA;
 
 /*
@@ -80,7 +89,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.IN
 public abstract class YangInput
         extends YangNode
         implements YangLeavesHolder, Parsable, CollisionDetector,
-        YangAugmentableNode, YangIsFilterContentNodes, InvalidOpTypeHolder {
+        YangAugmentableNode, YangIsFilterContentNodes, InvalidOpTypeHolder,
+        SchemaDataNode, SingleInstanceNodeContext {
 
     private static final long serialVersionUID = 806201608L;
 
@@ -100,7 +110,7 @@ public abstract class YangInput
      * Create a rpc input node.
      */
     public YangInput() {
-        super(INPUT_NODE, new HashMap<>());
+        super(INPUT_NODE, new HashMap<>(), DataNode.Type.SINGLE_INSTANCE_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         yangAugmentedInfo = new ArrayList<>();
@@ -245,7 +255,39 @@ public abstract class YangInput
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
+        }
+    }
+
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, getNameSpace().getModuleNamespace());
+        try {
+            YangSchemaNode node = getChildSchema(id).getSchemaNode();
+            if (node instanceof SchemaDataNode) {
+                return node;
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
+                                                            schemaId.name(),
+                                                            getName()));
+            }
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

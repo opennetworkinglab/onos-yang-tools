@@ -332,6 +332,7 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns register RPC class contents.
      *
+     * @param node YANG module node
      * @return register RPC class contents
      */
     public static String getRegisterRpcContents(YangNode node) {

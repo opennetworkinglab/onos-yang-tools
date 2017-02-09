@@ -1,0 +1,65 @@
+module choice-case {
+
+    yang-version 1;
+
+    namespace "yrt:choice-case";
+
+    prefix "choice";
+
+    organization "ON-LAB";
+
+    description "This module defines for choice-case.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+    choice snack {
+       case sportsarena {
+
+           leaf pretzel {
+               type empty;
+           }
+
+           choice bear {
+                case type {
+                    leaf light {
+                        type empty;
+                    }
+                }
+
+                case add-on {
+                   choice snacks {
+                        case chips {
+                            leaf-list potato {
+                                type empty;
+                            }
+
+                            list banana {
+                                config false;
+                                leaf l1 {
+                                    type string;
+                                }
+                            }
+
+                            container cold-drink {
+                                leaf-list flavor {
+                                    type string;
+                                }
+                            }
+                        }
+                   }
+                }
+           }
+       }
+       case latenight {
+           leaf chocolate {
+               type enumeration {
+                   enum dark;
+                   enum milk;
+                   enum first-available;
+               }
+           }
+       }
+    }
+}

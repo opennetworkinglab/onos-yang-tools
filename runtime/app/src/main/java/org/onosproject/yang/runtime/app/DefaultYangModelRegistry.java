@@ -18,9 +18,16 @@ package org.onosproject.yang.runtime.app;
 
 import org.onosproject.yang.YangModel;
 import org.onosproject.yang.YangModuleId;
+import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
+import org.onosproject.yang.compiler.datamodel.YangChoice;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.SingleInstanceNodeContext;
 import org.onosproject.yang.runtime.api.AppModuleInfo;
 import org.onosproject.yang.runtime.api.ModelRegistrationParam;
 import org.onosproject.yang.runtime.api.YangModelRegistry;
@@ -34,7 +41,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.sort;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
 import static org.onosproject.yang.compiler.plugin.utils.YangApacheUtils.getDateInStringFormat;
 import static org.onosproject.yang.runtime.utils.RuntimeHelper.getInterfaceClassName;
 import static org.onosproject.yang.runtime.utils.RuntimeHelper.getNodes;
@@ -45,7 +54,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Represents YANG model registry implementation.
  */
-public class DefaultYangModelRegistry implements YangModelRegistry {
+public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstanceNodeContext {
 
     private static final Logger log = getLogger(DefaultYangModelRegistry.class);
     private static final String AT = "@";
@@ -93,6 +102,11 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
     private final Set<YangModel> models;
 
     /**
+     * Represents the schema id for model registry.
+     */
+    private SchemaId schemaId;
+
+    /**
      * Creates an instance of default YANG schema registry.
      */
     public DefaultYangModelRegistry() {
@@ -103,6 +117,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
         registerClassStore = new ConcurrentHashMap<>();
         appNameKeyStore = new ConcurrentHashMap<>();
         nameSpaceSchemaStore = new ConcurrentHashMap<>();
+        schemaId = new SchemaId("/", null);
     }
 
     @Override
@@ -128,6 +143,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
                     }
                 }
             }
+            updateChildContext(curNodes);
         } else {
             throw new RuntimeException("model can not be null.");
         }
@@ -154,17 +170,20 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
 
                     if (curNode != null) {
                         removeSchemaNode(curNode);
-                        interfaceNameKeyStore.remove(getInterfaceClassName(curNode));
-                        opParamNameKeyStore.remove(getOpParamClassName(curNode));
+                        interfaceNameKeyStore.remove(
+                                getInterfaceClassName(curNode));
+                        opParamNameKeyStore.remove(
+                                getOpParamClassName(curNode));
                         appNameKeyStore.remove(serviceName);
-                        nameSpaceSchemaStore.remove(curNode.getNameSpace()
-                                                            .getModuleNamespace());
+                        nameSpaceSchemaStore.remove(
+                                curNode.getNameSpace().getModuleNamespace());
                         log.info(" service class {} of model {} is " +
                                          "unregistered.", sClass
                                          .getSimpleName(), param);
                     } else {
-                        throw new RuntimeException(sClass.getSimpleName() +
-                                                           " service was not registered.");
+                        throw new RuntimeException(
+                                sClass.getSimpleName() +
+                                        " service was not registered.");
                     }
                 }
             } else {
@@ -276,7 +295,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
     private void processRegistration(Class<?> service, Set<YangNode> nodes) {
 
         // process storing operations.
-        YangNode schemaNode = findNodeWhichShouldBeReg(service.getName(), nodes);
+        YangNode schemaNode = findNodeWhichShouldBeReg(service.getName(),
+                                                       nodes);
         if (schemaNode != null) {
             //Process application context for registrations.
             processApplicationContext(schemaNode, service.getName());
@@ -319,7 +339,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
      * @param appNode application YANG schema nodes
      * @param name    class name
      */
-    private void processApplicationContext(YangSchemaNode appNode, String name) {
+    private void processApplicationContext(YangSchemaNode appNode,
+                                           String name) {
 
         //Update map for which registrations is being called.
         try {
@@ -340,7 +361,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
         opParamNameKeyStore.put(getOpParamClassName(appNode), appNode);
 
         //update namespaceSchema store.
-        nameSpaceSchemaStore.put(appNode.getNameSpace().getModuleNamespace(), appNode);
+        nameSpaceSchemaStore.put(appNode.getNameSpace().getModuleNamespace(),
+                                 appNode);
 
         log.info("successfully registered this application {}", name);
     }
@@ -378,7 +400,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
         return null;
     }
 
-    private String getLatestVersion(ConcurrentMap<String, YangSchemaNode> revMap) {
+    private String getLatestVersion(ConcurrentMap<String,
+            YangSchemaNode> revMap) {
         List<String> keys = new ArrayList<>();
         for (Map.Entry<String, YangSchemaNode> entry : revMap.entrySet()) {
             keys.add(entry.getKey());
@@ -423,11 +446,114 @@ public class DefaultYangModelRegistry implements YangModelRegistry {
         if (date != null) {
             revName = name + AT + date;
         }
-        ConcurrentMap<String, YangSchemaNode> revMap = yangSchemaStore.get(name);
+        ConcurrentMap<String, YangSchemaNode> revMap =
+                yangSchemaStore.get(name);
         if (revMap != null && !revMap.isEmpty() && revMap.size() != 1) {
             revMap.remove(revName);
         } else {
             yangSchemaStore.remove(removableNode.getName());
         }
+    }
+
+    @Override
+    public SchemaContext getParentContext() {
+        return null;
+    }
+
+    @Override
+    public DataNode.Type getType() {
+        return DataNode.Type.SINGLE_INSTANCE_NODE;
+    }
+
+    @Override
+    public SchemaId getSchemaId() {
+        return schemaId;
+    }
+
+    /**
+     * Updates child's context. It sets itself as a parent context for first
+     * level child's in module/sub-module.
+     *
+     * @param nodes set of module/submodule nodes
+     */
+    public void updateChildContext(Set<YangNode> nodes) {
+        // Preparing schema id for logical node with name "/"
+        for (YangNode node : nodes) {
+            node.setLeafRootContext(this);
+            YangNode child = node.getChild();
+            while (child != null) {
+                if (child instanceof YangChoice) {
+                    updateSchemaContextForChoiceChild(child);
+                } else if (child instanceof SchemaDataNode) {
+                    child.setRootContext(this);
+                }
+                child = child.getNextSibling();
+            }
+        }
+    }
+
+    /**
+     * Updates the parent context for given choice-case node child's.
+     *
+     * @param child yang node
+     */
+    private void updateContextForChoiceCase(YangNode child) {
+        while (child != null) {
+            if (child instanceof YangChoice) {
+                updateSchemaContextForChoiceChild(child);
+            } else if (child instanceof SchemaDataNode) {
+                child.setRootContext(this);
+            }
+            child = child.getNextSibling();
+        }
+    }
+
+    /**
+     * Updates the parent context for given choice node child's.
+     *
+     * @param curNode choice node
+     */
+    public void updateSchemaContextForChoiceChild(YangNode curNode) {
+        YangNode child = curNode.getChild();
+        // Setting the parent context for case
+        while (child != null) {
+            updateSchemaContextForCaseChild(child);
+            child = child.getNextSibling();
+        }
+    }
+
+    /**
+     * Updates the parent context for given case node child's.
+     *
+     * @param curNode case node
+     */
+    public void updateSchemaContextForCaseChild(YangNode curNode) {
+        curNode.setLeafRootContext(this);
+        YangNode child = curNode.getChild();
+        updateContextForChoiceCase(child);
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        if (schemaId.namespace() == null) {
+            log.error("node with {} namespace not found.",
+                      schemaId.namespace());
+        }
+
+        String namespace = schemaId.namespace();
+        YangSchemaNode node = getForNameSpace(namespace);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, namespace);
+
+        try {
+            if (node != null) {
+                return node.getChildSchema(id).getSchemaNode();
+            }
+        } catch (DataModelException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

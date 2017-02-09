@@ -19,6 +19,13 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.ObjectProvider;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.LeafRestriction;
+import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.LeafType;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -26,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getLeafTypeByDataType;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateEmptyDataType;
 
 /*
@@ -64,7 +72,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.valid
 public abstract class YangLeafList extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
-        YangConfig, YangUnits, YangMaxElementHolder, YangMinElementHolder {
+        YangConfig, YangUnits, YangMaxElementHolder, YangMinElementHolder,
+        SchemaDataNode, LeafSchemaContext {
 
     private static final long serialVersionUID = 806201637L;
 
@@ -159,6 +168,11 @@ public abstract class YangLeafList extends DefaultLocationInfo
      * Referred schema leaf list.
      */
     private YangLeafList referredLeafList;
+
+    /**
+     * Parent context of data node.
+     */
+    private SchemaContext parentContext;
 
     /**
      * Creates a YANG leaf-list.
@@ -589,5 +603,52 @@ public abstract class YangLeafList extends DefaultLocationInfo
      */
     public void setReferredSchemaLeafList(YangLeafList leafList) {
         referredLeafList = leafList;
+    }
+
+    @Override
+    public DataNode.Type getType() {
+        return DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
+    }
+
+    @Override
+    public SchemaId getSchemaId() {
+        SchemaId schemaId = new SchemaId(
+                this.getName(), this.getNameSpace().getModuleNamespace());
+        return schemaId;
+    }
+
+    @Override
+    public SchemaContext getParentContext() {
+        return parentContext;
+    }
+
+    /**
+     * Sets the parent context for current context.
+     *
+     * @param schemaContext schema context
+     */
+    public void setParentContext(SchemaContext schemaContext) {
+        this.parentContext = schemaContext;
+    }
+
+    @Override
+    public void setRootContext(SchemaContext context) {
+        parentContext = context;
+    }
+
+    @Override
+    public LeafType getLeafType() {
+        return getLeafTypeByDataType(dataType, dataType.getDataType());
+    }
+
+    @Override
+    public <T extends LeafRestriction> T getLeafRestrictions() {
+        // TODO implementation.
+        return null;
+    }
+
+    @Override
+    public Object fromString(String value) {
+        return ObjectProvider.getObject(dataType, value, dataType.getDataType());
     }
 }

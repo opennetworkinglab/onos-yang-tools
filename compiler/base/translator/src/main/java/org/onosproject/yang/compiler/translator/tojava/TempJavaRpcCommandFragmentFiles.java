@@ -224,6 +224,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns RPC commands contents.
      *
+     * @param curNode YANG RPC node
      * @return RPC commands contents
      */
     public static String getRpcCommandContents(YangNode curNode) {

@@ -28,8 +28,8 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -65,7 +65,7 @@ public class KeyListenerTest {
         YangList yangList = (YangList) yangNode.getChild();
         assertThat(yangList.getName(), is("valid"));
 
-        ListIterator<String> keyList = yangList.getKeyList().listIterator();
+        Iterator<String> keyList = yangList.getKeyList().iterator();
         assertThat(keyList.next(), is("invalid-interval"));
     }
 
@@ -90,7 +90,7 @@ public class KeyListenerTest {
         YangList yangList = (YangList) yangNode.getChild();
         assertThat(yangList.getName(), is("valid"));
 
-        List<String> keyList = yangList.getKeyList();
+        LinkedHashSet<String> keyList = yangList.getKeyList();
         assertThat(keyList.contains("ospf"), is(true));
         assertThat(keyList.contains("isis"), is(true));
     }
@@ -138,7 +138,7 @@ public class KeyListenerTest {
         YangList yangList = (YangList) yangNode.getChild();
         assertThat(yangList.getName(), is("valid"));
 
-        ListIterator<String> keyList = yangList.getKeyList().listIterator();
+        Iterator<String> keyList = yangList.getKeyList().iterator();
         assertThat(keyList.next(), is("invalid-interval"));
     }
 
@@ -178,7 +178,7 @@ public class KeyListenerTest {
         YangList yangList = (YangList) yangNode.getChild();
         assertThat(yangList.getName(), is("valid"));
 
-        ListIterator<String> keyList = yangList.getKeyList().listIterator();
+        Iterator<String> keyList = yangList.getKeyList().iterator();
         assertThat(keyList.next(), is("invalid-interval"));
     }
 
@@ -198,7 +198,7 @@ public class KeyListenerTest {
         YangList yangList = (YangList) yangNode.getChild().getNextSibling();
         assertThat(yangList.getName(), is("valid"));
 
-        ListIterator<String> keyList = yangList.getKeyList().listIterator();
+        Iterator<String> keyList = yangList.getKeyList().iterator();
         assertThat(keyList.next(), is("invalid-interval"));
     }
 

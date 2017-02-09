@@ -20,15 +20,25 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.MultiInstanceNodeContext;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.LIST_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.LIST_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 
@@ -79,7 +89,7 @@ public abstract class YangList
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangIsFilterContentNodes, YangConfig, YangUniqueHolder,
-        YangMaxElementHolder, YangMinElementHolder {
+        YangMaxElementHolder, YangMinElementHolder, SchemaDataNode, MultiInstanceNodeContext {
 
     private static final long serialVersionUID = 806201609L;
 
@@ -116,9 +126,9 @@ public abstract class YangList
      * All key leafs in a list MUST have the same value for their "config" as
      * the list itself.
      * <p>
-     * List of key leaf names.
+     * Set of key leaf names.
      */
-    private List<String> keyList;
+    private LinkedHashSet<String> keyList;
 
     /**
      * Reference RFC 6020.
@@ -215,16 +225,21 @@ public abstract class YangList
     private transient YangCompilerAnnotation compilerAnnotation;
 
     /**
+     * Parent context of data node.
+     */
+    private SchemaContext parentContext;
+
+    /**
      * Creates a YANG list object.
      */
     public YangList() {
-        super(LIST_NODE, new HashMap<>());
+        super(LIST_NODE, new HashMap<>(), DataNode.Type.MULTI_INSTANCE_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         mustConstraintList = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
         uniqueList = new LinkedList<>();
-        keyList = new LinkedList<>();
+        keyList = new LinkedHashSet<>();
     }
 
     @Override
@@ -347,20 +362,25 @@ public abstract class YangList
     }
 
     /**
-     * Returns the list of key field names.
+     * Returns the set of key field names.
      *
-     * @return the list of key field names
+     * @return the set of key field names
      */
-    public List<String> getKeyList() {
+    public LinkedHashSet<String> getKeyList() {
+        return keyList;
+    }
+
+    @Override
+    public LinkedHashSet<String> getKeyLeaf() {
         return keyList;
     }
 
     /**
      * Sets the list of key field names.
      *
-     * @param keyList the list of key field names
+     * @param keyList the set of key field names
      */
-    private void setKeyList(List<String> keyList) {
+    private void setKeyList(LinkedHashSet<String> keyList) {
         this.keyList = keyList;
     }
 
@@ -373,7 +393,7 @@ public abstract class YangList
     public void addKey(String key)
             throws DataModelException {
         if (getKeyList() == null) {
-            setKeyList(new LinkedList<>());
+            setKeyList(new LinkedHashSet<String>());
         }
 
         if (getKeyList().contains(key)) {
@@ -600,7 +620,7 @@ public abstract class YangList
     @Override
     public void validateDataOnExit()
             throws DataModelException {
-        List<String> keys = getKeyList();
+        LinkedHashSet<String> keys = getKeyList();
         List<YangLeaf> leaves = getListOfLeaf();
         List<YangLeafList> leafLists = getListOfLeafList();
 
@@ -664,10 +684,10 @@ public abstract class YangList
      * Validates key statement of list.
      *
      * @param leaves list of leaf attributes of list
-     * @param keys   list of key attributes of list
+     * @param keys   set of key attributes of list
      * @throws DataModelException a violation of data model rules
      */
-    private void validateKey(List<YangLeaf> leaves, List<String> keys)
+    private void validateKey(List<YangLeaf> leaves, LinkedHashSet<String> keys)
             throws DataModelException {
         boolean leafFound = false;
         List<YangLeaf> keyLeaves = new LinkedList<>();
@@ -827,7 +847,39 @@ public abstract class YangList
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
+        }
+    }
+
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, getNameSpace().getModuleNamespace());
+        try {
+            YangSchemaNode node = getChildSchema(id).getSchemaNode();
+            if (node instanceof SchemaDataNode) {
+                return node;
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
+                                                            schemaId.name(),
+                                                            getName()));
+            }
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

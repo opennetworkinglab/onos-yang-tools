@@ -19,6 +19,13 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.ObjectProvider;
+import org.onosproject.yang.model.DataNode.Type;
+import org.onosproject.yang.model.LeafRestriction;
+import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.LeafType;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -26,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getLeafTypeByDataType;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateEmptyDataType;
 
 /*
@@ -68,7 +76,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.valid
 public abstract class YangLeaf extends DefaultLocationInfo
         implements YangCommonInfo, Parsable, Cloneable, Serializable,
         YangMustHolder, YangIfFeatureHolder, YangWhenHolder, YangSchemaNode,
-        YangConfig, YangUnits, YangDefault, YangMandatory {
+        YangConfig, YangUnits, YangDefault, YangMandatory, LeafSchemaContext,
+        SchemaDataNode {
 
     private static final long serialVersionUID = 806201635L;
 
@@ -144,6 +153,11 @@ public abstract class YangLeaf extends DefaultLocationInfo
     private YangLeaf referredLeaf;
 
     private boolean isKeyLeaf;
+
+    /**
+     * Parent context of data node.
+     */
+    private SchemaContext parentContext;
 
     /**
      * Creates a YANG leaf.
@@ -594,5 +608,53 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     public void setKeyLeaf(boolean keyLeaf) {
         isKeyLeaf = keyLeaf;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
+    }
+
+    @Override
+    public SchemaId getSchemaId() {
+        SchemaId schemaId = new SchemaId(getName(), getNameSpace()
+                .getModuleNamespace());
+        return schemaId;
+    }
+
+
+    @Override
+    public LeafType getLeafType() {
+        return getLeafTypeByDataType(dataType, dataType.getDataType());
+    }
+
+    @Override
+    public <T extends LeafRestriction> T getLeafRestrictions() {
+        //TODO implementation
+        return null;
+    }
+
+    @Override
+    public Object fromString(String value) {
+        return ObjectProvider.getObject(dataType, value, dataType.getDataType());
+    }
+
+    @Override
+    public SchemaContext getParentContext() {
+        return parentContext;
+    }
+
+    /**
+     * Sets the parent context for current context.
+     *
+     * @param sc schema context
+     */
+    public void setParentContext(SchemaContext sc) {
+        parentContext = sc;
+    }
+
+    @Override
+    public void setRootContext(SchemaContext context) {
+        parentContext = context;
     }
 }

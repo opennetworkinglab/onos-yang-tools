@@ -283,6 +283,9 @@ public abstract class YangSubModule
      */
     private boolean isModuleForDeviation;
 
+    private static final String E_NONDATA =
+            "Method called for other then data node";
+
     /**
      * Creates a sub module node.
      */
@@ -813,6 +816,10 @@ public abstract class YangSubModule
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        throw new IllegalArgumentException(E_NONDATA);
+    }
 
     @Override
     public boolean isNotificationPresent() {

@@ -1525,7 +1525,6 @@ public final class MethodsGenerator {
                             .append(getIfConditionForAddToListMethod(attr));
                     retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD + ADD_STRING +
                             OPEN_PARENTHESIS + ADD_STRING + TO_CAPS + CLOSE_PARENTHESIS;
-
             }
         } else {
             builder.append(methodSignature(ADD_STRING + TO_CAPS +
@@ -1543,7 +1542,6 @@ public final class MethodsGenerator {
                 .append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
-
     }
 
     // Returns if condition for add to list method.
@@ -1573,7 +1571,6 @@ public final class MethodsGenerator {
                 default:
                     type = ARRAY_LIST_INIT;
                     break;
-
             }
         } else {
             type = ARRAY_LIST_INIT;
@@ -1939,7 +1936,8 @@ public final class MethodsGenerator {
      *
      * @param name         class name
      * @param modifierType modifier type
-     * @param params       parameters for constrcutors
+     * @param params       parameters for constructor
+     * @param space        space
      * @return parameterisied constructor method string
      */
     public static String getParaMeterisiedConstructor(String name,

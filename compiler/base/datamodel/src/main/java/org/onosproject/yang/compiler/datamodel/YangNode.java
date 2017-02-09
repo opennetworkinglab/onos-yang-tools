@@ -17,6 +17,9 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -25,8 +28,10 @@ import java.util.Map;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yang.compiler.datamodel.YangNodeType.RPC_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeaf;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeafList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.updateClonedLeavesUnionEnumRef;
 
 /**
@@ -44,14 +49,29 @@ public abstract class YangNode
     private YangSchemaNodeIdentifier yangSchemaNodeIdentifier;
 
     /**
+     * YANG Data node schema identifier.
+     */
+    private SchemaId schemaId;
+
+    /**
      * Type of node.
      */
     private YangNodeType nodeType;
 
     /**
+     * Type of node.
+     */
+    private DataNode.Type dataNodeType;
+
+    /**
      * Parent reference.
      */
     private YangNode parent;
+
+    /**
+     * Parent schema context reference.
+     */
+    private SchemaContext parentContext;
 
     /**
      * First child reference.
@@ -112,6 +132,9 @@ public abstract class YangNode
      */
     private YangNode referredSchemaNode;
 
+    private static final String E_NONDATA =
+            "Method called for other then data node";
+
     /**
      * Returns the priority of the node.
      *
@@ -142,9 +165,26 @@ public abstract class YangNode
      *
      * @param type              of YANG node
      * @param ysnContextInfoMap YSN context info map
+     * @param dtype             data node type
      */
     protected YangNode(YangNodeType type,
-                       Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> ysnContextInfoMap) {
+                       Map<YangSchemaNodeIdentifier,
+                               YangSchemaNodeContextInfo> ysnContextInfoMap,
+                       DataNode.Type dtype) {
+        nodeType = type;
+        dataNodeType = dtype;
+        this.ysnContextInfoMap = ysnContextInfoMap;
+    }
+
+    /**
+     * Creates a specific type of node.
+     *
+     * @param type              of YANG node
+     * @param ysnContextInfoMap YSN context info map
+     */
+    protected YangNode(YangNodeType type,
+                       Map<YangSchemaNodeIdentifier,
+                               YangSchemaNodeContextInfo> ysnContextInfoMap) {
         nodeType = type;
         this.ysnContextInfoMap = ysnContextInfoMap;
     }
@@ -515,7 +555,6 @@ public abstract class YangNode
                      * update the traversal's current node.
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
-
                 } else if (nextNodeToClone.getNextSibling() != null) {
 
                     curTraversal = SIBILING;
@@ -533,7 +572,6 @@ public abstract class YangNode
                                                  " at " + nextNodeToClone.getCharPosition() +
                                                  " in " + nextNodeToClone.getFileName() + "\"");
         }
-
     }
 
     /**
@@ -796,13 +834,12 @@ public abstract class YangNode
     /**
      * Adds to YSN context info map.
      *
-     * @param yangSchemaNodeIdentifier  YANG schema node identifier
-     * @param yangSchemaNodeContextInfo YANG schema node context info
+     * @param id   YANG schema node identifier
+     * @param info YANG schema node context info
      */
-    public void addToYsnContextInfoMap(YangSchemaNodeIdentifier
-                                               yangSchemaNodeIdentifier, YangSchemaNodeContextInfo
-                                               yangSchemaNodeContextInfo) {
-        getYsnContextInfoMap().put(yangSchemaNodeIdentifier, yangSchemaNodeContextInfo);
+    public void addToYsnContextInfoMap(YangSchemaNodeIdentifier id,
+                                       YangSchemaNodeContextInfo info) {
+        getYsnContextInfoMap().put(id, info);
     }
 
     @Override
@@ -823,13 +860,13 @@ public abstract class YangNode
     /**
      * Sets YANG schema node identifier.
      *
-     * @param yangSchemaNodeIdentifier YANG schema node identifier
+     * @param id YANG schema node identifier
      */
-    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier yangSchemaNodeIdentifier) {
+    public void setYangSchemaNodeIdentifier(YangSchemaNodeIdentifier id) {
         if (this.yangSchemaNodeIdentifier == null) {
             this.yangSchemaNodeIdentifier = new YangSchemaNodeIdentifier();
         }
-        this.yangSchemaNodeIdentifier = yangSchemaNodeIdentifier;
+        this.yangSchemaNodeIdentifier = id;
     }
 
     @Override
@@ -935,5 +972,80 @@ public abstract class YangNode
     @Override
     public void setFileName(String name) {
         fileName = name;
+    }
+
+    @Override
+    public SchemaId getSchemaId() throws IllegalArgumentException {
+        if (schemaId == null) {
+            throw new IllegalArgumentException(E_NONDATA);
+        }
+        return schemaId;
+    }
+
+    @Override
+    public DataNode.Type getType() throws IllegalArgumentException {
+        if (dataNodeType == null) {
+            throw new IllegalArgumentException(E_NONDATA);
+        }
+        return dataNodeType;
+    }
+
+    @Override
+    public SchemaContext getParentContext() throws IllegalArgumentException {
+        if (parentContext == null) {
+            throw new IllegalArgumentException(E_NONDATA);
+        }
+        return parentContext;
+    }
+
+    /**
+     * Sets parent context of data node.
+     */
+    public void setParentContext() {
+        if (this instanceof SchemaDataNode) {
+            parentContext = getParentSchemaContext(this.getParent());
+
+            // As rpc node is not leaf holder
+            if (this.nodeType != RPC_NODE) {
+                ((YangLeavesHolder) this).setLeafParentContext();
+            }
+            // setting the schema Id
+            schemaId = new SchemaId(getName(), getNameSpace()
+                    .getModuleNamespace());
+        } else if (this instanceof YangCase) {
+            ((YangLeavesHolder) this).setLeafParentContext();
+        }
+    }
+
+    /**
+     * Sets given node as parent context current data node.
+     *
+     * @param schemaContext schema context
+     */
+    public void setParentContext(SchemaContext schemaContext) {
+        parentContext = schemaContext;
+    }
+
+    @Override
+    public void setRootContext(SchemaContext context) {
+        parentContext = context;
+    }
+
+    /**
+     * Sets provided context as parent context for module/submodule and case
+     * nodes.
+     *
+     * @param context module registry schema context
+     */
+    public void setLeafRootContext(SchemaContext context) {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : ((YangLeavesHolder) this).getListOfLeaf()) {
+            yangLeaf.setParentContext(context);
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : ((YangLeavesHolder) this)
+                .getListOfLeafList()) {
+            yangLeafList.setParentContext(context);
+        }
     }
 }

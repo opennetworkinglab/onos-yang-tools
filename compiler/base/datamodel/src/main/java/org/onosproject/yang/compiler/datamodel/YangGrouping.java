@@ -121,6 +121,9 @@ public abstract class YangGrouping
      */
     private int groupingDepth;
 
+    private static final String E_NONDATA =
+            "Method called for other then data node";
+
     /**
      * Creates the grouping node.
      */
@@ -364,6 +367,11 @@ public abstract class YangGrouping
         for (YangLeafList yangLeafList : listOfLeafList) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    @Override
+    public void setLeafParentContext() {
+        throw new IllegalArgumentException(E_NONDATA);
     }
     // TODO  A grouping MUST NOT reference itself, neither directly nor indirectly through a chain of other groupings.
 

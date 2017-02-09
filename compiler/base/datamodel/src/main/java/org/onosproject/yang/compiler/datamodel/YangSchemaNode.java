@@ -17,6 +17,7 @@
 package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.model.SchemaContext;
 
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import java.util.Map;
  * Abstraction of YANG data node, used by YMS to abstractly refer the data
  * nodes in YANG data tree.
  */
-public interface YangSchemaNode extends LocationInfo {
+public interface YangSchemaNode extends LocationInfo, SchemaContext {
 
     /**
      * Returns type of YANG schema node.
@@ -156,4 +157,11 @@ public interface YangSchemaNode extends LocationInfo {
      * @throws DataModelException when fails to do data model operations
      */
     boolean isEmptyDataType() throws DataModelException;
+
+    /**
+     * Sets the root parent context for the module/submodule child data node.
+     *
+     * @param context schema context
+     */
+    void setRootContext(SchemaContext context);
 }

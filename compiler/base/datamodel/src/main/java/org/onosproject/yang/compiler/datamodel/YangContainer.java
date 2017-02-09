@@ -19,13 +19,22 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.SingleInstanceNodeContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 
 /*-
  * Reference RFC 6020.
@@ -93,7 +102,7 @@ public abstract class YangContainer
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes,
-        YangConfig {
+        YangConfig, SingleInstanceNodeContext, SchemaDataNode {
 
     private static final long serialVersionUID = 806201605L;
 
@@ -154,7 +163,8 @@ public abstract class YangContainer
      * Create a container node.
      */
     public YangContainer() {
-        super(YangNodeType.CONTAINER_NODE, new HashMap<>());
+        super(YangNodeType.CONTAINER_NODE, new HashMap<>(),
+              DataNode.Type.SINGLE_INSTANCE_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         mustConstraintList = new LinkedList<>();
@@ -421,7 +431,8 @@ public abstract class YangContainer
      * @param leafLists list of leaf-list attributes of container
      * @throws DataModelException a violation of data model rules
      */
-    private void validateConfig(List<YangLeaf> leaves, List<YangLeafList> leafLists)
+    private void validateConfig(List<YangLeaf> leaves,
+                                List<YangLeafList> leafLists)
             throws DataModelException {
 
         /*
@@ -431,12 +442,13 @@ public abstract class YangContainer
         if (!isConfig && leaves != null) {
             for (YangLeaf leaf : leaves) {
                 if (leaf.isConfig()) {
-                    throw new DataModelException("If a container has \"config\" set to \"false\", no node underneath " +
-                                                         "it can have \"config\" set to \"true\"." +
-                                                         getName() + " in " +
-                                                         getLineNumber() + " at " +
-                                                         getCharPosition() +
-                                                         " in " + getFileName() + "\"");
+                    throw new DataModelException(
+                            "If a container has \"config\" set to \"false\", " +
+                                    "no node underneath it can have " +
+                                    "\"config\" set to \"true\"." + getName() +
+                                    " in " + getLineNumber() + " at " +
+                                    getCharPosition() +
+                                    " in " + getFileName() + "\"");
                 }
             }
         }
@@ -444,33 +456,39 @@ public abstract class YangContainer
         if (!isConfig && leafLists != null) {
             for (YangLeafList leafList : leafLists) {
                 if (leafList.isConfig()) {
-                    throw new DataModelException("If a container has \"config\" set to \"false\", no node underneath " +
-                                                         "it can have \"config\" set to \"true\"." +
-                                                         getName() + " in " +
-                                                         getLineNumber() + " at " +
-                                                         getCharPosition() +
-                                                         " in " + getFileName() + "\"");
+                    throw new DataModelException(
+                            "If a container has \"config\" set to \"false\", " +
+                                    "no node underneath it can have " +
+                                    "\"config\" set to \"true\"." +
+                                    getName() + " in " +
+                                    getLineNumber() + " at " +
+                                    getCharPosition() +
+                                    " in " + getFileName() + "\"");
                 }
             }
         }
     }
 
     @Override
-    public void detectCollidingChild(String identifierName, YangConstructType dataType)
+    public void detectCollidingChild(String identifierName,
+                                     YangConstructType dataType)
             throws DataModelException {
         // Asks helper to detect colliding child.
         detectCollidingChildUtil(identifierName, dataType, this);
     }
 
     @Override
-    public void detectSelfCollision(String identifierName, YangConstructType dataType)
+    public void detectSelfCollision(String identifierName,
+                                    YangConstructType dataType)
             throws DataModelException {
         if (getName().equals(identifierName)) {
-            throw new DataModelException("YANG file error: Duplicate input identifier detected, same as container \"" +
-                                                 getName() + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition() +
-                                                 " in " + getFileName() + "\"");
+            throw new DataModelException(
+                    "YANG file error: Duplicate input identifier detected," +
+                            " same as container \"" +
+                            getName() + " in " +
+                            getLineNumber() + " at " +
+                            getCharPosition() +
+                            " in " + getFileName() + "\"");
         }
     }
 
@@ -537,7 +555,39 @@ public abstract class YangContainer
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
+        }
+    }
+
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, getNameSpace().getModuleNamespace());
+        try {
+            YangSchemaNode node = getChildSchema(id).getSchemaNode();
+            if (node instanceof SchemaDataNode) {
+                return node;
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
+                                                            schemaId.name(),
+                                                            getName()));
+            }
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

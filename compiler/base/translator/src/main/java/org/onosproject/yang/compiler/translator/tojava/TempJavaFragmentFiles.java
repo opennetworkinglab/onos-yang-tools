@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
@@ -696,7 +697,7 @@ public class TempJavaFragmentFiles {
      */
     public static List<JavaAttributeInfo> getListOfAttributesForKey(
             YangNode curNode) throws IOException {
-        List<String> keys = ((YangList) curNode).getKeyList();
+        LinkedHashSet<String> keys = ((YangList) curNode).getKeyList();
 
         JavaFileInfoTranslator fileInfo =
                 ((JavaFileInfoContainer) curNode).getJavaFileInfo();

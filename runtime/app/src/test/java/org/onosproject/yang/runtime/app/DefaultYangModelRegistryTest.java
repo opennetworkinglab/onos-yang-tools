@@ -194,7 +194,6 @@ public class DefaultYangModelRegistryTest {
         assertThat(true, is(yangNode == null));
 
         //Here the yangNode should be the node which does not have revision.
-
         // asset should pass with false.
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(((YangNode) yangNode).getRevision() == null));

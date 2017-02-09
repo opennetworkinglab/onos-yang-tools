@@ -19,11 +19,16 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.SingleInstanceNodeContext;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.RPC_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
@@ -31,7 +36,10 @@ import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.RPC;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.RPC_DATA;
 
 /*
@@ -71,7 +79,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.RP
 public abstract class YangRpc
         extends YangNode
         implements YangCommonInfo, Parsable,
-        CollisionDetector, YangIfFeatureHolder, InvalidOpTypeHolder {
+        CollisionDetector, YangIfFeatureHolder, InvalidOpTypeHolder,
+        SingleInstanceNodeContext, SchemaDataNode {
 
     private static final long serialVersionUID = 806201613L;
 
@@ -99,7 +108,7 @@ public abstract class YangRpc
      * Creates a rpc node.
      */
     public YangRpc() {
-        super(RPC_NODE, new HashMap<>());
+        super(RPC_NODE, new HashMap<>(), DataNode.Type.SINGLE_INSTANCE_NODE);
         ifFeatureList = new LinkedList<>();
     }
 
@@ -214,5 +223,25 @@ public abstract class YangRpc
     @Override
     public void setIfFeatureList(List<YangIfFeature> ifFeatureList) {
         this.ifFeatureList = ifFeatureList;
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, getNameSpace().getModuleNamespace());
+        try {
+            YangSchemaNode node = getChildSchema(id).getSchemaNode();
+            if (node instanceof SchemaDataNode) {
+                return node;
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
+                                                            schemaId.name(),
+                                                            getName()));
+            }
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

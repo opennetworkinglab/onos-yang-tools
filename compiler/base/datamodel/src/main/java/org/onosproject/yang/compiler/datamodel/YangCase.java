@@ -33,6 +33,7 @@ import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.I
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsg;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.CASE_DATA;
 
 /*-
@@ -105,7 +106,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.CA
 public abstract class YangCase
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
-        YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder, YangIsFilterContentNodes {
+        YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder,
+        YangIsFilterContentNodes {
 
     private static final long serialVersionUID = 806201603L;
 
@@ -461,6 +463,17 @@ public abstract class YangCase
         }
     }
 
+    @Override
+    public void setLeafParentContext() {
+        // Add parent context for all leafs.
+        for (YangLeaf yangLeaf : getListOfLeaf()) {
+            yangLeaf.setParentContext(getParentSchemaContext(this));
+        }
+        // Add parent context for all leaf list.
+        for (YangLeafList yangLeafList : getListOfLeafList()) {
+            yangLeafList.setParentContext(getParentSchemaContext(this));
+        }
+    }
 
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();

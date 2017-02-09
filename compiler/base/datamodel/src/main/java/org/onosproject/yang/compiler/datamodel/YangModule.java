@@ -279,6 +279,9 @@ public abstract class YangModule
      */
     private boolean isModuleForDeviation;
 
+    private static final String E_NONDATA =
+            "Method called for other then data node";
+
     /**
      * Creates a YANG node of module type.
      */
@@ -805,6 +808,11 @@ public abstract class YangModule
         for (YangLeafList yangLeafList : getListOfLeafList()) {
             yangLeafList.setLeafNameSpaceAndAddToParentSchemaMap(getNameSpace());
         }
+    }
+
+    @Override
+    public void setLeafParentContext() {
+        throw new IllegalArgumentException(E_NONDATA);
     }
 
     @Override

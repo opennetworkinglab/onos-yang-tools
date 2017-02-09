@@ -1078,6 +1078,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
+     * @return generated file
      * @throws IOException when fails to generate class file
      */
     public static File generateRpcExtendedCommand(File file, YangNode curNode,
@@ -1099,6 +1100,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
+     * @return generated file
      * @throws IOException when fails to generate class file
      */
     public static File generateRpcCommand(File file, YangNode curNode,
@@ -1122,6 +1124,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
+     * @return generated file
      * @throws IOException when fails to generate class file
      */
     public static File generateRegisterRpc(File file, YangNode curNode,

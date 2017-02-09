@@ -726,6 +726,7 @@ public final class JavaDocGen {
     /**
      * Returns javadoc for RPC command constructor.
      *
+     * @param rpcName rpc name
      * @return javadoc for RPC command constructor
      */
     public static String getJavaDocForRpcCommandConstructor(String rpcName) {
