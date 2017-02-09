@@ -1,0 +1,35 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+# Builds an ONOS Yang Tools release
+# -----------------------------------------------------------------------------
+
+if [ $# -ne 3  ]; then
+    echo "Usage: onos-yang-tools-build-release version next-version branch"
+    echo "For example, to build beta 2 on the master branch - onos-yang-tools-build-release 1.12-b2 1.12-SNAPSHOT master"
+    exit 1
+fi
+
+export OYT_VERSION=$1
+export OYT_SNAPSHOT=$2
+export BRANCH=$3
+
+set -e
+set -x
+
+export OYT_TAG=$OYT_VERSION
+
+ssh -p 29418 gerrit.onosproject.org projectlock lock onos-yang-tools $OYT_BRANCH
+
+mvn versions:set -DnewVersion=$OYT_VERSION versions:commit
+mvn -Prelease clean deploy
+git commit -am"Releasing $OYT_VERSION"
+git tag -sm"Tagging $OYT_VERSION" $OYT_VERSION
+
+mvn versions:set -DnewVersion=$OYT_SNAPSHOT versions:commit
+git commit -am"Bumping version to $OYT_SNAPSHOT"
+git push origin $OYT_BRANCH
+git push origin $OYT_TAG
+
+ssh -p 29418 gerrit.onosproject.org projectlock unlock onos-yang-tools master
+
+unset OYT_VERSION OYT_SNAPSHOT OYT_BRANCH OYT_TAG
