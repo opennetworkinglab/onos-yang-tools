@@ -17,8 +17,10 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
+import org.onosproject.yang.compiler.datamodel.YangDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
+import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeDef;
@@ -42,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Collections.sort;
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
@@ -97,7 +100,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAugmentationsString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassFromString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getBitSetEnumClassToString;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getCompareToForKeyClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEnumsConstructor;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEnumsOfValueMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
@@ -119,6 +121,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodOpen;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getUnionToStringMethod;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.isLeafValueSetInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getInterfaceLeafIdEnumMethods;
@@ -129,34 +132,43 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUt
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getTypeFiles;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ENUM_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_LISTENER_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_SUBJECT_NAME_SUFFIX;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPL_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.KEY_INFO;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
+import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PROTECTED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGISTER_RPC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE_METHOD_STRING;
+import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.UNION_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
@@ -273,16 +285,21 @@ public final class JavaFileGenerator {
         String className = getCapitalCase(fileInfo.getJavaName()) + KEYS;
         List<String> imports = new ArrayList<>();
 
-        YangNode parent = curNode.getParent();
-        JavaImportData importData = ((JavaCodeGeneratorInfo) parent)
-                .getTempJavaCodeFragmentFiles().getBeanTempFiles()
-                .getJavaImportData();
-        JavaQualifiedTypeInfoTranslator info =
-                new JavaQualifiedTypeInfoTranslator();
-        info.setClassInfo(className);
-        info.setPkgInfo(fileInfo.getPackage());
-        importData.addImportInfo(info, parent.getJavaClassNameOrBuiltInType(),
-                                 parent.getJavaPackage());
+        YangDataStructure data = getYangDataStructure(
+                ((YangList) curNode).getCompilerAnnotation());
+        if (((YangList) curNode).isConfig() &&
+                data == YangDataStructure.MAP) {
+            YangNode parent = curNode.getParent();
+            JavaImportData importData = ((JavaCodeGeneratorInfo) parent)
+                    .getTempJavaCodeFragmentFiles().getBeanTempFiles()
+                    .getJavaImportData();
+            JavaQualifiedTypeInfoTranslator info =
+                    new JavaQualifiedTypeInfoTranslator();
+            info.setClassInfo(className);
+            info.setPkgInfo(fileInfo.getPackage());
+            importData.addImportInfo(info, parent.getJavaClassNameOrBuiltInType(),
+                                     parent.getJavaPackage());
+        }
         List<JavaAttributeInfo> attrs = getListOfAttributesForKey(curNode);
 
         Iterator<JavaAttributeInfo> attrIt = attrs.iterator();
@@ -291,7 +308,8 @@ public final class JavaFileGenerator {
         while (attrIt.hasNext()) {
             attr = attrIt.next();
             typeInfo = attr.getImportInfo();
-            if (!typeInfo.getClassInfo().equals(className)) {
+            if (!typeInfo.getClassInfo().equals(className) &&
+                    attr.getImportInfo().getPkgInfo() != null) {
                 imports.add(getImportString(attr.getImportInfo().getPkgInfo(),
                                             attr.getImportInfo().getClassInfo()));
             } else {
@@ -299,8 +317,11 @@ public final class JavaFileGenerator {
             }
         }
 
-        imports.add(getImportString(JAVA_UTIL_PKG,
-                                    JAVA_UTIL_OBJECTS_IMPORT_CLASS));
+        imports.add(getImportString(MODEL_PKG, KEY_INFO));
+        if (!attrs.isEmpty()) {
+            imports.add(getImportString(JAVA_UTIL_PKG,
+                                        JAVA_UTIL_OBJECTS_IMPORT_CLASS));
+        }
 
         initiateJavaFileGeneration(file, GENERATE_KEY_CLASS, imports, curNode,
                                    className);
@@ -311,10 +332,26 @@ public final class JavaFileGenerator {
             if (attr.isQualifiedName()) {
                 pkg = attr.getImportInfo().getPkgInfo();
             }
-            insertDataIntoJavaFile(file, getJavaAttributeDefinition(
-                    pkg, attr.getImportInfo().getClassInfo(),
-                    attr.getAttributeName(), false, PROTECTED, null));
+            String attrType = attr.getImportInfo().getClassInfo();
+            if (attr.getAttributeType() != null &&
+                    attr.getAttributeType().getDataType() == IDENTITYREF) {
+                String type = attrType;
+                if (pkg != null) {
+                    type = pkg + PERIOD + attrType;
+                }
+                attrType = CLASS_STRING + DIAMOND_OPEN_BRACKET +
+                        QUESTION_MARK + SPACE + EXTEND + SPACE + type +
+                        DIAMOND_CLOSE_BRACKET;
+                insertDataIntoJavaFile(file, getJavaAttributeDefinition(
+                        null, attrType, attr.getAttributeName(),
+                        false, PROTECTED, null));
+            } else {
+                insertDataIntoJavaFile(file, getJavaAttributeDefinition(
+                        pkg, attr.getImportInfo().getClassInfo(),
+                        attr.getAttributeName(), false, PROTECTED, null));
+            }
         }
+
         attrIt = attrs.iterator();
         while (attrIt.hasNext()) {
             attr = attrIt.next();
@@ -328,26 +365,25 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, getJavaDoc(MANAGER_SETTER_METHOD, attr
                     .getAttributeName(), false, null));
             insertDataIntoJavaFile(file, getSetterForClass(
-                    attr, className, GENERATE_EVENT_SUBJECT_CLASS));
+                    attr, GENERATE_EVENT_SUBJECT_CLASS));
             insertDataIntoJavaFile(file, NEW_LINE);
         }
-        //add hashcode and equals method.
-        insertDataIntoJavaFile(file, getHashCodeMethodOpen());
-        StringBuilder builder = new StringBuilder();
-        for (JavaAttributeInfo att : attrs) {
-            builder.append(getHashCodeMethod(att));
+        if (!attrs.isEmpty()) {
+            //add hashcode and equals method.
+            insertDataIntoJavaFile(file, getHashCodeMethodOpen());
+            StringBuilder builder = new StringBuilder();
+            for (JavaAttributeInfo att : attrs) {
+                builder.append(getHashCodeMethod(att));
+            }
+            insertDataIntoJavaFile(file, getHashCodeMethodClose(builder.toString()));
+
+            insertDataIntoJavaFile(file, getEqualsMethodOpen(className));
+            StringBuilder builder2 = new StringBuilder();
+            for (JavaAttributeInfo att : attrs) {
+                builder2.append(getEqualsMethod(att)).append(NEW_LINE);
+            }
+            insertDataIntoJavaFile(file, getEqualsMethodClose(builder2.toString()));
         }
-        insertDataIntoJavaFile(file, getHashCodeMethodClose(builder.toString()));
-
-        insertDataIntoJavaFile(file, getEqualsMethodOpen(className));
-        StringBuilder builder2 = new StringBuilder();
-        for (JavaAttributeInfo att : attrs) {
-            builder2.append(getEqualsMethod(att)).append(NEW_LINE);
-        }
-        insertDataIntoJavaFile(file, getEqualsMethodClose(builder2.toString()));
-
-        insertDataIntoJavaFile(file, getCompareToForKeyClass(attrs, className));
-
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
         return file;
     }
@@ -1046,8 +1082,10 @@ public final class JavaFileGenerator {
      * @return true if leaves are present, false otherwise
      */
     private static boolean leavesPresent(YangLeavesHolder holder) {
-        return holder.getListOfLeaf() != null &&
-                !holder.getListOfLeaf().isEmpty();
+        return (holder.getListOfLeaf() != null &&
+                !holder.getListOfLeaf().isEmpty()) ||
+                (holder.getListOfLeafList() != null &&
+                        !holder.getListOfLeafList().isEmpty());
     }
 
     /**
@@ -1078,7 +1116,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
-     * @return generated file
+     * @return RPC extended command file
      * @throws IOException when fails to generate class file
      */
     public static File generateRpcExtendedCommand(File file, YangNode curNode,
@@ -1100,7 +1138,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
-     * @return generated file
+     * @return RPC command file
      * @throws IOException when fails to generate class file
      */
     public static File generateRpcCommand(File file, YangNode curNode,
@@ -1124,7 +1162,7 @@ public final class JavaFileGenerator {
      * @param file    generated file
      * @param curNode current YANG node
      * @param imports imports for file
-     * @return generated file
+     * @return register RPC file
      * @throws IOException when fails to generate class file
      */
     public static File generateRegisterRpc(File file, YangNode curNode,

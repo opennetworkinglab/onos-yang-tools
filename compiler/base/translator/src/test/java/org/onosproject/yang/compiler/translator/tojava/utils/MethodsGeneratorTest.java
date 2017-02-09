@@ -32,7 +32,10 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.*;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getGetterForClass;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getGetterForInterface;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForClass;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForInterface;
 
 /**
  * Unit tests for generated methods from the file type.
@@ -179,7 +182,8 @@ public final class MethodsGeneratorTest {
     @Test
     public void getSetterForClassTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
-        String method = getSetterForClass(testAttr, CLASS_NAME, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
+        String method = getSetterForClass(
+                testAttr, GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER);
         assertThat(true, is(
                 method.contains(UtilConstants.PUBLIC + UtilConstants.SPACE + UtilConstants.VOID +
                                         UtilConstants.SPACE + UtilConstants.SET_METHOD_PREFIX +

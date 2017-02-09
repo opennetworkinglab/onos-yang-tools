@@ -1025,6 +1025,40 @@ public final class StringGenerator {
     }
 
     /**
+     * Returns class definition for implements.
+     *
+     * @param classType     class type
+     * @param name          name of class
+     * @param modifier      modifier
+     * @param implClassList list of class which should be implemented
+     * @return class definition
+     */
+    static String getDefinitionWithMultipleImplements(String classType,
+                                                      String name,
+                                                      String modifier,
+                                                      List<String>
+                                                              implClassList) {
+        String mod = EMPTY_STRING;
+        if (modifier != null) {
+            mod = modifier + SPACE;
+        }
+        String classDef = mod + classType + SPACE + name + SPACE
+                + IMPLEMENTS + SPACE;
+        if (implClassList != null && !implClassList.isEmpty()) {
+            Iterator<String> implIterator = implClassList.iterator();
+            while (implIterator.hasNext()) {
+                String implClass = implIterator.next();
+                classDef = classDef + implClass;
+                if (implIterator.hasNext()) {
+                    classDef = classDef + COMMA + SPACE;
+                }
+            }
+
+        }
+        return classDef + defCloseString();
+    }
+
+    /**
      * Returns string for service class.
      *
      * @param name1 name of even listener class

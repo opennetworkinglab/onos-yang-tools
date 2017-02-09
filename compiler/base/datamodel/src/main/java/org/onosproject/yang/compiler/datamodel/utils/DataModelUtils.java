@@ -1243,7 +1243,7 @@ public final class DataModelUtils {
     /**
      * Searches for input in given RPC node.
      *
-     * @param rpc yang node
+     * @param rpc YANG RPC node
      * @return input node
      */
     public static YangNode findRpcInput(YangNode rpc) {
@@ -1261,7 +1261,7 @@ public final class DataModelUtils {
     /**
      * Searches for output in given RPC node.
      *
-     * @param rpc yang node
+     * @param rpc YANG RPC node
      * @return output node
      */
     public static YangNode findRpcOutput(YangNode rpc) {

@@ -905,6 +905,9 @@ public final class UtilConstants {
      * Static attribute for is LeafIdentifier enum prefix.
      */
     public static final String LEAF_IDENTIFIER = "LeafIdentifier";
+
+    public static final String MODEL_LEAF_IDENTIFIER = "org.onosproject.yang.model.LeafIdentifier";
+
     /**
      * Static attribute for is leaf.
      */
@@ -1061,16 +1064,6 @@ public final class UtilConstants {
      * BitSet built in java type.
      */
     public static final String BIT_SET = "BitSet";
-
-    /**
-     * Flag for subtree filtering in augment.
-     */
-    public static final String SUBTREE_FILTERED = "isSubTreeFiltered";
-
-    /**
-     * Augment map type.
-     */
-    public static final String AUGMENT_MAP_TYPE = "Map<Class<?>, Object>";
 
     /**
      * Byte java built in type.
@@ -1970,6 +1963,10 @@ public final class UtilConstants {
     public static final String CREATE_MODEL = "createModel";
 
     public static final String CREATE_DATA_NODE = "createDataNode";
+
+    public static final String MULTI_INSTANCE_OBJECT = "MultiInstanceObject";
+
+    public static final String KEY_INFO = "KeyInfo";
 
     // No instantiation.
     private UtilConstants() {

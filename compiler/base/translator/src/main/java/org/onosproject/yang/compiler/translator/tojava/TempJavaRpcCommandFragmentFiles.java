@@ -224,14 +224,14 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns RPC commands contents.
      *
-     * @param curNode YANG RPC node
+     * @param node YANG RPC node
      * @return RPC commands contents
      */
-    public static String getRpcCommandContents(YangNode curNode) {
-        String appService = curNode.getParent()
+    public static String getRpcCommandContents(YangNode node) {
+        String appService = node.getParent()
                 .getJavaClassNameOrBuiltInType() + SERVICE;
         String className = getCapitalCase(getCamelCase(
-                curNode.getJavaClassNameOrBuiltInType(), null)) + COMMAND;
+                node.getJavaClassNameOrBuiltInType(), null)) + COMMAND;
 
         // parameters for constructors
         Map<String, String> param = new LinkedHashMap<>();
@@ -251,7 +251,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
 
                 // add constructor
                 .append(getJavaDocForRpcCommandConstructor(
-                        curNode.getJavaClassNameOrBuiltInType()))
+                        node.getJavaClassNameOrBuiltInType()))
                 .append(NEW_LINE)
                 .append(multiAttrMethodSignature(className, null, PUBLIC,
                                                  null, param, CLASS_TYPE,
@@ -272,10 +272,10 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(NEW_LINE)
 
                 //add execute method
-                .append(getRpcCommandExecuteMethod(appService, curNode))
+                .append(getRpcCommandExecuteMethod(appService, node))
 
                 //add get resource id method
-                .append(getResourceIdMethod(curNode));
+                .append(getResourceIdMethod(node));
 
         // add execute method with msgid
         return builder.toString();

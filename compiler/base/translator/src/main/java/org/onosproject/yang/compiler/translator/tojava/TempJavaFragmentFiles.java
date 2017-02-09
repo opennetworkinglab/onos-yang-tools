@@ -114,6 +114,8 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_PKG;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MULTI_INSTANCE_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
@@ -649,10 +651,10 @@ public class TempJavaFragmentFiles {
         if (leafList) {
             tempFiles.getJavaImportData().setIfListImported(true);
             return getAttributeOfLeafInfoContainer(tempFiles, container, config,
-                                                   true);
+                                                   true, false);
         }
         return getAttributeOfLeafInfoContainer(tempFiles, container, config,
-                                               false);
+                                               false, false);
     }
 
     /**
@@ -662,6 +664,7 @@ public class TempJavaFragmentFiles {
      * @param container     JAVA leaf info container
      * @param config        plugin configurations
      * @param listAttribute flag indicating if list attribute
+     * @param keyLeaf       flag indicating key leaf
      * @return JAVA attribute information
      * @throws IOException when fails to do IO operations
      */
@@ -669,7 +672,8 @@ public class TempJavaFragmentFiles {
     getAttributeOfLeafInfoContainer(TempJavaFragmentFiles tempFiles,
                                     JavaLeafInfoContainer container,
                                     YangPluginConfig config,
-                                    boolean listAttribute) throws IOException {
+                                    boolean listAttribute, boolean keyLeaf)
+            throws IOException {
         container.setConflictResolveConfig(config.getConflictResolver());
         container.updateJavaQualifiedInfo();
         addImportForLeafInfo(tempFiles, container);
@@ -681,7 +685,8 @@ public class TempJavaFragmentFiles {
                         container.getJavaQualifiedInfo()), listAttribute);
         boolean condition =
                 ((YangSchemaNode) container).getReferredSchema() == null &&
-                        container.getDataType().getDataType() == BITS;
+                        container.getDataType().getDataType() == BITS &&
+                        !keyLeaf;
         if (condition) {
             addBitsHandler(attr, container.getDataType(), tempFiles);
         }
@@ -715,8 +720,8 @@ public class TempJavaFragmentFiles {
                 leaf = (YangJavaLeafTranslator) leafIt.next();
                 if (key.equals(leaf.getName())) {
                     attrs.add(getAttributeOfLeafInfoContainer(
-                            beanFile, leaf,
-                            fileInfo.getPluginConfig(), false));
+                            beanFile, leaf, fileInfo.getPluginConfig(),
+                            false, true));
                 }
             }
         }
@@ -998,8 +1003,7 @@ public class TempJavaFragmentFiles {
     private void addSetterImpl(JavaAttributeInfo attr)
             throws IOException {
         int generatedJavaFiles = getGeneratedJavaFiles();
-        String setter = getSetterForClass(attr, getGeneratedJavaClassName(),
-                                          generatedJavaFiles);
+        String setter = getSetterForClass(attr, generatedJavaFiles);
         YangDataStructure ds = getYangDataStructure(
                 attr.getCompilerAnnotation());
         String annotation = null;
@@ -1490,7 +1494,7 @@ public class TempJavaFragmentFiles {
         YangType attrType = newAttrInfo.getAttributeType();
 
         if (tempFlagSet(LEAF_IDENTIFIER_ENUM_ATTRIBUTES_MASK) &&
-                !listAttr && attrType != null) {
+                attrType != null) {
             leafCount++;
             addLeafIdAttributes(newAttrInfo, leafCount);
         }
@@ -1617,6 +1621,11 @@ public class TempJavaFragmentFiles {
             getBeanFiles(curNode).getJavaExtendsListHolder()
                     .addToExtendsList(typeInfo, curNode, getBeanFiles(curNode));
 
+            // add import for multi instance object
+            if (curNode instanceof YangList) {
+                imports.add(getImportString(MODEL_PKG, MULTI_INSTANCE_OBJECT));
+            }
+
             //Create impl class file.
             implClassJavaFileHandle =
                     getJavaFileHandle(getImplClassName(curNode));
@@ -1631,15 +1640,10 @@ public class TempJavaFragmentFiles {
 
         if (curNode instanceof YangList) {
             File keyClassJavaFileHandle;
-            YangList list = (YangList) curNode;
-            YangDataStructure data = getYangDataStructure(
-                    list.getCompilerAnnotation());
-            if (list.isConfig() && data == YangDataStructure.MAP) {
-                keyClassJavaFileHandle =
-                        getJavaFileHandle(getJavaClassName(
-                                KEY_CLASS_FILE_NAME_SUFFIX));
-                generateKeyClassFile(keyClassJavaFileHandle, curNode);
-            }
+            keyClassJavaFileHandle =
+                    getJavaFileHandle(getJavaClassName(
+                            KEY_CLASS_FILE_NAME_SUFFIX));
+            generateKeyClassFile(keyClassJavaFileHandle, curNode);
         }
         //Close all the file handles.
         freeTemporaryResources(false);

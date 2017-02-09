@@ -143,6 +143,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJE
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH_CODE_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IF;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INSTANCE_OF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IS_EMPTY;
@@ -156,6 +157,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.LONG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MIN_RANGE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_LEAF_IDENTIFIER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEG_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
@@ -441,12 +443,10 @@ public final class MethodsGenerator {
      * Returns the setter method strings for class file.
      *
      * @param attr               attribute info
-     * @param className          name of the class
      * @param generatedJavaFiles generated java files
      * @return setter method for class
      */
     public static String getSetterForClass(JavaAttributeInfo attr,
-                                           String className,
                                            int generatedJavaFiles) {
         String attrQualifiedType = getReturnType(attr);
         String attributeName = attr.getAttributeName();
@@ -455,28 +455,26 @@ public final class MethodsGenerator {
             isTypeNull = true;
         }
         if (!attr.isListAttr()) {
-            return getSetter(className, attributeName, attrQualifiedType,
-                             generatedJavaFiles, isTypeNull, false);
+            return getSetter(attributeName, attrQualifiedType,
+                             generatedJavaFiles, isTypeNull);
         }
         String attrParam = getListAttribute(attrQualifiedType,
                                             attr.getCompilerAnnotation());
-        return getSetter(className, attributeName, attrParam,
-                         generatedJavaFiles, isTypeNull, true);
+        return getSetter(attributeName, attrParam,
+                         generatedJavaFiles, isTypeNull);
     }
 
     /**
      * Returns setter for attribute.
      *
-     * @param className  class name
      * @param name       attribute name
      * @param type       return type
      * @param isTypeNull if attribute type is null
-     * @param isList     true if leaf-list
      * @return setter for attribute
      */
-    private static String getSetter(String className, String name, String type,
+    private static String getSetter(String name, String type,
                                     int genType,
-                                    boolean isTypeNull, boolean isList) {
+                                    boolean isTypeNull) {
         StringBuilder builder = new StringBuilder();
         if (genType == GENERATE_SERVICE_AND_MANAGER) {
             //Append method signature.
@@ -506,7 +504,7 @@ public final class MethodsGenerator {
         builder.append(methodSignature(name, EMPTY_STRING, PUBLIC, name,
                                        VOID, type, CLASS_TYPE));
 
-        if (!isTypeNull && !isList &&
+        if (!isTypeNull &&
                 genType != GENERATE_TYPEDEF_CLASS && genType != GENERATE_UNION_CLASS) {
             builder.append(getLeafFlagSetString(name, VALUE_LEAF, EIGHT_SPACE_INDENTATION,
                                                 SET_METHOD_PREFIX)).append(signatureClose());
@@ -1542,6 +1540,7 @@ public final class MethodsGenerator {
                 .append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
+
     }
 
     // Returns if condition for add to list method.
@@ -1610,7 +1609,8 @@ public final class MethodsGenerator {
                 "     * Identify the leaf of " + name + PERIOD + NEW_LINE +
                 "     */\n";
         return start + FOUR_SPACE_INDENTATION + PUBLIC + SPACE + ENUM + SPACE +
-                LEAF_IDENTIFIER + SPACE + OPEN_CURLY_BRACKET + NEW_LINE;
+                LEAF_IDENTIFIER + SPACE + IMPLEMENTS + SPACE +
+                MODEL_LEAF_IDENTIFIER + OPEN_CURLY_BRACKET + NEW_LINE;
     }
 
     /**
@@ -1936,8 +1936,8 @@ public final class MethodsGenerator {
      *
      * @param name         class name
      * @param modifierType modifier type
-     * @param params       parameters for constructor
-     * @param space        space
+     * @param params       parameters for constrcutor
+     * @param space        indentation for constructor
      * @return parameterisied constructor method string
      */
     public static String getParaMeterisiedConstructor(String name,

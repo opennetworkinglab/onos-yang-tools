@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcNotificationPresent;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_EVENT_CLASS_MASK;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ALL_RPC_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateCodeOfRootNode;
@@ -190,6 +191,10 @@ public class YangJavaSubModuleTranslator
                     if (isRpcNotificationPresent(this)) {
                         getTempJavaCodeFragmentFiles().generateJavaFile(
                                 GENERATE_SERVICE_AND_MANAGER, this);
+                    }
+                    if (isRpcChildNodePresent(this)) {
+                        getTempJavaCodeFragmentFiles()
+                                .generateJavaFile(GENERATE_ALL_RPC_CLASS_MASK, this);
                     }
                 }
             }

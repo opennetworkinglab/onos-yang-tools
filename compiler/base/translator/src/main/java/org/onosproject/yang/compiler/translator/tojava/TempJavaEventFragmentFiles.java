@@ -329,7 +329,7 @@ public class TempJavaEventFragmentFiles
         addEventEnum(notificationName);
         addEventSubjectAttribute(javaAttributeInfo);
         addEventSubjectGetter(javaAttributeInfo);
-        addEventSubjectSetter(javaAttributeInfo, currentInfo);
+        addEventSubjectSetter(javaAttributeInfo);
     }
 
     /*Adds event to enum temp file.*/
@@ -370,8 +370,7 @@ public class TempJavaEventFragmentFiles
     }
 
     /*Adds setter method for event in event subject class.*/
-    private void addEventSubjectSetter(JavaAttributeInfo attr,
-                                       String className)
+    private void addEventSubjectSetter(JavaAttributeInfo attr)
             throws IOException {
         String appDataStructure = null;
         if (attr.getCompilerAnnotation() != null) {
@@ -381,7 +380,7 @@ public class TempJavaEventFragmentFiles
         appendToFile(getEventSubjectSetterTempFileHandle(), getJavaDoc(
                 MANAGER_SETTER_METHOD, attr.getAttributeName(),
                 false, appDataStructure) + getSetterForClass(
-                attr, className, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
+                attr, GENERATE_EVENT_SUBJECT_CLASS) + NEW_LINE);
     }
 
     /**

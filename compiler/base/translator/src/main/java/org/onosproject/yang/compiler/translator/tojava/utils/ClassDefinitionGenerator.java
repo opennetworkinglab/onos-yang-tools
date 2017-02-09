@@ -19,6 +19,7 @@ package org.onosproject.yang.compiler.translator.tojava.utils;
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
+import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
@@ -59,9 +60,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT_EVENT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
-import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARABLE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ENUM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ERROR_MSG_JAVA_IDENTITY;
@@ -72,8 +73,11 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FINAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTERFACE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.KEY_INFO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LISTENER_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MULTI_INSTANCE_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
@@ -155,7 +159,7 @@ final class ClassDefinitionGenerator {
             case GENERATE_EVENT_LISTENER_INTERFACE:
                 return getEventListenerDefinition(yangName);
             case GENERATE_KEY_CLASS:
-                return getKeyClassDefinition(yangName);
+                return getKeyClassDefinition(yangName, curNode);
             case GENERATE_EVENT_SUBJECT_CLASS:
                 return getClassDefinition(yangName);
             case GENERATE_IDENTITY_CLASS:
@@ -231,12 +235,18 @@ final class ClassDefinitionGenerator {
      * Returns impl file class definition.
      *
      * @param yangName file name
+     * @param node     YANG list node
      * @return definition
      */
-    private static String getKeyClassDefinition(String yangName) {
-        String compareName = COMPARABLE + brackets(
-                OPEN_CLOSE_DIAMOND_WITH_VALUE, yangName, null);
-        return getDefinitionWithImplements(CLASS, yangName, PUBLIC, compareName);
+    private static String getKeyClassDefinition(String yangName,
+                                                YangNode node) {
+        String keyInfo = KEY_INFO +
+                brackets(OPEN_CLOSE_DIAMOND_WITH_VALUE,
+                         DEFAULT_CAPS + getCapitalCase(getCamelCase(
+                                 node.getJavaClassNameOrBuiltInType(), null)),
+                         null);
+        return getDefinitionWithImplements(CLASS, yangName, PUBLIC,
+                                           keyInfo);
     }
 
     /**
@@ -394,8 +404,21 @@ final class ClassDefinitionGenerator {
                     }
 
                     // append implements
-                    def.append(IMPLEMENTS).append(SPACE)
-                            .append(yangName);
+                    if (curNode instanceof YangList) {
+                        String multiInstanceObj = MULTI_INSTANCE_OBJECT +
+                                brackets(OPEN_CLOSE_DIAMOND_WITH_VALUE,
+                                         getCapitalCase(getCamelCase(yangName,
+                                                                     null)) +
+                                                 KEYS, null);
+                        def.append(NEW_LINE).append(EIGHT_SPACE_INDENTATION)
+                                .append(IMPLEMENTS).append(SPACE)
+                                .append(yangName).append(COMMA).append(SPACE)
+                                .append(multiInstanceObj);
+
+                    } else {
+                        def.append(IMPLEMENTS).append(SPACE)
+                                .append(yangName);
+                    }
                     break;
                 default:
                     return null;

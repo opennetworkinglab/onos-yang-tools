@@ -259,9 +259,7 @@ public final class YangJavaModelUtils {
             if (isLeafPresent || isLeafListPresent) {
                 bean.addCurNodeLeavesInfoToTempFiles((YangNode) info,
                                                      config);
-            }
-            //Add value leaf flag attribute to temp file.
-            if (isLeafPresent) {
+                //Add value leaf flag attribute to temp file.
                 bean.addValueLeafFlag(config, (YangNode) info);
             }
         } else if (info instanceof YangTypeHolder) {

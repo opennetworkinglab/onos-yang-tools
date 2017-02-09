@@ -1,0 +1,35 @@
+module check {
+   yang-version 1;
+   namespace "modelObjectTest";
+   prefix nd;
+   container cont50 {
+       leaf leaf51 {
+           type int32;
+       }
+   }
+   list list52 {
+       key leaf52;
+       leaf leaf52 {
+           type int32;
+       }
+   }
+
+   container cont53 {
+       leaf-list leaf54 {
+           type string;
+       }
+       leaf leaf55 {
+           type string;
+       }
+   }
+
+   list list56 {
+       config false;
+       leaf-list leaf57 {
+           type string;
+       }
+       leaf leaf58 {
+           type string;
+       }
+   }
+}

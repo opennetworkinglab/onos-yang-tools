@@ -181,6 +181,8 @@ public class YangJavaModuleTranslator
                     if (isRpcNotificationPresent(this)) {
                         getTempJavaCodeFragmentFiles()
                                 .generateJavaFile(GENERATE_SERVICE_AND_MANAGER, this);
+                    }
+                    if (isRpcChildNodePresent(this)) {
                         getTempJavaCodeFragmentFiles()
                                 .generateJavaFile(GENERATE_ALL_RPC_CLASS_MASK, this);
                     }
