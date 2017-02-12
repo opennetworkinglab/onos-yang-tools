@@ -254,7 +254,7 @@ public final class SerializerHelper {
      */
     public static Builder addDataNode(Builder builder,
                                       String name, String namespace,
-                                      String value, DataNode type) {
+                                      String value, DataNode.Type type) {
         try {
             SchemaContext node;
             ExtResourceIdBldr rIdBldr;

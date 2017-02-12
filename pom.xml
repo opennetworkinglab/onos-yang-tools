@@ -37,6 +37,7 @@
         <module>compiler</module>
         <module>model</module>
         <module>runtime</module>
+        <module>serializers</module>
     </modules>
 
     <!-- FIXME this can be removed if/when buck-api is released -->
