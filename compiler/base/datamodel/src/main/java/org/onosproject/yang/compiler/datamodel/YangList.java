@@ -21,7 +21,7 @@ import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.model.DataNode;
-import org.onosproject.yang.model.MultiInstanceNodeContext;
+import org.onosproject.yang.model.ListSchemaContext;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 
@@ -89,7 +89,7 @@ public abstract class YangList
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangMustHolder, YangWhenHolder, YangIfFeatureHolder, YangSchemaNode,
         YangIsFilterContentNodes, YangConfig, YangUniqueHolder,
-        YangMaxElementHolder, YangMinElementHolder, SchemaDataNode, MultiInstanceNodeContext {
+        YangMaxElementHolder, YangMinElementHolder, SchemaDataNode, ListSchemaContext {
 
     private static final long serialVersionUID = 806201609L;
 

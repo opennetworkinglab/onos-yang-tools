@@ -20,11 +20,21 @@ import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.KeyLeaf;
+import org.onosproject.yang.model.LeafListKey;
+import org.onosproject.yang.model.ListKey;
+import org.onosproject.yang.model.NodeKey;
+import org.onosproject.yang.model.ResourceId;
+import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 
 public final class TestUtils {
 
@@ -37,9 +47,9 @@ public final class TestUtils {
     /**
      * Checks the schema context values of given leaf node.
      */
-    static void checkLeafSchemaContext(String name, String namespace,
-                                       String pname, String pnamespace,
-                                       YangLeaf child) {
+    public static void checkLeafSchemaContext(String name, String namespace,
+                                              String pname, String pnamespace,
+                                              YangLeaf child) {
         SchemaId id = child.getSchemaId();
         assertEquals(id.name(), name);
         assertEquals(id.namespace(), namespace);
@@ -69,9 +79,9 @@ public final class TestUtils {
     /**
      * Checks the schema context values of given node.
      */
-    static void checkSchemaContext(String name, String namespace,
-                                   String pname, String pnamespace,
-                                   DataNode.Type type, YangNode child) {
+    public static void checkSchemaContext(String name, String namespace,
+                                          String pname, String pnamespace,
+                                          DataNode.Type type, YangNode child) {
         SchemaId id = child.getSchemaId();
         assertEquals(id.name(), name);
         assertEquals(id.namespace(), namespace);
@@ -80,5 +90,55 @@ public final class TestUtils {
         assertEquals(id.name(), pname);
         assertEquals(id.namespace(), pnamespace);
         assertEquals(child.getType(), type);
+    }
+
+
+    /**
+     * Validates the root level node schema context.
+     *
+     * @param context schema context
+     */
+    public static void checkRootLevelContext(SchemaContext context) {
+        SchemaId id = context.getSchemaId();
+        assertEquals(id.name(), "/");
+        assertEquals(id.namespace(), null);
+        assertNull(context.getParentContext());
+        assertEquals(context.getType(), SINGLE_INSTANCE_NODE);
+    }
+
+    /**
+     * Validate the resource id builder.
+     */
+    public static void validateResourceId(String[] nA, String[] nsA, String[] valA,
+                                          ResourceId rBlrEx) {
+        SchemaId sId;
+        Object val = null;
+        List<NodeKey> keys = rBlrEx.nodeKeys();
+        int i = 0;
+        int j = 0;
+        ListKey.ListKeyBuilder lKeyBlr;
+        for (NodeKey k : keys) {
+            sId = k.schemaId();
+            assertEquals(sId.name(), nA[i]);
+            assertEquals(sId.namespace(), nsA[i]);
+            i++;
+            if (k instanceof ListKey) {
+                List<KeyLeaf> kLeaf = ((ListKey) k).keyLeafs();
+                for (KeyLeaf kl : kLeaf) {
+                    sId = kl.leafSchema();
+                    assertEquals(sId.name(), nA[i]);
+                    assertEquals(sId.namespace(), nsA[i]);
+                    assertEquals(kl.leafValAsString(), valA[j]);
+                    i++;
+                    j++;
+                }
+            } else if (k instanceof LeafListKey) {
+                val = ((LeafListKey) k).value().toString();
+            }
+            if (val != null) {
+                assertEquals(val, valA[j]);
+                j++;
+            }
+        }
     }
 }

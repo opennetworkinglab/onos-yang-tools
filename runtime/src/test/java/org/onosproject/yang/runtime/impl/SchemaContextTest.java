@@ -28,14 +28,13 @@ import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 
 import java.util.List;
 
-
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
 
 /**
  * Tests the default schema context methods.
  */
-public class TestSchemaContext {
+public class SchemaContextTest {
 
     private static TestYangSchemaNodeProvider schemaProvider =
             new TestYangSchemaNodeProvider();

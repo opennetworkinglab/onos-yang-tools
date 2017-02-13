@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.model;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -47,8 +49,8 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
      *
      * @return List of key leaf nodes
      */
-    List<KeyLeaf> keyLeafs() {
-        return keyLeafs;
+    public List<KeyLeaf> keyLeafs() {
+        return ImmutableList.copyOf(keyLeafs);
     }
 
     /**
@@ -130,7 +132,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
          * @param nameSpace key laef namespace
          * @param val       value of key
          */
-        void addKeyLeaf(String name, String nameSpace, Object val) {
+        public void addKeyLeaf(String name, String nameSpace, Object val) {
             KeyLeaf keyLeaf = new KeyLeaf(name, nameSpace, val);
             keyLeafs.add(keyLeaf);
         }

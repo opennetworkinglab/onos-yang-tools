@@ -19,11 +19,12 @@ package org.onosproject.yang.model;
 /**
  * Constants used in model package.
  */
-final class ModelConstants {
-    static final String INCOMPLETE_SCHEMA_INFO = "Schema info is not complete";
-    static final String LEAF_IS_TERMINAL = "Leaf must be the terminal node";
-    static final String NON_KEY_LEAF = "Leaf list is not a key of list";
-    static final String NO_KEY_SET = "Resource Identifier is empty";
+public final class ModelConstants {
+    public static final String INCOMPLETE_SCHEMA_INFO = "Schema info is not " +
+            "complete";
+    public static final String LEAF_IS_TERMINAL = "Leaf must be the terminal node";
+    public static final String NON_KEY_LEAF = "Leaf list is not a key of list";
+    public static final String NO_KEY_SET = "Resource Identifier is empty";
 
     // Forbid construction.
     private ModelConstants() {

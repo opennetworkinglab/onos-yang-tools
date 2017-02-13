@@ -32,7 +32,7 @@ import static org.onosproject.yang.model.ModelConstants.NO_KEY_SET;
  * hierarchy to reach a resource in the instance tree.
  */
 
-public final class ResourceId {
+public class ResourceId {
 
     /**
      * List of node keys.
@@ -44,7 +44,7 @@ public final class ResourceId {
      *
      * @param builder initialized builder
      */
-    private ResourceId(Builder builder) {
+    public ResourceId(Builder builder) {
         nodeKeyList = builder.nodeKeyList;
     }
 
@@ -113,8 +113,8 @@ public final class ResourceId {
          */
         protected Object appInfo;
 
-        private List<NodeKey> nodeKeyList;
-        private NodeKey.NodeKeyBuilder curKeyBuilder = null;
+        protected List<NodeKey> nodeKeyList;
+        protected NodeKey.NodeKeyBuilder curKeyBuilder;
 
         /**
          * Creates an instance of resource identifier builder.
@@ -156,7 +156,7 @@ public final class ResourceId {
         /**
          * Validates, build and add current key.
          */
-        private void processCurKey() {
+        protected void processCurKey() {
             if (curKeyBuilder != null) {
                 if (curKeyBuilder instanceof LeafListKey.LeafListKeyBuilder) {
                     throw new ModelException(LEAF_IS_TERMINAL);

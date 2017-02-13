@@ -158,7 +158,6 @@ public class NodeKey<E extends NodeKey> implements Comparable<E>, Cloneable {
          */
         public NodeKey build() {
             checkNotNull(schemaId.name(), INCOMPLETE_SCHEMA_INFO);
-            checkNotNull(schemaId.namespace(), INCOMPLETE_SCHEMA_INFO);
             return new NodeKey(this);
         }
     }

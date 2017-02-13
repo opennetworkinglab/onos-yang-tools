@@ -35,7 +35,7 @@ import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
 /**
  * Tests the default schema context methods.
  */
-public class TestLeafSchemaContext {
+public class LeafSchemaContextTest {
 
     private static TestYangSchemaNodeProvider schemaProvider =
             new TestYangSchemaNodeProvider();

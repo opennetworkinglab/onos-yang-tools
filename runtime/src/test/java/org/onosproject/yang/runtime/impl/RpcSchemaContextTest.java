@@ -19,7 +19,7 @@ package org.onosproject.yang.runtime.impl;
 /**
  * Tests the default schema context methods.
  */
-public class TestRpcSchemaContext {
+public class RpcSchemaContextTest {
 
     //TODO : need to be updated afetr RPC implementation
 

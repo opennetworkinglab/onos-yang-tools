@@ -43,7 +43,7 @@ public final class LeafListKey extends NodeKey<LeafListKey>
      *
      * @return value maintained in the node
      */
-    Object value() {
+    public Object value() {
         return val;
     }
 
@@ -52,7 +52,7 @@ public final class LeafListKey extends NodeKey<LeafListKey>
      *
      * @return string representation of value
      */
-    String asString() {
+    public String asString() {
         return val.toString();
     }
 
@@ -115,7 +115,7 @@ public final class LeafListKey extends NodeKey<LeafListKey>
          * @param val leaf list value
          * @return builder
          */
-        LeafListKeyBuilder value(Object val) {
+        public LeafListKeyBuilder value(Object val) {
             this.val = val;
             return this;
         }
