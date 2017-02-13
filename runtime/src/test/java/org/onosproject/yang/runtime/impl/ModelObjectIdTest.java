@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.app;
+package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
 import org.onosproject.yang.gen.v1.modelobjecttest.check.Cont53;

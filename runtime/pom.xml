@@ -69,6 +69,22 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.onosproject</groupId>
+                <artifactId>onos-yang-compiler-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <yangFilesDir>src/test/resources</yangFilesDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>yang2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
