@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.schemacontext;
 
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
@@ -24,6 +24,7 @@ import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 
 import java.util.List;

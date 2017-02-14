@@ -55,6 +55,7 @@ public final class SerializerHelper {
             "NameSpace is mandatory to provide for first level node.";
     private static final String E_LEAFLIST =
             "Method is not allowed to pass multiple values for leaf-list.";
+    private static final String E_RESID = "Invalid resourceId builder.";
 
     // Name for first level child
     private static final String SLASH = "/";
@@ -74,7 +75,7 @@ public final class SerializerHelper {
             YangSerializerContext context) {
         SchemaContext cont = context.getContext();
         SchemaId id = cont.getSchemaId();
-        ExtResourceIdBldr rIdBdr = new ExtResourceIdBldr();
+        ResourceId.Builder rIdBdr = ResourceId.builder();
         rIdBdr.addBranchPointSchema(id.name(), id.namespace());
         // Adding the schema context to resource id app info.
         rIdBdr.appInfo(cont);
@@ -141,29 +142,32 @@ public final class SerializerHelper {
     public static ResourceId.Builder addToResourceId(
             ResourceId.Builder builder, String name, String namespace,
             List<String> value) throws IllegalArgumentException {
+        Object valObject;
         SchemaContext child = getChildSchemaContext(
                 (SchemaContext) builder.appInfo(), name, namespace);
         namespace = child.getSchemaId().namespace();
-        builder.appInfo(child);
         DataNode.Type childType = child.getType();
         try {
             if (childType == MULTI_INSTANCE_LEAF_VALUE_NODE) {
                 if (value.size() > 1) {
                     throw new IllegalArgumentException(errorMsg(E_LEAFLIST));
                 }
-                builder.addLeafListBranchPoint(name, namespace, value);
+                valObject = ((LeafSchemaContext) child).fromString(
+                        value.get(0));
+                builder.addLeafListBranchPoint(name, namespace, valObject);
             } else if (childType == MULTI_INSTANCE_NODE) {
+                // Adding list node.
+                String v = null;
+                builder = addToResourceId(builder, name, namespace, v);
                 Set<String> keyLeafs = ((ListSchemaContext) child)
                         .getKeyLeaf();
-                int expectedCount = keyLeafs.size();
-
                 try {
-                    checkElementCount(name, expectedCount, value.size());
+                    checkElementCount(name, keyLeafs.size(), value.size());
                 } catch (IllegalArgumentException e) {
                     throw new IllegalArgumentException(e.getMessage());
                 }
 
-                //After validation adding the key nodes under the list node.
+                // After validation adding the key nodes under the list node.
                 Iterator<String> sklIter = keyLeafs.iterator();
                 Iterator<String> kvlIter = value.iterator();
                 String keyEleName;
@@ -171,15 +175,20 @@ public final class SerializerHelper {
                 while (kvlIter.hasNext()) {
                     String val = kvlIter.next();
                     keyEleName = sklIter.next();
-                    builder.addKeyLeaf(keyEleName, namespace, val);
+                    SchemaContext keyChild = getChildSchemaContext(
+                            (SchemaContext) builder.appInfo(), keyEleName,
+                            namespace);
+                    valObject = ((LeafSchemaContext) keyChild).fromString(val);
+                    builder.addKeyLeaf(keyEleName, namespace, valObject);
                 }
             } else {
-                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
-                                                            name));
+                throw new IllegalArgumentException(
+                        errorMsg(FMT_NOT_EXIST, name));
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+        builder.appInfo(child);
         return builder;
     }
 
@@ -194,15 +203,16 @@ public final class SerializerHelper {
      */
     public static Builder initializeDataNode(ResourceId.Builder builder) {
 
-        if (!(builder instanceof ExtResourceIdBldr)) {
-            throw new IllegalArgumentException("Invalid resourceId builder.");
-        }
+        ExtResourceIdBldr rIdBldr = new ExtResourceIdBldr();
+        rIdBldr = rIdBldr.copyBuilder(rIdBldr, builder);
+        rIdBldr.appInfo(builder.appInfo());
         SchemaContext node = (SchemaContext) builder.appInfo();
         HelperContext info = new HelperContext();
         info.setResourceIdBuilder(null);
-        info.setParentResourceIdBldr((ExtResourceIdBldr) builder);
+        info.setParentResourceIdBldr(rIdBldr);
         SchemaId sId = node.getSchemaId();
-        InnerNode.Builder dBldr = InnerNode.builder(sId.name(), sId.namespace());
+        InnerNode.Builder dBldr = InnerNode.builder(
+                sId.name(), sId.namespace());
         dBldr.appInfo(info);
         return dBldr;
     }
@@ -222,13 +232,11 @@ public final class SerializerHelper {
         rId.addBranchPointSchema(sId.name(), sId.namespace());
         rId.appInfo(node);
         info.setResourceIdBuilder(rId);
-//        info.setSchemaContext(node);
         InnerNode.Builder dBlr = InnerNode.builder(sId.name(), sId.namespace());
         dBlr.type(SINGLE_INSTANCE_NODE);
         dBlr.appInfo(info);
         return dBlr;
     }
-
 
     /**
      * Adds a data node to a given data node builder.
@@ -254,7 +262,7 @@ public final class SerializerHelper {
      */
     public static Builder addDataNode(Builder builder,
                                       String name, String namespace,
-                                      String value, DataNode type) {
+                                      String value, DataNode.Type type) {
         try {
             SchemaContext node;
             ExtResourceIdBldr rIdBldr;
@@ -263,7 +271,6 @@ public final class SerializerHelper {
             ExtResourceIdBldr curBldr = info.getResourceIdBuilder();
             boolean isCreate = false;
             if (curBldr != null) {
-//                node = info.getSchemaContext();
                 rIdBldr = info.getResourceIdBuilder();
                 node = (SchemaContext) rIdBldr.appInfo();
                 isCreate = true;
@@ -275,10 +282,14 @@ public final class SerializerHelper {
                     node, name, namespace);
             DataNode.Type nodeType = childSchema.getType();
             if (type != null && !nodeType.equals(type)) {
-                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST, name));
+                throw new IllegalArgumentException(
+                        errorMsg(FMT_NOT_EXIST, name));
             }
 
+            // Updating the namespace
+            namespace = childSchema.getSchemaId().namespace();
             updateResourceId(rIdBldr, name, value, childSchema, nodeType);
+            Object valObject;
             if (isCreate) {
                 switch (nodeType) {
 
@@ -288,9 +299,21 @@ public final class SerializerHelper {
                                 .type(nodeType);
                         break;
                     case SINGLE_INSTANCE_LEAF_VALUE_NODE:
+                        valObject = ((LeafSchemaContext) childSchema)
+                                .fromString(value);
+                        if (((YangLeaf) childSchema).isKeyLeaf()) {
+                            builder = builder.addKeyLeaf(
+                                    name, namespace, valObject);
+                        }
+                        builder = builder.createChildBuilder(
+                                name, namespace, valObject).type(nodeType);
+                        break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
-                        builder = builder.createChildBuilder(name, namespace, value)
-                                .type(nodeType);
+                        valObject = ((LeafSchemaContext) childSchema)
+                                .fromString(value);
+                        builder = builder.createChildBuilder(
+                                name, namespace, valObject).type(nodeType)
+                                .addLeafListValue(valObject);
                         break;
                     default:
                         throw new IllegalArgumentException(
@@ -302,7 +325,6 @@ public final class SerializerHelper {
                 builder.type(nodeType);
                 nodeInfo = info;
             }
-//            nodeInfo.setSchemaContext(childSchema);
             nodeInfo.setResourceIdBuilder(rIdBldr);
             builder.appInfo(nodeInfo);
         } catch (IllegalArgumentException e) {
@@ -411,9 +433,9 @@ public final class SerializerHelper {
      * @param child   child schema context
      * @param type    type of data node
      */
-    private static void updateResourceId(ResourceId.Builder builder, String name,
-                                         String value, SchemaContext child,
-                                         DataNode.Type type)
+    private static void updateResourceId(
+            ResourceId.Builder builder, String name, String value,
+            SchemaContext child, DataNode.Type type)
             throws IllegalArgumentException {
 
         Object valObject;

@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.serializerhelper;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
 
 /**
  * Tests the serializer helper methods.
  */
-
-@FixMethodOrder(MethodSorters.DEFAULT)
-public class AddToDataNodeRidTest {
+public class AddToResourceIdTest {
 
     public static final String LNS = "yrt:list";
 
@@ -69,24 +66,23 @@ public class AddToDataNodeRidTest {
     String[] valA;
 
     /**
-     * Test add to data node after initializing it with resource builder.
+     * Test add to data node builder.
      */
     @Test
     public void addToDataListTest() {
 
         ResourceId.Builder rIdBlr = initializeResourceId(context);
-        rIdBlr = addToResourceId(rIdBlr, "l1", LNS, value);
-        rIdBlr = addToResourceId(rIdBlr, "c1", LNS, value);
-        dBlr = initializeDataNode(rIdBlr);
-        value = "0";
-        dBlr = addDataNode(dBlr, "l1", null, value, null);
-        info = (HelperContext) dBlr.appInfo();
-        id = getResourceId(dBlr);
+        List<String> valueSet = new LinkedList<>();
+        valueSet.add("1");
+        valueSet.add("2");
+        valueSet.add("3");
+        rIdBlr = addToResourceId(rIdBlr, "l1", LNS, valueSet);
+        ResourceId id = rIdBlr.build();
 
         //Tree validation
-        nA = new String[]{"/", "l1", "c1", "l1", ""};
-        nsA = new String[]{null, LNS, LNS, LNS, ""};
-        valA = new String[]{"0", ""};
+        nA = new String[]{"/", "l1", "k1", "k2", "k3", ""};
+        nsA = new String[]{null, LNS, LNS, LNS, LNS, ""};
+        valA = new String[]{"1", "2", "3", ""};
         validateResourceId(nA, nsA, valA, id);
     }
 }

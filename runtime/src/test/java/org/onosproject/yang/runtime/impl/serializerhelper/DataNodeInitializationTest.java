@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.serializerhelper;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
@@ -31,8 +30,6 @@ import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 /**
  * Tests the initialize data node methods in serializer helper.
  */
-
-@FixMethodOrder(MethodSorters.DEFAULT)
 public class DataNodeInitializationTest {
 
     TestYangSerializerContext context = new TestYangSerializerContext();

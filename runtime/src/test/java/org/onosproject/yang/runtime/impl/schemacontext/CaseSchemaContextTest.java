@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.schemacontext;
 
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.DefaultYangNamespace;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 
+import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafListSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
@@ -35,51 +36,49 @@ import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
 /**
  * Tests the default schema context methods.
  */
-public class LeafSchemaContextTest {
+public class CaseSchemaContextTest {
 
     private static TestYangSchemaNodeProvider schemaProvider =
             new TestYangSchemaNodeProvider();
 
-    public static final String FOODNS = "yrt:food";
+    public static final String CASENS = "yrt:choice-case";
 
     /**
-     * Checks leaf, leaf-list, choice-case data node parent context.
+     * Checks module level choice-case data node parent context.
      */
     @Test
-    public void leafSchemaContTest() throws DataModelException {
+    public void caseSchemaContTest() throws DataModelException {
 
         schemaProvider.processSchemaRegistry();
         DefaultYangModelRegistry registry = schemaProvider.registry();
-        SchemaId id = new SchemaId("food", FOODNS);
+        SchemaId id = new SchemaId("pretzel", CASENS);
+        YangLeaf leaf = (YangLeaf) registry.getChildContext(id);
+        checkLeafSchemaContext("pretzel", CASENS, "/", null, leaf);
+
+        id = new SchemaId("light", CASENS);
+        leaf = (YangLeaf) registry.getChildContext(id);
+        checkLeafSchemaContext("light", CASENS, "/", null, leaf);
+
+        id = new SchemaId("potato", CASENS);
+        YangLeafList leafList = (YangLeafList) registry.getChildContext(id);
+        checkLeafListSchemaContext("potato", CASENS, "/", null,
+                                   leafList);
+
+        id = new SchemaId("banana", CASENS);
         YangNode child = (YangNode) registry.getChildContext(id);
-        checkSchemaContext("food", FOODNS, "/", null,
-                           DataNode.Type.SINGLE_INSTANCE_NODE, child);
+        checkSchemaContext("banana", CASENS, "/", null,
+                           MULTI_INSTANCE_NODE, child);
+
+        id = new SchemaId("cold-drink", CASENS);
+        child = (YangNode) registry.getChildContext(id);
+        checkSchemaContext("cold-drink", CASENS, "/", null,
+                           SINGLE_INSTANCE_NODE, child);
 
         YangSchemaNodeIdentifier rId = new YangSchemaNodeIdentifier();
-        rId.setName("pretzel");
-        rId.setNameSpace(new DefaultYangNamespace(FOODNS));
-        YangSchemaNode leaf1 = child.getChildSchema(rId).getSchemaNode();
-        checkLeafSchemaContext("pretzel", FOODNS, "food", FOODNS,
-                               (YangLeaf) leaf1);
-
-        rId.setName("redbull");
-        leaf1 = child.getChildSchema(rId).getSchemaNode();
-        checkLeafSchemaContext("redbull", FOODNS, "food", FOODNS,
-                               (YangLeaf) leaf1);
-
-        rId.setName("kingfisher");
-        leaf1 = child.getChildSchema(rId).getSchemaNode();
-        checkLeafSchemaContext("kingfisher", FOODNS, "food", FOODNS,
-                               (YangLeaf) leaf1);
-
-        id = new SchemaId("bool", FOODNS);
-        YangLeaf leaf = (YangLeaf) registry.getChildContext(id);
-        checkLeafSchemaContext("bool", FOODNS, "/", null,
-                               leaf);
-
-        id = new SchemaId("boolean", FOODNS);
-        YangLeafList leafList = (YangLeafList) registry.getChildContext(id);
-        checkLeafListSchemaContext("boolean", FOODNS, "/", null,
+        rId.setName("flavor");
+        rId.setNameSpace(new DefaultYangNamespace(CASENS));
+        leafList = (YangLeafList) child.getChildSchema(rId).getSchemaNode();
+        checkLeafListSchemaContext("flavor", CASENS, "cold-drink", CASENS,
                                    leafList);
     }
 }

@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.serializerhelper;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
-import static org.onosproject.yang.runtime.impl.SchemaContextTest.IETFNS;
+import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
 
 /**
  * Tests the initialize resource id methods in serializer helper.
  */
-@FixMethodOrder(MethodSorters.DEFAULT)
 public class ResourceIdInitializationTest {
 
     TestYangSerializerContext context = new TestYangSerializerContext();
@@ -44,6 +43,13 @@ public class ResourceIdInitializationTest {
      * Reference for the value.
      */
     String value;
+
+    /*
+     * Reference for string array to used for resource id testing.
+     */
+    String[] nA;
+    String[] nsA;
+    String[] valA;
 
     /**
      * Checks initialize resource id.
@@ -63,5 +69,11 @@ public class ResourceIdInitializationTest {
         rIdBlr = addToResourceId(rIdBlr, "network", null, value);
         value = "network1";
         rIdBlr = addToResourceId(rIdBlr, "network-id", null, value);
+        ResourceId id = rIdBlr.build();
+
+        nA = new String[]{"/", "networks", "network", "network-id", ""};
+        nsA = new String[]{null, IETFNS, IETFNS, IETFNS, ""};
+        valA = new String[]{"network1", ""};
+        validateResourceId(nA, nsA, valA, id);
     }
 }

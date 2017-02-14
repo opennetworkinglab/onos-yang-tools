@@ -16,10 +16,14 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
+import org.onosproject.yang.model.KeyLeaf;
+import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.LeafListKey.LeafListKeyBuilder;
+import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.ModelException;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
+import org.onosproject.yang.model.SchemaId;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -51,9 +55,16 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
      */
     void traveseToParent() {
         if (curKeyBuilder != null) {
+            curKeyBuilder = null;
+        } else {
             curKeyBuilder = builders.get(builders.size() - 1);
             builders.remove(builders.size() - 1);
         }
+    }
+
+    @Override
+    public ResourceId build() {
+        return getResourceId();
     }
 
     /**
@@ -62,9 +73,9 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
      * @return resource Id
      */
     ResourceId getResourceId() {
-
-        builders.add(curKeyBuilder);
-
+        if (curKeyBuilder != null) {
+            builders.add(curKeyBuilder);
+        }
         List<NodeKey> keys = new LinkedList<>();
         for (NodeKey.NodeKeyBuilder builder : builders) {
             keys.add(builder.build());
@@ -72,5 +83,41 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
         nodeKeyList = keys;
         builders.remove(builders.size() - 1);
         return (new ResourceId(this));
+    }
+
+    /**
+     * Creates the extended resource id builder from given resource id
+     * builder.
+     *
+     * @param ridBldr extended resource id builder
+     * @param builder resource id builder
+     * @return updated extended resource id builder
+     */
+    public ExtResourceIdBldr copyBuilder(ExtResourceIdBldr ridBldr, ResourceId
+            .Builder builder) {
+        ResourceId id = builder.build();
+        SchemaId sId;
+        // Preparing the extended resource id builder from resourceId.
+        List<NodeKey> keys = id.nodeKeys();
+
+        for (NodeKey k : keys) {
+            sId = k.schemaId();
+            if (k instanceof ListKey) {
+                List<KeyLeaf> kLeaf = ((ListKey) k).keyLeafs();
+                for (KeyLeaf kl : kLeaf) {
+                    sId = kl.leafSchema();
+                    ridBldr.addKeyLeaf(sId.name(), sId.namespace(),
+                                       kl.leafValue());
+                }
+                continue;
+            } else if (k instanceof LeafListKey) {
+                sId = k.schemaId();
+                ridBldr.addLeafListBranchPoint(sId.name(), sId.namespace(),
+                                               ((LeafListKey) k).value());
+                continue;
+            }
+            ridBldr.addBranchPointSchema(sId.name(), sId.namespace());
+        }
+        return ridBldr;
     }
 }

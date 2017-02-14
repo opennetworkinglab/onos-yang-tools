@@ -34,4 +34,8 @@ module list {
                 }
             }
     }
+
+    leaf-list leaf1 {
+        type string;
+    }
 }

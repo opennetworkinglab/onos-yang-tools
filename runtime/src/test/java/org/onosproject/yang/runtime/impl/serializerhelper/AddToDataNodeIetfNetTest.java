@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.runtime.impl.serializerhelper;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.impl.SchemaContextTest.IETFNS;
+import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
 
 /**
  * Tests the serializer helper methods.
  */
-
-@FixMethodOrder(MethodSorters.DEFAULT)
 public class AddToDataNodeIetfNetTest {
 
     TestYangSerializerContext context = new TestYangSerializerContext();
