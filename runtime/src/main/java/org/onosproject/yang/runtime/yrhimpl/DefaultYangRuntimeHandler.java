@@ -20,13 +20,14 @@ import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
 import org.onosproject.yang.runtime.DefaultYangSerializerContext;
+import org.onosproject.yang.runtime.RuntimeContext;
 import org.onosproject.yang.runtime.YangRuntimeException;
 import org.onosproject.yang.runtime.YangRuntimeService;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
 import org.onosproject.yang.runtime.YangSerializerRegistry;
-import org.onosproject.yang.runtime.ysrimpl.DefaultYangSerializerRegistry;
 import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
+import org.onosproject.yang.runtime.ysrimpl.DefaultYangSerializerRegistry;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -41,7 +42,6 @@ public class DefaultYangRuntimeHandler implements YangRuntimeService {
     private static final String NR = " is not registered.";
     private YangSerializerRegistry registry;
     private SchemaContext rootContext;
-    private YangSerializerContext serializerContext;
 
     /**
      * Creates a new YANG runtime manager.
@@ -53,19 +53,24 @@ public class DefaultYangRuntimeHandler implements YangRuntimeService {
                                      SchemaContext c) {
         registry = r;
         rootContext = c;
-        serializerContext = new DefaultYangSerializerContext(rootContext);
     }
 
     @Override
-    public CompositeData decode(CompositeStream external, String dataFormat) {
-        YangSerializer ys = getRegisteredSerializer(dataFormat);
-        return ys.decode(external, serializerContext);
+    public CompositeData decode(CompositeStream external, RuntimeContext c) {
+        YangSerializer ys = getRegisteredSerializer(c.getDataFormat());
+        YangSerializerContext sc =
+                new DefaultYangSerializerContext(rootContext,
+                                                 c.getProtocolAnnotations());
+        return ys.decode(external, sc);
     }
 
     @Override
-    public CompositeStream encode(CompositeData internal, String dataFormat) {
-        YangSerializer ys = getRegisteredSerializer(dataFormat);
-        return ys.encode(internal, serializerContext);
+    public CompositeStream encode(CompositeData internal, RuntimeContext c) {
+        YangSerializer ys = getRegisteredSerializer(c.getDataFormat());
+        YangSerializerContext sc =
+                new DefaultYangSerializerContext(rootContext,
+                                                 c.getProtocolAnnotations());
+        return ys.encode(internal, sc);
     }
 
     /**

@@ -19,6 +19,7 @@ package org.onosproject.yang.runtime.impl;
 import org.junit.Test;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
+import org.onosproject.yang.runtime.DefaultRuntimeContext;
 import org.onosproject.yang.runtime.YangRuntimeService;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.yrhimpl.DefaultYangRuntimeHandler;
@@ -51,11 +52,13 @@ public class RuntimeHandlerTest {
     @Test
     public void validateRuntimeHandler() {
         register(XML);
-        CompositeData dd = s.decode(null, XML);
+        CompositeData dd = s.decode(null, DefaultRuntimeContext.builder()
+                .setDataFormat(XML).build());
         assertThat(TESTSTREAM, is(dd.resourceData().resourceId().nodeKeys()
                                           .get(0).schemaId().name()));
 
-        CompositeStream cs = s.encode(null, XML);
+        CompositeStream cs = s.encode(null, DefaultRuntimeContext.builder()
+                .setDataFormat(XML).build());
         assertThat(TESTSTREAM, is(cs.resourceId()));
     }
 
@@ -65,7 +68,8 @@ public class RuntimeHandlerTest {
     @Test(expected = RuntimeException.class)
     public void validateRuntimeHandlerError() throws RuntimeException {
         register(XML);
-        CompositeData dd = s.decode(null, JSON);
+        CompositeData dd = s.decode(null, DefaultRuntimeContext.builder()
+                .setDataFormat(JSON).build());
         assertThat(TESTSTREAM, is(dd.resourceData().resourceId().nodeKeys()
                                           .get(0).schemaId().name()));
     }

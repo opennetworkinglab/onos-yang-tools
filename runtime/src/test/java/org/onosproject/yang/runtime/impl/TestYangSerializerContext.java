@@ -17,8 +17,11 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.runtime.Annotation;
 import org.onosproject.yang.runtime.YangSerializerContext;
 import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
+
+import java.util.List;
 
 /**
  * Tests the default schema context provider methods.
@@ -34,5 +37,10 @@ public class TestYangSerializerContext implements YangSerializerContext {
         schemaProvider.processSchemaRegistry();
         DefaultYangModelRegistry registry = schemaProvider.registry();
         return registry;
+    }
+
+    @Override
+    public List<Annotation> getProtocolAnnotations() {
+        return null;
     }
 }

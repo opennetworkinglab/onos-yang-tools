@@ -37,14 +37,14 @@ public interface YangRuntimeService {
      * which will be reported back to protocol in output. Produced
      * annotations will be in order of pre-order traversal.
      *
-     * @param external   composite input stream carrying external
-     *                   representation of configuration data
-     * @param dataFormat data format of the provided external representation
+     * @param external composite input stream carrying external
+     *                 representation of configuration data
+     * @param context  additional YANG runtime context information
      * @return in-memory representation of configuration data with decorated
      * node information
      * @throws YangRuntimeException when fails to perform decode operation
      */
-    CompositeData decode(CompositeStream external, String dataFormat);
+    CompositeData decode(CompositeStream external, RuntimeContext context);
 
     /**
      * Encodes the internal in-memory representation of a configuration model
@@ -65,11 +65,11 @@ public interface YangRuntimeService {
      * decorations for the node. These decoration should be in pre-order
      * traversal order.
      *
-     * @param internal   in-memory representation of configuration data
-     * @param dataFormat expected data format of the external representation
+     * @param internal in-memory representation of configuration data
+     * @param context  additional YANG runtime context information
      * @return input stream carrying external representation of
      * configuration data
      * @throws YangRuntimeException when fails to perform encode operation
      */
-    CompositeStream encode(CompositeData internal, String dataFormat);
+    CompositeStream encode(CompositeData internal, RuntimeContext context);
 }

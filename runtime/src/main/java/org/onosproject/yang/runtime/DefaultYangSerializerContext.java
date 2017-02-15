@@ -18,24 +18,34 @@ package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.model.SchemaContext;
 
+import java.util.List;
+
 /**
  * Represents YANG serializer context implementation.
  */
 public class DefaultYangSerializerContext implements YangSerializerContext {
 
     private SchemaContext rootContext;
+    private List<Annotation> annotations;
 
     /**
      * Creates an instance of YANG serializer context.
      *
      * @param c root's schema context
+     * @param a dependent annotations
      */
-    public DefaultYangSerializerContext(SchemaContext c) {
+    public DefaultYangSerializerContext(SchemaContext c, List<Annotation> a) {
         rootContext = c;
+        annotations = a;
     }
 
     @Override
     public SchemaContext getContext() {
         return null;
+    }
+
+    @Override
+    public List<Annotation> getProtocolAnnotations() {
+        return annotations;
     }
 }

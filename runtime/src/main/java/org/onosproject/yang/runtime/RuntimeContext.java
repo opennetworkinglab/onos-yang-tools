@@ -16,8 +16,6 @@
 
 package org.onosproject.yang.runtime;
 
-import org.onosproject.yang.model.SchemaContext;
-
 import java.util.List;
 
 /*
@@ -48,16 +46,17 @@ import java.util.List;
  */
 
 /**
- * Representation of a context for decoding YANG models via serializers.
+ * Abstraction of an entity that is representation of YANG runtime service
+ * context information.
  */
-public interface YangSerializerContext {
+public interface RuntimeContext {
 
     /**
-     * Returns schema context of root node "/".
+     * Returns data format.
      *
-     * @return schema context provider
+     * @return data format
      */
-    SchemaContext getContext();
+    String getDataFormat();
 
     /**
      * Returns dependent annotations which are present as a part of protocol
@@ -67,4 +66,33 @@ public interface YangSerializerContext {
      * @return list of annotations
      */
     List<Annotation> getProtocolAnnotations();
+
+    /**
+     * Abstraction of runtime context builder.
+     */
+    interface Builder {
+
+        /**
+         * Sets data format.
+         *
+         * @param dataFormat data format
+         * @return builder
+         */
+        Builder setDataFormat(String dataFormat);
+
+        /**
+         * Adds an annotation.
+         *
+         * @param annotation annotation
+         * @return builder
+         */
+        Builder addAnnotation(Annotation annotation);
+
+        /**
+         * Builds an instance of runtime context.
+         *
+         * @return runtime context
+         */
+        RuntimeContext build();
+    }
 }
