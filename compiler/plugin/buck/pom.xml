@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-compiler-plugin</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.12-b3</version>
     </parent>
 
     <artifactId>onos-yang-compiler-buck-plugin</artifactId>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-tool</artifactId>
-            <version>1.12-SNAPSHOT</version>
+            <version>1.12-b3</version>
         </dependency>
     </dependencies>
 
