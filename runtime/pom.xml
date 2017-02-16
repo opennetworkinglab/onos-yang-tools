@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-tools</artifactId>
-        <version>1.12-b3</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>onos-yang-runtime</artifactId>
@@ -42,22 +42,22 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-model</artifactId>
-            <version>1.12-b3</version>
+            <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-api</artifactId>
-            <version>1.12-b3</version>
+            <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-datamodel</artifactId>
-            <version>1.12-b3</version>
+            <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-plugin-utils</artifactId>
-            <version>1.12-b3</version>
+            <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
