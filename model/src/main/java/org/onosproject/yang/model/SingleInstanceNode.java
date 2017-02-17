@@ -21,7 +21,7 @@ import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 /**
  * Represents a single instance object.
  */
-public class SingleInstanceNode<T extends ModelObject> extends AtomicPath {
+public class SingleInstanceNode<T extends InnerModelObject> extends AtomicPath {
 
     private Class<T> containerClass;
 

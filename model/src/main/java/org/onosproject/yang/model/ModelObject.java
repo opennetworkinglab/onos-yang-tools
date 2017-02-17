@@ -16,59 +16,45 @@
 
 package org.onosproject.yang.model;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 /**
- * Abstraction of an entity that provides common basis for all POJOs which are
- * generated from a YANG model.
+ * Abstraction of an entity that provides common basis to specify atomic and
+ * non atomic model.
  */
 public abstract class ModelObject {
 
-    private ConcurrentMap<Class<? extends ModelObject>, ModelObject> augments =
-            new ConcurrentHashMap<>();
+    /*
+ * Represents type of node in data store.
+ */
+    public enum ModelObjectType {
+
+        /**
+         * Atomic node.
+         */
+        ATOMIC,
+
+        /**
+         * Non atomic node.
+         */
+        NON_ATOMIC
+    }
+
+    private ModelObjectType modelObjectType;
 
     /**
-     * Adds the specified augmentation to this model object.
+     * Creates an instance of model object.
      *
-     * @param obj model object of augmentation
+     * @param t type of model object
      */
-    public void addAugmentation(ModelObject obj) {
-        augments.put(obj.getClass(), obj);
+    protected ModelObject(ModelObjectType t) {
+        modelObjectType = t;
     }
 
     /**
-     * Removes the specified augmentation to this model object.
+     * Returns type of model object.
      *
-     * @param obj model object of augmentation
+     * @return type
      */
-    public void removeAugmentation(ModelObject obj) {
-        augments.remove(obj.getClass());
+    ModelObjectType getModelObjectType() {
+        return modelObjectType;
     }
-
-    /**
-     * Returns the map of augmentations available to this model object.
-     *
-     * @return map of augmentations
-     */
-    public Map<Class<? extends ModelObject>, ModelObject> augmentations() {
-        return ImmutableMap.copyOf(augments);
-    }
-
-    /**
-     * Returns the augmentation for to a given augmentation class.
-     *
-     * @param c   augmentation class
-     * @param <T> augmentation class type
-     * @return augmentation object if available, null otherwise
-     */
-    public <T extends ModelObject> T augmentation(Class<T> c) {
-        return (T) augments.get(c);
-    }
-
-    // TODO analyze if some more common information of generated code like
-    // augment which needs to be moved to base ModelObject.
 }

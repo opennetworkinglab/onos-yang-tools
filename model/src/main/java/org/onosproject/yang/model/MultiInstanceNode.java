@@ -21,7 +21,7 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 /**
  * Represents a multi instance object.
  */
-public class MultiInstanceNode<T extends ModelObject, K extends KeyInfo>
+public class MultiInstanceNode<T extends InnerModelObject, K extends KeyInfo>
         extends AtomicPath {
 
     private Class<T> listClass;

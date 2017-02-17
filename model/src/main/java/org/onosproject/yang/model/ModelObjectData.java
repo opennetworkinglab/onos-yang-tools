@@ -14,58 +14,56 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime;
-
-import org.onosproject.yang.model.DataNode;
-import org.onosproject.yang.model.ResourceId;
+package org.onosproject.yang.model;
 
 import java.util.List;
 
 /**
- * Abstraction of an entity that is representation of resource data.
+ * Abstraction of an entity that is composition of model object identifier
+ * and its data.
  */
-public interface ResourceData {
+public interface ModelObjectData {
 
     /**
-     * Returns list of data nodes.
+     * Returns model objects.
      *
-     * @return list of data nodes
+     * @return model objects
      */
-    List<DataNode> dataNodes();
+    List<ModelObject> modelObjects();
 
     /**
-     * Returns resource identifier.
+     * Returns module object identifier.
      *
-     * @return resource identifier
+     * @return identifier
      */
-    ResourceId resourceId();
+    ModelObjectId identifier();
 
     /**
-     * Abstraction of an entity that represents builder of composite data.
+     * Represents builder of composite model data.
      */
     interface Builder {
 
         /**
-         * Adds a data node.
+         * Adds a model object.
          *
-         * @param node data node
+         * @param o model object to be added
          * @return builder
          */
-        Builder addDataNode(DataNode node);
+        Builder addModelObject(ModelObject o);
 
         /**
-         * Sets resource identifier.
+         * Sets module object identifier.
          *
-         * @param identifier resource identifier
+         * @param id identifier
          * @return builder
          */
-        Builder resourceId(ResourceId identifier);
+        Builder identifer(ModelObjectId id);
 
         /**
-         * Builds an instance of resource data.
+         * Builds an instance of model object data.
          *
-         * @return resource data
+         * @return model object data
          */
-        ResourceData build();
+        ModelObjectData build();
     }
 }

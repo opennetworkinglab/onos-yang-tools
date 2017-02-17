@@ -98,7 +98,7 @@ public final class ModelObjectId {
          * @param <T>       generated java class which extends model object
          * @return updated builder pointing to the specified schema location
          */
-        public <T extends ModelObject> Builder addChild(Class<T> container) {
+        public <T extends InnerModelObject> Builder addChild(Class<T> container) {
             atomicPathList.add(new SingleInstanceNode<>(container));
             return this;
         }
@@ -113,7 +113,7 @@ public final class ModelObjectId {
          *             identify the list
          * @return updated builder pointing to the specified schema location
          */
-        public <T extends ModelObject & MultiInstanceObject<K>,
+        public <T extends InnerModelObject & MultiInstanceObject<K>,
                 K extends KeyInfo<T>> Builder addChild(Class<T> list, K key) {
             atomicPathList.add(new MultiInstanceNode<>(list, key));
             return this;

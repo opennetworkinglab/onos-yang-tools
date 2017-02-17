@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.runtime;
 
+import org.onosproject.yang.model.ResourceData;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;

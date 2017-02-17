@@ -17,11 +17,11 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.AnnotatedNodeInfo;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
-import org.onosproject.yang.runtime.ResourceData;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
 

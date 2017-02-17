@@ -23,21 +23,25 @@ package org.onosproject.yang.model;
 public interface ModelConverter {
 
     /**
-     * Produces a POJO of the specified type, initialized and backed by
-     * the specified data node.
+     * Produces a POJO of the specified type.
+     * <p>
+     * Resource identifier will be converted to model object identifier and
+     * list of data nodes will be converted to list of model objects.
      *
-     * @param node data node
-     * @param <T>  type of model object
-     * @return POJO of specified data node
+     * @param data resource data
+     * @return model object data of specified resource data
      */
-    <T extends ModelObject> T createModel(DataNode node);
+    ModelObjectData createModel(ResourceData data);
 
     /**
      * Produces an immutable tree structure rooted at the returned DataNode
      * using the supplied model POJO object.
+     * <p>
+     * Model object identifier will be converted to resource identfier and
+     * list of model objects will be converted to list of data nodes.
      *
-     * @param obj model object
-     * @return data node corresponds to model object
+     * @param modelData model object data
+     * @return resource data corresponds to model object
      */
-    DataNode createDataNode(ModelObject obj);
+    ResourceData createDataNode(ModelObjectData modelData);
 }

@@ -1750,7 +1750,7 @@ public final class UtilConstants {
     /**
      * Static param for model object.
      */
-    public static final String MODEL_OBJECT = "ModelObject";
+    public static final String MODEL_OBJECT = "InnerModelObject";
 
     /**
      * Static param for add augmentation.

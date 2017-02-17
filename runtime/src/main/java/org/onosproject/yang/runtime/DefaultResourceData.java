@@ -17,6 +17,7 @@
 package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 
 import java.util.LinkedList;

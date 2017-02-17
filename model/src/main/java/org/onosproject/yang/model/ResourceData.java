@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime;
-
-import org.onosproject.yang.model.ResourceData;
+package org.onosproject.yang.model;
 
 import java.util.List;
 
 /**
- * Abstraction of an entity that is composition of resource data and
- * associated annotations information.
+ * Abstraction of an entity that is representation of resource data.
  */
-public interface CompositeData {
+public interface ResourceData {
 
     /**
-     * Returns resource node.
+     * Returns list of data nodes.
      *
-     * @return resource node
+     * @return list of data nodes
      */
-    ResourceData resourceData();
+    List<DataNode> dataNodes();
 
     /**
-     * Returns annotated nodes information.
+     * Returns resource identifier.
      *
-     * @return annotated nodes information
+     * @return resource identifier
      */
-    List<AnnotatedNodeInfo> annotatedNodesInfo();
+    ResourceId resourceId();
 
     /**
      * Abstraction of an entity that represents builder of composite data.
@@ -46,26 +43,26 @@ public interface CompositeData {
     interface Builder {
 
         /**
-         * Sets resource node.
+         * Adds a data node.
          *
-         * @param node resource node
+         * @param node data node
          * @return builder
          */
-        Builder resourceData(ResourceData node);
+        Builder addDataNode(DataNode node);
 
         /**
-         * Adds information about annotated node.
+         * Sets resource identifier.
          *
-         * @param info annotated node information
+         * @param identifier resource identifier
          * @return builder
          */
-        Builder addAnnotatedNodeInfo(AnnotatedNodeInfo info);
+        Builder resourceId(ResourceId identifier);
 
         /**
-         * Builds an instance of composite data.
+         * Builds an instance of resource data.
          *
-         * @return composite data
+         * @return resource data
          */
-        CompositeData build();
+        ResourceData build();
     }
 }
