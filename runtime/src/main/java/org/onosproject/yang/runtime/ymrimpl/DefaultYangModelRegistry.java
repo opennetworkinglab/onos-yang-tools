@@ -54,9 +54,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Represents YANG model registry implementation.
  */
-public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstanceNodeContext {
+public class DefaultYangModelRegistry implements YangModelRegistry,
+        SingleInstanceNodeContext {
 
-    private static final Logger log = getLogger(DefaultYangModelRegistry.class);
+    private final Logger log = getLogger(getClass());
     private static final String AT = "@";
 
     /*
@@ -181,9 +182,9 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
                                          "unregistered.", sClass
                                          .getSimpleName(), param);
                     } else {
-                        throw new RuntimeException(
-                                sClass.getSimpleName() +
-                                        " service was not registered.");
+                        log.error("Either {} service was not registered or " +
+                                          "already unregistered from model " +
+                                          "registry.", sClass.getSimpleName());
                     }
                 }
             } else {
@@ -277,12 +278,16 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
      * @return registered class
      */
     public Class<?> getRegisteredClass(YangSchemaNode schemaNode) {
-        String interfaceName = getInterfaceClassName(schemaNode);
-        String serviceName = getServiceName(schemaNode);
-        Class<?> regClass = registerClassStore.get(serviceName);
-        if (regClass == null) {
-            regClass = registerClassStore.get(interfaceName);
+        Class<?> regClass = null;
+        if (schemaNode != null) {
+            String interfaceName = getInterfaceClassName(schemaNode);
+            String serviceName = getServiceName(schemaNode);
+            regClass = registerClassStore.get(serviceName);
+            if (regClass == null) {
+                regClass = registerClassStore.get(interfaceName);
+            }
         }
+        log.error("{} node should not be null.");
         return regClass;
     }
 
@@ -476,7 +481,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
      *
      * @param nodes set of module/submodule nodes
      */
-    public void updateChildContext(Set<YangNode> nodes) {
+    private void updateChildContext(Set<YangNode> nodes) {
         // Preparing schema id for logical node with name "/"
         for (YangNode node : nodes) {
             node.setLeafRootContext(this);
@@ -513,7 +518,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
      *
      * @param curNode choice node
      */
-    public void updateSchemaContextForChoiceChild(YangNode curNode) {
+    private void updateSchemaContextForChoiceChild(YangNode curNode) {
         YangNode child = curNode.getChild();
         // Setting the parent context for case
         while (child != null) {
@@ -527,7 +532,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
      *
      * @param curNode case node
      */
-    public void updateSchemaContextForCaseChild(YangNode curNode) {
+    private void updateSchemaContextForCaseChild(YangNode curNode) {
         curNode.setLeafRootContext(this);
         YangNode child = curNode.getChild();
         updateContextForChoiceCase(child);
@@ -538,8 +543,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry, SingleInstan
 
         checkNotNull(schemaId);
         if (schemaId.namespace() == null) {
-            log.error("node with {} namespace not found.",
-                      schemaId.namespace());
+            log.error("node with {} namespace not found.", schemaId.namespace());
         }
 
         String namespace = schemaId.namespace();

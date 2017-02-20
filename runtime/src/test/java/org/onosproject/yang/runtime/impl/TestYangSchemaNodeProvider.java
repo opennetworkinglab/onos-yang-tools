@@ -29,6 +29,7 @@ import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +43,6 @@ import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getInterfac
 /**
  * Represents mock bundle context. provides bundle context for YSR to do unit
  * testing.
- * //TODO: add unreg ut.
  */
 public class TestYangSchemaNodeProvider {
 
@@ -70,38 +70,60 @@ public class TestYangSchemaNodeProvider {
             //Need to deserialize generated meta data file for unit tests.
             Set<YangNode> appNode = deSerializeDataModel(META_PATH);
             nodes.addAll(appNode);
-
-            //Process loading class file.
-            String appName;
-            ClassLoader classLoader = TestYangSchemaNodeProvider.class.getClassLoader();
-            for (YangSchemaNode node : nodes) {
-
-                //If service class is not generated then use
-                // interface file to load this class.
-                appName = getInterfaceClassName(node);
-                Class<?> cls;
-                try {
-                    cls = classLoader.loadClass(appName);
-                } catch (ClassNotFoundException e) {
-                    continue;
-                }
-
-                //Create model registration param.
-                ModelRegistrationParam.Builder b =
-                        DefaultModelRegistrationParam.builder();
-
-                //create a new YANG model
-                YangModel model = processYangModel(META_PATH, nodes);
-                //set YANG model
-                b.setYangModel(model);
-                //generate app info.
-                AppModuleInfo info = new DefaultAppModuleInfo(cls, null);
-                b.addAppModuleInfo(processModuleId((YangNode) node), info);
-                reg.registerModel(b.build());
-            }
+            reg.registerModel(prepareParam(nodes));
             deleteDirectory(TEMP_FOLDER_PATH);
         } catch (IOException e) {
         }
+    }
+
+    /**
+     * Unregister given nodes from runtime service.
+     *
+     * @param nodes list of nodes
+     */
+    public void unRegister(List<YangNode> nodes) {
+        reg.unregisterModel(prepareParam(nodes));
+    }
+
+    /**
+     * Prepares model registration parameter.
+     *
+     * @param nodes list of nodes
+     * @return model registration parameter
+     */
+    private ModelRegistrationParam prepareParam(List<YangNode> nodes) {
+        //Process loading class file.
+        String appName;
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        //Create model registration param.
+        ModelRegistrationParam.Builder b =
+                DefaultModelRegistrationParam.builder();
+
+        //create a new YANG model
+        YangModel model = processYangModel(META_PATH, nodes);
+        //set YANG model
+        b.setYangModel(model);
+
+        Iterator<YangNode> it = nodes.iterator();
+        while (it.hasNext()) {
+            YangSchemaNode node = it.next();
+
+            //If service class is not generated then use
+            // interface file to load this class.
+            appName = getInterfaceClassName(node);
+            Class<?> cls;
+            try {
+                cls = classLoader.loadClass(appName);
+            } catch (ClassNotFoundException e) {
+                continue;
+            }
+
+            //generate app info.
+            AppModuleInfo info = new DefaultAppModuleInfo(cls, null);
+            b.addAppModuleInfo(processModuleId((YangNode) node), info);
+        }
+        return b.build();
     }
 
     /**

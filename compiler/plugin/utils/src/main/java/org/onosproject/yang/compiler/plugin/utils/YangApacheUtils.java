@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -104,7 +105,9 @@ public final class YangApacheUtils {
                                              List<YangNode> curNodes) {
         DefaultYangModel model = new DefaultYangModel();
         YangModuleId id;
-        for (YangSchemaNode node : curNodes) {
+        Iterator<YangNode> it = curNodes.iterator();
+        while (it.hasNext()) {
+            YangSchemaNode node = it.next();
             id = processModuleId((YangNode) node);
             org.onosproject.yang.YangModule module =
                     new DefaultYangModule(id, get(node.getFileName()), get(path));
