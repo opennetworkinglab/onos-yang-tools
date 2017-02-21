@@ -22,11 +22,13 @@ import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.helperutils.HelperContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
 
 /**
@@ -75,15 +77,19 @@ public class AddToDataNodeRidTest {
         rIdBlr = addToResourceId(rIdBlr, "l1", LNS, value);
         rIdBlr = addToResourceId(rIdBlr, "c1", LNS, value);
         dBlr = initializeDataNode(rIdBlr);
-        value = "0";
-        dBlr = addDataNode(dBlr, "l1", null, value, null);
+        value = null;
+        dBlr = addDataNode(dBlr, "leaf_c1", null, value, null);
         info = (HelperContext) dBlr.appInfo();
         id = getResourceId(dBlr);
 
         //Tree validation
-        nA = new String[]{"/", "l1", "c1", "l1", ""};
-        nsA = new String[]{null, LNS, LNS, LNS, ""};
-        valA = new String[]{"0", ""};
+        nA = new String[]{"/", "l1", "c1", "leaf_c1"};
+        nsA = new String[]{null, LNS, LNS, LNS};
+        valA = new String[]{null};
         validateResourceId(nA, nsA, valA, id);
+
+        DataNode node = dBlr.build();
+        validateDataNode(node, "leaf_c1", LNS, SINGLE_INSTANCE_LEAF_VALUE_NODE,
+                         false, null);
     }
 }

@@ -196,7 +196,7 @@ public class ResourceId {
             }
             leafListKeyBuilder = new LeafListKey.LeafListKeyBuilder()
                     .schemaId(name, nameSpace).value(val);
-
+            processCurKey();
             curKeyBuilder = leafListKeyBuilder;
             return this;
         }

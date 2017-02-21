@@ -66,7 +66,7 @@ public class AddToResourceIdTest {
     String[] valA;
 
     /**
-     * Test add to data node builder.
+     * Test add to resource id with all list key.
      */
     @Test
     public void addToDataListTest() {
@@ -80,9 +80,27 @@ public class AddToResourceIdTest {
         ResourceId id = rIdBlr.build();
 
         //Tree validation
-        nA = new String[]{"/", "l1", "k1", "k2", "k3", ""};
-        nsA = new String[]{null, LNS, LNS, LNS, LNS, ""};
-        valA = new String[]{"1", "2", "3", ""};
+        nA = new String[]{"/", "l1", "k1", "k2", "k3"};
+        nsA = new String[]{null, LNS, LNS, LNS, LNS};
+        valA = new String[]{"1", "2", "3"};
+        validateResourceId(nA, nsA, valA, id);
+    }
+
+    /**
+     * Test add to resource id without any key.
+     */
+    @Test
+    public void addToDataList1Test() {
+
+        ResourceId.Builder rIdBlr = initializeResourceId(context);
+        List<String> valueSet = null;
+        rIdBlr = addToResourceId(rIdBlr, "l1", LNS, valueSet);
+        ResourceId id = rIdBlr.build();
+
+        //Tree validation
+        nA = new String[]{"/", "l1"};
+        nsA = new String[]{null, LNS};
+        valA = new String[]{};
         validateResourceId(nA, nsA, valA, id);
     }
 }

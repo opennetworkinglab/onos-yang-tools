@@ -23,9 +23,9 @@ import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
-import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
+import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 
 /**
  * Tests the initialize resource id methods in serializer helper.
@@ -71,9 +71,9 @@ public class ResourceIdInitializationTest {
         rIdBlr = addToResourceId(rIdBlr, "network-id", null, value);
         ResourceId id = rIdBlr.build();
 
-        nA = new String[]{"/", "networks", "network", "network-id", ""};
-        nsA = new String[]{null, IETFNS, IETFNS, IETFNS, ""};
-        valA = new String[]{"network1", ""};
+        nA = new String[]{"/", "networks", "network", "network-id"};
+        nsA = new String[]{null, IETFNS, IETFNS, IETFNS};
+        valA = new String[]{"network1"};
         validateResourceId(nA, nsA, valA, id);
     }
 }

@@ -29,7 +29,9 @@ import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.runtime.helperutils.DataNodeListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -38,13 +40,45 @@ import static org.junit.Assert.assertNull;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.runtime.helperutils.DefaultDataNodeWalker.walk;
 
-public final class TestUtils {
+public final class TestUtils implements DataNodeListener {
 
     /**
      * Restricts creation of test utils instance.
      */
     private TestUtils() {
+    }
+
+    public static final String PERIOD = ".";
+
+    // Logger list is used for walker testing.
+    private static final List<String> LOGGER = new ArrayList<>();
+
+    @Override
+    public void enterDataNode(DataNode node) {
+        LOGGER.add("Entry Node is " + node.key().schemaId().name() + PERIOD);
+    }
+
+    @Override
+    public void exitDataNode(DataNode node) {
+        LOGGER.add("Exit Node is " + node.key().schemaId().name() + PERIOD);
+    }
+
+    /**
+     * Returns the LOGGER with log for testing the YDT walker.
+     *
+     * @return list of logs
+     */
+    public static List<String> getLogger() {
+        return LOGGER;
+    }
+
+    /**
+     * Clear the LOGGER array.
+     */
+    public static void resetLogger() {
+        LOGGER.clear();
     }
 
     /**
@@ -135,7 +169,12 @@ public final class TestUtils {
                     j++;
                 }
             } else if (k instanceof LeafListKey) {
-                val = ((LeafListKey) k).value().toString();
+                if (((LeafListKey) k).value() == null) {
+                    assertNull(valA[j]);
+                    val = null;
+                } else {
+                    val = ((LeafListKey) k).value().toString();
+                }
             }
             if (val != null) {
                 assertEquals(val, valA[j]);
@@ -162,15 +201,19 @@ public final class TestUtils {
         assertEquals(id.name(), n);
         assertEquals(id.namespace(), ns);
         if (node instanceof InnerNode) {
-            assertEquals(((InnerNode) node).type(), type);
+            assertEquals(node.type(), type);
             if (isChild) {
                 assertNotNull(((InnerNode) node).childNodes());
             } else {
                 assertNull(((InnerNode) node).childNodes());
             }
         } else {
-            assertEquals(((LeafNode) node).type(), type);
-            assertEquals(((LeafNode) node).value().toString(), value);
+            assertEquals(node.type(), type);
+            if (((LeafNode) node).value() == null) {
+                assertNull(value);
+            } else {
+                assertEquals(((LeafNode) node).value().toString(), value);
+            }
         }
     }
 
@@ -188,5 +231,23 @@ public final class TestUtils {
         assertEquals(id.name(), n);
         assertEquals(id.namespace(), ns);
         assertEquals(key.leafValue().toString(), v);
+    }
+
+    /**
+     * Walks in the given built data tree and validates it.
+     */
+    public static void walkINTree(DataNode node,
+                                  String[] expected) {
+        resetLogger();
+
+        TestUtils utils = new TestUtils();
+        // Assign root node as starting node to walk the whole tree.
+        walk(utils, node);
+        // Logger list is used for walker testing.
+        List<String> logger = getLogger();
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], logger.get(i));
+        }
     }
 }

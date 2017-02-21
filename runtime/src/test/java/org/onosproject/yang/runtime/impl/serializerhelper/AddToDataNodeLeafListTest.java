@@ -19,29 +19,26 @@ package org.onosproject.yang.runtime.impl.serializerhelper;
 import org.junit.Test;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.helperutils.HelperContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
-import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
+import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
-import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
+import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
 
 /**
- * Tests the initialize data node methods in serializer helper.
+ * Tests the serializer helper methods.
  */
-public class DataNodeInitializationTest {
+public class AddToDataNodeLeafListTest {
+
+    public static final String LNS = "yrt:list";
 
     TestYangSerializerContext context = new TestYangSerializerContext();
-
-    /*
-     * Reference for resource id builder.
-     */
-    ResourceId.Builder rIdBlr;
 
     /*
      * Reference for data node info.
@@ -58,6 +55,10 @@ public class DataNodeInitializationTest {
      */
     ResourceId id;
 
+    /*
+     * Reference for the value.
+     */
+    String value;
 
     /*
      * Reference for string array to used for resource id testing.
@@ -66,42 +67,33 @@ public class DataNodeInitializationTest {
     String[] nsA;
     String[] valA;
 
-    /**
-     * Checks initialize data node using context.
-     */
-    @Test
-    public void initializeDataNodeTest() {
-
-        dBlr = initializeDataNode(context);
-        info = (HelperContext) dBlr.appInfo();
-        checkRootLevelContext((SchemaContext) info.getResourceIdBuilder()
-                .appInfo());
-        id = getResourceId(dBlr);
-        nA = new String[]{"/"};
-        nsA = new String[]{null};
-        valA = new String[]{};
-        validateResourceId(nA, nsA, valA, id);
-        validateDataNode(dBlr.build(), "/", null,
-                         SINGLE_INSTANCE_NODE, true, null);
-    }
+    private static final String[] EXPECTED = {
+            "Entry Node is leaf1.",
+            "Exit Node is leaf1."
+    };
 
     /**
-     * Checks initialize data node using resource id.
+     * Test add to data node after initializing it with resource builder.
      */
     @Test
-    public void initializeDataNodeRIdTest() {
+    public void addToDataLeafListTest() {
 
-        rIdBlr = initializeResourceId(context);
+        ResourceId.Builder rIdBlr = initializeResourceId(context);
         dBlr = initializeDataNode(rIdBlr);
+        value = "0";
+        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
         info = (HelperContext) dBlr.appInfo();
-        checkRootLevelContext((SchemaContext) info.getParentResourceIdBldr()
-                .appInfo());
         id = getResourceId(dBlr);
-        nA = new String[]{"/"};
-        nsA = new String[]{null};
-        valA = new String[]{};
+
+        //Tree validation
+        nA = new String[]{"/", "leaf1"};
+        nsA = new String[]{null, LNS};
+        valA = new String[]{"0"};
         validateResourceId(nA, nsA, valA, id);
-        validateDataNode(dBlr.build(), "/", null,
-                         SINGLE_INSTANCE_NODE, true, null);
+
+        DataNode node = dBlr.build();
+        validateDataNode(node, "leaf1", LNS, MULTI_INSTANCE_LEAF_VALUE_NODE,
+                         false, "0");
+        walkINTree(node, EXPECTED);
     }
 }

@@ -52,7 +52,7 @@ public class ResourceIdNegative3Test {
         valueSet.add("2");
         boolean isExpOccurred = false;
         try {
-            rIdBlr = addToResourceId(rIdBlr, "l1", LNS, valueSet);
+            addToResourceId(rIdBlr, "l1", LNS, valueSet);
         } catch (IllegalArgumentException e) {
             isExpOccurred = true;
             assertEquals(e.getMessage(), E_TOO_FEW);

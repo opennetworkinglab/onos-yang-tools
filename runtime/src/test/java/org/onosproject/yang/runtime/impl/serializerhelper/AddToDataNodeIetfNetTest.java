@@ -26,6 +26,7 @@ import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataN
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
 import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
 
@@ -63,6 +64,38 @@ public class AddToDataNodeIetfNetTest {
     String[] nsA;
     String[] valA;
 
+    private static final String[] EXPECTED = {
+            "Entry Node is /.",
+            "Entry Node is networks.",
+            "Entry Node is network.",
+            "Entry Node is network-id.",
+            "Exit Node is network-id.",
+            "Entry Node is supporting-network.",
+            "Entry Node is network-ref.",
+            "Exit Node is network-ref.",
+            "Exit Node is supporting-network.",
+            "Entry Node is node.",
+            "Entry Node is node-id.",
+            "Exit Node is node-id.",
+            "Entry Node is supporting-node.",
+            "Entry Node is network-ref.",
+            "Exit Node is network-ref.",
+            "Entry Node is node-ref.",
+            "Exit Node is node-ref.",
+            "Exit Node is supporting-node.",
+            "Exit Node is node.",
+            "Exit Node is network.",
+            "Exit Node is networks.",
+            "Entry Node is networks-state.",
+            "Entry Node is network.",
+            "Entry Node is network-ref.",
+            "Exit Node is network-ref.",
+            "Entry Node is server-provided.",
+            "Exit Node is server-provided.",
+            "Exit Node is network.",
+            "Exit Node is networks-state.",
+            "Exit Node is /.",
+    };
     /**
      * Test add to data node builder.
      */
@@ -129,15 +162,19 @@ public class AddToDataNodeIetfNetTest {
         value = "network5";
         dBlr = addDataNode(dBlr, "network-ref", null, value, null);
         dBlr = exitDataNode(dBlr);
-
         // Adding leaf server-provided
         value = "true";
         dBlr = addDataNode(dBlr, "server-provided", null, value, null);
+        dBlr = exitDataNode(dBlr);
+        dBlr = exitDataNode(dBlr);
+        dBlr = exitDataNode(dBlr);
 
         //Tree validation
         nA = new String[]{"/", "networks", "network", "network-id", ""};
         nsA = new String[]{null, IETFNS, IETFNS, IETFNS, ""};
         valA = new String[]{"network1", ""};
         validateResourceId(nA, nsA, valA, id);
+        DataNode node = dBlr.build();
+        walkINTree(dBlr.build(), EXPECTED);
     }
 }

@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
@@ -38,6 +37,7 @@ import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataN
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
@@ -46,7 +46,8 @@ import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
 /**
  * Tests the serializer helper methods.
  */
-public class AddToDataNodeListTest {
+public class AddToDataNodeList1Test {
+
 
     public static final String LNS = "yrt:list";
 
@@ -80,7 +81,6 @@ public class AddToDataNodeListTest {
     String[] valA;
 
     private static final String[] EXPECTED = {
-            "Entry Node is /.",
             "Entry Node is l1.",
             "Entry Node is k1.",
             "Exit Node is k1.",
@@ -93,15 +93,6 @@ public class AddToDataNodeListTest {
             "Entry Node is k3.",
             "Exit Node is k3.",
             "Exit Node is l1.",
-            "Entry Node is leaf1.",
-            "Exit Node is leaf1.",
-            "Entry Node is leaf1.",
-            "Exit Node is leaf1.",
-            "Entry Node is leaf1.",
-            "Exit Node is leaf1.",
-            "Entry Node is leaf1.",
-            "Exit Node is leaf1.",
-            "Exit Node is /."
     };
 
     /**
@@ -109,8 +100,9 @@ public class AddToDataNodeListTest {
      */
     @Test
     public void addToDataListTest() throws IOException {
-        ResourceId id;
-        dBlr = initializeDataNode(context);
+        ResourceId.Builder rIdBlr = initializeResourceId(context);
+        dBlr = initializeDataNode(rIdBlr);
+
         dBlr = addDataNode(dBlr, "l1", LNS, value, null);
         value = "1";
         dBlr = addDataNode(dBlr, "k1", null, value, null);
@@ -137,22 +129,6 @@ public class AddToDataNodeListTest {
         ResourceId id2 = getResourceId(dBlr);
 
         dBlr = exitDataNode(dBlr);
-        dBlr = exitDataNode(dBlr);
-
-        // Checking leaf list
-        value = "1";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
-        dBlr = exitDataNode(dBlr);
-        value = "2";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
-        dBlr = exitDataNode(dBlr);
-        value = "3";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
-        dBlr = exitDataNode(dBlr);
-        value = null;
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
-        ResourceId id3 = getResourceId(dBlr);
-        dBlr = exitDataNode(dBlr);
 
         //Tree validation
         nA = new String[]{"/", "l1", "k1", "k2", "k3", "c1", "leaf_c1"};
@@ -170,29 +146,20 @@ public class AddToDataNodeListTest {
         valA = new String[]{"1", "2", "3"};
         validateResourceId(nA, nsA, valA, id2);
 
-        nA = new String[]{"/", "leaf1"};
-        nsA = new String[]{null, LNS};
-        valA = new String[]{null};
-        validateResourceId(nA, nsA, valA, id3);
-
         // Validating the data node.
         DataNode node = dBlr.build();
-        validateDataNode(node, "/", null, SINGLE_INSTANCE_NODE, true, null);
 
-        Map<NodeKey, DataNode> childMap = ((InnerNode) node).childNodes();
-        Iterator<Map.Entry<NodeKey, DataNode>> it = childMap.entrySet().iterator();
-        Map.Entry<NodeKey, DataNode> n = it.next();
-        validateDataNode(n.getValue(), "l1", LNS, MULTI_INSTANCE_NODE,
+        validateDataNode(node, "l1", LNS, MULTI_INSTANCE_NODE,
                          true, null);
-
-        Iterator<KeyLeaf> keyIt = ((ListKey) n.getKey()).keyLeafs().iterator();
+        Iterator<KeyLeaf> keyIt = ((ListKey) node.key())
+                .keyLeafs().iterator();
 
         validateLeafDataNode(keyIt.next(), "k1", LNS, "1");
         validateLeafDataNode(keyIt.next(), "k2", LNS, "2");
         validateLeafDataNode(keyIt.next(), "k3", LNS, "3");
 
         Iterator<Map.Entry<NodeKey, DataNode>> it1;
-        it1 = ((InnerNode) n.getValue()).childNodes().entrySet().iterator();
+        it1 = ((InnerNode) node).childNodes().entrySet().iterator();
         validateDataNode(it1.next().getValue(), "k1", LNS,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, false, "1");
         validateDataNode(it1.next().getValue(), "k2", LNS,
@@ -207,14 +174,6 @@ public class AddToDataNodeListTest {
         it2 = ((InnerNode) n1).childNodes().entrySet().iterator();
         validateDataNode(it2.next().getValue(), "leaf_c1", LNS,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, false, "0");
-        validateDataNode(it.next().getValue(), "leaf1", LNS,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, false, "1");
-        validateDataNode(it.next().getValue(), "leaf1", LNS,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, false, "2");
-        validateDataNode(it.next().getValue(), "leaf1", LNS,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, false, "3");
-        validateDataNode(it.next().getValue(), "leaf1", LNS,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, false, null);
-        walkINTree(dBlr.build(), EXPECTED);
+        walkINTree(node, EXPECTED);
     }
 }

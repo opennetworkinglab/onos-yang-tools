@@ -55,8 +55,6 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
      */
     void traveseToParent() {
         if (curKeyBuilder != null) {
-            curKeyBuilder = null;
-        } else {
             curKeyBuilder = builders.get(builders.size() - 1);
             builders.remove(builders.size() - 1);
         }
@@ -109,14 +107,13 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
                     ridBldr.addKeyLeaf(sId.name(), sId.namespace(),
                                        kl.leafValue());
                 }
-                continue;
             } else if (k instanceof LeafListKey) {
                 sId = k.schemaId();
                 ridBldr.addLeafListBranchPoint(sId.name(), sId.namespace(),
                                                ((LeafListKey) k).value());
-                continue;
+            } else {
+                ridBldr.addBranchPointSchema(sId.name(), sId.namespace());
             }
-            ridBldr.addBranchPointSchema(sId.name(), sId.namespace());
         }
         return ridBldr;
     }
