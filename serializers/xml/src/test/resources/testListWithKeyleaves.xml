@@ -1,0 +1,16 @@
+<l1 xmlns="yrt:list" operation="replace">
+<k1>k1_Value</k1>
+<k2>k2_Value</k2>
+<k3>k3_Value</k3>
+<c1>
+<leaf_c1>l1_value</leaf_c1>
+</c1>
+</l1>
+<l1 xmlns="yrt:list" operation="replace">
+<k1>k1_Value1</k1>
+<k2>k2_Value2</k2>
+<k3>k3_Value3</k3>
+<c1>
+<leaf_c1>l1_value1</leaf_c1>
+</c1>
+</l1>

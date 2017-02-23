@@ -1,0 +1,8 @@
+<food xmlns="yrt:food">
+<p1>p1_value</p1>
+<p2>p2_value</p2>
+<p2>p2_value1</p2>
+</food>
+<c2 xmlns="yrt:food">
+<p3>p3_value</p3>
+</c2>

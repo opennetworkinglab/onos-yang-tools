@@ -35,7 +35,7 @@ public class DefaultAnnotation implements Annotation {
      * @param n annotation name
      * @param v annotation value
      */
-    protected DefaultAnnotation(String n, String v) {
+    public DefaultAnnotation(String n, String v) {
         name = n;
         value = v;
     }

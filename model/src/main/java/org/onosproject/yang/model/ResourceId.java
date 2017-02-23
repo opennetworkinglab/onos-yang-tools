@@ -20,11 +20,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.hash;
 import static org.onosproject.yang.model.ModelConstants.LEAF_IS_TERMINAL;
 import static org.onosproject.yang.model.ModelConstants.NON_KEY_LEAF;
-import static org.onosproject.yang.model.ModelConstants.NO_KEY_SET;
 
 /**
  * Representation of an entity which identifies a resource in the logical tree
@@ -234,9 +232,21 @@ public class ResourceId {
          * @return built resource identifier
          */
         public ResourceId build() {
-            checkNotNull(curKeyBuilder, NO_KEY_SET);
-            nodeKeyList.add(curKeyBuilder.build());
+            if (curKeyBuilder != null) {
+                nodeKeyList.add(curKeyBuilder.build());
+                curKeyBuilder = null;
+            }
             return new ResourceId(this);
+        }
+
+        /**
+         * Removes last key in the node key list.
+         *
+         * @return updated builder
+         */
+        public Builder removeLastKey() {
+            nodeKeyList.remove(nodeKeyList.size() - 1);
+            return this;
         }
 
         /**

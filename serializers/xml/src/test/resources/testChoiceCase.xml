@@ -1,0 +1,6 @@
+<banana xmlns="yrt:choice-case">
+<l1>value2</l1>
+</banana>
+<cold-drink xmlns="yrt:choice-case">
+<flavor>value3</flavor>
+</cold-drink>

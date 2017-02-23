@@ -26,15 +26,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>onos-yang-serializers-json</artifactId>
+    <artifactId>onos-yang-serializers-xml</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -42,46 +37,19 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-model</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-runtime</artifactId>
             <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.8.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.8.6</version>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.dom4j</artifactId>
+            <version>1.6.1_5</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-serializers-utils</artifactId>
             <version>1.12-SNAPSHOT</version>
         </dependency>
-        <!-- TODO: remove
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-api</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-datamodel</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-plugin-utils</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -91,6 +59,22 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.onosproject</groupId>
+                <artifactId>onos-yang-compiler-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <yangFilesDir>src/test/resources</yangFilesDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>yang2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

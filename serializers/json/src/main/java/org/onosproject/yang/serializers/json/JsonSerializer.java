@@ -37,9 +37,9 @@ import java.io.InputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.serializers.json.DecoderUtils.convertJsonToDataNode;
-import static org.onosproject.yang.serializers.json.DecoderUtils.convertUriToRid;
 import static org.onosproject.yang.serializers.json.EncoderUtils.convertDataNodeToJson;
-import static org.onosproject.yang.serializers.json.EncoderUtils.convertRidToUri;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.convertUriToRid;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -64,8 +64,8 @@ public class JsonSerializer implements YangSerializer {
     public CompositeData decode(CompositeStream compositeStream,
                                 YangSerializerContext yangSerializerContext) {
         try {
-            ResourceId rid = convertUriToRid(compositeStream.resourceId(),
-                                             yangSerializerContext);
+            ResourceId.Builder rIdBuilder = convertUriToRid(
+                    compositeStream.resourceId(), yangSerializerContext);
 
             ObjectNode rootNode = null;
 
@@ -83,9 +83,9 @@ public class JsonSerializer implements YangSerializer {
              * and in this case the resourceId builder which was constructed
              * for a URL, needs to be given as an Input parameter.
              */
-            if (rid != null) {
+            if (rIdBuilder != null) {
                 dataNode = convertJsonToDataNode(rootNode,
-                                                 new ResourceId.Builder(rid));
+                                                 rIdBuilder);
 
             } else {
                 dataNode = convertJsonToDataNode(rootNode,
@@ -93,13 +93,8 @@ public class JsonSerializer implements YangSerializer {
             }
 
             ResourceData resourceData = DefaultResourceData.builder().
-                    addDataNode(dataNode).resourceId(rid).build();
+                    addDataNode(dataNode).resourceId(rIdBuilder.build()).build();
             return DefaultCompositeData.builder().resourceData(resourceData).build();
-        } catch (CloneNotSupportedException e) {
-            log.error("ERROR: JsonProcessingException {}",
-                      e.getMessage());
-            log.debug("Exception in decode:", e);
-            throw new SerializerException("JSON serializer decode failure");
         } catch (JsonProcessingException e) {
             log.error("ERROR: JsonProcessingException {}",
                       e.getMessage());

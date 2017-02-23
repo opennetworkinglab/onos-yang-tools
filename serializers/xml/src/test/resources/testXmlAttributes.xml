@@ -1,0 +1,10 @@
+<top xmlns="http://example.com/schema/1.2/config">
+<interface xc:operation="replace">
+<name>Ethernet0/0</name>
+<mtu>1500</mtu>
+<address>
+<name>192.0.2.4</name>
+<prefix-length>24</prefix-length>
+</address>
+</interface>
+</top>

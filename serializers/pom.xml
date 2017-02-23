@@ -31,6 +31,8 @@
 
     <modules>
         <module>json</module>
+        <module>xml</module>
+        <module>utils</module>
     </modules>
 
     <description>Serializers for various codecs</description>

@@ -17,17 +17,11 @@
 package org.onosproject.yang.serializers.json;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Splitter;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
-import org.onosproject.yang.model.KeyLeaf;
-import org.onosproject.yang.model.LeafListKey;
-import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.NodeKey;
-import org.onosproject.yang.model.ResourceId;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,95 +39,9 @@ import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.
  * Utilities for converting Data Nodes into JSON format.
  */
 public final class EncoderUtils {
-    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
-    private static final Splitter COMMA_SPLITTER = Splitter.on(',');
-    private static final String EQUAL = "=";
-    private static final String COMMA = ",";
-    private static final String COLON = ":";
-    private static final String SLASH = "/";
 
     // no instantiation
     private EncoderUtils() {
-    }
-
-    /**
-     * Converts a resource identifier to URI string.
-     *
-     * @param rid resource identifier
-     * @return URI
-     */
-    public static String convertRidToUri(ResourceId rid) {
-        if (rid == null) {
-            return null;
-        }
-
-        StringBuilder uriBuilder = new StringBuilder();
-        List<NodeKey> nodeKeyList = rid.nodeKeys();
-        String curNameSpace = null;
-        for (NodeKey key : nodeKeyList) {
-            curNameSpace = addNodeKeyToUri(key, curNameSpace, uriBuilder);
-        }
-        return uriBuilder.toString();
-    }
-
-    private static String addNodeKeyToUri(NodeKey key,
-                                          String curNameSpace,
-                                          StringBuilder uriBuilder) {
-        String newNameSpace;
-        if (key instanceof LeafListKey) {
-            newNameSpace = addLeafListNodeToUri((LeafListKey) key, curNameSpace, uriBuilder);
-        } else if (key instanceof ListKey) {
-            newNameSpace = addListNodeToUri((ListKey) key, curNameSpace, uriBuilder);
-        } else {
-            uriBuilder.append(SLASH);
-            newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
-        }
-        return newNameSpace;
-    }
-
-    private static String addLeafListNodeToUri(LeafListKey key,
-                                               String curNameSpace,
-                                               StringBuilder uriBuilder) {
-
-        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
-        uriBuilder.append(EQUAL);
-        uriBuilder.append(key.asString());
-        return newNameSpace;
-    }
-
-    private static String addListNodeToUri(ListKey key,
-                                           String curNameSpace,
-                                           StringBuilder uriBuilder) {
-        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
-        uriBuilder.append(EQUAL);
-        String prefix = "";
-        for (KeyLeaf keyLeaf : key.keyLeafs()) {
-            uriBuilder.append(prefix);
-            prefix = COMMA;
-            uriBuilder.append(keyLeaf.leafValue().toString());
-        }
-
-        return newNameSpace;
-    }
-
-    private static String addNodeNameToUri(NodeKey key,
-                                           String curNameSpace,
-                                           StringBuilder uriBuilder) {
-        String nodeName = key.schemaId().name();
-        String newNameSpace = key.schemaId().namespace();
-
-        uriBuilder.append(nodeName);
-
-        if (newNameSpace == null) {
-            return curNameSpace;
-        }
-
-        if (!newNameSpace.equals(curNameSpace)) {
-            uriBuilder.append(COLON);
-            uriBuilder.append(newNameSpace);
-        }
-
-        return newNameSpace;
     }
 
     /**

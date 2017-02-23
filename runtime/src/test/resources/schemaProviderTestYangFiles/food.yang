@@ -17,7 +17,6 @@ module food {
     container food {
        choice snack {
            case sportsarena {
-
                leaf pretzel {
                    type empty;
                }
@@ -44,6 +43,18 @@ module food {
                }
            }
        }
+       leaf p1 {
+           type string;
+       }
+       leaf-list p2 {
+           type string;
+       }
+    }
+
+    container c2 {
+        leaf p3 {
+            type string;
+        }
     }
 
     leaf bool {

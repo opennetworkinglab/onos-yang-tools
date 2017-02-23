@@ -1,0 +1,6 @@
+<interface xmlns="ser.ospf" operation="replace">
+<area-type>Stub</area-type>
+</interface>
+<statistics xmlns="ser.ospf" operation="replace">
+<spf-runs-count>3</spf-runs-count>
+</statistics>
