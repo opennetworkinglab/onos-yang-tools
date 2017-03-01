@@ -26,9 +26,10 @@ import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataN
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
-import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
+import static org.onosproject.yang.runtime.impl.TestUtils.IETFNAME;
+import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
+import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
 
 /**
  * Tests the serializer helper methods.
@@ -104,7 +105,7 @@ public class AddToDataNodeIetfNetTest {
 
         dBlr = initializeDataNode(context);
         // Adding container
-        dBlr = addDataNode(dBlr, "networks", IETFNS, value, null);
+        dBlr = addDataNode(dBlr, "networks", IETFNAME, value, null);
         // Adding list inside container
         dBlr = addDataNode(dBlr, "network", null, value, null);
         // Adding key element network Id
@@ -155,7 +156,7 @@ public class AddToDataNodeIetfNetTest {
 
         value = null;
         // Adding container
-        dBlr = addDataNode(dBlr, "networks-state", IETFNS, value, null);
+        dBlr = addDataNode(dBlr, "networks-state", IETFNAME, value, null);
         // Adding list inside container
         dBlr = addDataNode(dBlr, "network", null, value, null);
         // Adding key element network-ref

@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.E_ID;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
@@ -574,7 +575,7 @@ public abstract class YangContainer
     @Override
     public SchemaContext getChildContext(SchemaId schemaId) {
 
-        checkNotNull(schemaId);
+        checkNotNull(schemaId, E_ID);
         YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
                 schemaId, getNameSpace().getModuleNamespace());
         try {

@@ -548,6 +548,10 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
         String namespace = schemaId.namespace();
         YangSchemaNode node = getForNameSpace(namespace);
+        if (node == null) {
+            //If namespace if module name.
+            node = getForSchemaName(schemaId.namespace());
+        }
         YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
                 schemaId, namespace);
 
@@ -556,7 +560,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
                 return node.getChildSchema(id).getSchemaNode();
             }
         } catch (DataModelException e) {
-            e.printStackTrace();
+            log.error("failed to get child schema", e);
         }
         return null;
     }

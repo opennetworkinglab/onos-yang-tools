@@ -35,6 +35,7 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SI
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.OUTPUT;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.E_ID;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
@@ -271,7 +272,7 @@ public abstract class YangOutput
     @Override
     public SchemaContext getChildContext(SchemaId schemaId) {
 
-        checkNotNull(schemaId);
+        checkNotNull(schemaId, E_ID);
         YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
                 schemaId, getNameSpace().getModuleNamespace());
         try {

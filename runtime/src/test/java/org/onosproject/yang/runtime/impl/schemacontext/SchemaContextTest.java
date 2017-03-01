@@ -29,6 +29,8 @@ import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 
 import java.util.List;
 
+import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
+import static org.onosproject.yang.runtime.impl.TestUtils.TOPONS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
 
@@ -39,11 +41,6 @@ public class SchemaContextTest {
 
     private static TestYangSchemaNodeProvider schemaProvider =
             new TestYangSchemaNodeProvider();
-
-    public static final String IETFNS =
-            "urn:ietf:params:xml:ns:yang:yrt-ietf-network";
-    public static final String TOPONS =
-            "urn:ietf:params:xml:ns:yang:yrt-ietf-network-topology";
 
     /**
      * Validates the getting schema context by schema Id scenario.

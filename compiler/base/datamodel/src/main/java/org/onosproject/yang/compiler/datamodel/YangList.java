@@ -35,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.LIST_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.E_ID;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
@@ -866,7 +867,7 @@ public abstract class YangList
     @Override
     public SchemaContext getChildContext(SchemaId schemaId) {
 
-        checkNotNull(schemaId);
+        checkNotNull(schemaId, E_ID);
         YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
                 schemaId, getNameSpace().getModuleNamespace());
         try {

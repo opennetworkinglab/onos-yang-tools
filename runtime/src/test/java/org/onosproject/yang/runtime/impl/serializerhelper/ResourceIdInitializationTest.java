@@ -23,9 +23,9 @@ import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
-import static org.onosproject.yang.runtime.impl.schemacontext.SchemaContextTest.IETFNS;
 
 /**
  * Tests the initialize resource id methods in serializer helper.

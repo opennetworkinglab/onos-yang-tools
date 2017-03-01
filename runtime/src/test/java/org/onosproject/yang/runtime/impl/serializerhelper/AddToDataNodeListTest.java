@@ -38,6 +38,8 @@ import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataN
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.LNS;
+import static org.onosproject.yang.runtime.impl.TestUtils.L_NAME;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
@@ -47,8 +49,6 @@ import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
  * Tests the serializer helper methods.
  */
 public class AddToDataNodeListTest {
-
-    public static final String LNS = "yrt:list";
 
     TestYangSerializerContext context = new TestYangSerializerContext();
 
@@ -111,7 +111,7 @@ public class AddToDataNodeListTest {
     public void addToDataListTest() throws IOException {
         ResourceId id;
         dBlr = initializeDataNode(context);
-        dBlr = addDataNode(dBlr, "l1", LNS, value, null);
+        dBlr = addDataNode(dBlr, "l1", L_NAME, value, null);
         value = "1";
         dBlr = addDataNode(dBlr, "k1", null, value, null);
         dBlr = exitDataNode(dBlr);
@@ -141,16 +141,16 @@ public class AddToDataNodeListTest {
 
         // Checking leaf list
         value = "1";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
+        dBlr = addDataNode(dBlr, "leaf1", L_NAME, value, null);
         dBlr = exitDataNode(dBlr);
         value = "2";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
+        dBlr = addDataNode(dBlr, "leaf1", L_NAME, value, null);
         dBlr = exitDataNode(dBlr);
         value = "3";
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
+        dBlr = addDataNode(dBlr, "leaf1", L_NAME, value, null);
         dBlr = exitDataNode(dBlr);
         value = null;
-        dBlr = addDataNode(dBlr, "leaf1", LNS, value, null);
+        dBlr = addDataNode(dBlr, "leaf1", L_NAME, value, null);
         ResourceId id3 = getResourceId(dBlr);
         dBlr = exitDataNode(dBlr);
 

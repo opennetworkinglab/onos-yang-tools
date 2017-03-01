@@ -51,6 +51,15 @@ public final class TestUtils implements DataNodeListener {
     }
 
     public static final String PERIOD = ".";
+    public static final String IETFNS =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-network";
+    public static final String IETFNAME = "yrt-ietf-network";
+    public static final String TOPONS =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-network-topology";
+    public static final String LNS = "yrt:list";
+    public static final String L_NAME = "list";
+    public static final String LMNG = "yrt.Logistics-manager";
+    public static final String LMNG_N = "Logistics-manager";
 
     // Logger list is used for walker testing.
     private static final List<String> LOGGER = new ArrayList<>();

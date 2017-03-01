@@ -116,6 +116,7 @@ public final class DataModelUtils {
     public static final String FMT_NOT_EXIST =
             "Requested %s is not child in %s.";
     private static final String E_DATATYPE = "Data type not supported.";
+    public static final String E_ID = "Schema id should not be null.";
 
     /**
      * Creates a new data model tree utility.

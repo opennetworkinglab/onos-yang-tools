@@ -37,6 +37,8 @@ import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataN
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.LMNG;
+import static org.onosproject.yang.runtime.impl.TestUtils.LMNG_N;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;
@@ -46,8 +48,6 @@ import static org.onosproject.yang.runtime.impl.TestUtils.walkINTree;
  * Tests the serializer helper methods.
  */
 public class AddToDataNodeLogisticTest {
-
-    public static final String LMNG = "yrt.Logistics-manager";
 
     TestYangSerializerContext context = new TestYangSerializerContext();
 
@@ -287,7 +287,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = initializeDataNode(context);
 
         value = "1";
-        dBlr = addDataNode(dBlr, "Customs-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Customs-supervisor", LMNG_N, value, null);
         id = getResourceId(dBlr);
         nA = new String[]{"/", "Customs-supervisor"};
         nsA = new String[]{null, LMNG};
@@ -306,10 +306,10 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = null;
-        dBlr = addDataNode(dBlr, "Material-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Material-supervisor", LMNG_N, value, null);
 
         value = "abc";
-        dBlr = addDataNode(dBlr, "name", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "name", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "dep-1";
@@ -333,7 +333,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = addDataNode(dBlr, "Material-supervisor", LMNG, value, null);
 
         value = "abc1";
-        dBlr = addDataNode(dBlr, "name", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "name", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "dep-1";
@@ -342,7 +342,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = null;
-        dBlr = addDataNode(dBlr, "Material-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Material-supervisor", LMNG_N, value, null);
 
         value = "abc2";
         dBlr = addDataNode(dBlr, "name", LMNG, value, null);
@@ -359,7 +359,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = null;
-        dBlr = addDataNode(dBlr, "Purchasing-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Purchasing-supervisor", LMNG_N, value, null);
 
         value = "xyz";
         dBlr = addDataNode(dBlr, "purchasing-specialist", LMNG, value, null);
@@ -388,7 +388,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = "2";
-        dBlr = addDataNode(dBlr, "Warehouse-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Warehouse-supervisor", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "3";
@@ -396,7 +396,7 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = "4";
-        dBlr = addDataNode(dBlr, "Warehouse-supervisor", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Warehouse-supervisor", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "1";
@@ -408,11 +408,11 @@ public class AddToDataNodeLogisticTest {
         dBlr = exitDataNode(dBlr);
 
         value = "2";
-        dBlr = addDataNode(dBlr, "Employee-id", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Employee-id", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "3";
-        dBlr = addDataNode(dBlr, "Employee-id", LMNG, value, null);
+        dBlr = addDataNode(dBlr, "Employee-id", LMNG_N, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "4";

@@ -107,10 +107,6 @@ public final class SerializerHelper {
         try {
             SchemaContext child = getChildSchemaContext(
                     (SchemaContext) builder.appInfo(), name, namespace);
-            if (child == null) {
-                throw new IllegalArgumentException(
-                        errorMsg(FMT_NOT_EXIST, name));
-            }
             DataNode.Type type = child.getType();
             updateResourceId(builder, name, value, child, type);
         } catch (IllegalArgumentException e) {
@@ -440,6 +436,10 @@ public final class SerializerHelper {
 
         SchemaId id = new SchemaId(name, namespace);
         child = ((SingleInstanceNodeContext) context).getChildContext(id);
+        if (child == null) {
+            throw new IllegalArgumentException(
+                    errorMsg(FMT_NOT_EXIST, name));
+        }
         return child;
     }
 
