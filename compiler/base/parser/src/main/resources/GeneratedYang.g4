@@ -21,10 +21,6 @@
 grammar GeneratedYang;
 import YangLexer;
 
-@header {
-package org.onosproject.yang.compiler.parser.antlrgencode;
-}
-
     yangfile : moduleStatement EOF
              | subModuleStatement EOF;
 

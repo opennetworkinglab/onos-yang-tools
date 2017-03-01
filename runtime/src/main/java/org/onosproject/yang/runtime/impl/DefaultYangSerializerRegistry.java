@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.ysrimpl;
+package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerRegistry;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 import org.slf4j.Logger;
 
 import java.util.HashSet;

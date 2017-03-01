@@ -20,7 +20,7 @@ import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.Annotation;
 import org.onosproject.yang.runtime.DefaultAnnotation;
 import org.onosproject.yang.runtime.YangSerializerContext;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
+import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.util.LinkedList;
 import java.util.List;

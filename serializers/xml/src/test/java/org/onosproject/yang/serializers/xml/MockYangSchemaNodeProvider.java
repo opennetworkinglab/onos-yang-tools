@@ -24,7 +24,7 @@ import org.onosproject.yang.runtime.DefaultAppModuleInfo;
 import org.onosproject.yang.runtime.DefaultModelRegistrationParam;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
 import org.onosproject.yang.runtime.YangModelRegistry;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
+import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.io.File;
 import java.io.IOException;

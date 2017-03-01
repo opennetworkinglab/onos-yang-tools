@@ -20,6 +20,10 @@
 
 lexer grammar YangLexer;
 
+@header {
+package org.onosproject.yang.compiler.parser.antlrgencode;
+}
+
     // Statements keywords
     ANYXML_KEYWORD      : 'anyxml';
     ARGUMENT_KEYWORD    : 'argument';

@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains implementation of YANG model registry.
+ * Provides an implementation of YANG runtime.
  */
-package org.onosproject.yang.runtime.ymrimpl;
+package org.onosproject.yang.runtime.impl;

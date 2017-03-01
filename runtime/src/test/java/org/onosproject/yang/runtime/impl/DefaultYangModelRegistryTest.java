@@ -22,7 +22,6 @@ import org.junit.rules.ExpectedException;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRevision;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
 
 import java.io.IOException;
 import java.util.ArrayList;

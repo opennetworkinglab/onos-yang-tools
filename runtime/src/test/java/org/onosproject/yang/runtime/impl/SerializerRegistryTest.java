@@ -18,7 +18,6 @@ package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
 import org.onosproject.yang.runtime.YangSerializer;
-import org.onosproject.yang.runtime.ysrimpl.DefaultYangSerializerRegistry;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

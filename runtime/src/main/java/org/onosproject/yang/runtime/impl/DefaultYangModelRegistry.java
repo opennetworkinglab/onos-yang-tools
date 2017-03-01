@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.ymrimpl;
+package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.YangModel;
 import org.onosproject.yang.YangModuleId;
@@ -57,9 +57,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DefaultYangModelRegistry implements YangModelRegistry,
         SingleInstanceNodeContext {
 
-    private final Logger log = getLogger(getClass());
     private static final String AT = "@";
-
+    private final Logger log = getLogger(getClass());
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.

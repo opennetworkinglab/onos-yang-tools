@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.yrhimpl;
+package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.CompositeData;
@@ -26,8 +26,6 @@ import org.onosproject.yang.runtime.YangRuntimeService;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
 import org.onosproject.yang.runtime.YangSerializerRegistry;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
-import org.onosproject.yang.runtime.ysrimpl.DefaultYangSerializerRegistry;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;

@@ -22,8 +22,6 @@ import org.onosproject.yang.runtime.CompositeStream;
 import org.onosproject.yang.runtime.DefaultRuntimeContext;
 import org.onosproject.yang.runtime.YangRuntimeService;
 import org.onosproject.yang.runtime.YangSerializer;
-import org.onosproject.yang.runtime.yrhimpl.DefaultYangRuntimeHandler;
-import org.onosproject.yang.runtime.ysrimpl.DefaultYangSerializerRegistry;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

@@ -27,7 +27,7 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
-import org.onosproject.yang.runtime.ymrimpl.DefaultYangModelRegistry;
+import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafListSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
