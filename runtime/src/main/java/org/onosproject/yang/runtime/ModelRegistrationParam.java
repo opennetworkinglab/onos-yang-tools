@@ -16,8 +16,8 @@
 
 package org.onosproject.yang.runtime;
 
-import org.onosproject.yang.YangModel;
-import org.onosproject.yang.YangModuleId;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModuleId;
 
 /**
  * Representation of model registration parameters.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
+package org.onosproject.yang.model;
 
 /**
  * Representation of an entity which provides YANG module identifiers.

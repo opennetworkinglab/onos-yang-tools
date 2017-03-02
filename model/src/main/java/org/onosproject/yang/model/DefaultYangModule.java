@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
-
-import org.onosproject.yang.compiler.api.YangCompilerException;
+package org.onosproject.yang.model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,8 +60,8 @@ public class DefaultYangModule implements YangModule {
         try {
             return new FileInputStream(yangSrc.toString());
         } catch (FileNotFoundException e) {
-            throw new YangCompilerException("Yang source file not found." +
-                                                    yangSrc);
+            throw new ModelException("Yang source file not found." +
+                                             yangSrc);
         }
     }
 
@@ -72,8 +70,8 @@ public class DefaultYangModule implements YangModule {
         try {
             return new FileInputStream(metadata.toString());
         } catch (FileNotFoundException e) {
-            throw new YangCompilerException("metadata source file not found." +
-                                                    metadata);
+            throw new ModelException("metadata source file not found." +
+                                             metadata);
         }
     }
 

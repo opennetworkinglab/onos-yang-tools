@@ -1,0 +1,23 @@
+module attributes {
+    yang-version 1;
+    namespace "http://example.com/schema/1.2/config";
+    prefix "attr";
+    container top {
+        container interface {
+            leaf name {
+                type string;
+            }
+            leaf mtu {
+                type string;
+            }
+            container address {
+                leaf name {
+                    type string;
+                }
+                leaf prefix-length {
+                    type string;
+                }
+            }
+        }
+    }
+}

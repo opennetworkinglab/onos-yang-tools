@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang;
+package org.onosproject.yang.model;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

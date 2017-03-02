@@ -16,7 +16,7 @@
 
 package org.onosproject.yang.runtime;
 
-import org.onosproject.yang.YangModel;
+import org.onosproject.yang.model.YangModel;
 
 import java.util.Set;
 

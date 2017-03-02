@@ -16,7 +16,7 @@
 
 package org.onosproject.yang.serializers.xml;
 
-import org.onosproject.yang.YangModel;
+import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.runtime.AppModuleInfo;
@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.deSerializeDataModel;
-import static org.onosproject.yang.compiler.plugin.utils.YangApacheUtils.processModuleId;
-import static org.onosproject.yang.compiler.plugin.utils.YangApacheUtils.processYangModel;
+import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processModuleId;
+import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processYangModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
 import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getInterfaceClassName;

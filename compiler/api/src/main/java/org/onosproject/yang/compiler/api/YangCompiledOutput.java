@@ -16,7 +16,7 @@
 
 package org.onosproject.yang.compiler.api;
 
-import org.onosproject.yang.YangModel;
+import org.onosproject.yang.model.YangModel;
 
 import java.nio.file.Path;
 import java.util.Set;

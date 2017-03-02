@@ -16,11 +16,10 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
-import org.onosproject.yang.YangModel;
-import org.onosproject.yang.YangModule;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
-import org.onosproject.yang.compiler.plugin.utils.YangApacheUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.onosproject.yang.compiler.plugin.utils.YangApacheUtils.getYangModel;
+import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;

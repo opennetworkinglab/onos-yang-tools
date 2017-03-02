@@ -15,6 +15,6 @@
  */
 
 /**
- * Created by root1 on 10/1/17.
+ * Representation of a compiled YANG model.
  */
 package org.onosproject.yang.compiler.api;

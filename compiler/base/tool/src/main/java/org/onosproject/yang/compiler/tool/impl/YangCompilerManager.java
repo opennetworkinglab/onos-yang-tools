@@ -16,11 +16,12 @@
 
 package org.onosproject.yang.compiler.tool.impl;
 
-import org.onosproject.yang.DefaultYangModel;
-import org.onosproject.yang.DefaultYangModule;
-import org.onosproject.yang.DefaultYangModuleId;
-import org.onosproject.yang.YangModel;
-import org.onosproject.yang.YangModuleId;
+import org.onosproject.yang.model.DefaultYangModel;
+import org.onosproject.yang.model.DefaultYangModule;
+import org.onosproject.yang.model.DefaultYangModuleId;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
@@ -115,7 +116,7 @@ public class YangCompilerManager implements YangCompilerService {
         YangModuleId id;
         for (YangNode node : yangNodeSet) {
             id = processModuleId(node);
-            org.onosproject.yang.YangModule module =
+            YangModule module =
                     new DefaultYangModule(id, get(node.getFileName()), get(path));
             model.addModule(id, module);
         }

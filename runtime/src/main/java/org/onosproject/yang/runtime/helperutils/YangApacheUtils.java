@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.plugin.utils;
+package org.onosproject.yang.runtime.helperutils;
 
-import org.onosproject.yang.DefaultYangModel;
-import org.onosproject.yang.DefaultYangModule;
-import org.onosproject.yang.DefaultYangModuleId;
-import org.onosproject.yang.YangModel;
-import org.onosproject.yang.YangModuleId;
+import org.onosproject.yang.model.DefaultYangModel;
+import org.onosproject.yang.model.DefaultYangModule;
+import org.onosproject.yang.model.DefaultYangModuleId;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.osgi.framework.Bundle;
@@ -109,7 +110,7 @@ public final class YangApacheUtils {
         while (it.hasNext()) {
             YangSchemaNode node = it.next();
             id = processModuleId((YangNode) node);
-            org.onosproject.yang.YangModule module =
+            YangModule module =
                     new DefaultYangModule(id, get(node.getFileName()), get(path));
             model.addModule(id, module);
         }

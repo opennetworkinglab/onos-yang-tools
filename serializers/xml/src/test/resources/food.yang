@@ -1,0 +1,67 @@
+module food {
+
+    yang-version 1;
+
+    namespace "yrt:food";
+
+    prefix "foodType";
+
+    organization "ON-LAB";
+
+    description "This module defines for food.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+    container food {
+       choice snack {
+           case sportsarena {
+               leaf pretzel {
+                   type empty;
+               }
+
+               choice bear {
+                    case type {
+                        leaf kingfisher {
+                            type empty;
+                        }
+
+                        leaf redbull {
+                            type empty;
+                        }
+                    }
+               }
+           }
+           case latenight {
+               leaf chocolate {
+                   type enumeration {
+                       enum dark;
+                       enum milk;
+                       enum first-available;
+                   }
+               }
+           }
+       }
+       leaf p1 {
+           type string;
+       }
+       leaf-list p2 {
+           type string;
+       }
+    }
+
+    container c2 {
+        leaf p3 {
+            type string;
+        }
+    }
+
+    leaf bool {
+        type boolean;
+    }
+
+    leaf-list boolean {
+        type boolean;
+    }
+}
