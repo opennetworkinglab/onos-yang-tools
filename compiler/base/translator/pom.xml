@@ -25,7 +25,7 @@
     </parent>
 
     <artifactId>onos-yang-compiler-translator</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

@@ -25,7 +25,7 @@
     </parent>
 
     <artifactId>onos-yang-compiler-datamodel</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <build>
         <plugins>

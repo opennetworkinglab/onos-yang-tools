@@ -28,7 +28,7 @@
 
     <artifactId>onos-yang-compiler-tool</artifactId>
     <version>1.12-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

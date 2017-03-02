@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>onos-yang-serializers-utils</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

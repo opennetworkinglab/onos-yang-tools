@@ -23,7 +23,6 @@
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-serializers</artifactId>
         <version>1.12-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>onos-yang-serializers-xml</artifactId>
@@ -75,11 +74,30 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+            Cleans up generated test artifacts which get included as a source
+            directory, but which we don't want as part of the bundle.
+             -->
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.2.0</version>
-                <extensions>true</extensions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${project.build.outputDirectory}/org/onosproject/yang/gen" includes="**/*"/>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
