@@ -55,6 +55,11 @@
             <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-yang-compiler-plugin-utils</artifactId>
+            <version>1.12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>RELEASE</version>
@@ -87,8 +92,7 @@
                         <Export-Package>
                             org.onosproject.yang.runtime.*
                         </Export-Package>
-                        <Include-Resource>${project.build.testOutputDirectory}
-                        </Include-Resource>
+                        <Include-Resource>${project.build.testOutputDirectory}</Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>
