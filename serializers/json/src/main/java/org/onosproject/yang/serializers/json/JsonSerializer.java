@@ -47,6 +47,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class JsonSerializer implements YangSerializer {
     private static final String JSON_FORMAT = "JSON";
+    private static final String ERROR_INFO = "JSON serializer decode failure";
 
     private final Logger log = getLogger(getClass());
     private final ObjectMapper mapper = new ObjectMapper();
@@ -92,17 +93,19 @@ public class JsonSerializer implements YangSerializer {
                                                  yangSerializerContext);
             }
 
-            ResourceData resourceData = DefaultResourceData.builder().
-                    addDataNode(dataNode).resourceId(rIdBuilder.build()).build();
+            ResourceData resourceData = DefaultResourceData.builder()
+                    .addDataNode(dataNode)
+                    .resourceId(rIdBuilder == null ? null : rIdBuilder.build())
+                    .build();
             return DefaultCompositeData.builder().resourceData(resourceData).build();
         } catch (JsonProcessingException e) {
             log.error("ERROR: JsonProcessingException {}",
                       e.getMessage());
             log.debug("Exception in decode:", e);
-            throw new SerializerException("JSON serializer decode failure");
+            throw new SerializerException(ERROR_INFO);
         } catch (IOException ex) {
             log.error("ERROR: decode ", ex);
-            throw new SerializerException("JSON serializer decode failure");
+            throw new SerializerException(ERROR_INFO);
         }
     }
 
@@ -125,10 +128,7 @@ public class JsonSerializer implements YangSerializer {
         if (rootNode != null) {
             inputStream = IOUtils.toInputStream(rootNode.toString());
         }
-
-        CompositeStream compositeStream = new DefaultCompositeStream(uriString,
-                                                                     inputStream);
-
-        return compositeStream;
+        // return a CompositeStream
+        return new DefaultCompositeStream(uriString, inputStream);
     }
 }

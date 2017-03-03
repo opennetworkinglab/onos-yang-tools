@@ -1,0 +1,25 @@
+{
+  "jsonlist:top1":{
+    "jsonlist:l1":[
+      {
+        "k1":"k1value",
+        "k2":"k2value",
+        "k3":"k3value",
+        "c1":{
+          "leaf_c1":"c1leaf"
+        }
+      },
+      {
+        "k1":"k1value2",
+        "k2":"k2value2",
+        "k3":"k3value2",
+        "c1":{
+          "leaf_c1":"c1leaf2"
+        }
+      }
+    ],
+    "jsonlist:c2":{
+      "leaflist1":["a","b","c"]
+    }
+  }
+}

@@ -260,14 +260,14 @@ public final class SerializersUtil {
      * Returns the previous segment of a path which is separated by a split char.
      * For example:
      * <pre>
-     * "foo:bar", ":"   -->  "foo"
+     * "foo:bar", ":" to "foo"
      * </pre>
      *
      * @param path      the original path string
      * @param splitChar char used to split the path
      * @return the previous segment of the path
      */
-    private static String getPreSegment(String path, String splitChar) {
+    public static String getPreSegment(String path, String splitChar) {
         int idx = path.lastIndexOf(splitChar);
         if (idx == -1) {
             return null;
@@ -279,14 +279,14 @@ public final class SerializersUtil {
      * Returns the latter segment of a path which is separated by a split char.
      * For example:
      * <pre>
-     * "foo:bar", ":"   -->  "bar"
+     * "foo:bar", ":" to "bar"
      * </pre>
      *
      * @param path      the original path string
      * @param splitChar char used to split the path
      * @return the latter segment of the path
      */
-    private static String getLatterSegment(String path, String splitChar) {
+    public static String getLatterSegment(String path, String splitChar) {
         int idx = path.lastIndexOf(splitChar);
         if (idx == -1) {
             return path;

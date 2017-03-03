@@ -16,19 +16,20 @@
 
 package org.onosproject.yang.serializers.json;
 
+import java.util.Iterator;
+import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.runtime.helperutils.SerializerHelper;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.getLatterSegment;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.getPreSegment;
 
 /**
  * Represents implementation of JSON walk, which walks the JSON object node.
@@ -38,19 +39,19 @@ public class DefaultJsonWalker implements JsonWalker {
 
     private DataNode.Builder dataNodeBuilder;
 
-    public DefaultJsonWalker(DataNode.Builder dataNodeBuilder) {
-        this.dataNodeBuilder = dataNodeBuilder;
+    /**
+     * Constructor.
+     */
+    public DefaultJsonWalker(DataNode.Builder db) {
+        dataNodeBuilder = db;
     }
 
     @Override
     public void walkJsonNode(String fieldName, JsonNode jsonNode) {
-
-        JsonNodeType nodeType = jsonNode.getNodeType();
-
         if (!jsonNode.isContainerNode()) {
             //the node has no children, so add it as leaf node to the data tree.
             addLeafNodeToDataTree(fieldName, jsonNode);
-            SerializerHelper.exitDataNode(dataNodeBuilder);
+            dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
             return;
         }
 
@@ -64,7 +65,8 @@ public class DefaultJsonWalker implements JsonWalker {
             // Let's deal with the leaflist case first.
             if (isJsonNodeLeafList((ArrayNode) jsonNode)) {
                 addLeafListNodeToDataTree(fieldName, (ArrayNode) jsonNode);
-                SerializerHelper.exitDataNode(dataNodeBuilder);
+                //Don't move up, as addLeafListNodeToDataTree() does it.
+                //SerializerHelper.exitDataNode(dataNodeBuilder);
                 return;
             }
 
@@ -80,12 +82,13 @@ public class DefaultJsonWalker implements JsonWalker {
                 // Recursively build the subtree of element
                 walkJsonNode(null, element);
 
-                // We are done with this array element
-                SerializerHelper.exitDataNode(dataNodeBuilder);
+                // We are done with this array element.
+                dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
             }
 
             // We are done with this array node.
-            SerializerHelper.exitDataNode(dataNodeBuilder);
+            // Don't move up, as we are already at the parent node.
+            //SerializerHelper.exitDataNode(dataNodeBuilder);
             return;
         }
 
@@ -113,18 +116,18 @@ public class DefaultJsonWalker implements JsonWalker {
 
         if (fieldName != null) {
             // move up since we finish creating a container node.
-            SerializerHelper.exitDataNode(dataNodeBuilder);
+            dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
         }
     }
 
     private void addDataNode(String fieldName, String value, DataNode.Type nodeType) {
         String nodeName = getLatterSegment(fieldName, COLON);
         String namespace = getPreSegment(fieldName, COLON);
-        SerializerHelper.addDataNode(dataNodeBuilder,
-                                     nodeName,
-                                     namespace,
-                                     value,
-                                     nodeType);
+        dataNodeBuilder = SerializerHelper.addDataNode(dataNodeBuilder,
+                                                       nodeName,
+                                                       namespace,
+                                                       value,
+                                                       nodeType);
     }
 
     private void addNoneLeafDataNode(String fieldName, DataNode.Type nodeType) {
@@ -159,7 +162,7 @@ public class DefaultJsonWalker implements JsonWalker {
             if (eleType == JsonNodeType.STRING || eleType == JsonNodeType.NUMBER) {
                 addLeafDataNode(fieldName, element.asText(),
                                 MULTI_INSTANCE_LEAF_VALUE_NODE);
-                SerializerHelper.exitDataNode(dataNodeBuilder);
+                dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
             }
         }
     }
@@ -168,7 +171,6 @@ public class DefaultJsonWalker implements JsonWalker {
         if (!jsonNode.isArray()) {
             return false;
         }
-
         Iterator<JsonNode> elements = jsonNode.elements();
         while (elements.hasNext()) {
             JsonNode element = elements.next();
@@ -177,55 +179,6 @@ public class DefaultJsonWalker implements JsonWalker {
                 return false;
             }
         }
-
         return true;
-    }
-
-    /**
-     * Returns the previous segment of a path which is separated by a split char.
-     * For example:
-     * <pre>
-     * "foo:bar", ":"   -->  "foo"
-     * </pre>
-     *
-     * @param path      the original path string
-     * @param splitChar char used to split the path
-     * @return the previous segment of the path
-     */
-    private String getPreSegment(String path, String splitChar) {
-        int idx = path.indexOf(splitChar);
-        if (idx == -1) {
-            return null;
-        }
-
-        if (path.indexOf(splitChar, idx + 1) != -1) {
-            return null;
-        }
-
-        return path.substring(0, idx);
-    }
-
-    /**
-     * Returns the latter segment of a path which is separated by a split char.
-     * For example:
-     * <pre>
-     * "foo:bar", ":"   -->  "bar"
-     * </pre>
-     *
-     * @param path      the original path string
-     * @param splitChar char used to split the path
-     * @return the latter segment of the path
-     */
-    private String getLatterSegment(String path, String splitChar) {
-        int idx = path.indexOf(splitChar);
-        if (idx == -1) {
-            return path;
-        }
-
-        if (path.indexOf(splitChar, idx + 1) != -1) {
-            return null;
-        }
-
-        return path.substring(idx + 1);
     }
 }

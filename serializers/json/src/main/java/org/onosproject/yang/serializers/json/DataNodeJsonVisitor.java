@@ -25,13 +25,19 @@ import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.LAST_INSTANCE;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.SINGLE_INSTANCE_IN_MULTI_NODE;
 
+/**
+ * Representation implementation of DataNode visitor, which traverse data tree.
+ */
 public class DataNodeJsonVisitor implements DataNodeVisitor {
     private static final String COLON = ":";
 
     private JsonBuilder jsonBuilder;
 
-    public DataNodeJsonVisitor(JsonBuilder jsonBuilder) {
-        this.jsonBuilder = jsonBuilder;
+    /**
+     * Constructor.
+     */
+    public DataNodeJsonVisitor(JsonBuilder jb) {
+        jsonBuilder = jb;
     }
 
     @Override
@@ -50,15 +56,17 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
                 jsonBuilder.addNodeTopHalf("", JsonNodeType.OBJECT);
                 break;
             case SINGLE_INSTANCE_LEAF_VALUE_NODE:
+                LeafNode sLeafNode = (LeafNode) dataNode;
                 jsonBuilder.addNodeWithValueTopHalf(nodeName,
-                                                    ((LeafNode) dataNode).value().toString());
+                                                    sLeafNode.asString());
                 break;
             case MULTI_INSTANCE_LEAF_VALUE_NODE:
                 if (siblingType == FIRST_INSTANCE ||
                         siblingType == SINGLE_INSTANCE_IN_MULTI_NODE) {
                     jsonBuilder.addNodeTopHalf(nodeName, JsonNodeType.ARRAY);
                 }
-                jsonBuilder.addValueToLeafListNode(((LeafNode) dataNode).value().toString());
+                LeafNode mLeafNode = (LeafNode) dataNode;
+                jsonBuilder.addValueToLeafListNode(mLeafNode.asString());
                 break;
             default:
                 break;
@@ -71,12 +79,12 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(nodeName);
-
         if (nameSpace != null) {
-            builder.append(COLON);
             builder.append(nameSpace);
+            builder.append(COLON);
         }
+
+        builder.append(nodeName);
 
         return builder.toString();
     }

@@ -1,0 +1,46 @@
+module jsonlist {
+
+    yang-version 1;
+
+    namespace "jsonlist";
+
+    prefix "l";
+
+    organization "ON-LAB";
+
+    description "This module defines for list.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+  container top1 {
+    list l1 {
+        key "k1 k2 k3";
+            leaf k1 {
+               type string;
+            }
+
+            leaf k2 {
+              type string;
+            }
+
+            leaf k3 {
+              type string;
+            }
+
+            container c1 {
+                leaf leaf_c1 {
+                  type string;
+                }
+            }
+    }
+
+    container c2 {
+      leaf-list leaflist1 {
+          type string;
+      }
+    }
+
+  }
+}
