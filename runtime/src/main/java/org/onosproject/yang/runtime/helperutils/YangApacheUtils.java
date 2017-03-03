@@ -16,14 +16,14 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
+import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DefaultYangModel;
 import org.onosproject.yang.model.DefaultYangModule;
 import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.model.YangModuleId;
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -37,11 +37,6 @@ import java.util.regex.Pattern;
 
 import static java.nio.file.Paths.get;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.parseJarFile;
-import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_META_DATA;
-import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RESOURCES;
 import static org.osgi.framework.FrameworkUtil.getBundle;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -50,6 +45,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public final class YangApacheUtils {
 
+    public static final String SLASH = File.separator;
+    public static final String HYPHEN = "-";
+    public static final String PERIOD = ".";
+    public static final String YANG_META_DATA = "YangMetaData.ser";
+    public static final String YANG_RESOURCES = "yang/resources";
     private static final String SYSTEM = SLASH + "system" + SLASH;
     private static final String MAVEN = "mvn:";
     private static final String JAR = ".jar";

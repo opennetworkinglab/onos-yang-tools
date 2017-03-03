@@ -16,10 +16,10 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
-import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,10 +29,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 
 /**
  * Represents utility for runtime. These utilities can be used by application
@@ -40,6 +36,10 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapital
  * to get the YANG node for given YANG model.
  */
 public final class RuntimeHelper {
+
+    public static final String OP_PARAM = "OpParam";
+    public static final String PERIOD = ".";
+    public static final String SERVICE = "Service";
 
     // Forbid construction.
     private RuntimeHelper() {
@@ -123,5 +123,39 @@ public final class RuntimeHelper {
      */
     public static String getDateInStringFormat(YangNode schemaNode) {
         return YangApacheUtils.getDateInStringFormat(schemaNode);
+    }
+
+    /**
+     * Returns the YANG identifier name as java identifier with first letter
+     * in capital.
+     *
+     * @param yangIdentifier identifier in YANG file
+     * @return corresponding java identifier
+     */
+    public static String getCapitalCase(String yangIdentifier) {
+        yangIdentifier = yangIdentifier.substring(0, 1).toUpperCase() + yangIdentifier.substring(1);
+        return restrictConsecutiveCapitalCase(yangIdentifier);
+    }
+
+    /**
+     * Restricts consecutive capital cased string as a rule in camel case.
+     *
+     * @param consecCapitalCaseRemover which requires the restriction of consecutive capital case
+     * @return string without consecutive capital case
+     */
+    private static String restrictConsecutiveCapitalCase(String consecCapitalCaseRemover) {
+
+        for (int k = 0; k < consecCapitalCaseRemover.length(); k++) {
+            if (k + 1 < consecCapitalCaseRemover.length()) {
+                if (Character.isUpperCase(consecCapitalCaseRemover.charAt(k))) {
+                    if (Character.isUpperCase(consecCapitalCaseRemover.charAt(k + 1))) {
+                        consecCapitalCaseRemover = consecCapitalCaseRemover.substring(0, k + 1)
+                                + consecCapitalCaseRemover.substring(k + 1, k + 2).toLowerCase()
+                                + consecCapitalCaseRemover.substring(k + 2);
+                    }
+                }
+            }
+        }
+        return consecCapitalCaseRemover;
     }
 }
