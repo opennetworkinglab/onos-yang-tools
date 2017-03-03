@@ -85,10 +85,36 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.onosproject.yang.runtime.*
+                            org.onosproject.yang.runtime.*,
+                            org.osgi.*,
+                            org.onosproject.yang.compiler.datamodel.*
                         </Export-Package>
                     </instructions>
                 </configuration>
+            </plugin>
+            <!--
+            Cleans up generated test artifacts which get included as a source
+            directory, but which we don't want as part of the bundle.
+             -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete>
+                                    <fileset dir="${project.build.outputDirectory}/org/onosproject/yang/gen" includes="**/*"/>
+                                </delete>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
