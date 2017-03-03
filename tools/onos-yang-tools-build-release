@@ -11,7 +11,7 @@ fi
 
 export OYT_VERSION=$1
 export OYT_SNAPSHOT=$2
-export BRANCH=$3
+export OYT_BRANCH=$3
 
 set -e
 set -x
@@ -30,6 +30,6 @@ git commit -am"Bumping version to $OYT_SNAPSHOT"
 git push origin $OYT_BRANCH
 git push origin $OYT_TAG
 
-ssh -p 29418 gerrit.onosproject.org projectlock unlock onos-yang-tools master
+ssh -p 29418 gerrit.onosproject.org projectlock unlock onos-yang-tools $OYT_BRANCH
 
 unset OYT_VERSION OYT_SNAPSHOT OYT_BRANCH OYT_TAG
