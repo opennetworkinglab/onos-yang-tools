@@ -39,26 +39,6 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-datamodel</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-translator</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-linker</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-utils</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-parser</artifactId>
             <version>1.12-SNAPSHOT</version>
         </dependency>
@@ -68,24 +48,4 @@
             <version>1.12-SNAPSHOT</version>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <configuration>
-                    <skipIfEmpty>true</skipIfEmpty>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

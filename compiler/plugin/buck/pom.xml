@@ -34,11 +34,6 @@
             <version>0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-tool</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>

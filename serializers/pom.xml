@@ -36,4 +36,12 @@
     </modules>
 
     <description>Serializers for various codecs</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-yang-runtime</artifactId>
+            <version>1.12-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

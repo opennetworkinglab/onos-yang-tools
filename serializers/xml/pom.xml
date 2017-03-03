@@ -36,16 +36,6 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-runtime</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.dom4j</artifactId>
-            <version>1.6.1_5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-serializers-utils</artifactId>
             <version>1.12-SNAPSHOT</version>
         </dependency>
@@ -92,7 +82,9 @@
                         <configuration>
                             <tasks>
                                 <delete>
-                                    <fileset dir="${project.build.outputDirectory}/org/onosproject/yang/gen" includes="**/*"/>
+                                    <fileset
+                                            dir="${project.build.outputDirectory}/org/onosproject/yang/gen"
+                                            includes="**/*"/>
                                 </delete>
                             </tasks>
                         </configuration>
