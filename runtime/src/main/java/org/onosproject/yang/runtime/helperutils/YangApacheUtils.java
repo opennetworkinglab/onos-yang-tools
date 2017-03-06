@@ -45,17 +45,16 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public final class YangApacheUtils {
 
-    public static final String SLASH = File.separator;
-    public static final String HYPHEN = "-";
-    public static final String PERIOD = ".";
-    public static final String YANG_META_DATA = "YangMetaData.ser";
-    public static final String YANG_RESOURCES = "yang/resources";
+    private static final String SLASH = File.separator;
+    private static final String HYPHEN = "-";
+    private static final String PERIOD = ".";
+    private static final String YANG_META_DATA = "YangMetaData.ser";
+    private static final String YANG_RESOURCES = "yang/resources";
     private static final String SYSTEM = SLASH + "system" + SLASH;
     private static final String MAVEN = "mvn:";
     private static final String JAR = ".jar";
     private static final String USER_DIRECTORY = "user.dir";
     private static final String DATE_FORMAT = "yyyy-mm-dd";
-    private static final String ONOS = "org.onosproject";
     private static final Logger log = getLogger(YangApacheUtils.class);
 
     // Forbid construction.
@@ -71,25 +70,17 @@ public final class YangApacheUtils {
     public static YangModel getYangModel(Class<?> modClass) {
         BundleContext context = getBundle(modClass).getBundleContext();
         if (context != null) {
-            Bundle[] bundles = context.getBundles();
-            Bundle bundle;
-            int len = bundles.length;
+            Bundle bundle = context.getBundle();
             List<YangNode> curNodes;
             String jarPath;
             String metaPath;
-            for (int i = len - 1; i >= 0; i--) {
-                bundle = bundles[i];
-                if (bundle.getSymbolicName().contains(ONOS)) {
-                    jarPath = getJarPathFromBundleLocation(
-                            bundle.getLocation(), context.getProperty(USER_DIRECTORY));
-                    metaPath = jarPath + SLASH +
-                            YANG_RESOURCES + SLASH + YANG_META_DATA;
-                    curNodes = processJarParsingOperations(jarPath);
-                    // process model creations.
-                    if (curNodes != null && !curNodes.isEmpty()) {
-                        return processYangModel(metaPath, curNodes);
-                    }
-                }
+            jarPath = getJarPathFromBundleLocation(
+                    bundle.getLocation(), context.getProperty(USER_DIRECTORY));
+            metaPath = jarPath + SLASH + YANG_RESOURCES + SLASH + YANG_META_DATA;
+            curNodes = processJarParsingOperations(jarPath);
+            // process model creations.
+            if (curNodes != null && !curNodes.isEmpty()) {
+                return processYangModel(metaPath, curNodes);
             }
         }
         return null;

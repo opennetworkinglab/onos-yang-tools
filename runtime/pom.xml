@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>RELEASE</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -86,8 +86,13 @@
                     <instructions>
                         <Export-Package>
                             org.onosproject.yang.runtime.*,
-                            org.osgi.*,
-                            org.onosproject.yang.compiler.datamodel.*
+                            org.onosproject.yang.compiler.datamodel.*,
+                            org.onosproject.yang.compiler.translator.*,
+                            org.onosproject.yang.compiler.utils.*,
+                            org.onosproject.yang.compiler.linker.*,
+                            org.onosproject.yang.compiler.tool.*,
+                            org.onosproject.yang.compiler.parser.*,
+                            org.antlr.v4.*,
                         </Export-Package>
                     </instructions>
                 </configuration>
