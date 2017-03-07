@@ -40,7 +40,7 @@ public class DefaultJsonWalker implements JsonWalker {
     private DataNode.Builder dataNodeBuilder;
 
     /**
-     * Constructor.
+     * Creates an instance of JSON object node walker.
      */
     public DefaultJsonWalker(DataNode.Builder db) {
         dataNodeBuilder = db;
@@ -124,10 +124,8 @@ public class DefaultJsonWalker implements JsonWalker {
         String nodeName = getLatterSegment(fieldName, COLON);
         String namespace = getPreSegment(fieldName, COLON);
         dataNodeBuilder = SerializerHelper.addDataNode(dataNodeBuilder,
-                                                       nodeName,
-                                                       namespace,
-                                                       value,
-                                                       nodeType);
+                                                       nodeName, namespace,
+                                                       value, nodeType);
     }
 
     private void addNoneLeafDataNode(String fieldName, DataNode.Type nodeType) {
