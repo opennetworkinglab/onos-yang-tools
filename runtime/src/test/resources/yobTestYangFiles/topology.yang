@@ -1,0 +1,90 @@
+
+module yms-topology {
+    yang-version 1;
+    namespace urn:topo;
+    prefix topo;
+    revision 2014-01-01 {
+        description "desc";
+        reference "ref";
+    }
+    list node {
+        key "node-id";
+        leaf node-id{
+           type string;
+        }
+        leaf-list node-prop{
+           type string;
+        }
+        container termination-points{
+            leaf number-of-tp {
+                type int16;
+            }
+            list termination-point {
+                key "tp-id";
+                leaf tp-id {
+                    type string;
+                }
+            }
+        }
+        choice choice1{
+           case case1a{
+               leaf leaf1a1{
+                   type string;
+               }
+               leaf leaf1a2{
+                   type string;
+               }
+           }
+           case case1b{
+               choice choice1b{
+                   case case1bi{
+                       leaf leaf1bia{
+                           type string;
+                       }
+                       leaf leaf1bib{
+                           type string;
+                       }
+                   }
+                   case case1bii{
+                       leaf leaf1biia{
+                           type string;
+                       }
+                       leaf leaf1biib{
+                           type string;
+                       }
+                   }
+               }
+           }
+        }
+    }
+    choice choice2 {
+        case case2a {
+            leaf leaf2a1 {
+                type string;
+            }
+            leaf leaf2a2 {
+                type string;
+            }
+        }
+        case case2b {
+            choice choice3b {
+                case case2bi {
+                    leaf leaf2bia {
+                       type string;
+                    }
+                    leaf leaf2bib {
+                       type string;
+                    }
+                }
+                case case3bii {
+                   leaf leaf3biia {
+                       type string;
+                   }
+                   leaf leaf3biib {
+                      type string;
+                   }
+                }
+            }
+        }
+    }
+}

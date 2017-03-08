@@ -1,0 +1,256 @@
+module simple-data-types-ll {
+  namespace "simple:data:types:ll";
+
+  prefix "smpdtp";
+  revision 2013-11-12 {
+  }
+
+  identity iden {
+  }
+
+  typedef tpdfempty {
+    type empty;
+  }
+
+  typedef tpdfbit {
+     type bits {
+        bit b1;
+        bit b2;
+        bit b3;
+    }
+  }
+
+  typedef tpdfun4 {
+    type boolean;
+  }
+
+  typedef tpdfun3 {
+    type union {
+        type tpdfbit;
+        type tpdfempty;
+    }
+  }
+
+  typedef tpdfun2 {
+    type union {
+        type tpdfun3;
+        type tpdfun4;
+    }
+  }
+
+  typedef tpdfun1 {
+    type union {
+        type uint8;
+        type decimal64 {
+            fraction-digits 2;
+        }
+    }
+  }
+
+  container cont1 {
+     leaf-list lfnint8Min {
+        type int8;
+      }
+      leaf-list lfnint8Max {
+        type int8;
+      }
+      leaf-list lfnint16Min {
+        type int16;
+      }
+      leaf-list lfnint16Max {
+        type int16;
+      }
+      leaf-list lfnint32Min {
+        type int32;
+      }
+      leaf-list lfnint32Max {
+        type int32;
+      }
+      leaf-list lfnint64Min {
+        type int64;
+      }
+      leaf-list lfnint64Max {
+        type int64;
+      }
+      leaf-list lfnuint8Max {
+        type uint8;
+      }
+      leaf-list lfnuint16Max {
+        type uint16;
+      }
+      leaf-list lfnuint32Max {
+        type uint32;
+      }
+      leaf-list lfuint64Max {
+        type uint64;
+      }
+      leaf-list lfstr {
+        type string;
+      }
+      leaf-list lfstr1 {
+        type string;
+      }
+      leaf-list lfbool1 {
+        type boolean;
+      }
+      leaf-list lfbool2 {
+        type boolean;
+      }
+      leaf-list lfbool3 {
+        type boolean;
+      }
+      leaf-list lfdecimal1 {
+        type decimal64 {
+            fraction-digits 1;
+        }
+      }
+      leaf-list lfdecimal2 {
+        type decimal64 {
+            fraction-digits 2;
+        }
+      }
+      leaf-list lfdecimal3 {
+        type decimal64 {
+            fraction-digits 3;
+        }
+      }
+
+      leaf-list lfdecimal4 {
+        type decimal64 {
+            fraction-digits 4;
+        }
+      }
+
+      leaf-list lfdecimal6 {
+        type decimal64 {
+            fraction-digits 6;
+        }
+      }
+
+    leaf-list lfenum {
+      type enumeration {
+        enum enum1;
+        enum enum2;
+        enum enum3;
+        enum enum4;
+      }
+    }
+
+    leaf-list lfbits {
+      type bits {
+        bit bit1;
+        bit bit2;
+        bit bit3;
+        bit bit4;
+      }
+    }
+
+    leaf-list lfbinary {
+        type binary;
+    }  
+
+    leaf-list lfref1 {                  //reference to string type
+        type leafref {
+            path "../lfstr";
+        }
+    }
+
+    leaf-list lfref2 {                  //reference to number type
+        type leafref {
+            path "../lfnint8Max";
+        }
+    }
+
+    leaf-list lfempty {
+        type empty;
+    }
+
+    leaf-list lfunion1 {
+        type union {
+            type uint16;
+            type string;
+        }
+    }
+    leaf-list lfunion2 {
+        type union {
+            type decimal64 {
+                fraction-digits 2;
+            }
+            type string;
+        }
+    }
+
+    leaf-list lfunion4 {
+        type union {
+            type boolean;
+            type string;
+        }
+    }
+
+    leaf-list lfunion5 {
+        type union {
+            type uint16;
+            type string;
+        }
+    }
+
+    leaf-list lfunion7 {
+        type tpdfun3;
+    }
+
+    leaf-list lfunion8 {
+        type union {
+            type uint16;
+            type string;
+        }
+    }
+
+    leaf-list lfunion9 {
+        type union {
+            type uint16;
+            type boolean;
+        }
+    }
+
+    leaf-list lfunion10 {
+        type union {
+            type bits {
+                bit bt1;
+                bit bt2;
+            }
+            type boolean;
+        }
+    }
+
+    leaf-list lfunion11 {
+        type union {
+            type tpdfun1;
+            type tpdfun2;
+        }
+    }
+
+    leaf-list lfunion12 {
+        type tpdfun2;
+    }
+
+    leaf-list lfunion13 {
+        type tpdfbit;    
+    }
+
+    leaf-list lfunion14 {
+        type union {
+            type enumeration {
+                enum zero;
+                enum one;
+            }
+            type uint16;
+        }
+    }
+
+    leaf-list identityref1 {
+        type identityref {
+            base iden;
+        }
+    }
+  }
+}

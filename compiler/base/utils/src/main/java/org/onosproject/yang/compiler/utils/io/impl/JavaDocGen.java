@@ -597,9 +597,7 @@ public final class JavaDocGen {
                     break;
             }
         }
-        javadoc.append(getJavaDocParamLine(
-                attribute, ADD_STRING + TO_CAPS))
-                .append(getJavaDocReturnLine(attribute))
+        javadoc.append(getJavaDocParamLine(attribute, ADD_STRING + TO_CAPS))
                 .append(getJavaDocEndLine());
         return javadoc.toString();
     }

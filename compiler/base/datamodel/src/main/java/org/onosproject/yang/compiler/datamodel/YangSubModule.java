@@ -97,7 +97,8 @@ public abstract class YangSubModule
         extends YangNode
         implements YangLeavesHolder, YangDesc, YangReference, Parsable,
         CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
-        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace, YangDeviationHolder {
+        YangFeatureHolder, YangIsFilterContentNodes, YangNamespace,
+        YangDeviationHolder {
 
     private static final long serialVersionUID = 806201614L;
 

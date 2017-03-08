@@ -19,12 +19,17 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.SingleInstanceNodeContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.NOTIFICATION_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
@@ -32,7 +37,11 @@ import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.NOTIFICATION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.E_ID;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.FMT_NOT_EXIST;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.NOTIFICATION_DATA;
 
@@ -88,7 +97,8 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.NO
 public abstract class YangNotification
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
-        YangAugmentableNode, YangIfFeatureHolder, InvalidOpTypeHolder {
+        YangAugmentableNode, YangIfFeatureHolder, InvalidOpTypeHolder,
+        SingleInstanceNodeContext {
 
     private static final long serialVersionUID = 806201611L;
 
@@ -128,7 +138,8 @@ public abstract class YangNotification
      * Create a notification node.
      */
     public YangNotification() {
-        super(NOTIFICATION_NODE, new HashMap<>());
+        super(NOTIFICATION_NODE, new HashMap<>(),
+              DataNode.Type.SINGLE_INSTANCE_NODE);
         listOfLeaf = new LinkedList<>();
         listOfLeafList = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
@@ -328,5 +339,25 @@ public abstract class YangNotification
 
     public void cloneAugmentInfo() {
         yangAugmentedInfo = new ArrayList<>();
+    }
+
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId, E_ID);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
+                schemaId, getNameSpace().getModuleNamespace());
+        try {
+            YangSchemaNode node = getChildSchema(id).getSchemaNode();
+            if (node instanceof SchemaDataNode) {
+                return node;
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST,
+                                                            schemaId.name(),
+                                                            getName()));
+            }
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

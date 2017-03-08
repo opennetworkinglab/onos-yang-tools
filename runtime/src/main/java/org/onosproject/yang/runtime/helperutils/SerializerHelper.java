@@ -105,10 +105,19 @@ public final class SerializerHelper {
             ResourceId.Builder builder, String name, String namespace,
             String value) {
         try {
+            SchemaContext parentCont = (SchemaContext) builder.appInfo();
             SchemaContext child = getChildSchemaContext(
-                    (SchemaContext) builder.appInfo(), name, namespace);
+                    parentCont, name, namespace);
+            if (child == null) {
+                throw new IllegalArgumentException(
+                        errorMsg(FMT_NOT_EXIST, name));
+            }
             DataNode.Type type = child.getType();
             updateResourceId(builder, name, value, child, type);
+            if (type == SINGLE_INSTANCE_LEAF_VALUE_NODE &&
+                    ((YangLeaf) child).isKeyLeaf()) {
+                builder.appInfo(parentCont);
+            }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -287,8 +296,8 @@ public final class SerializerHelper {
                 nodeInfo = info;
             }
 
-            SchemaContext childSchema = getChildSchemaContext(
-                    node, name, namespace);
+            SchemaContext childSchema = getChildSchemaContext(node, name,
+                                                              namespace);
             DataNode.Type nodeType = childSchema.getType();
 
             if (type != null && !nodeType.equals(type)) {
@@ -423,7 +432,7 @@ public final class SerializerHelper {
      * @param namespace namespace of the child node
      * @return schema context
      */
-    private static SchemaContext getChildSchemaContext(
+    public static SchemaContext getChildSchemaContext(
             SchemaContext context, String name, String namespace)
             throws IllegalArgumentException {
         SchemaContext child;
@@ -436,10 +445,6 @@ public final class SerializerHelper {
 
         SchemaId id = new SchemaId(name, namespace);
         child = ((SingleInstanceNodeContext) context).getChildContext(id);
-        if (child == null) {
-            throw new IllegalArgumentException(
-                    errorMsg(FMT_NOT_EXIST, name));
-        }
         return child;
     }
 

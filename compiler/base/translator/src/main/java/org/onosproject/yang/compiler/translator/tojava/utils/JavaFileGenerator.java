@@ -59,6 +59,8 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileT
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_TYPEDEF_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_UNION_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.INTERFACE_MASK;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_IMPL_MASK;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ADD_TO_LIST_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ATTRIBUTES_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.CONSTRUCTOR_FOR_TYPE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.ENUM_IMPL_MASK;
@@ -254,6 +256,8 @@ public final class JavaFileGenerator {
 
                 insertDataIntoJavaFile(file, getDataFromTempFileHandle(
                         SETTER_FOR_INTERFACE_MASK, getBeanFiles(curNode), path));
+                insertDataIntoJavaFile(file, getDataFromTempFileHandle(
+                        ADD_TO_LIST_INTERFACE_MASK, getBeanFiles(curNode), path));
             } catch (IOException e) {
                 throw new IOException(getErrorMsg(className, INTERFACE));
             }
@@ -499,6 +503,10 @@ public final class JavaFileGenerator {
             //Getter methods.
             methods.add(getDataFromTempFileHandle(
                     SETTER_FOR_CLASS_MASK, getBeanFiles(curNode), path));
+
+            //Add to list impl method.
+            methods.add(getDataFromTempFileHandle(
+                    ADD_TO_LIST_IMPL_MASK, getBeanFiles(curNode), path));
 
             // Hash code method.
             methods.add(getHashCodeMethodClose(

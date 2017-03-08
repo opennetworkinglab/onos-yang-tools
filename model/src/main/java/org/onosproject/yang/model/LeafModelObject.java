@@ -72,4 +72,13 @@ public final class LeafModelObject extends ModelObject {
     public void values(List<Object> v) {
         values = v;
     }
+
+    /**
+     * Adds value to list.
+     *
+     * @param v value
+     */
+    public void addValue(Object v) {
+        values.add(v);
+    }
 }

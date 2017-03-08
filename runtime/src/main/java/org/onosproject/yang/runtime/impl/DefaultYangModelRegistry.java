@@ -16,8 +16,6 @@
 
 package org.onosproject.yang.runtime.impl;
 
-import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.YangChoice;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -28,6 +26,8 @@ import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.SingleInstanceNodeContext;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.runtime.AppModuleInfo;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
 import org.onosproject.yang.runtime.YangModelRegistry;
@@ -580,8 +580,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             //If namespace if module name.
             node = getForSchemaName(schemaId.namespace());
         }
-        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(
-                schemaId, namespace);
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(schemaId, namespace);
 
         try {
             if (node != null) {

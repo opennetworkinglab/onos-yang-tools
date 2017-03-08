@@ -80,7 +80,9 @@ public final class ObjectProvider {
             case BOOLEAN:
                 return Boolean.parseBoolean(leafValue);
             case BINARY:
-                return Base64.getDecoder().decode(leafValue);
+                byte[] data = Base64.getDecoder().decode(leafValue);
+                String str = new String(data);
+                return str;
             case BITS:
             case IDENTITYREF:
             case ENUMERATION:
@@ -93,8 +95,12 @@ public final class ObjectProvider {
                         .getDataTypeExtendedInfo()).getEffectiveDataType();
                 return getObject(refType, leafValue, refType.getDataType());
             case DERIVED:
-                return getObject(null, leafValue, ((YangDerivedInfo) typeInfo
-                        .getDataTypeExtendedInfo()).getEffectiveBuiltInType());
+                // referred typedef's list of type will always has only one type
+                YangType rt = ((YangDerivedInfo) typeInfo
+                        .getDataTypeExtendedInfo()).getReferredTypeDef()
+                        .getTypeList().get(0);
+                return getObject(rt, leafValue, ((YangDerivedInfo)
+                        typeInfo.getDataTypeExtendedInfo()).getEffectiveBuiltInType());
             case UNION:
                 return parseUnionTypeInfo(typeInfo, leafValue);
             default:

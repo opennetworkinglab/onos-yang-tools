@@ -38,7 +38,8 @@ public class DefaultModelConverter implements ModelConverter {
 
     @Override
     public ModelObjectData createModel(ResourceData data) {
-        return null;
+        DefaultYobBuilder builder = new DefaultYobBuilder(reg);
+        return builder.getYangObject(data);
     }
 
     @Override

@@ -1451,17 +1451,17 @@ public final class MethodsGenerator {
                     param.put(attr.getAttributeName() + KEYS, retType + KEYS);
                     param.put(attr.getAttributeName() + VALUE_CAPS, retType);
                     return multiAttrMethodSignature(methodName, null, null,
-                                                    className, param,
+                                                    VOID, param,
                                                     INTERFACE_TYPE,
                                                     FOUR_SPACE_INDENTATION);
                 default:
                     return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                                           className, retType,
+                                           VOID, retType,
                                            INTERFACE_TYPE);
             }
         }
         return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                               className, getReturnType(attr),
+                               VOID, getReturnType(attr),
                                INTERFACE_TYPE);
     }
 
@@ -1505,7 +1505,7 @@ public final class MethodsGenerator {
                     param.put(attr.getAttributeName() + VALUE_CAPS, retType);
                     builder.append(multiAttrMethodSignature(methodName,
                                                             null, PUBLIC,
-                                                            name, param,
+                                                            VOID, param,
                                                             CLASS_TYPE,
                                                             FOUR_SPACE_INDENTATION))
                             .append(getIfConditionForAddToListMethod(attr));
@@ -1518,7 +1518,7 @@ public final class MethodsGenerator {
                     builder.append(methodSignature(methodName,
                                                    null, PUBLIC,
                                                    ADD_STRING + TO_CAPS,
-                                                   name, retType,
+                                                   VOID, retType,
                                                    CLASS_TYPE))
                             .append(getIfConditionForAddToListMethod(attr));
                     retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD + ADD_STRING +
@@ -1528,15 +1528,13 @@ public final class MethodsGenerator {
             builder.append(methodSignature(ADD_STRING + TO_CAPS +
                                                    getCapitalCase(attrName),
                                            null, PUBLIC, ADD_STRING + TO_CAPS,
-                                           name, retType,
+                                           VOID, retType,
                                            CLASS_TYPE))
                     .append(getIfConditionForAddToListMethod(attr));
             retString = EIGHT_SPACE_INDENTATION + attrName + PERIOD + ADD_STRING +
                     OPEN_PARENTHESIS + ADD_STRING + TO_CAPS + CLOSE_PARENTHESIS;
         }
         builder.append(retString)
-                .append(signatureClose())
-                .append(getReturnString(THIS, EIGHT_SPACE_INDENTATION))
                 .append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();

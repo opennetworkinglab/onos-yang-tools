@@ -1017,7 +1017,7 @@ public abstract class YangNode
             // setting the schema Id
             schemaId = new SchemaId(getName(), getNameSpace()
                     .getModuleNamespace());
-        } else if (this instanceof YangCase) {
+        } else if (this instanceof YangCase || this instanceof YangAugment) {
             ((YangLeavesHolder) this).setLeafParentContext();
         }
     }
