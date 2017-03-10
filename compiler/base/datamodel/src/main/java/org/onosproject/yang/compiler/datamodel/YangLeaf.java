@@ -500,6 +500,11 @@ public abstract class YangLeaf extends DefaultLocationInfo
     }
 
     @Override
+    public boolean isRpcPresent() throws DataModelException {
+        throw new DataModelException("Method is called for node other than module/sub-module.");
+    }
+
+    @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
         return YangSchemaNodeType.YANG_SINGLE_INSTANCE_LEAF_NODE;
     }

@@ -285,6 +285,10 @@ public abstract class YangSubModule
 
     private static final String E_NONDATA =
             "Method called for other then data node";
+    /**
+     * Flag to check whether this module is having rpc.
+     */
+    private boolean isRpcPresent;
 
     /**
      * Creates a sub module node.
@@ -827,6 +831,11 @@ public abstract class YangSubModule
     }
 
     @Override
+    public boolean isRpcPresent() throws DataModelException {
+        return isRpcPresent;
+    }
+
+    @Override
     public void setNotificationPresenceFlag(boolean notificationPresent) {
         isNotificationPresent = notificationPresent;
     }
@@ -892,5 +901,14 @@ public abstract class YangSubModule
     @Override
     public void setModuleForDeviation(boolean moduleForDeviation) {
         isModuleForDeviation = moduleForDeviation;
+    }
+
+    /**
+     * Returns true if rpc is present.
+     *
+     * @param rpcPresent true if rpc is present
+     */
+    public void setRpcPresent(boolean rpcPresent) {
+        isRpcPresent = rpcPresent;
     }
 }

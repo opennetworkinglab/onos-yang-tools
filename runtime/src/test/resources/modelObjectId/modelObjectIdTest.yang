@@ -32,4 +32,35 @@ module check {
            type string;
        }
    }
+
+   augment /list56 {
+       container cont56 {
+          leaf cl56 {
+              type int32;
+          }
+      }
+   }
+
+   augment /list56/cont56 {
+       container cont57 {
+          leaf cl57 {
+              type int32;
+          }
+          uses group1;
+      }
+   }
+
+    grouping group1 {
+        container cont58 {
+            leaf cl58 {
+               type int32;
+            }
+        }
+        list list57 {
+            key "gl57";
+            leaf gl57 {
+                type string;
+            }
+        }
+    }
 }

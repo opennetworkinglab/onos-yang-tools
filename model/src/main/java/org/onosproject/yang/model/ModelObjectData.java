@@ -52,7 +52,12 @@ public interface ModelObjectData {
         Builder addModelObject(ModelObject o);
 
         /**
-         * Sets module object identifier.
+         * Sets module object identifier. In case of schema nodes under
+         * module level id should be null.
+         * <p>
+         * in case of RPC id should be constructed using input's class.
+         * <p>
+         * in case of notification id can be constructed similar as container.
          *
          * @param id identifier
          * @return builder

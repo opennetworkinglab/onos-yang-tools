@@ -31,6 +31,13 @@ public interface RpcNotificationContainer {
     void setNotificationPresenceFlag(boolean notificationPresent);
 
     /**
+     * Sets rpc presence flag.
+     *
+     * @param rpcPresent rpc presence flag
+     */
+    void setRpcPresent(boolean rpcPresent);
+
+    /**
      * Adds to notification enumeration map.
      *
      * @param enumName   name of notification in enum

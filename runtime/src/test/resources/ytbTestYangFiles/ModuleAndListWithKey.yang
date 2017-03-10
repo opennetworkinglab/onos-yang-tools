@@ -1,0 +1,12 @@
+module ModuleListAndKey {
+    yang-version 1;
+    namespace "yms:test:ytb:tree:builder:for:list:having:list";
+    prefix "sch";
+    revision "2016-08-26";
+    list modKey {
+        key "types";
+            leaf types {
+                type int32;
+                }
+            }
+}

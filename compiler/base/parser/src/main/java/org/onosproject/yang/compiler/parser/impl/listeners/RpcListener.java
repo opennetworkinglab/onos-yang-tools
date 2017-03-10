@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
+import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
@@ -26,14 +27,22 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
 import static org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage.JAVA_GENERATION;
-import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.*;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.DESCRIPTION_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.INPUT_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.OUTPUT_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.REFERENCE_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.RPC_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.STATUS_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.RpcStatementContext;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerCollisionDetector.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidIdentifier;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.validateCardinalityMaxOne;
@@ -108,6 +117,7 @@ public final class RpcListener {
             yangRpc.setCharPosition(ctx.getStart().getCharPositionInLine());
             yangRpc.setFileName(listener.getFileName());
             yangRpc.setName(identifier);
+            ((RpcNotificationContainer) curData).setRpcPresent(true);
             try {
                 curNode.addChild(yangRpc);
             } catch (DataModelException e) {

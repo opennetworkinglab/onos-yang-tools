@@ -164,10 +164,10 @@ public class ResourceId {
         }
 
         /**
-         * Adds the descendent node's schema identity.
+         * Adds the descendant node's schema identity.
          *
-         * @param name      name of descendent node
-         * @param nameSpace name space pf descendent node
+         * @param name      name of descendant node
+         * @param nameSpace name space pf descendant node
          * @return updated builder pointing to the specified schema location
          */
         public Builder addBranchPointSchema(String name, String nameSpace) {

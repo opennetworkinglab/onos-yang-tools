@@ -130,6 +130,15 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
             throws DataModelException;
 
     /**
+     * Checks for the presence of rpc in module/sub-module. Exception
+     * will be thrown if this is called for any other node type.
+     *
+     * @return true if rpc is present, false otherwise
+     * @throws DataModelException a violation in data model rule
+     */
+    boolean isRpcPresent() throws DataModelException;
+
+    /**
      * Returns notification schema node corresponding to the name of
      * notification as per the generated code enumeration. This is to be used
      * for notification processing in YMS.

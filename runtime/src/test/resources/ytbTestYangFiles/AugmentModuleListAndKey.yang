@@ -1,0 +1,18 @@
+module ModuleListAndKeyAugment {
+    yang-version 1;
+    namespace "yms:test:ytb:tree:builder:for:list:having:list";
+    prefix "sch1";
+    import ModuleListAndKey {
+        prefix sch;
+    }
+    revision "2016-08-26";
+
+    augment /sch:modKey/ {
+        list aug-list-modKey {
+        key "types";
+            leaf types {
+                type int32;
+            }
+        }
+    }
+}

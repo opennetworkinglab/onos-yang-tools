@@ -118,6 +118,16 @@ public final class InnerNode extends DataNode {
         }
 
         /**
+         * Returns the children nodes to the current node.
+         * Children nodes are identified based on the node key.
+         *
+         * @return read only linked map of children nodes
+         */
+        public Map<NodeKey, DataNode> childNodes() {
+            return childNodes;
+        }
+
+        /**
          * Builds a inner node object.
          *
          * @return inner node

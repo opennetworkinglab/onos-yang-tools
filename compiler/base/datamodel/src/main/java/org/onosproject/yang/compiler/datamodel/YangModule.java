@@ -255,6 +255,11 @@ public abstract class YangModule
     private boolean isNotificationPresent;
 
     /**
+     * Flag to indicate the presence of notification.
+     */
+    private boolean isRpcPresent;
+
+    /**
      * Map of notification enum.
      */
     private final Map<String, YangSchemaNode> notificationEnumMap;
@@ -821,6 +826,11 @@ public abstract class YangModule
     }
 
     @Override
+    public boolean isRpcPresent() throws DataModelException {
+        return isRpcPresent;
+    }
+
+    @Override
     public void setNotificationPresenceFlag(boolean notificationPresent) {
         isNotificationPresent = notificationPresent;
     }
@@ -886,5 +896,14 @@ public abstract class YangModule
     @Override
     public void setModuleForDeviation(boolean moduleForDeviation) {
         isModuleForDeviation = moduleForDeviation;
+    }
+
+    /**
+     * Sets true if rpc is present.
+     *
+     * @param rpcPresent true if rpc is present
+     */
+    public void setRpcPresent(boolean rpcPresent) {
+        isRpcPresent = rpcPresent;
     }
 }

@@ -22,20 +22,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.onosproject.yang.model.ModelObject.ModelObjectType.NON_ATOMIC;
+
 /**
  * Abstraction of an entity that provides common basis for all POJOs which are
  * generated from a YANG model.
  */
 public abstract class InnerModelObject extends ModelObject {
 
-    private ConcurrentMap<Class<? extends InnerModelObject>, InnerModelObject> augments =
+    private final ConcurrentMap<Class<? extends InnerModelObject>, InnerModelObject> augments =
             new ConcurrentHashMap<>();
 
     /**
      * Creates an instance of Inner model object.
      */
     protected InnerModelObject() {
-        super(ModelObjectType.NON_ATOMIC);
+        super(NON_ATOMIC);
     }
 
     /**

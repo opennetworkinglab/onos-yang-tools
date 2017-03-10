@@ -1,0 +1,146 @@
+module model-data-to-resource-data {
+    yang-version 1;
+    namespace "yrt:model:converter:model:data:to:resource:data";
+    prefix "sch";
+    revision "2016-08-26";
+
+    leaf leaf1 {
+        type int32;
+    }
+
+    leaf-list leaf-list1 {
+        type string;
+    }
+
+    typedef uri {
+        type string;
+    }
+
+    grouping group1 {
+        container group-container {
+            leaf group-leaf {
+                type uri;
+            }
+        }
+    }
+    container first-level {
+        container only-container {
+        }
+        container container-leaf {
+            leaf leaf2 {
+                type string;
+            }
+        }
+        container container-leaf-list {
+            leaf-list leaf-list2 {
+                type enumeration {
+                    enum ten { value "10";}
+                    enum hundred { value "100";}
+                    enum thousand { value "1000"; }
+                }
+            }
+        }
+        container container-list {
+            list list-leaf {
+                key "name";
+                leaf name {
+                    type string;
+                }
+            }
+        }
+        container container-choice {
+            choice choice-case {
+                case leaf-case {
+                    leaf leaf3 {
+                        type uint32;
+                    }
+                }
+                case container-case {
+                    container case-container {
+                        leaf leaf4 {
+                            type uri;
+                        }
+                    }
+                }
+                case list-case {
+                    list case-list {
+                        config false;
+                        leaf leaf5 {
+                            type uri;
+                        }
+                    }
+                }
+            }
+        }
+        container container-grouping {
+            uses group1;
+        }
+        list list-in-list {
+            key "list-key";
+            leaf list-key {
+                type uri;
+            }
+            list list2 {
+                key "key2";
+                leaf key2 {
+                    type int32;
+                }
+            }
+        }
+    }
+
+    augment /first-level {
+        leaf leaf-aug {
+            type int32;
+        }
+    }
+
+    augment /first-level/container-leaf {
+        leaf leaf-aug {
+            type empty;
+        }
+    }
+
+    augment /first-level/container-list/list-leaf {
+        leaf leaf-aug {
+            type union-typedef;
+        }
+    }
+
+    augment /first-level/container-choice/choice-case {
+        leaf leaf-aug {
+            type bits-typedef;
+        }
+    }
+
+    augment /first-level/container-choice/choice-case/leaf-case {
+        leaf leaf-aug {
+            type binary-typedef;
+        }
+    }
+    typedef binary-typedef {
+        type binary;
+    }
+
+    typedef bits-typedef {
+        type bits {
+            bit index {
+                position 1;
+            }
+            bit name {
+                position 10;
+            }
+            bit signature {
+                position 100;
+            }
+        }
+    }
+
+    typedef union-typedef {
+        type union {
+            type int32;
+            type string;
+        }
+    }
+
+}

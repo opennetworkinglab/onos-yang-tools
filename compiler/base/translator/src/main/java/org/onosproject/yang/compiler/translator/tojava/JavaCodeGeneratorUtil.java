@@ -32,7 +32,7 @@ import java.io.IOException;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
-import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
 
 /**
@@ -78,7 +78,7 @@ public final class JavaCodeGeneratorUtil {
                     }
                 } catch (InvalidNodeForTranslatorException e) {
                     if (codeGenNode.getNextSibling() != null) {
-                        curTraversal = SIBILING;
+                        curTraversal = SIBLING;
                         codeGenNode = codeGenNode.getNextSibling();
                     } else {
                         curTraversal = PARENT;
@@ -102,7 +102,7 @@ public final class JavaCodeGeneratorUtil {
                     close(codeGenNode, yangPlugin, rootNode);
                     throw new TranslatorException(e.getMessage());
                 }
-                curTraversal = SIBILING;
+                curTraversal = SIBLING;
                 codeGenNode = codeGenNode.getNextSibling();
             } else {
                 try {
@@ -185,7 +185,7 @@ public final class JavaCodeGeneratorUtil {
                     curTraversal = CHILD;
                     freedNode = freedNode.getChild();
                 } else if (freedNode.getNextSibling() != null) {
-                    curTraversal = SIBILING;
+                    curTraversal = SIBLING;
                     if (freedNode != tempNode) {
                         free(freedNode);
                     }
@@ -245,7 +245,7 @@ public final class JavaCodeGeneratorUtil {
                     curTraversal = CHILD;
                     tempNode = tempNode.getChild();
                 } else if (tempNode.getNextSibling() != null) {
-                    curTraversal = SIBILING;
+                    curTraversal = SIBLING;
                     tempNode = tempNode.getNextSibling();
                 } else {
                     curTraversal = PARENT;
@@ -312,7 +312,7 @@ public final class JavaCodeGeneratorUtil {
                 curTraversal = CHILD;
                 child = child.getChild();
             } else if (child.getNextSibling() != null) {
-                curTraversal = SIBILING;
+                curTraversal = SIBLING;
                 child = child.getNextSibling();
             } else {
                 curTraversal = PARENT;

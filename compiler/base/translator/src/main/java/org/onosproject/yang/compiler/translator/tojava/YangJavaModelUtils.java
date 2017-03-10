@@ -641,8 +641,8 @@ public final class YangJavaModelUtils {
      * @param config  plugin configurations
      * @return augment class name
      */
-    private static String getAugmentClassName(YangAugment augment,
-                                              YangPluginConfig config) {
+    public static String getAugmentClassName(YangAugment augment,
+                                             YangPluginConfig config) {
         YangNodeIdentifier identifier =
                 augment.getTargetNode().get(augment.getTargetNode().size() - 1)
                         .getNodeIdentifier();

@@ -169,6 +169,15 @@ public abstract class DataNode {
         }
 
         /**
+         * Returns parent node.
+         *
+         * @return parent node
+         */
+        public B parent() {
+            return (B) parent;
+        }
+
+        /**
          * Sets node type in builder object.
          *
          * @param type node type
@@ -300,9 +309,11 @@ public abstract class DataNode {
          * this builder as there work bench.
          *
          * @param appInfo application related information
+         * @return builder object
          */
-        public void appInfo(Object appInfo) {
+        public B appInfo(Object appInfo) {
             this.appInfo = appInfo;
+            return (B) this;
         }
     }
 }

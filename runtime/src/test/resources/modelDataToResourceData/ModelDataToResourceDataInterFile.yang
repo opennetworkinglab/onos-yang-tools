@@ -1,0 +1,33 @@
+module model-data-to-resource-data-inter-file {
+    yang-version 1;
+    namespace "yrt:model:converter:model:data:to:resource:data";
+    prefix "sch-inter";
+    import model-data-to-resource-data {
+        prefix sch;
+    }
+    revision "2016-08-26";
+
+    augment /sch:first-level/sch:container-choice/sch:choice-case {
+        leaf leaf-inter-aug {
+            type sch:uri;
+        }
+    }
+
+    augment /sch:first-level/sch:container-choice/sch:choice-case/sch:leaf-case {
+        leaf leaf-inter-aug {
+            type decimal64 {
+                fraction-digits 2;
+            }
+        }
+    }
+
+    augment /sch:first-level {
+        container inter-container {
+            leaf leaf-inter-aug {
+                type decimal64 {
+                    fraction-digits 2;
+                }
+            }
+        }
+    }
+}

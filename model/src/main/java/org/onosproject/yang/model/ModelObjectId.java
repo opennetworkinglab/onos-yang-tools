@@ -32,7 +32,7 @@ public final class ModelObjectId {
     /**
      * List of atomic paths.
      */
-    List<AtomicPath> atomicPaths;
+    private final List<AtomicPath> atomicPaths;
 
     /**
      * Create object from builder.
@@ -89,7 +89,7 @@ public final class ModelObjectId {
      */
     public static class Builder {
 
-        private List<AtomicPath> atomicPathList = new LinkedList<>();
+        private final List<AtomicPath> atomicPathList = new LinkedList<>();
 
         /**
          * Adds the node's identity for container.

@@ -27,7 +27,7 @@ import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
-import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.USES_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
@@ -466,7 +466,7 @@ public abstract class YangUses
                 curTraversal = CHILD;
                 curNode = curNode.getChild();
             } else if (curNode.getNextSibling() != null) {
-                curTraversal = SIBILING;
+                curTraversal = SIBLING;
                 curNode = curNode.getNextSibling();
             } else {
                 curTraversal = PARENT;

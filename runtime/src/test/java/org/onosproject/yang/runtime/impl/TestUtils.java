@@ -75,7 +75,7 @@ public final class TestUtils implements DataNodeListener {
     }
 
     /**
-     * Returns the LOGGER with log for testing the YDT walker.
+     * Returns the LOGGER with log for testing the data tree walker.
      *
      * @return list of logs
      */

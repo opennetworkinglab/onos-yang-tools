@@ -28,7 +28,7 @@ public class DefaultYangNamespace implements YangNamespace {
 
     /**
      * Creates an instance of namespace which is used to initialize the
-     * nameSpace for requested YDT node.
+     * nameSpace for requested data tree node.
      *
      * @param ns namespace of the requested node
      */

@@ -41,7 +41,7 @@ public class DefaultYangSerializerContext implements YangSerializerContext {
 
     @Override
     public SchemaContext getContext() {
-        return null;
+        return rootContext;
     }
 
     @Override

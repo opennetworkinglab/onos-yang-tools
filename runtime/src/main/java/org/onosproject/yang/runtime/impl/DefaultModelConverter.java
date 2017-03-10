@@ -38,13 +38,12 @@ public class DefaultModelConverter implements ModelConverter {
 
     @Override
     public ModelObjectData createModel(ResourceData data) {
-        //TODO: add implementation.
         return null;
     }
 
     @Override
-    public ResourceData createDataNode(ModelObjectData modelData) {
-        //TODO: add implementation.
-        return null;
+    public synchronized ResourceData createDataNode(ModelObjectData modelData) {
+        DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(reg);
+        return builder.getResourceData(modelData);
     }
 }

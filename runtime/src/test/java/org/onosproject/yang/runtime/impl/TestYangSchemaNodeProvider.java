@@ -23,7 +23,6 @@ import org.onosproject.yang.runtime.AppModuleInfo;
 import org.onosproject.yang.runtime.DefaultAppModuleInfo;
 import org.onosproject.yang.runtime.DefaultModelRegistrationParam;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
-import org.onosproject.yang.runtime.YangModelRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +51,7 @@ public class TestYangSchemaNodeProvider {
             FS + "YangMetaData.ser";
     private static final String META_PATH = PATH + SER_FILE_PATH;
     private static final String TEMP_FOLDER_PATH = PATH + TEMP;
-    private YangModelRegistry reg = new DefaultYangModelRegistry();
+    private DefaultYangModelRegistry reg = new DefaultYangModelRegistry();
     private List<YangNode> nodes = new ArrayList<>();
 
     /**
@@ -131,6 +130,16 @@ public class TestYangSchemaNodeProvider {
      * @return schema registry
      */
     public DefaultYangModelRegistry registry() {
-        return (DefaultYangModelRegistry) reg;
+        return reg;
+    }
+
+    /**
+     * Adds a mock node in reg.
+     *
+     * @param node schema node
+     * @param name name of node
+     */
+    public void addMockNode(YangSchemaNode node, String name) {
+        reg.processApplicationContext(node, name);
     }
 }

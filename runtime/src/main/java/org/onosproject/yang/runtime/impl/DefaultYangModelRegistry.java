@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.sort;
+import static java.util.Collections.unmodifiableSet;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
 import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getDateInStringFormat;
 import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getInterfaceClassName;
@@ -57,8 +58,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DefaultYangModelRegistry implements YangModelRegistry,
         SingleInstanceNodeContext {
 
-    private static final String AT = "@";
     private final Logger log = getLogger(getClass());
+    private static final String AT = "@";
+
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -71,6 +73,12 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * interface file name.
      */
     private final ConcurrentMap<String, YangSchemaNode> interfaceNameKeyStore;
+
+    /*
+     * Map for storing YANG schema nodes with respect to root's generated
+     * interface file name.
+     */
+    private final ConcurrentMap<String, YangSchemaNode> pkgKeyStore;
 
     /*
      * Map for storing YANG schema nodes root's generated op param file name.
@@ -117,6 +125,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         registerClassStore = new ConcurrentHashMap<>();
         appNameKeyStore = new ConcurrentHashMap<>();
         nameSpaceSchemaStore = new ConcurrentHashMap<>();
+        pkgKeyStore = new ConcurrentHashMap<>();
         schemaId = new SchemaId("/", null);
     }
 
@@ -172,6 +181,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
                         removeSchemaNode(curNode);
                         interfaceNameKeyStore.remove(
                                 getInterfaceClassName(curNode));
+                        pkgKeyStore.remove(getInterfaceClassName(curNode)
+                                                   .toLowerCase());
                         opParamNameKeyStore.remove(
                                 getOpParamClassName(curNode));
                         appNameKeyStore.remove(serviceName);
@@ -194,7 +205,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
     @Override
     public Set<YangModel> getModels() {
-        return models;
+        return unmodifiableSet(models);
     }
 
     /**
@@ -234,6 +245,23 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         YangSchemaNode node = interfaceNameKeyStore.get(name);
         if (node == null) {
             log.error("{} not found.", name);
+        }
+        return node;
+    }
+
+    /**
+     * Returns schema node for the given package. pkg should be generated class
+     * pkg. the pkg provided here should be for registered interface class.
+     * pkg string contains the java package and java name of the module
+     * generated class in lower case.
+     *
+     * @param pkg interface class pkg
+     * @return YANG schema node
+     */
+    public YangSchemaNode getForInterfaceFilePkg(String pkg) {
+        YangSchemaNode node = pkgKeyStore.get(pkg);
+        if (node == null) {
+            log.error("{} not found.", pkg);
         }
         return node;
     }
@@ -343,23 +371,24 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * @param appNode application YANG schema nodes
      * @param name    class name
      */
-    private void processApplicationContext(YangSchemaNode appNode,
-                                           String name) {
+    public void processApplicationContext(YangSchemaNode appNode,
+                                          String name) {
 
         //Update map for which registrations is being called.
         try {
-            if (appNode.isNotificationPresent()) {
-                //TODO: add logic for getting wrt RPC.
+            if (appNode.isNotificationPresent() || appNode.isRpcPresent()) {
                 appNameKeyStore.put(name, appNode);
             }
         } catch (DataModelException e) {
-            e.printStackTrace();
+            log.error("error occurred due to {}", e.getLocalizedMessage());
         }
 
         // Updates schema store.
         addToSchemaStore(appNode);
         // update interface store.
         interfaceNameKeyStore.put(getInterfaceClassName(appNode), appNode);
+
+        pkgKeyStore.put(getInterfaceClassName(appNode).toLowerCase(), appNode);
 
         //update op param store.
         opParamNameKeyStore.put(getOpParamClassName(appNode), appNode);

@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
-import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.FAILED_TO_ADD_CASE;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.TARGET_NODE;
@@ -307,7 +307,7 @@ public final class YangLinkerUtils {
                 curTraversal = CHILD;
                 curNode = curNode.getChild();
             } else if (curNode.getNextSibling() != null) {
-                curTraversal = SIBILING;
+                curTraversal = SIBLING;
                 curNode = curNode.getNextSibling();
             } else {
                 curTraversal = PARENT;
@@ -554,7 +554,7 @@ public final class YangLinkerUtils {
             if (curTraversal != PARENT) {
                 if (curNode instanceof YangGrouping || curNode instanceof YangUses) {
                     if (curNode.getNextSibling() != null) {
-                        curTraversal = SIBILING;
+                        curTraversal = SIBLING;
                         curNode = curNode.getNextSibling();
                     } else {
                         curTraversal = PARENT;
@@ -599,7 +599,7 @@ public final class YangLinkerUtils {
                 curNode = curNode.getChild();
             } else if (curNode.getNextSibling() != null) {
 
-                curTraversal = SIBILING;
+                curTraversal = SIBLING;
                 curNode = curNode.getNextSibling();
             } else {
                 curTraversal = PARENT;

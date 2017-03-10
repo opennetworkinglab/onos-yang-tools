@@ -40,6 +40,8 @@ public final class RuntimeHelper {
     public static final String OP_PARAM = "OpParam";
     public static final String PERIOD = ".";
     public static final String SERVICE = "Service";
+    public static final String DEFAULT_CAPS = "Default";
+    public static final String UNDER_SCORE = "_";
 
     // Forbid construction.
     private RuntimeHelper() {

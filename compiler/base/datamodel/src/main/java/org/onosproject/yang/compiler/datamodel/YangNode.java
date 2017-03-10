@@ -27,7 +27,7 @@ import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
-import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBILING;
+import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.RPC_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeaf;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeafList;
@@ -537,7 +537,7 @@ public abstract class YangNode
                      * new node.
                      */
                     clonedTreeCurNode = newNode;
-                } else if (curTraversal == SIBILING) {
+                } else if (curTraversal == SIBLING) {
 
                     clonedTreeCurNode.addNextSibling(newNode);
                     clonedTreeCurNode = newNode;
@@ -557,7 +557,7 @@ public abstract class YangNode
                     nextNodeToClone = nextNodeToClone.getChild();
                 } else if (nextNodeToClone.getNextSibling() != null) {
 
-                    curTraversal = SIBILING;
+                    curTraversal = SIBLING;
 
                     nextNodeToClone = nextNodeToClone.getNextSibling();
                 } else {
@@ -601,7 +601,7 @@ public abstract class YangNode
         if (addAs == CHILD) {
             collisionDetector.detectCollidingChild(newNode.getName(),
                                                    parsable.getYangConstructType());
-        } else if (addAs == SIBILING) {
+        } else if (addAs == SIBLING) {
             currentNode = currentNode.getParent();
             if (!(currentNode instanceof CollisionDetector)) {
                 throw new DataModelException("Node in data model tree does " +
@@ -733,6 +733,11 @@ public abstract class YangNode
 
     @Override
     public boolean isNotificationPresent() throws DataModelException {
+        throw new DataModelException("Method is called for node other than module/sub-module.");
+    }
+
+    @Override
+    public boolean isRpcPresent() throws DataModelException {
         throw new DataModelException("Method is called for node other than module/sub-module.");
     }
 

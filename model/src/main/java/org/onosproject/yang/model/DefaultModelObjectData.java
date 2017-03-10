@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class DefaultModelObjectData implements ModelObjectData {
 
-    private List<ModelObject> objects;
-    private ModelObjectId identifier;
+    private final List<ModelObject> objects;
+    private final ModelObjectId identifier;
 
     /**
      * Creates an instance of model object data.
