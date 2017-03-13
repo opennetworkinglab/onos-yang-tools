@@ -51,10 +51,12 @@ public final class DecoderUtils {
         DataNode.Builder dataNodeBuilder = SerializerHelper.
                 initializeDataNode(context);
 
-        JsonWalker jsonWalker = new DefaultJsonWalker(dataNodeBuilder);
+        DefaultJsonWalker jsonWalker = new DefaultJsonWalker(dataNodeBuilder);
+        // FIXME: Handle scenario wherein there are multiple data nodes are
+        // there at root level.
         jsonWalker.walkJsonNode(null, rootNode);
-
-        return dataNodeBuilder.build();
+        // returning the updated data node builder
+        return jsonWalker.rootBuilder().build();
     }
 
     /**
@@ -76,9 +78,11 @@ public final class DecoderUtils {
         DataNode.Builder dataNodeBuilder = SerializerHelper.
                 initializeDataNode(ridBuilder);
 
-        JsonWalker jsonWalker = new DefaultJsonWalker(dataNodeBuilder);
+        DefaultJsonWalker jsonWalker = new DefaultJsonWalker(dataNodeBuilder);
+        // FIXME: Handle scenario wherein there are multiple data nodes are
+        // there at root level.
         jsonWalker.walkJsonNode(null, rootNode);
-
-        return dataNodeBuilder.build();
+        // returning the updated data node builder
+        return jsonWalker.rootBuilder().build();
     }
 }

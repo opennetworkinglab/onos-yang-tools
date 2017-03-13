@@ -16,13 +16,14 @@
 
 package org.onosproject.yang.serializers.json;
 
-import java.util.Iterator;
-import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.runtime.helperutils.SerializerHelper;
+
+import java.util.Iterator;
+import java.util.Map;
 
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
@@ -46,12 +47,24 @@ public class DefaultJsonWalker implements JsonWalker {
         dataNodeBuilder = db;
     }
 
+    /**
+     * Returns the root data node builder.
+     *
+     * @return data node builder
+     */
+    public DataNode.Builder rootBuilder() {
+        return dataNodeBuilder;
+    }
+
     @Override
     public void walkJsonNode(String fieldName, JsonNode jsonNode) {
         if (!jsonNode.isContainerNode()) {
             //the node has no children, so add it as leaf node to the data tree.
             addLeafNodeToDataTree(fieldName, jsonNode);
-            dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
+            // this is to avoid exit node for top level node
+            if (dataNodeBuilder.parent() != null) {
+                dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
+            }
             return;
         }
 
@@ -83,7 +96,10 @@ public class DefaultJsonWalker implements JsonWalker {
                 walkJsonNode(null, element);
 
                 // We are done with this array element.
-                dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
+                // this is to avoid exit node for top level node
+                if (dataNodeBuilder.parent() != null) {
+                    dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
+                }
             }
 
             // We are done with this array node.
@@ -114,7 +130,7 @@ public class DefaultJsonWalker implements JsonWalker {
             // SerializerHelper.exitDataNode(dataNodeBuilder);
         }
 
-        if (fieldName != null) {
+        if (fieldName != null && dataNodeBuilder.parent() != null) {
             // move up since we finish creating a container node.
             dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
         }
