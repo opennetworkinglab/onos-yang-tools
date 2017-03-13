@@ -185,7 +185,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(lateNight);
         mid = ModelObjectId.builder().addChild(DefaultYtbFood.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         nameSpace = "yms:test:ytb:simple:choice:case";
@@ -455,7 +455,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(augCont2);
         mid = ModelObjectId.builder().addChild(DefaultCont1.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         nameSpace = "yms:test:ytb:simple:augment";
@@ -537,7 +537,7 @@ public class DataTreeContextSwitchTest {
         mid = ModelObjectId.builder().addChild(DefaultCont1.class)
                 .addChild(DefaultCont2.class).build();
 
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         nameSpace = "yms:test:ytb:simple:augment";
@@ -597,7 +597,7 @@ public class DataTreeContextSwitchTest {
                 .addChild(DefaultCont2.class)
                 .addChild(DefaultCont1s.class).build();
 
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         nameSpace = "yms:test:ytb:simple:augment";
@@ -706,7 +706,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -749,7 +749,7 @@ public class DataTreeContextSwitchTest {
         setUp();
 
         data = new DefaultModelObjectData.Builder();
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class)
                                .addChild(DefaultOnlyContainer.class).build());
 
@@ -799,7 +799,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -863,7 +863,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -943,7 +943,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -1051,7 +1051,7 @@ public class DataTreeContextSwitchTest {
         DefaultContainerList con = new DefaultContainerList();
         con.listLeaf(list);
 
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class)
                                .addChild(DefaultContainerList.class).build());
 
@@ -1129,7 +1129,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         ListLeafKeys key = new ListLeafKeys();
         key.name("key leaf");
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class)
                                .addChild(DefaultContainerList.class)
                                .addChild(DefaultListLeaf.class, key).build());
@@ -1207,7 +1207,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -1274,7 +1274,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
@@ -1332,7 +1332,7 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
-        data.identifer(ModelObjectId.builder()
+        data.identifier(ModelObjectId.builder()
                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.

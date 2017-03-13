@@ -18,6 +18,7 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
+import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData;
@@ -84,7 +85,7 @@ public class DefaultYobBuilder {
                 }
             }
         }
-        return builder.identifer(id).build();
+        return builder.identifier(id).build();
     }
 
     /**
@@ -116,6 +117,13 @@ public class DefaultYobBuilder {
                         schemaNode = ((YangSchemaNode)
                                 getChildSchemaContext(lastIndexNode, sId.name(),
                                                       sId.namespace()));
+                    }
+
+                    if (schemaNode instanceof YangRpc) {
+                        // RPC resource id need not be converted to model
+                        // object id.
+                        lastIndexNode = schemaNode;
+                        return null;
                     }
 
                     if (key instanceof ListKey) {

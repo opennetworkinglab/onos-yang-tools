@@ -79,7 +79,7 @@ public class DefaultModelObjectData implements ModelObjectData {
         }
 
         @Override
-        public Builder identifer(ModelObjectId id) {
+        public Builder identifier(ModelObjectId id) {
             identifier = id;
             return this;
         }

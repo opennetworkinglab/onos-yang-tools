@@ -41,6 +41,8 @@ public class DefaultJsonWalker implements JsonWalker {
 
     /**
      * Creates an instance of JSON object node walker.
+     *
+     * @param db data node builder
      */
     public DefaultJsonWalker(DataNode.Builder db) {
         dataNodeBuilder = db;
