@@ -560,8 +560,7 @@ final class YobUtils {
      */
     static LeafIdentifier getLeafIdentifier(SchemaId id,
                                             YangSchemaNode leafHolder,
-                                            DefaultYangModelRegistry
-                                                    reg) {
+                                            DefaultYangModelRegistry reg) {
         String qualName = getQualifiedDefaultClass(leafHolder);
         ClassLoader classLoader = getClassLoader(leafHolder, reg);
         try {
@@ -760,6 +759,7 @@ final class YobUtils {
      * @param midb       model object identifier
      * @param reg        model registry
      * @param schemaNode leaf schema node
+     * @param key        leaf list node key
      * @return model object id builder
      */
     static ModelObjectId.Builder handleLeafListKey(
@@ -835,6 +835,7 @@ final class YobUtils {
      *
      * @param midb       model object identifier builder
      * @param reg        model registry
+     * @param key        leaf node key
      * @param schemaNode YANG schema node
      * @return model object builder with single instance node
      */

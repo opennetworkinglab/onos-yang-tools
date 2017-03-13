@@ -35,6 +35,8 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
 
     /**
      * Creates an instance of data node JSON visitor.
+     *
+     * @param jb json builder
      */
     public DataNodeJsonVisitor(JsonBuilder jb) {
         jsonBuilder = jb;

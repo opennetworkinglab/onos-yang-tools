@@ -29,7 +29,9 @@ import java.util.Map;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.findRpcInput;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.findRpcOutput;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateRpcCommand;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getVariableDeclaration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
@@ -43,14 +45,17 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CREATE_DATA_NODE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CREATE_MODEL;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DATA_NODE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_MODEL_OBJECT_DATA;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RESOURCE_DATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DYNAMIC_CONFIG_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_CONVERTER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT_DATA;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NULL;
@@ -60,12 +65,14 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PRIVATE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RESOURCE_DATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RESOURCE_ID;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RETURN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SUCCESS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RUNTIME_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
@@ -105,10 +112,17 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     private static final String VAR_INPUT_OBJECT = "inputObject";
     private static final String VAR_OUTPUT_OBJECT = "outputObject";
     private static final String RPC_RESPONSE = "rpcResponse";
-    private static final String VAR_DATA_NODE = "dataNode";
+    private static final String VAR_INPUT_MO = "inputMo";
+    private static final String VAR_OUTPUT_MO = "outputMo";
+    private static final String VAR_INPUT_DATA = "inputData";
+    private static final String VAR_OUTPUT_DATA = "outputData";
+    private static final String BUILDER_METHOD = "builder";
+    private static final String ADD_DATA_NODE = "addDataNode";
+    private static final String ADD_MODEL_OBJECT = "addModelObject";
+    private static final String VAR_RESOURCE_ID = "resourceId";
 
     @Override
-    public void generateJavaFile(int fileType, YangNode curNode) {
+    public void generateJavaFile(int fileType, YangNode curNode) throws IOException {
         JavaImportData importData = ((JavaCodeGeneratorInfo) curNode)
                 .getTempJavaCodeFragmentFiles().getRpcCommandTempFiles()
                 .getJavaImportData();
@@ -117,6 +131,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 curNode.getParent().getJavaClassNameOrBuiltInType(), null));
         String className = getCapitalCase(getCamelCase(
                 curNode.getJavaClassNameOrBuiltInType(), null) + COMMAND);
+        createPackage(curNode);
 
         // add RPC input import
         YangNode inputNode = findRpcInput(curNode);
@@ -140,8 +155,6 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
             outputImport.setPkgInfo(outputNode.getJavaPackage());
             outputImport.setClassInfo(getCapitalCase(getCamelCase(
                     outputNode.getJavaClassNameOrBuiltInType(), null)));
-            importData.addImportInfo(outputImport, className,
-                                     curNode.getJavaPackage());
 
             JavaQualifiedTypeInfoTranslator defaultOutput = new
                     JavaQualifiedTypeInfoTranslator();
@@ -152,6 +165,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                                  null)));
             importData.addImportInfo(defaultOutput, className,
                                      curNode.getJavaPackage());
+
         }
 
         // add application service import
@@ -179,15 +193,23 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         imports.add(importData.getImportForRpcInput());
         imports.add(importData.getImportForRpcOutput());
         imports.add(importData.getImportForDynamicStoreService());
-        imports.add(importData.getImportForDataNode());
+        if (inputNode != null || outputNode != null) {
+            imports.add(getImportString(MODEL_PKG, RESOURCE_DATA));
+            imports.add(getImportString(MODEL_PKG, MODEL_OBJECT_DATA));
+        }
+        if (inputNode != null) {
+            imports.add(getImportString(RUNTIME_PKG, DEFAULT_RESOURCE_DATA));
+        }
+        if (outputNode != null) {
+            imports.add(getImportString(MODEL_PKG, DEFAULT_MODEL_OBJECT_DATA));
+        }
         imports.add(importData.getImportForRpcSuccess());
-
         try {
             rpcCommandClassTempFileHandle = getJavaFileHandle(className);
             generateRpcCommand(rpcCommandClassTempFileHandle, curNode, imports);
         } catch (IOException e) {
             throw new TranslatorException(
-                    "Failed to generate code for RPC command" + curNode.getName());
+                    "Failed to generate code for RPC command " + curNode.getName());
         }
     }
 
@@ -376,15 +398,14 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         StringBuilder builder = new StringBuilder();
         YangNode inputNode = findRpcInput(node);
         if (inputNode != null) {
-            String inputName = getCapitalCase(getCamelCase(
-                    inputNode.getJavaClassNameOrBuiltInType(), null));
-            builder.append(EIGHT_SPACE_INDENTATION).append(inputName).append(SPACE)
-                    .append(VAR_INPUT_OBJECT).append(SPACE).append(EQUAL).append(SPACE)
+            // build resource data
+            builder.append(buildResourceData())
+                    .append(EIGHT_SPACE_INDENTATION).append(MODEL_OBJECT_DATA).append(SPACE)
+                    .append(VAR_INPUT_MO).append(SPACE).append(EQUAL).append(SPACE)
                     .append(VAR_MODEL_CONVERTER).append(PERIOD)
                     .append(CREATE_MODEL).append(OPEN_PARENTHESIS)
-                    .append(VAR_RPC_INPUT).append(PERIOD).append(VAR_INPUT)
-                    .append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS)
-                    .append(CLOSE_PARENTHESIS).append(SEMI_COLON).append(NEW_LINE);
+                    .append(VAR_INPUT_DATA).append(CLOSE_PARENTHESIS)
+                    .append(SEMI_COLON).append(NEW_LINE);
         }
         return builder.toString();
     }
@@ -398,15 +419,13 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         StringBuilder builder = new StringBuilder();
         YangNode outputNode = findRpcOutput(node);
         if (outputNode != null) {
-            String outputName = getCapitalCase(getCamelCase(
-                    outputNode.getJavaClassNameOrBuiltInType(), null));
-            builder.append(EIGHT_SPACE_INDENTATION).append(DATA_NODE).append(SPACE)
-                    .append(VAR_DATA_NODE).append(SPACE).append(EQUAL)
-                    .append(SPACE).append(VAR_MODEL_CONVERTER).append(PERIOD)
+            // create model object data
+            builder.append(buildModelObjectData());
+            builder.append(EIGHT_SPACE_INDENTATION).append(RESOURCE_DATA)
+                    .append(SPACE).append(VAR_OUTPUT_DATA).append(SPACE)
+                    .append(EQUAL).append(SPACE).append(VAR_MODEL_CONVERTER).append(PERIOD)
                     .append(CREATE_DATA_NODE).append(OPEN_PARENTHESIS)
-                    .append(OPEN_PARENTHESIS).append(DEFAULT_CAPS)
-                    .append(outputName).append(CLOSE_PARENTHESIS).append(SPACE)
-                    .append(VAR_OUTPUT_OBJECT).append(CLOSE_PARENTHESIS)
+                    .append(VAR_OUTPUT_MO).append(CLOSE_PARENTHESIS)
                     .append(SEMI_COLON).append(NEW_LINE);
         }
         return builder.toString();
@@ -431,23 +450,27 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         }
 
         if (inputNode != null && outputNode != null) {
-            builder.append(EIGHT_SPACE_INDENTATION).append(outputName)
-                    .append(SPACE).append(VAR_OUTPUT_OBJECT).append(SPACE)
-                    .append(EQUAL).append(SPACE).append(appService)
-                    .append(PERIOD).append(rpc).append(OPEN_PARENTHESIS)
-                    .append(VAR_INPUT_OBJECT).append(CLOSE_PARENTHESIS)
+            builder.append(getInputObject(inputNode));
+            builder.append(EIGHT_SPACE_INDENTATION).append(DEFAULT_CAPS)
+                    .append(outputName).append(SPACE).append(VAR_OUTPUT_OBJECT)
+                    .append(SPACE).append(EQUAL).append(SPACE).append(OPEN_PARENTHESIS)
+                    .append(DEFAULT_CAPS).append(outputName).append(CLOSE_PARENTHESIS)
+                    .append(SPACE).append(appService).append(PERIOD).append(rpc)
+                    .append(OPEN_PARENTHESIS).append(VAR_INPUT_OBJECT).append(CLOSE_PARENTHESIS)
                     .append(SEMI_COLON).append(NEW_LINE);
         } else if (inputNode != null && outputNode == null) {
+            builder.append(getInputObject(inputNode));
             builder.append(EIGHT_SPACE_INDENTATION).append(appService)
                     .append(PERIOD).append(rpc).append(OPEN_PARENTHESIS)
                     .append(VAR_INPUT_OBJECT).append(CLOSE_PARENTHESIS)
                     .append(SEMI_COLON).append(NEW_LINE);
         } else if (inputNode == null && outputNode != null) {
-            builder.append(EIGHT_SPACE_INDENTATION).append(outputName)
-                    .append(SPACE).append(VAR_OUTPUT_OBJECT).append(SPACE)
-                    .append(EQUAL).append(SPACE).append(appService)
-                    .append(PERIOD).append(rpc).append(OPEN_PARENTHESIS)
-                    .append(CLOSE_PARENTHESIS).append(SEMI_COLON)
+            builder.append(EIGHT_SPACE_INDENTATION).append(DEFAULT_CAPS)
+                    .append(outputName).append(SPACE).append(VAR_OUTPUT_OBJECT)
+                    .append(SPACE).append(EQUAL).append(SPACE).append(OPEN_PARENTHESIS)
+                    .append(DEFAULT_CAPS).append(outputName).append(CLOSE_PARENTHESIS)
+                    .append(SPACE).append(appService).append(PERIOD).append(rpc)
+                    .append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS).append(SEMI_COLON)
                     .append(NEW_LINE);
         } else {
             builder.append(EIGHT_SPACE_INDENTATION).append(appService)
@@ -466,7 +489,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
      */
     private static String createRpcOutputString(YangNode node) {
         YangNode outputNode = findRpcOutput(node);
-        String dataNode = VAR_DATA_NODE;
+        String dataNode = "outputData.dataNodes().get(0)";
         if (outputNode == null) {
             dataNode = NULL;
         }
@@ -493,6 +516,77 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(VAR_OUTPUT).append(CLOSE_PARENTHESIS).append(SEMI_COLON)
                 .append(NEW_LINE);
         return builder.toString();
+    }
+
+
+    /**
+     * Returns create resource data string.
+     *
+     * @return create resource data string
+     */
+    private static String buildResourceData() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(EIGHT_SPACE_INDENTATION).append(RESOURCE_DATA)
+                .append(SPACE).append(VAR_INPUT_DATA).append(SPACE).append(EQUAL)
+                .append(SPACE).append(DEFAULT_RESOURCE_DATA).append(PERIOD)
+                .append(BUILDER_METHOD).append(OPEN_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(NEW_LINE)
+                .append(SIXTEEN_SPACE_INDENTATION).append(PERIOD)
+                .append(VAR_RESOURCE_ID).append(OPEN_PARENTHESIS)
+                .append(GET_RESOURCE_ID).append(OPEN_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(CLOSE_PARENTHESIS)
+                .append(NEW_LINE).append(SIXTEEN_SPACE_INDENTATION).append(PERIOD)
+                .append(ADD_DATA_NODE).append(OPEN_PARENTHESIS)
+                .append(VAR_RPC_INPUT).append(PERIOD).append(VAR_INPUT)
+                .append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(PERIOD)
+                .append(BUILD).append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS)
+                .append(SEMI_COLON).append(NEW_LINE);
+        return builder.toString();
+    }
+
+
+    /**
+     * Returns input object string.
+     *
+     * @param inputNode YANG RPC input node
+     * @return input object string
+     */
+    private static String getInputObject(YangNode inputNode) {
+        StringBuilder builder = new StringBuilder();
+        if (inputNode != null) {
+            String inputName = getCapitalCase(getCamelCase(
+                    inputNode.getJavaClassNameOrBuiltInType(), null));
+            String modelObject = "inputMo.modelObjects().get(0)";
+            return builder.append(EIGHT_SPACE_INDENTATION).append(inputName)
+                    .append(SPACE).append(VAR_INPUT_OBJECT)
+                    .append(SPACE).append(EQUAL).append(SPACE)
+                    .append(OPEN_PARENTHESIS).append(OPEN_PARENTHESIS)
+                    .append(inputName).append(CLOSE_PARENTHESIS).append(SPACE)
+                    .append(modelObject).append(CLOSE_PARENTHESIS)
+                    .append(SEMI_COLON).append(NEW_LINE).toString();
+        }
+        return null;
+    }
+
+    /**
+     * Returns model object data creation string.
+     *
+     * @return model object data string
+     */
+    private static String buildModelObjectData() {
+        StringBuilder builder = new StringBuilder();
+        return builder.append(EIGHT_SPACE_INDENTATION).append(MODEL_OBJECT_DATA)
+                .append(SPACE).append(VAR_OUTPUT_MO).append(SPACE).append(EQUAL)
+                .append(SPACE).append(DEFAULT_MODEL_OBJECT_DATA).append(PERIOD)
+                .append(BUILDER_METHOD).append(OPEN_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(NEW_LINE)
+                .append(SIXTEEN_SPACE_INDENTATION).append(PERIOD)
+                .append(ADD_MODEL_OBJECT).append(OPEN_PARENTHESIS)
+                .append(VAR_OUTPUT_OBJECT).append(CLOSE_PARENTHESIS)
+                .append(PERIOD).append(BUILD).append(OPEN_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(SEMI_COLON)
+                .append(NEW_LINE).toString();
     }
 
 }

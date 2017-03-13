@@ -1825,6 +1825,11 @@ public final class UtilConstants {
     public static final String MODEL_PKG = "org.onosproject.yang.model";
 
     /**
+     * Static attribute for runtime import package.
+     */
+    public static final String RUNTIME_PKG = "org.onosproject.yang.runtime";
+
+    /**
      * Static attribute for RPC execution status import package.
      */
     public static final String RPC_OUTPUT_STATUS_PKG = "org.onosproject.config" +
@@ -1951,22 +1956,19 @@ public final class UtilConstants {
             "capable of invoking the appropriate RPC command's execute method";
 
     public static final String RUNNABLE = "Runnable";
-
     public static final String RUN = "run";
-
     public static final String BUILDER = "Builder";
-
     public static final String BUILD = "build";
-
     public static final String ADD_BRANCH_POINT_SCHEMA = "addBranchPointSchema";
-
     public static final String CREATE_MODEL = "createModel";
-
     public static final String CREATE_DATA_NODE = "createDataNode";
-
     public static final String MULTI_INSTANCE_OBJECT = "MultiInstanceObject";
-
     public static final String KEY_INFO = "KeyInfo";
+    public static final String RESOURCE_DATA = "ResourceData";
+    public static final String DEFAULT_RESOURCE_DATA = "DefaultResourceData";
+    public static final String MODEL_OBJECT_DATA = "ModelObjectData";
+    public static final String DEFAULT_MODEL_OBJECT_DATA =
+            "DefaultModelObjectData";
 
     // No instantiation.
     private UtilConstants() {

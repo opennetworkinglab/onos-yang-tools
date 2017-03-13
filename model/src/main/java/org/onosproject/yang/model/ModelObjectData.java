@@ -62,7 +62,7 @@ public interface ModelObjectData {
          * @param id identifier
          * @return builder
          */
-        Builder identifer(ModelObjectId id);
+        Builder identifier(ModelObjectId id);
 
         /**
          * Builds an instance of model object data.

@@ -373,7 +373,7 @@ public class DefaultDataTreeBuilderTest {
         mid = ModelObjectId.builder()
                 .addChild(DefaultModKey.class, keyKeys).build();
 
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         id = rscData.resourceId();
@@ -440,7 +440,7 @@ public class DefaultDataTreeBuilderTest {
                 .addChild(DefaultModKey.class, keyKeys)
                 .addChild(ModKey.LeafIdentifier.TYPES).build();
 
-        data.identifer(mid);
+        data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
 
         id = rscData.resourceId();
@@ -621,7 +621,7 @@ public class DefaultDataTreeBuilderTest {
 
         // Builds YANG tree in YTB.
         mid = ModelObjectId.builder().addChild(DefaultSched.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
 
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -864,7 +864,7 @@ public class DefaultDataTreeBuilderTest {
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestNotification.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
 
         registry = ut.reg;
         DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
@@ -901,7 +901,7 @@ public class DefaultDataTreeBuilderTest {
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestNotification.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
         data.addModelObject(new DefaultTestContainer());
 
         registry = ut.reg;
@@ -945,7 +945,7 @@ public class DefaultDataTreeBuilderTest {
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestInput.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
 
         registry = ut.reg;
         DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
@@ -986,7 +986,7 @@ public class DefaultDataTreeBuilderTest {
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestInput.class).build();
-        data.identifer(mid);
+        data.identifier(mid);
         data.addModelObject(new org.onosproject.yang.runtime.mockclass
                 .testmodule.testrpc.testinput.DefaultTestContainer());
 
