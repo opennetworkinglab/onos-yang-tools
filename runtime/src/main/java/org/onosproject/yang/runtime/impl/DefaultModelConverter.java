@@ -43,7 +43,7 @@ public class DefaultModelConverter implements ModelConverter {
     }
 
     @Override
-    public synchronized ResourceData createDataNode(ModelObjectData modelData) {
+    public ResourceData createDataNode(ModelObjectData modelData) {
         DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(reg);
         return builder.getResourceData(modelData);
     }

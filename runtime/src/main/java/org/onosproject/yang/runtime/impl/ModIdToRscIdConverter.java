@@ -69,6 +69,11 @@ class ModIdToRscIdConverter {
     private boolean isRpcAdded = true;
 
     /**
+     * Flag is true if we have found module node using input/output packages.
+     */
+    private boolean isInputOrOutput;
+
+    /**
      * Model registry.
      */
     private final DefaultYangModelRegistry reg;
@@ -159,6 +164,7 @@ class ModIdToRscIdConverter {
         modPkg.deleteCharAt(modPkg.lastIndexOf(PERIOD));
         YangNode node = (YangNode) reg.getForInterfaceFilePkg(modPkg.toString());
         if (node != null) {
+            isInputOrOutput = true;
             modNode = node;
             //in this case we should update the lastIndexNode for object to
             // data fetchNode conversion. because we need to create the data fetchNode
@@ -166,7 +172,8 @@ class ModIdToRscIdConverter {
             node = node.getChild();
             while (node != null) {
                 if (node.getJavaAttributeName().toLowerCase()
-                        .equals(strArray[i])) {
+                        .equals(strArray[i]) &&
+                        node.getYangSchemaNodeType() != YANG_NON_DATA_NODE) {
                     //last index fetchNode will be input fetchNode.
                     lastIndexNode = node.getChild();
                     break;
@@ -252,7 +259,20 @@ class ModIdToRscIdConverter {
     private void handleLeafInRid(YangSchemaNode preNode, ModelObjectId id,
                                  ResourceId.Builder builder, AtomicPath path) {
         //check leaf nodes in previous nodes.
-        YangSchemaNode curNode = fetchLeaf(preNode, fetchPackage(path));
+        String pkg = fetchPackage(path);
+        YangSchemaNode curNode = fetchLeaf(preNode, pkg);
+        if (curNode == null) {
+            if (preNode instanceof YangAugmentableNode) {
+                List<YangAugment> augments = ((YangAugmentableNode) preNode)
+                        .getAugmentedInfoList();
+                for (YangAugment augment : augments) {
+                    curNode = fetchLeaf(augment, pkg);
+                    if (curNode != null) {
+                        break;
+                    }
+                }
+            }
+        }
         if (curNode == null) {
             throw new ModelConvertorException("invalid model object id." + id);
         }
@@ -334,13 +354,7 @@ class ModIdToRscIdConverter {
         while (node != null) {
             //compare the java package with the package found in model object
             // identifier.
-            if (node.getYangSchemaNodeType() == YANG_NON_DATA_NODE) {
-                while (node != null &&
-                        node.getYangSchemaNodeType() == YANG_NON_DATA_NODE) {
-                    node = node.getNextSibling();
-                }
-            }
-            if (node != null) {
+            if (node.getYangSchemaNodeType() != YANG_NON_DATA_NODE) {
                 java = getJavaPkg(node);
                 if (java.equals(pkg)) {
                     return node;
@@ -358,6 +372,9 @@ class ModIdToRscIdConverter {
                     // check in next sibling node
                     node = node.getNextSibling();
                 }
+            } else {
+                // check in next sibling node
+                node = node.getNextSibling();
             }
         }
         return null;
@@ -404,5 +421,14 @@ class ModIdToRscIdConverter {
      */
     boolean isMoIdWithLeaf() {
         return isMoIdWithLeaf;
+    }
+
+    /**
+     * Returns true if module node is found using input/output packages.
+     *
+     * @return true if module node is found using input/output packages
+     */
+    boolean isInputOrOutput() {
+        return isInputOrOutput;
     }
 }

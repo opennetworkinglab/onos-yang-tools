@@ -22,6 +22,7 @@ import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.unmodifiableList;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
@@ -403,6 +404,12 @@ public abstract class YangUses
 
                 clonedLeaf.setContainedIn(usesParent);
                 usesParent.addLeaf(clonedLeaf);
+                if (usesParent instanceof YangList) {
+                    Set<String> keys = ((YangList) usesParent).getKeyLeaf();
+                    if (keys.contains(clonedLeaf.getName())) {
+                        clonedLeaf.setKeyLeaf(true);
+                    }
+                }
             }
         }
         if (referredGrouping.getListOfLeafList() != null) {

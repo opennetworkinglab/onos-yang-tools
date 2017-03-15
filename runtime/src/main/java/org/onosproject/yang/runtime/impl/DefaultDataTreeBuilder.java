@@ -21,11 +21,14 @@ import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangChoice;
+import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangOutput;
+import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.DataNode;
@@ -36,6 +39,7 @@ import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.ResourceData;
+import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.DefaultResourceData;
 
 import java.util.Iterator;
@@ -129,20 +133,25 @@ class DefaultDataTreeBuilder {
         //Create data nodes.
         DataTreeBuilderHelper helper = new DataTreeBuilderHelper(reg);
         YangSchemaNode curNode;
-        for (Object modObj : modelObjects) {
+        for (ModelObject modObj : modelObjects) {
             //Do processing of data node conversion from model objects.
             if (modObj instanceof LeafModelObject) {
                 //Process leaf object.
                 processLeafObj(lastIndexNode, rscData, (LeafModelObject) modObj);
             } else {
-                curNode = fetchCurNode(modObj, (YangNode) lastIndexNode);
+                if (converter.isInputOrOutput()) {
+                    curNode = handleRpcChild(modObj, (YangNode)
+                            lastIndexNode, rscData);
+                } else {
+                    curNode = fetchCurNode(modObj, (YangNode) lastIndexNode);
+                }
                 if (curNode != null) {
                     processDataNodeConversion((YangNode) curNode, helper,
                                               rscData, modObj);
                 } else {
                     throw new ModelConvertorException(
                             "failed to convert model object in data node" +
-                                    modObj.toString());
+                                    modObj);
                 }
             }
         }
@@ -189,6 +198,44 @@ class DefaultDataTreeBuilder {
                         "Non processable schema node has arrived for adding " +
                                 "it in data tree");
         }
+    }
+
+    /**
+     * Returns input/output nodes.
+     *
+     * @param obj     model object for input/output nodes
+     * @param parent  module node
+     * @param rscData resource data builder
+     * @return input/output node
+     */
+    private YangSchemaNode handleRpcChild(
+            Object obj, YangNode parent, DefaultResourceData.Builder rscData) {
+        if (obj != null && parent != null) {
+            //process all the node which are in data model tree.
+            String name = obj.getClass().getName();
+            YangNode child = parent.getChild();
+            while (child != null && !(child instanceof YangRpc)) {
+                child = child.getNextSibling();
+            }
+            if (child != null) {
+                //Rpc should be part of resource identifier for input/output
+                // nodes.
+                ResourceId id = ResourceId.builder()
+                        .addBranchPointSchema("/", null)
+                        .addBranchPointSchema(child.getName(), child
+                                .getNameSpace().getModuleNamespace()).build();
+                rscData.resourceId(id);
+                child = child.getChild();
+                return getNode(child, name);
+            }
+        }
+        // this could also be possible that we have received this module node
+        // when model object is a node at third level of root node. for
+        // example if we have a model object id which is null and model
+        // object is an object of choice instance then this will be called
+        // because choice object will be instance of case class which is an
+        // third level node.
+        return fetchCurNode(obj, parent);
     }
 
     /**
@@ -323,6 +370,10 @@ class DefaultDataTreeBuilder {
                 javaName = child.getJavaPackage() + PERIOD + DEFAULT_CAPS +
                         getAugmentClassName((YangAugment) child,
                                             new YangPluginConfig());
+            } else if (child instanceof YangInput ||
+                    child instanceof YangOutput) {
+                javaName = child.getJavaPackage() + PERIOD + DEFAULT_CAPS +
+                        getCapitalCase(child.getJavaClassNameOrBuiltInType());
             } else {
                 javaName = child.getJavaPackage() + PERIOD + DEFAULT_CAPS +
                         getCapitalCase(getCamelCase(child.getName(), null));

@@ -462,7 +462,7 @@ public class DefaultYangModelRegistryTest {
         provider.processSchemaRegistry();
         DefaultYangModelRegistry registry = provider.registry();
 
-        YangSchemaNode yangNode = registry.getForNameSpace(NAMESPACE);
+        YangSchemaNode yangNode = registry.getForNameSpace(NAMESPACE, false);
         assertThat(true, is(CHECK.equals(yangNode.getName())));
 
         YangRevision rev = ((YangNode) yangNode).getRevision();

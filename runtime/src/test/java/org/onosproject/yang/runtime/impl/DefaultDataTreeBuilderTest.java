@@ -48,6 +48,7 @@ import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.mockclass.testmodule.DefaultTestNotification;
 import org.onosproject.yang.runtime.mockclass.testmodule.testnotification.DefaultTestContainer;
 import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestInput;
+import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestOutput;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -940,7 +941,7 @@ public class DefaultDataTreeBuilderTest {
     @Test
     public void processRpcWithInput() {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
-        ut.addMockModWithInput();
+        ut.addMockModWithRpc();
 
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()
@@ -975,13 +976,95 @@ public class DefaultDataTreeBuilderTest {
     /**
      * Unit test for a module containing rpc. Model object contains input
      * class so resource identifier will start from "/" and will go till
+     * rpc node.as object is given for input node so data node will be having
+     * input node.
+     */
+    @Test
+    public void processRpcWithInputDataNode() {
+        MoIdToRscIdTest ut = new MoIdToRscIdTest();
+        ut.addMockModWithRpc();
+
+        DefaultTestInput input = new DefaultTestInput();
+        input.testContainer(new DefaultTestContainer());
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject(input);
+
+        registry = ut.reg;
+        DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
+        rscData = builder.getResourceData(data.build());
+
+        nameSpace = "testNamespace";
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(2, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = keys.get(1).schemaId();
+        assertThat("test-rpc", is(sid.name()));
+        assertThat(nameSpace, is(sid.namespace()));
+
+        dataNodes = rscData.dataNodes();
+        assertThat(1, is(dataNodes.size()));
+
+        node = dataNodes.get(0);
+        validateDataNode(node, "input", nameSpace,
+                         SINGLE_INSTANCE_NODE,
+                         true, null);
+    }
+
+    /**
+     * Unit test for a module containing rpc. Model object contains input
+     * class so resource identifier will start from "/" and will go till
+     * rpc node.as object is given for output node so data node will be having
+     * input node.
+     */
+    @Test
+    public void processRpcWithOutputDataNode() {
+        MoIdToRscIdTest ut = new MoIdToRscIdTest();
+        ut.addMockModWithRpc();
+
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject(new DefaultTestOutput());
+
+        registry = ut.reg;
+        DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
+        rscData = builder.getResourceData(data.build());
+
+        nameSpace = "testNamespace";
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(2, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = keys.get(1).schemaId();
+        assertThat("test-rpc", is(sid.name()));
+        assertThat(nameSpace, is(sid.namespace()));
+
+        dataNodes = rscData.dataNodes();
+        assertThat(1, is(dataNodes.size()));
+
+        node = dataNodes.get(0);
+        validateDataNode(node, "output", nameSpace,
+                         SINGLE_INSTANCE_NODE,
+                         true, null);
+    }
+
+    /**
+     * Unit test for a module containing rpc. Model object contains input
+     * class so resource identifier will start from "/" and will go till
      * input node. it will contains rpc node as well. as object is given for
      * input node so data node will be for container node.
      */
     @Test
     public void processRpcWithInputModId() {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
-        ut.addMockModWithInput();
+        ut.addMockModWithRpc();
 
         data = new DefaultModelObjectData.Builder();
         mid = ModelObjectId.builder()

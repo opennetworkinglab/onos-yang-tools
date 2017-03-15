@@ -214,32 +214,6 @@ public class XmlSerializerTest {
     }
 
     /**
-     * Validates data node in which XML element is child of YANG grouping.
-     */
-    @Test
-    public void testGroupingUsesDataNode() {
-        String path = "src/test/resources/testGroupingUses.xml";
-
-        String uri = "urn:ietf:params:xml:ns:yang:yrt-ietf-network:networks-state/network";
-        DefaultCompositeStream external =
-                new DefaultCompositeStream(uri, parseInput(path));
-        CompositeData compositeData = xmlSerializer.decode(external, context);
-        ResourceData resourceData = compositeData.resourceData();
-        List<DataNode> dataNodes = resourceData.dataNodes();
-        LeafNode dataNode = ((LeafNode) dataNodes.get(0));
-        SchemaId schemaId = dataNode.key().schemaId();
-        assertThat(schemaId.name(), is("network-ref"));
-        assertThat(schemaId.namespace(), is("urn:ietf:params:xml:ns:yang:yrt-ietf-network"));
-        assertThat(dataNode.value().toString(), is("abc"));
-
-        // encode test
-        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
-                                                               context);
-        InputStream inputStream = compositeStream.resourceData();
-        assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
-    }
-
-    /**
      * Validates whether XML attributes is converted to annotations.
      */
     @Test

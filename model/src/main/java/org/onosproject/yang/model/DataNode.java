@@ -163,7 +163,7 @@ public abstract class DataNode {
          * @param node parent node builder
          * @return builder object
          */
-        protected B parent(InnerNode.Builder node) {
+        public B parent(InnerNode.Builder node) {
             parent = node;
             return (B) this;
         }

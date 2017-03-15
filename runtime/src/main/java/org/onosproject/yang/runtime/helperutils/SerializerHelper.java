@@ -215,7 +215,7 @@ public final class SerializerHelper {
     public static Builder initializeDataNode(ResourceId.Builder builder) {
 
         ExtResourceIdBldr rIdBldr = new ExtResourceIdBldr();
-        rIdBldr = rIdBldr.copyBuilder(rIdBldr, builder);
+        rIdBldr = rIdBldr.copyBuilder(rIdBldr, builder.build());
         rIdBldr.appInfo(builder.appInfo());
         SchemaContext node = (SchemaContext) builder.appInfo();
         HelperContext info = new HelperContext();

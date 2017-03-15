@@ -88,12 +88,11 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
      * builder.
      *
      * @param ridBldr extended resource id builder
-     * @param builder resource id builder
+     * @param id      resource id
      * @return updated extended resource id builder
      */
-    public ExtResourceIdBldr copyBuilder(ExtResourceIdBldr ridBldr, ResourceId
-            .Builder builder) {
-        ResourceId id = builder.build();
+    public ExtResourceIdBldr copyBuilder(ExtResourceIdBldr ridBldr,
+                                         ResourceId id) {
         SchemaId sId;
         // Preparing the extended resource id builder from resourceId.
         List<NodeKey> keys = id.nodeKeys();

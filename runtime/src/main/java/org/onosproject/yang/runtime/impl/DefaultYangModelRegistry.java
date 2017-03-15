@@ -286,13 +286,15 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * Returns schema node for the given name. Name should be nodes namespace
      * defined in YANG file
      *
-     * @param nameSpace name space of YANG file
+     * @param nameSpace         name space of YANG file
+     * @param isForChildContext if the method call has arrived for child context
      * @return YANG schema node
      */
-    public YangSchemaNode getForNameSpace(String nameSpace) {
+    public YangSchemaNode getForNameSpace(String nameSpace,
+                                          boolean isForChildContext) {
 
         YangSchemaNode node = nameSpaceSchemaStore.get(nameSpace);
-        if (node == null) {
+        if (node == null && !isForChildContext) {
             log.error("node with {} namespace not found.", nameSpace);
         }
         return node;
@@ -314,7 +316,9 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
                 regClass = registerClassStore.get(interfaceName);
             }
         }
-        log.error("{} node should not be null.");
+        if (regClass == null) {
+            log.error("{} node should not be null.");
+        }
         return regClass;
     }
 
@@ -575,7 +579,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         }
 
         String namespace = schemaId.namespace();
-        YangSchemaNode node = getForNameSpace(namespace);
+        YangSchemaNode node = getForNameSpace(namespace, true);
         if (node == null) {
             //If namespace if module name.
             node = getForSchemaName(schemaId.namespace());
@@ -585,6 +589,9 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         try {
             if (node != null) {
                 return node.getChildSchema(id).getSchemaNode();
+            } else {
+                log.error("node with {} namespace not found.", schemaId
+                        .namespace());
             }
         } catch (DataModelException e) {
             log.error("failed to get child schema", e);

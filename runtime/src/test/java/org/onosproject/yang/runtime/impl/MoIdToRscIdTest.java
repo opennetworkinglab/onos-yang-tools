@@ -45,6 +45,9 @@ import org.onosproject.yang.gen.v1.yms.test.ytb.tree.builder.yangautoprefixfor.y
 import org.onosproject.yang.gen.v1.yms.test.ytb.tree.builder.yangautoprefixfor.yangautoprefixlist.having.yangautoprefixlist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.MultiplexesKeys;
 import org.onosproject.yang.gen.v1.yms.test.ytb.tree.builder.yangautoprefixfor.yangautoprefixlist.having.yangautoprefixlist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.multiplexes.ApplicationAreasKeys;
 import org.onosproject.yang.gen.v1.yms.test.ytb.tree.builder.yangautoprefixfor.yangautoprefixlist.having.yangautoprefixlist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.multiplexes.DefaultApplicationAreas;
+import org.onosproject.yang.gen.v1.yrt.model.converter.model.data.to.resource.data.rev20160826.modeldatatoresourcedata.DefaultFirstLevel;
+import org.onosproject.yang.gen.v1.yrt.model.converter.model.data.to.resource.data.rev20160826.modeldatatoresourcedata.firstlevel.DefaultContainerLeaf;
+import org.onosproject.yang.gen.v1.yrt.model.converter.model.data.to.resource.data.rev20160826.modeldatatoresourcedata.firstlevel.containerleaf.AugmentedContainerLeaf;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.ListKey;
@@ -55,6 +58,7 @@ import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.mockclass.testmodule.DefaultTestNotification;
 import org.onosproject.yang.runtime.mockclass.testmodule.testnotification.DefaultTestContainer;
 import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestInput;
+import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestOutput;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -92,11 +96,11 @@ public class MoIdToRscIdTest {
     /**
      * Adds mock node in registry.
      */
-    void addMockModWithInput() {
+    void addMockModWithRpc() {
         setUp();
         YangModule mod = null;
         try {
-            mod = (YangModule) getModuleWithInput();
+            mod = (YangModule) getModuleWithRpc();
         } catch (DataModelException e) {
             log.info("test error");
         }
@@ -239,6 +243,32 @@ public class MoIdToRscIdTest {
     }
 
     /**
+     * Unit test with current node having augmented leaf as model object
+     * identifier.
+     */
+    @Test
+    public void modIdWithAugmentLeaf() {
+        setUp();
+        mid = ModelObjectId.builder()
+                .addChild(DefaultFirstLevel.class)
+                .addChild(DefaultContainerLeaf.class)
+                .addChild(AugmentedContainerLeaf.LeafIdentifier.LEAFAUG)
+                .build();
+        rscId = builder.fetchResourceId(mid);
+
+        nodeKeys = rscId.nodeKeys();
+        assertThat(4, is(nodeKeys.size()));
+
+        sid = nodeKeys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = nodeKeys.get(1).schemaId();
+        assertThat("first-level", is(sid.name()));
+        assertThat("yrt:model:converter:model:data:to:resource:data", is(sid.namespace()));
+    }
+
+    /**
      * Unit test case for model object identifier as list with leaf.
      */
     @Test
@@ -276,7 +306,7 @@ public class MoIdToRscIdTest {
      */
     @Test
     public void moIdWithInput() {
-        addMockModWithInput();
+        addMockModWithRpc();
 
         mid = new ModelObjectId.Builder()
                 .addChild(DefaultTestInput.class).build();
@@ -299,11 +329,11 @@ public class MoIdToRscIdTest {
     }
 
     /**
-     * Unit test case for model object identifier input with leaf.
+     * Unit test case for model object identifier input with container.
      */
     @Test
     public void moIdWithInputAndContainer() {
-        addMockModWithInput();
+        addMockModWithRpc();
 
         mid = new ModelObjectId.Builder()
                 .addChild(DefaultTestInput.class)
@@ -333,6 +363,34 @@ public class MoIdToRscIdTest {
     }
 
     /**
+     * Unit test case for model object identifier output.
+     */
+    @Test
+    public void moIdWithOutput() {
+        addMockModWithRpc();
+
+        mid = new ModelObjectId.Builder()
+                .addChild(DefaultTestOutput.class)
+                .build();
+
+        rscId = builder.fetchResourceId(mid);
+        nodeKeys = rscId.nodeKeys();
+        assertThat(3, is(nodeKeys.size()));
+
+        sid = nodeKeys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = nodeKeys.get(1).schemaId();
+        assertThat("test-rpc", is(sid.name()));
+        assertThat("testNamespace", is(sid.namespace()));
+
+        sid = nodeKeys.get(2).schemaId();
+        assertThat("output", is(sid.name()));
+        assertThat("testNamespace", is(sid.namespace()));
+    }
+
+    /**
      * Unit test case for model object identifier as notification.
      */
     @Test
@@ -356,7 +414,8 @@ public class MoIdToRscIdTest {
     }
 
     /**
-     * Unit test case for model object identifier as notification with leaf.
+     * Unit test case for model object identifier as notification with
+     * container.
      */
     @Test
     public void moIdWithNotificationAndContainer() {
@@ -643,7 +702,7 @@ public class MoIdToRscIdTest {
      * @return mock node tree with module, rpc, input and output
      * @throws DataModelException when fails to do data model operations
      */
-    private YangNode getModuleWithInput() throws DataModelException {
+    private YangNode getModuleWithRpc() throws DataModelException {
         YangModule mod = getYangModule();
         YangRpc rpc = getRpcNode();
         mod.addChild(rpc);
@@ -794,7 +853,6 @@ public class MoIdToRscIdTest {
             }
         };
         out.setName("output");
-        out.addLeaf(getLeafNode());
         out.setNameSpace(getMockNamespace());
         return out;
     }
