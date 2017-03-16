@@ -886,6 +886,9 @@ public final class DataModelUtils {
                 fileOutputStream.close();
                 inputStream.close();
                 nodes.addAll(deSerializeDataModel(serializedFile.toString()));
+                //As of now only one metadata files will be there so if we
+                // found one then we should break the loop.
+                break;
             }
         }
         jar.close();
@@ -931,6 +934,9 @@ public final class DataModelUtils {
                 }
                 fileOutputStream.close();
                 inputStream.close();
+                //As of now only one metadata files will be there so if we
+                // found one then we should break the loop.
+                break;
             }
         }
         jar.close();

@@ -255,12 +255,13 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * pkg string contains the java package and java name of the module
      * generated class in lower case.
      *
-     * @param pkg interface class pkg
+     * @param pkg       interface class pkg
+     * @param isFromDnb true when request has come from data tree builder
      * @return YANG schema node
      */
-    public YangSchemaNode getForInterfaceFilePkg(String pkg) {
+    public YangSchemaNode getForInterfaceFilePkg(String pkg, boolean isFromDnb) {
         YangSchemaNode node = pkgKeyStore.get(pkg);
-        if (node == null) {
+        if (node == null && !isFromDnb) {
             log.error("{} not found.", pkg);
         }
         return node;

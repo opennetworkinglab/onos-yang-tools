@@ -162,7 +162,8 @@ class ModIdToRscIdConverter {
         // because the next string will be rpc name in received from fetch
         // package method.
         modPkg.deleteCharAt(modPkg.lastIndexOf(PERIOD));
-        YangNode node = (YangNode) reg.getForInterfaceFilePkg(modPkg.toString());
+        YangNode node = (YangNode) reg.getForInterfaceFilePkg(modPkg.toString(),
+                                                              true);
         if (node != null) {
             isInputOrOutput = true;
             modNode = node;
@@ -184,7 +185,7 @@ class ModIdToRscIdConverter {
             modPkg.append(PERIOD);
             //In this case this package will be of module fetchNode.
             modPkg.append(strArray[i]);
-            modNode = reg.getForInterfaceFilePkg(modPkg.toString());
+            modNode = reg.getForInterfaceFilePkg(modPkg.toString(), false);
         }
         return modNode;
     }
