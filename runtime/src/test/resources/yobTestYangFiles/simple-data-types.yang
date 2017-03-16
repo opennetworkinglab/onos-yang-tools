@@ -47,6 +47,17 @@ module simple-data-types {
     }
   }
 
+  typedef tpdfun0 {
+     type enumeration {
+        enum "successful exit" {
+            value 1;
+        }
+        enum "grace period expired" {
+            value 2;
+        }
+     }
+  }
+
   container cont {
      leaf lfnint8Min {
         type int8;
@@ -251,6 +262,10 @@ module simple-data-types {
         type identityref {
             base iden;
         }
+    }
+
+    leaf lfenum1 {
+        type tpdfun0;
     }
   }
 }

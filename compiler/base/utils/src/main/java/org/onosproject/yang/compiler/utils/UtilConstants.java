@@ -1147,7 +1147,7 @@ public final class UtilConstants {
     /**
      * Static attribute for regex for all the special characters.
      */
-    public static final String REGEX_WITH_ALL_SPECIAL_CHAR = "\\p{Punct}+";
+    public static final String REGEX_WITH_ALL_SPECIAL_CHAR = "[\\p{Punct}\\s]+";
 
     /**
      * Static attribute for regex for three special characters used in

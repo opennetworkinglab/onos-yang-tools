@@ -252,5 +252,16 @@ module simple-data-types-ll {
             base iden;
         }
     }
+
+    leaf-list lfenum1 {
+        type enumeration {
+            enum "successful exit" {
+                value 1;
+            }
+            enum "grace period expired" {
+                value 2;
+            }
+        }
+    }
   }
 }

@@ -19,6 +19,8 @@ package org.onosproject.yang.runtime.impl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.DefaultCont;
+import org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.Tpdfun0;
 import org.onosproject.yang.gen.v1.yms.test.ytb.module.with.container.rev20160826.ytbmodulewithcontainer.DefaultSched;
 import org.onosproject.yang.gen.v1.yms.test.ytb.module.with.leaf.ietfschedule.rev20160826.YtbIetfSchedule;
 import org.onosproject.yang.gen.v1.yms.test.ytb.module.with.leaf.ietfschedule.rev20160826.ytbietfschedule.Enum1Enum;
@@ -58,6 +60,8 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.Cont.LeafIdentifier.LFENUM1;
+import static org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
@@ -1102,5 +1106,43 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(node, "test-container", nameSpace,
                          SINGLE_INSTANCE_NODE,
                          true, null);
+    }
+
+    /**
+     * Unit test for leaf node with enumeration type.
+     */
+    @Test
+    public void processEnumeration() {
+        setUp();
+        data = new DefaultModelObjectData.Builder();
+        ModelObjectId.Builder moIdBdlr = ModelObjectId.builder()
+                .addChild(DefaultCont.class);
+        LeafModelObject mo = new LeafModelObject();
+        mo.leafIdentifier(LFENUM1);
+        mo.addValue(new Tpdfun0(SUCCESSFUL_EXIT));
+        data.addModelObject(mo);
+        data.identifier(moIdBdlr.build());
+        DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
+        rscData = builder.getResourceData(data.build());
+
+        nameSpace = "simple:data:types";
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(2, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = keys.get(1).schemaId();
+        assertThat("cont", is(sid.name()));
+        assertThat(nameSpace, is(sid.namespace()));
+
+        dataNodes = rscData.dataNodes();
+        assertThat(1, is(dataNodes.size()));
+        node = dataNodes.get(0);
+        validateDataNode(node, "lfenum1", nameSpace,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE,
+                         true, "successful exit");
     }
 }

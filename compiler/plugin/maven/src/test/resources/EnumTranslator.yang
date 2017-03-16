@@ -9,6 +9,7 @@ module Sfc {
       type enumeration {
          enum zero;
          enum one;
+         enum "twenty three";
          enum seven {
               value 7;
              }

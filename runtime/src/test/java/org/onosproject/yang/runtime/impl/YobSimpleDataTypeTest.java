@@ -29,6 +29,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.gen.v1.simple.data.types.ll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
+import static org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
@@ -213,6 +215,10 @@ public class YobSimpleDataTypeTest {
         value = "iden";
         dBlr = addDataNode(dBlr, "identityref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
+
+        value = "successful exit";
+        dBlr = addDataNode(dBlr, "lfenum1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
         dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
@@ -386,6 +392,10 @@ public class YobSimpleDataTypeTest {
         value = "iden";
         dBlr = addDataNode(dBlr, "identityref1", null, value, null);
         dBlr = exitDataNode(dBlr);
+
+        value = "grace period expired";
+        dBlr = addDataNode(dBlr, "lfenum1", null, value, null);
+        dBlr = exitDataNode(dBlr);
         dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
@@ -458,6 +468,7 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfunion13().toString(), is("b2 "));
         assertThat(cont.lfunion14().toString(), is("one"));
         assertThat(cont.identityref1().getSimpleName(), is("Iden"));
+        assertThat(cont.lfenum1().enumeration(), is(SUCCESSFUL_EXIT));
     }
 
 
@@ -530,5 +541,6 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfunion14().get(0).toString(), is("one"));
         assertThat(cont.identityref1().get(0).getSimpleName().toString(),
                    is("Iden"));
+        assertThat(cont.lfenum1().get(0), is(GRACE_PERIOD_EXPIRED));
     }
 }
