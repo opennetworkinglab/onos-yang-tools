@@ -254,6 +254,11 @@ class DefaultDataTreeBuilder {
             String name = obj.getClass().getName();
             YangNode child = parent.getChild();
             while (child != null) {
+
+                if (child.getYangSchemaNodeType() == YANG_NON_DATA_NODE) {
+                    child = child.getNextSibling();
+                    continue;
+                }
                 //search if parent node has choice as child node.
                 if (child instanceof YangChoice) {
                     output = findFromChoiceNode(name, parent);
@@ -261,8 +266,6 @@ class DefaultDataTreeBuilder {
                 } else if (child instanceof YangCase) {
                     output = findFromCaseNode(name, parent);
                     //no need to process non data nodes.
-                } else if (child.getYangSchemaNodeType() == YANG_NON_DATA_NODE) {
-                    continue;
                 } else {
                     //search for normal nodes.
                     output = getNode(child, name);

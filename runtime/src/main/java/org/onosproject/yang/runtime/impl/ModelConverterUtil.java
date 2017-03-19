@@ -365,8 +365,8 @@ final class ModelConverterUtil {
         Class<?> idClass;
         try {
             idClass = classLoader.loadClass(idPkg);
-            Method method = idClass.getDeclaredMethod(methodName, (Class<?>) null);
-            return String.valueOf(method.invoke(fieldObj, (Object) null)).trim();
+            Method method = idClass.getDeclaredMethod(methodName);
+            return String.valueOf(method.invoke(fieldObj)).trim();
         } catch (ClassNotFoundException | NoSuchMethodException |
                 InvocationTargetException | IllegalAccessException e) {
             throw new ModelConvertorException(e);

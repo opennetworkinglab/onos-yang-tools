@@ -16,6 +16,11 @@
 
 package org.onosproject.yang.model;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static java.util.Objects.hash;
+
 /**
  * Abstraction of an entity which identifies a generated class uniquely among
  * its siblings.
@@ -49,5 +54,26 @@ public class AtomicPath {
      */
     public void type(DataNode.Type type) {
         this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(type);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        AtomicPath that = (AtomicPath) obj;
+        return Objects.equals(type, that.type);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(getClass())
+                .add("type", type)
+                .toString();
     }
 }
