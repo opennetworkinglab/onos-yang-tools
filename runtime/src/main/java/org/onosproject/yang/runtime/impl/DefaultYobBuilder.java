@@ -135,7 +135,7 @@ public class DefaultYobBuilder {
                     } else {
                         midb = handleNodeKey(midb, registry, schemaNode, key);
                     }
-                    if (!(schemaNode instanceof YangLeaf) || !(schemaNode
+                    if (!(schemaNode instanceof YangLeaf) && !(schemaNode
                             instanceof YangLeafList)) {
                         lastIndexNode = schemaNode;
                     }

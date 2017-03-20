@@ -481,7 +481,8 @@ final class YobUtils {
         derivedId = getDerivedIdentity(leafValue.toString(), identityRef
                 .getReferredIdentity());
         if (derivedId == null) {
-            throw new ModelConvertorException(E_INVALID_IDENTITY_DATA);
+            throw new ModelConvertorException(E_INVALID_IDENTITY_DATA +
+                                                      leafValue.toString());
         }
         qualifiedClassName = derivedId.getJavaPackage() + PERIOD +
                 getCapitalCase(derivedId.getJavaClassNameOrBuiltInType());

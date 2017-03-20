@@ -69,5 +69,5 @@ final class YobConstants {
     static final String E_DATA_TYPE_NOT_SUPPORT =
             "Given data type is not supported.";
     static final String E_INVALID_IDENTITY_DATA =
-            "Value for identityref data type is invalid";
+            "Value for identityref data type is invalid ";
 }
