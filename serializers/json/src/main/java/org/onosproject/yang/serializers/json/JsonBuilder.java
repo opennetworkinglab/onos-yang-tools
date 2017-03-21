@@ -87,4 +87,6 @@ public interface JsonBuilder {
      * @return the final ObjectNode JSON tree after build operations
      */
     ObjectNode getTreeNode();
+
+    void removeExtraTerminator();
 }

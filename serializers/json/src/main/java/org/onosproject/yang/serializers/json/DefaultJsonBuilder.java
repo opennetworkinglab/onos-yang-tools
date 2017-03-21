@@ -174,6 +174,11 @@ public class DefaultJsonBuilder implements JsonBuilder {
         return node;
     }
 
+    @Override
+    public void removeExtraTerminator() {
+        removeCommaIfExist();
+    }
+
     private void appendField(String fieldName) {
         if (fieldName != null && !fieldName.isEmpty()) {
             treeString.append(QUOTE);
