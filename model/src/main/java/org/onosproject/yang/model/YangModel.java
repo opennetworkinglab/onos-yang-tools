@@ -52,5 +52,9 @@ public interface YangModel {
      * @param id     module identifier
      * @param module YANG module information
      */
+    @Deprecated
     void addModule(YangModuleId id, YangModule module);
+
+    // TODO: Make this class immutable post-ONS.
+    // Either specify modules during construction or create a builder.
 }
