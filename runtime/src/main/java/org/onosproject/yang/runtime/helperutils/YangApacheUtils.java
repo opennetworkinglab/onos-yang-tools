@@ -95,7 +95,7 @@ public final class YangApacheUtils {
      */
     public static YangModel processYangModel(String path,
                                              List<YangNode> curNodes) {
-        DefaultYangModel model = new DefaultYangModel();
+        YangModel.Builder b = DefaultYangModel.builder();
         YangModuleId id;
         Iterator<YangNode> it = curNodes.iterator();
         while (it.hasNext()) {
@@ -103,9 +103,9 @@ public final class YangApacheUtils {
             id = processModuleId((YangNode) node);
             YangModule module =
                     new DefaultYangModule(id, get(node.getFileName()), get(path));
-            model.addModule(id, module);
+            b.addModule(id, module);
         }
-        return model;
+        return b.build();
     }
 
     /**

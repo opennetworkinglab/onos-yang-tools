@@ -33,7 +33,17 @@ public class DefaultYangModel implements YangModel {
 
     /**
      * Creates an instance of YANG model.
+     *
+     * @param b YANG model builder
      */
+    private DefaultYangModel(Builder b) {
+        moduleMap = b.moduleMap;
+    }
+
+    /**
+     * Creates an instance of YANG model.
+     */
+    @Deprecated
     public DefaultYangModel() {
         moduleMap = new LinkedHashMap<>();
     }
@@ -62,6 +72,7 @@ public class DefaultYangModel implements YangModel {
     }
 
     @Override
+    @Deprecated
     public void addModule(YangModuleId id, YangModule module) {
         moduleMap.put(id, module);
     }
@@ -96,5 +107,39 @@ public class DefaultYangModel implements YangModel {
         return toStringHelper(getClass())
                 .add("model", moduleMap)
                 .toString();
+    }
+
+    /**
+     * Retrieves a new YANG model builder.
+     *
+     * @return YANG model builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Represents implementation of YANG model builder.
+     */
+    public static class Builder implements YangModel.Builder {
+        private final Map<YangModuleId, YangModule> moduleMap;
+
+        /**
+         * Creates an instance of YANG model builder.
+         */
+        public Builder() {
+            moduleMap = new LinkedHashMap<>();
+        }
+
+        @Override
+        public Builder addModule(YangModuleId id, YangModule module) {
+            moduleMap.put(id, module);
+            return this;
+        }
+
+        @Override
+        public YangModel build() {
+            return new DefaultYangModel(this);
+        }
     }
 }

@@ -16,12 +16,6 @@
 
 package org.onosproject.yang.compiler.tool.impl;
 
-import org.onosproject.yang.model.DefaultYangModel;
-import org.onosproject.yang.model.DefaultYangModule;
-import org.onosproject.yang.model.DefaultYangModuleId;
-import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.model.YangModule;
-import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
@@ -38,6 +32,12 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 import org.onosproject.yang.compiler.tool.YangFileInfo;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.model.DefaultYangModel;
+import org.onosproject.yang.model.DefaultYangModule;
+import org.onosproject.yang.model.DefaultYangModuleId;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.model.YangModuleId;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -112,15 +112,15 @@ public class YangCompilerManager implements YangCompilerService {
      * @return YANG model
      */
     private YangModel processYangModel(String path) {
-        DefaultYangModel model = new DefaultYangModel();
+        YangModel.Builder b = DefaultYangModel.builder();
         YangModuleId id;
         for (YangNode node : yangNodeSet) {
             id = processModuleId(node);
             YangModule module =
                     new DefaultYangModule(id, get(node.getFileName()), get(path));
-            model.addModule(id, module);
+            b.addModule(id, module);
         }
-        return model;
+        return b.build();
     }
 
     /**
@@ -157,22 +157,6 @@ public class YangCompilerManager implements YangCompilerService {
      */
     public Set<YangNode> getYangNodeSet() {
         return yangNodeSet;
-    }
-
-    /**
-     * Provides a list of files from list of strings.
-     *
-     * @param yangFileInfo set of yang file information
-     * @return list of files
-     */
-    private static List<File> getListOfFile(Set<YangFileInfo> yangFileInfo) {
-        List<File> files = new ArrayList<>();
-        for (YangFileInfo yangFile : yangFileInfo) {
-            if (yangFile.isForTranslator()) {
-                files.add(new File(yangFile.getYangFileName()));
-            }
-        }
-        return files;
     }
 
     /**
@@ -480,5 +464,21 @@ public class YangCompilerManager implements YangCompilerService {
      */
     public void setYangFileInfoSet(Set<YangFileInfo> yangFileInfoSet) {
         this.yangFileInfoSet = yangFileInfoSet;
+    }
+
+    /**
+     * Provides a list of files from list of strings.
+     *
+     * @param yangFileInfo set of yang file information
+     * @return list of files
+     */
+    private static List<File> getListOfFile(Set<YangFileInfo> yangFileInfo) {
+        List<File> files = new ArrayList<>();
+        for (YangFileInfo yangFile : yangFileInfo) {
+            if (yangFile.isForTranslator()) {
+                files.add(new File(yangFile.getYangFileName()));
+            }
+        }
+        return files;
     }
 }
