@@ -1,0 +1,35 @@
+{
+
+    "device": [
+      {
+        "deviceid": "string1-deviceid",
+        "Customs-supervisor": "string2",
+        "Merchandiser-supervisor": "string3",
+        "Warehouse-supervisor": [
+          "string4.1",
+          "string4.2",
+          "string4.3"
+        ],
+        "Trading-supervisor": "string4",
+        "Employee-id": [
+          "string4.1",
+          "string4.2",
+          "string4.3"
+        ],
+        "Material-supervisor": [
+          {
+            "name": "string5",
+            "departmentId": "string6"
+          }
+        ],
+        "Purchasing-supervisor": {
+          "purchasing-specialist": "string7",
+          "support": [
+            "string8.1",
+            "string8.2",
+            "string8.3"
+          ]
+        }
+      }
+    ]
+}

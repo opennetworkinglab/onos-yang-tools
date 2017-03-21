@@ -21,19 +21,15 @@ import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.NodeKey;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
-import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
-import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.FIRST_INSTANCE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.LAST_INSTANCE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.MIDDLE_INSTANCE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.NOT_MULTI_INSTANCE_NODE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.SINGLE_INSTANCE_IN_MULTI_NODE;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.UNKNOWN_TYPE;
+import static org.onosproject.yang.model.DataNode.Type.*;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.*;
 
 /**
  * Utilities for converting Data Nodes into JSON format.
@@ -59,6 +55,7 @@ public final class EncoderUtils {
         DataNodeSiblingPositionType siblingType = NOT_MULTI_INSTANCE_NODE;
         walkDataNodeTree(treeNodeListener, dataNode, siblingType);
 
+        jsonBuilder.removeExtraTerminator();
         ObjectNode resultData = jsonBuilder.getTreeNode();
         return resultData;
     }
@@ -102,8 +99,10 @@ public final class EncoderUtils {
         DataNodeSiblingPositionType prevChildType = UNKNOWN_TYPE;
         DataNodeSiblingPositionType currChildType = UNKNOWN_TYPE;
 
-        Iterator it = childrenList.entrySet().iterator();
-        DataNode currChild = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
+        List<DataNode> sortedChildList = sortChildrenList(childrenList);
+        checkNotNull(sortedChildList, "sorted children list cannot be null");
+        Iterator<DataNode> it = sortedChildList.iterator();
+        DataNode currChild = it.next();
         DataNode nextChild = null;
         boolean lastChildNotProcessed = true;
         while (lastChildNotProcessed) {
@@ -114,7 +113,7 @@ public final class EncoderUtils {
              * this info the walker.
              */
             if (it.hasNext()) {
-                nextChild = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
+                nextChild = it.next();
             } else {
                 /*
                  * Current child is the last child.
@@ -143,21 +142,21 @@ public final class EncoderUtils {
         DataNodeSiblingPositionType curChildSiblingType = UNKNOWN_TYPE;
         switch (prevChildType) {
             case UNKNOWN_TYPE:
+            case LAST_INSTANCE:
+            case NOT_MULTI_INSTANCE_NODE:
                 /*
-                 * If type of previous child is unknown, that means
-                 * the current child is the first sibling. If the next
-                 * child is null, then that means the current child is
-                 * the only child.
+                 * If type of previous child is unknown or last instance,
+                 * that means the current child is the first sibling. If
+                 * the next child is null or has a different node name,
+                 * then that means the current child is the only child.
                  */
-                if (nextChild == null) {
+                if (nextChild == null ||
+                        !nextChild.key().schemaId().name().
+                                equals(currChild.key().schemaId().name())) {
                     curChildSiblingType = SINGLE_INSTANCE_IN_MULTI_NODE;
                 } else {
                     curChildSiblingType = FIRST_INSTANCE;
                 }
-                break;
-            case NOT_MULTI_INSTANCE_NODE:
-            case LAST_INSTANCE:
-                curChildSiblingType = FIRST_INSTANCE;
                 break;
             case FIRST_INSTANCE:
             case MIDDLE_INSTANCE:
@@ -177,7 +176,38 @@ public final class EncoderUtils {
             default:
                 curChildSiblingType = UNKNOWN_TYPE;
         }
-
         return curChildSiblingType;
+    }
+
+    private static List<DataNode> sortChildrenList(
+            Map<NodeKey, DataNode> childrenList) {
+        if (childrenList == null || childrenList.isEmpty()) {
+            // the children list is either not yet created or empty.
+            return null;
+        }
+
+        List<DataNode> sortedList = new ArrayList<>();
+        Map<String, List<DataNode>> groupedBucket = new HashMap<>();
+
+        Iterator it = childrenList.entrySet().iterator();
+
+        while (it.hasNext()) {
+               DataNode dataNode = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
+               String nodeName = dataNode.key().schemaId().name();
+                List<DataNode> group = groupedBucket.get(nodeName);
+                if (group == null) {
+                    group = new ArrayList<>();
+                    groupedBucket.put(nodeName, group);
+                }
+
+                group.add(dataNode);
+
+        }
+
+        for (Map.Entry<String, List<DataNode>> entry : groupedBucket.entrySet()) {
+            sortedList.addAll(entry.getValue());
+        }
+
+        return sortedList;
     }
 }

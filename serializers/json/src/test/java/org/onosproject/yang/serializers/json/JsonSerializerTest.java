@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.serializers.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,10 +27,15 @@ import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceData;
+import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
+import org.onosproject.yang.runtime.DefaultCompositeData;
 import org.onosproject.yang.runtime.DefaultCompositeStream;
+import org.onosproject.yang.runtime.DefaultResourceData;
+import org.onosproject.yang.runtime.DefaultRuntimeContext;
+import org.onosproject.yang.runtime.RuntimeContext;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
 
@@ -135,6 +142,41 @@ public class JsonSerializerTest {
         InputStream inputStream = compositeStream.resourceData();
         String expectString = parseJsonToString(path);
         assertEquals(WRONG_STRUCTURE, expectString, convertInputStreamToString(inputStream));
+    }
+
+    @Test
+    public void demo1Test() {
+        String path = "src/test/resources/test.json";
+        // decode
+        DefaultCompositeStream external =
+                new DefaultCompositeStream("demo1:device", parseInput(path));
+        CompositeData compositeData = jsonSerializer.decode(external, context);
+        ResourceData resourceData = compositeData.resourceData();
+        ResourceId rid = resourceData.resourceId();
+        DataNode rootNode = resourceData.dataNodes().get(0);
+
+        // encode
+        RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
+        runtimeContextBuilder.setDataFormat("JSON");
+        DefaultResourceData.Builder resourceDataBuilder = DefaultResourceData.builder();
+        resourceDataBuilder.addDataNode(rootNode);
+        resourceDataBuilder.resourceId(rid);
+
+        ResourceData resourceDataOutput = resourceDataBuilder.build();
+        DefaultCompositeData.Builder compositeDataBuilder = DefaultCompositeData.builder();
+        compositeDataBuilder.resourceData(resourceDataOutput);
+        CompositeData compositeData1 = compositeDataBuilder.build();
+        // CompositeData --- YangRuntimeService ---> CompositeStream.
+        CompositeStream compositeStreamOutPut = jsonSerializer.encode(compositeData1,
+                                                                      context);
+        InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
+        ObjectNode rootNodeOutput;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+        } catch (IOException e) {
+            System.out.println("inputstream failed to parse");
+        }
     }
 
     /**
