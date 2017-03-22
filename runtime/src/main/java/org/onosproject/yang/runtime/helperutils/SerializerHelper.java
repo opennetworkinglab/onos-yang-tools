@@ -17,6 +17,7 @@
 package org.onosproject.yang.runtime.helperutils;
 
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
@@ -27,6 +28,7 @@ import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.SingleInstanceNodeContext;
 import org.onosproject.yang.runtime.YangSerializerContext;
+import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.util.Iterator;
 import java.util.List;
@@ -525,5 +527,23 @@ public final class SerializerHelper {
      */
     public static String errorMsg(String fmt, Object... params) {
         return String.format(fmt, params);
+    }
+
+    /**
+     * Returns the yang module name for given namespace.
+     *
+     * @param c  YANG serializer context
+     * @param ns namespace of the module
+     * @return namespace of the module
+     */
+    public static String getModuleNameFromNameSpace(YangSerializerContext c,
+                                                    String ns) {
+
+        YangSchemaNode schemaNode = ((DefaultYangModelRegistry) c.getContext())
+                .getForNameSpace(ns, false);
+        if (schemaNode != null) {
+            return schemaNode.getName();
+        }
+        return null;
     }
 }

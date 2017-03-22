@@ -30,12 +30,14 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getModuleNameFromNameSpace;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.LNS;
@@ -103,6 +105,16 @@ public class AddToDataNodeListTest {
             "Exit Node is leaf1.",
             "Exit Node is /."
     };
+
+    /**
+     * Test get module name from namespace.
+     */
+    @Test
+    public void getModuleNameTest() {
+
+        String ns = getModuleNameFromNameSpace(context, LNS);
+        assertEquals(ns, "list");
+    }
 
     /**
      * Test add to data node builder.
