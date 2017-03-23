@@ -131,75 +131,78 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
     @Override
     public void registerModel(ModelRegistrationParam param) {
-        YangModel model = param.getYangModel();
-        if (model != null) {
-            Set<YangNode> curNodes = getNodes(model);
-            models.add(model);
-            AppModuleInfo info;
-            Class<?> service;
-            for (YangModuleId id : model.getYangModulesId()) {
-                info = param.getAppModuleInfo(id);
-                if (info != null) {
-                    service = info.getModuleClass();
-                    String name = service.getName();
-                    if (!verifyIfApplicationAlreadyRegistered(service)) {
-                        if (!registerClassStore.containsKey(name)) {
-                            registerClassStore.put(name, service);
-                        }
-                        if (curNodes != null && !curNodes.isEmpty()) {
-                            processRegistration(service, curNodes);
-                        }
-                    }
-                }
+        YangModel model = checkNotNull(param.getYangModel(), "Model must not be null");
+        Set<YangNode> curNodes = getNodes(model);
+        models.add(model);
+        AppModuleInfo info;
+        for (YangModuleId id : model.getYangModulesId()) {
+            info = param.getAppModuleInfo(id);
+            if (info != null) {
+                registerModule(curNodes, info);
             }
-            updateChildContext(curNodes);
-        } else {
-            throw new RuntimeException("model can not be null.");
+        }
+        updateChildContext(curNodes);
+    }
+
+    private void registerModule(Set<YangNode> curNodes, AppModuleInfo info) {
+        Class<?> service;
+        service = info.getModuleClass();
+        String name = service.getName();
+        if (!verifyIfApplicationAlreadyRegistered(service)) {
+            if (!registerClassStore.containsKey(name)) {
+                registerClassStore.put(name, service);
+            }
+            if (curNodes != null && !curNodes.isEmpty()) {
+                processRegistration(service, curNodes);
+            }
         }
     }
 
     @Override
     public void unregisterModel(ModelRegistrationParam param) {
         synchronized (DefaultYangModelRegistry.class) {
-            YangModel model = param.getYangModel();
-            if (model != null) {
-                AppModuleInfo info;
-                for (YangModuleId id : model.getYangModulesId()) {
-                    info = param.getAppModuleInfo(id);
-                    YangSchemaNode curNode;
-                    Class<?> sClass = info.getModuleClass();
-                    String serviceName = sClass.getName();
-                    //Remove registered class from store.
-                    registerClassStore.remove(serviceName);
-                    //check if service is in app store.
-                    curNode = appNameKeyStore.get(serviceName);
-                    if (curNode == null) {
-                        curNode = interfaceNameKeyStore.get(serviceName);
-                    }
-
-                    if (curNode != null) {
-                        removeSchemaNode(curNode);
-                        interfaceNameKeyStore.remove(
-                                getInterfaceClassName(curNode));
-                        pkgKeyStore.remove(getInterfaceClassName(curNode)
-                                                   .toLowerCase());
-                        opParamNameKeyStore.remove(
-                                getOpParamClassName(curNode));
-                        appNameKeyStore.remove(serviceName);
-                        nameSpaceSchemaStore.remove(
-                                curNode.getNameSpace().getModuleNamespace());
-                        log.info(" service class {} of model {} is " +
-                                         "unregistered.", sClass
-                                         .getSimpleName(), param);
-                    } else {
-                        log.error("Either {} service was not registered or " +
-                                          "already unregistered from model " +
-                                          "registry.", sClass.getSimpleName());
-                    }
+            YangModel model = checkNotNull(param.getYangModel(), "Model must not be null");
+            models.remove(model);
+            AppModuleInfo info;
+            for (YangModuleId id : model.getYangModulesId()) {
+                info = param.getAppModuleInfo(id);
+                if (info != null) {
+                    unregisterModule(param, info);
                 }
-            } else {
-                throw new RuntimeException("model can not be null.");
             }
+        }
+    }
+
+    private void unregisterModule(ModelRegistrationParam param, AppModuleInfo info) {
+        YangSchemaNode curNode;
+        Class<?> sClass = info.getModuleClass();
+        String serviceName = sClass.getName();
+        //Remove registered class from store.
+        registerClassStore.remove(serviceName);
+        //check if service is in app store.
+        curNode = appNameKeyStore.get(serviceName);
+        if (curNode == null) {
+            curNode = interfaceNameKeyStore.get(serviceName);
+        }
+
+        if (curNode != null) {
+            removeSchemaNode(curNode);
+            interfaceNameKeyStore.remove(
+                    getInterfaceClassName(curNode));
+            pkgKeyStore.remove(getInterfaceClassName(curNode)
+                                       .toLowerCase());
+            opParamNameKeyStore.remove(
+                    getOpParamClassName(curNode));
+            appNameKeyStore.remove(serviceName);
+            nameSpaceSchemaStore.remove(
+                    curNode.getNameSpace().getModuleNamespace());
+            log.info(" service class {} of model {} is " +
+                             "unregistered.", sClass
+                             .getSimpleName(), param);
+        } else {
+            log.error("Either {} service was not registered or " +
+                              "already unregistered from model " +
+                              "registry.", sClass.getSimpleName());
         }
     }
 
