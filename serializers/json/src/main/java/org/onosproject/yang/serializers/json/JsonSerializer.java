@@ -122,7 +122,7 @@ public class JsonSerializer implements YangSerializer {
 
         if (compositeData.resourceData().dataNodes() != null) {
             rootNode = convertDataNodeToJson(compositeData.
-                    resourceData().dataNodes().get(0));
+                    resourceData().dataNodes().get(0), yangSerializerContext);
         }
 
         if (rootNode != null) {
