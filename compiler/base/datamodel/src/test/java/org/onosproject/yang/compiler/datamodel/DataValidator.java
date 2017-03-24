@@ -17,6 +17,8 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt8;
 
 import static org.onosproject.yang.compiler.datamodel.CheckValidationTest.dataValidation;
 import static org.onosproject.yang.compiler.datamodel.CheckValidationTest.rangeCheck;
@@ -207,10 +209,12 @@ public class DataValidator {
 
         YangType<?> newNode = new YangType<>();
         newNode.setDataType(BINARY);
-        dataValidation(newNode, "  ");
+        dataValidation(newNode, "");
     }
 
-   /* TODO: need to verify .
+    /**
+     * Creating nodes of type ENUMERATION and testing the data validation.
+     */
     @Test
     public void negativeEnum() throws DataModelException {
 
@@ -218,12 +222,11 @@ public class DataValidator {
         newNode.setDataType(YangDataTypes.ENUMERATION);
         YangEnum enum1 = new YangEnum();
         enum1.setNamedValue("sample1");
-
+        enum1.setValue(10);
         YangEnum enum2 = new YangEnum();
         enum2.setNamedValue("sample2");
         enum2.setValue(20);
-
-        YangEnumeration YEnumeration = new YangEnumeration() {
+        YangEnumeration yEnumeration = new YangEnumeration() {
             @Override
             public String getJavaPackage() {
                 return null;
@@ -239,19 +242,21 @@ public class DataValidator {
                 return null;
             }
         };
-        YEnumeration.addEnumInfo(enum1);
-        YEnumeration.addEnumInfo(enum2);
-        newNode.setDataTypeExtendedInfo(YEnumeration);
-        dataValidation(newNode," ");
-        dataValidation(newNode,"123");
-        dataValidation(newNode,"sample1");
+        yEnumeration.addEnumInfo(enum1);
+        yEnumeration.addEnumInfo(enum2);
+        newNode.setDataTypeExtendedInfo(yEnumeration);
+        dataValidation(newNode, " ");
+        dataValidation(newNode, "123");
     }
 
+    /**
+     * Creating nodes of type UNION and testing the data validation.
+     */
     @Test
     public void negativeUnion() throws DataModelException {
-        YangType<?> newNode = new YangType<>();
+
+        YangType<YangUnion> newNode = new YangType<>();
         newNode.setDataType(YangDataTypes.UNION);
-        List<YangType<?>> list = new LinkedList<>();
         YangUnion union = new YangUnion() {
             @Override
             public String getJavaPackage() {
@@ -268,13 +273,14 @@ public class DataValidator {
                 return null;
             }
         };
-        YangUnion YUnion = union;
         YangType<YangInt8> typeInt1 = new YangType<>();
+        typeInt1.setDataType(INT8);
         YangType<YangDecimal64> typeInt2 = new YangType<>();
-        YUnion.addType(typeInt1);
-        YUnion.addType(typeInt2);
-        //  newNode.setDataTypeExtendedInfo(YUnion);
-        dataValidation(newNode,"INT8");
+        typeInt2.setDataType(BOOLEAN);
+        union.addType(typeInt1);
+        union.addType(typeInt2);
+        newNode.setDataTypeExtendedInfo(union);
+        dataValidation(newNode, "abcd");
+        dataValidation(newNode, "-129");
     }
-    */
 }

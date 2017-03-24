@@ -21,13 +21,12 @@ import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTyp
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint16;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint32;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint64;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint8;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
-import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt8.MAX_VALUE;
-import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt8.MIN_VALUE;
 
 /**
  * Utility class to check error messages.
@@ -35,8 +34,6 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 final class CheckValidationTest {
     private static final String E_MESS = "Exception has not occurred for " +
             "invalid value with type ";
-    private static boolean expOccurred;
-
     private CheckValidationTest() {
     }
 
@@ -48,6 +45,7 @@ final class CheckValidationTest {
      */
     static void dataValidation(YangType node, String value)
             throws DataModelException {
+        boolean expOccurred = false;
         YangDataTypes type = node.getDataType();
         try {
             node.isValidValue(value);
@@ -66,6 +64,7 @@ final class CheckValidationTest {
      */
     static void rangeCheck(YangType node, String value)
             throws DataModelException {
+        boolean expOccurred = false;
         YangDataTypes type = node.getDataType();
         try {
             node.isValidValue(value);
@@ -88,16 +87,16 @@ final class CheckValidationTest {
         StringBuilder msg = new StringBuilder();
         switch (type) {
             case UINT8:
-                if (Integer.valueOf(value) < MIN_VALUE) {
+                if (Integer.valueOf(value) < YangUint8.MIN_VALUE) {
                     msg.append("YANG file error : ")
                             .append(value)
                             .append(" is lesser than minimum value ")
-                            .append(MIN_VALUE).append(".");
-                } else if (Integer.valueOf(value) > MAX_VALUE) {
+                            .append(YangUint8.MIN_VALUE).append(".");
+                } else if (Integer.valueOf(value) > YangUint8.MAX_VALUE) {
                     msg.append("YANG file error : ")
                             .append(value)
                             .append(" is greater than maximum value ")
-                            .append(MAX_VALUE).append(".");
+                            .append(YangUint8.MAX_VALUE).append(".");
                 }
                 break;
             case UINT16:
@@ -194,6 +193,7 @@ final class CheckValidationTest {
             case BINARY:
             case STRING:
             case BOOLEAN:
+            case UNION:
                 msg.append("YANG file error : Input value ").append("\"")
                         .append(value).append("\"")
                         .append(" is not a valid ").append(dataType);
