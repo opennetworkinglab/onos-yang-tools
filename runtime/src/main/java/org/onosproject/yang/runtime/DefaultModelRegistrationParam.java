@@ -54,6 +54,11 @@ public class DefaultModelRegistrationParam implements ModelRegistrationParam {
     }
 
     @Override
+    public boolean ifAppInfoPresent() {
+        return !appInfoMap.isEmpty();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(appInfoMap, model);
     }

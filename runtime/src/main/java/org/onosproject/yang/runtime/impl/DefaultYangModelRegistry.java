@@ -29,6 +29,7 @@ import org.onosproject.yang.model.SingleInstanceNodeContext;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModuleId;
 import org.onosproject.yang.runtime.AppModuleInfo;
+import org.onosproject.yang.runtime.DefaultModelRegistrationParam;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
 import org.onosproject.yang.runtime.YangModelRegistry;
 import org.slf4j.Logger;
@@ -135,15 +136,42 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         Set<YangNode> curNodes = getNodes(model);
         models.add(model);
         AppModuleInfo info;
-        for (YangModuleId id : model.getYangModulesId()) {
-            info = param.getAppModuleInfo(id);
-            if (info != null) {
-                registerModule(curNodes, info);
+        //TODO: changing for models-demo app to work.
+        if (checkForAppInfo(param)) {
+            for (YangModuleId id : model.getYangModulesId()) {
+                info = param.getAppModuleInfo(id);
+                if (info != null) {
+                    registerModule(curNodes, info);
+                }
             }
+        } else {
+            //TODO: check this after demo1:
+            registerWhenAppInfoNull(curNodes);
         }
         updateChildContext(curNodes);
     }
 
+    /**
+     * Registerer all the model if app info is null.
+     *
+     * @param curNodes current nodes
+     */
+    private void registerWhenAppInfoNull(Set<YangNode> curNodes) {
+        String name;
+        for (YangNode node : curNodes) {
+            name = getInterfaceClassName(node);
+            if (!interfaceNameKeyStore.containsKey(name)) {
+                processApplicationContext(node, name);
+            }
+        }
+    }
+
+    /**
+     * Register specific model.
+     *
+     * @param curNodes current nodes
+     * @param info     application info
+     */
     private void registerModule(Set<YangNode> curNodes, AppModuleInfo info) {
         Class<?> service;
         service = info.getModuleClass();
@@ -164,23 +192,44 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             YangModel model = checkNotNull(param.getYangModel(), "Model must not be null");
             models.remove(model);
             AppModuleInfo info;
-            for (YangModuleId id : model.getYangModulesId()) {
-                info = param.getAppModuleInfo(id);
-                if (info != null) {
-                    unregisterModule(param, info);
+            //TODO: changing for models-demo app to work
+            if (checkForAppInfo(param)) {
+                for (YangModuleId id : model.getYangModulesId()) {
+                    info = param.getAppModuleInfo(id);
+                    if (info != null) {
+                        unregisterModule(info);
+                    }
+                }
+            } else {
+                Set<YangNode> curNodes = getNodes(model);
+                for (YangNode cur : curNodes) {
+                    processUnReg(getInterfaceClassName(cur));
                 }
             }
         }
     }
 
-    private void unregisterModule(ModelRegistrationParam param, AppModuleInfo info) {
-        YangSchemaNode curNode;
+    /**
+     * Checks if current application has any application info.
+     *
+     * @param param model param
+     * @return if current application has any application info
+     */
+    private boolean checkForAppInfo(ModelRegistrationParam param) {
+        return ((DefaultModelRegistrationParam) param).ifAppInfoPresent();
+    }
+
+    private void unregisterModule(AppModuleInfo info) {
         Class<?> sClass = info.getModuleClass();
         String serviceName = sClass.getName();
         //Remove registered class from store.
         registerClassStore.remove(serviceName);
         //check if service is in app store.
-        curNode = appNameKeyStore.get(serviceName);
+        processUnReg(serviceName);
+    }
+
+    private void processUnReg(String serviceName) {
+        YangSchemaNode curNode = appNameKeyStore.get(serviceName);
         if (curNode == null) {
             curNode = interfaceNameKeyStore.get(serviceName);
         }
@@ -196,13 +245,12 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             appNameKeyStore.remove(serviceName);
             nameSpaceSchemaStore.remove(
                     curNode.getNameSpace().getModuleNamespace());
-            log.info(" service class {} of model {} is " +
-                             "unregistered.", sClass
-                             .getSimpleName(), param);
+            log.info(" service class {} of model is " +
+                             "unregistered.", serviceName);
         } else {
             log.error("Either {} service was not registered or " +
                               "already unregistered from model " +
-                              "registry.", sClass.getSimpleName());
+                              "registry.", serviceName);
         }
     }
 

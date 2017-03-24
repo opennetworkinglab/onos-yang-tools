@@ -40,6 +40,14 @@ public interface ModelRegistrationParam {
     AppModuleInfo getAppModuleInfo(YangModuleId id);
 
     /**
+     * Returns true for empty map. When application is being registered using
+     * model demo application then app info map will be empty.
+     *
+     * @return true for empty map
+     */
+    boolean ifAppInfoPresent();
+
+    /**
      * Abstraction of an entity that represents builder of model registration
      * parameters.
      */
