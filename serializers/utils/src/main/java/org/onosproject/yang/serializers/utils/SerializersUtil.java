@@ -199,7 +199,15 @@ public final class SerializersUtil {
 
     private static void processSinglePathSegment(String pathSegment,
                                                  ResourceId.Builder builder) {
-        if (pathSegment.contains(COLON)) {
+        String name = getPreSegment(pathSegment, EQUAL);
+        if (name != null) {
+            String c = getPreSegment(name, COLON);
+            if (c == null) {
+                processPathSegmentWithoutNamespace(pathSegment, builder);
+            } else {
+                // TODO
+            }
+        } else if (pathSegment.contains(COLON)) {
             processPathSegmentWithNamespace(pathSegment, builder);
         } else {
             processPathSegmentWithoutNamespace(pathSegment, builder);
@@ -374,5 +382,4 @@ public final class SerializersUtil {
 
         return newNameSpace;
     }
-
 }
