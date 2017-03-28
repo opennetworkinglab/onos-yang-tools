@@ -21,16 +21,20 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
+import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceData;
+import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.AnnotatedNodeInfo;
 import org.onosproject.yang.runtime.Annotation;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
+import org.onosproject.yang.runtime.DefaultAnnotatedNodeInfo;
+import org.onosproject.yang.runtime.DefaultCompositeData;
 import org.onosproject.yang.runtime.DefaultCompositeStream;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
@@ -153,8 +157,8 @@ public class XmlSerializerTest {
         validateLeafDataNode(c1, "leaf_c1", "yrt:list", "l1_value1");
 
         // encode test
-        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
-                                                               context);
+        CompositeStream compositeStream = xmlSerializer.encode(
+                getNewCompositeData(compositeData), context);
         InputStream inputStream = compositeStream.resourceData();
         assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
     }
@@ -180,8 +184,8 @@ public class XmlSerializerTest {
                                  "value3");
 
         // encode test
-        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
-                                                               context);
+        CompositeStream compositeStream = xmlSerializer.encode(
+                getNewCompositeData(compositeData), context);
         InputStream inputStream = compositeStream.resourceData();
         assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
     }
@@ -244,8 +248,8 @@ public class XmlSerializerTest {
         assertThat(annotation.value(), is("replace"));
 
         // encode test
-        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
-                                                               context);
+        CompositeStream compositeStream = xmlSerializer.encode(
+                getNewCompositeData(compositeData), context);
         InputStream inputStream = compositeStream.resourceData();
         assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
     }
@@ -421,5 +425,55 @@ public class XmlSerializerTest {
             throw new XmlSerializerException(e.getMessage());
         }
         return sb.toString();
+    }
+
+    private CompositeData getNewCompositeData(CompositeData data) {
+        List<AnnotatedNodeInfo> annotatedNodeInfos = data
+                .annotatedNodesInfo();
+        CompositeData.Builder newCompBuilder = DefaultCompositeData.builder()
+                .resourceData(data.resourceData());
+
+        if (annotatedNodeInfos != null && !annotatedNodeInfos.isEmpty()) {
+            for (AnnotatedNodeInfo annotatedNodeInfo : annotatedNodeInfos) {
+                AnnotatedNodeInfo.Builder newAnnoBuilder = DefaultAnnotatedNodeInfo
+                        .builder();
+                ResourceId id = annotatedNodeInfo.resourceId();
+                ResourceId.Builder newIdBuilder = ResourceId.builder();
+                List<NodeKey> keys = id.nodeKeys();
+                if (keys != null && !keys.isEmpty()) {
+                    for (NodeKey key : keys) {
+                        if (!key.schemaId().name().equals("/")) {
+                            SchemaId schemaId = key.schemaId();
+                            if (key instanceof LeafListKey) {
+                                newIdBuilder.addLeafListBranchPoint(
+                                        schemaId.name(), schemaId.namespace(),
+                                        ((LeafListKey) key).value());
+                            } else if (key instanceof ListKey) {
+                                newIdBuilder.addBranchPointSchema(
+                                        schemaId.name(), schemaId.namespace());
+                                List<KeyLeaf> listKeys = ((ListKey) key)
+                                        .keyLeafs();
+                                for (KeyLeaf listKey : listKeys) {
+                                    SchemaId keySchemaId = listKey.leafSchema();
+                                    newIdBuilder = newIdBuilder.addKeyLeaf(
+                                            keySchemaId.name(), keySchemaId.namespace(),
+                                            listKey.leafValue());
+                                }
+                            } else {
+                                newIdBuilder.addBranchPointSchema(
+                                        schemaId.name(), schemaId.namespace());
+                            }
+                        }
+                    }
+                }
+                newAnnoBuilder.resourceId(newIdBuilder.build());
+                List<Annotation> annotations = annotatedNodeInfo.annotations();
+                for (Annotation annotation : annotations) {
+                    newAnnoBuilder.addAnnotation(annotation);
+                }
+                newCompBuilder.addAnnotatedNodeInfo(newAnnoBuilder.build());
+            }
+        }
+        return newCompBuilder.build();
     }
 }

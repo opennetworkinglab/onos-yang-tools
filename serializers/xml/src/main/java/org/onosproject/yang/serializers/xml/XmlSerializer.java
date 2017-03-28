@@ -43,7 +43,6 @@ import java.util.Map;
 
 import static org.onosproject.yang.runtime.helperutils.DefaultDataNodeWalker.walk;
 import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.addRootElementWithAnnotation;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertUriToRid;
@@ -117,7 +116,8 @@ public class XmlSerializer implements YangSerializer {
         ResourceId.Builder builder;
 
         ResourceId resourceId = internal.resourceData().resourceId();
-        if (resourceId != null) {
+        if (resourceId != null && resourceId.nodeKeys() != null &&
+                !resourceId.nodeKeys().isEmpty()) {
             uriString = convertRidToUri(resourceId);
             try {
                 builder = resourceId.copyBuilder();
@@ -131,7 +131,7 @@ public class XmlSerializer implements YangSerializer {
              * data node and checked in annotation map for annotations
              * associated with resource id.
              */
-            builder = initializeResourceId(context);
+            builder = ResourceId.builder();
         }
 
         // Store annotations in map with resource id as key
