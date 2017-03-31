@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.runtime.YangSerializerContext;
 
+import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getModuleNameFromNameSpace;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.FIRST_INSTANCE;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.LAST_INSTANCE;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.SINGLE_INSTANCE_IN_MULTI_NODE;
@@ -33,19 +35,23 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
 
     private JsonBuilder jsonBuilder;
 
+    private YangSerializerContext jsonSerializerContext;
+
     /**
      * Creates an instance of data node JSON visitor.
      *
      * @param jb json builder
+     * @param context yang serializer context
      */
-    public DataNodeJsonVisitor(JsonBuilder jb) {
+    public DataNodeJsonVisitor(JsonBuilder jb, YangSerializerContext context) {
         jsonBuilder = jb;
+        jsonSerializerContext = context;
     }
 
     @Override
     public void enterDataNode(DataNode dataNode,
                               DataNodeSiblingPositionType siblingType) {
-        String nodeName = getNodeNameWithNamespace(dataNode.key().schemaId());
+        String nodeName = getNodeNameWithModuleName(dataNode.key().schemaId());
         switch (dataNode.type()) {
             case SINGLE_INSTANCE_NODE:
                 jsonBuilder.addNodeTopHalf(nodeName, JsonNodeType.OBJECT);
@@ -75,14 +81,16 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
         }
     }
 
-    private String getNodeNameWithNamespace(SchemaId schemaId) {
+    private String getNodeNameWithModuleName(SchemaId schemaId) {
         String nodeName = schemaId.name();
         String nameSpace = schemaId.namespace();
+        String moduleName = getModuleNameFromNameSpace(jsonSerializerContext,
+                                                       nameSpace);
 
         StringBuilder builder = new StringBuilder();
 
         if (nameSpace != null) {
-            builder.append(nameSpace);
+            builder.append(moduleName);
             builder.append(COLON);
         }
 

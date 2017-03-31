@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.NodeKey;
+import org.onosproject.yang.runtime.YangSerializerContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,13 +45,14 @@ public final class EncoderUtils {
      * Converts a data node to JSON data.
      *
      * @param dataNode given data node
+     * @param context jsonserializer context
      * @return JSON
      */
-    public static ObjectNode convertDataNodeToJson(DataNode dataNode) {
+    public static ObjectNode convertDataNodeToJson(DataNode dataNode, YangSerializerContext context) {
         checkNotNull(dataNode, "data node cannot be null");
 
         JsonBuilder jsonBuilder = new DefaultJsonBuilder();
-        DataNodeVisitor treeNodeListener = new DataNodeJsonVisitor(jsonBuilder);
+        DataNodeVisitor treeNodeListener = new DataNodeJsonVisitor(jsonBuilder, context);
 
         DataNodeSiblingPositionType siblingType = NOT_MULTI_INSTANCE_NODE;
         walkDataNodeTree(treeNodeListener, dataNode, siblingType);
