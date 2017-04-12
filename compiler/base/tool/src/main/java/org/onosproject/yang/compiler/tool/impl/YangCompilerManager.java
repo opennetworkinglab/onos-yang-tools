@@ -210,6 +210,9 @@ public class YangCompilerManager implements YangCompilerService {
                 // Carry out the parsing for all the YANG files.
                 parseYangFileInfoSet();
 
+                // Serialize data model.
+                processSerialization(config.resourceGenDir());
+
                 // Resolve dependencies using linker.
                 resolveDependenciesUsingLinker();
 
@@ -218,9 +221,6 @@ public class YangCompilerManager implements YangCompilerService {
 
                 //add to generated java code map
                 processGeneratedCode(config.getCodeGenDir());
-
-                // Serialize data model.
-                processSerialization(config.resourceGenDir());
 
                 //add YANG files to JAR
                 processCopyYangFile(config.resourceGenDir());

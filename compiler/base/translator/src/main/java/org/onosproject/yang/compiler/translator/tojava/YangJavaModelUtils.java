@@ -26,16 +26,21 @@ import org.onosproject.yang.compiler.datamodel.YangChoice;
 import org.onosproject.yang.compiler.datamodel.YangEnum;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangGrouping;
+import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
+import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeHolder;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
+import org.onosproject.yang.compiler.translator.tojava.javamodel.JavaLeafInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaEnumerationTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaInputTranslator;
@@ -55,6 +60,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getPa
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
+import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator.updateLeavesJavaQualifiedInfo;
 import static org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles.addCurNodeInfoInParentTempFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateInterfaceFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
@@ -786,5 +792,58 @@ public final class YangJavaModelUtils {
         validateLineLength(generateInterfaceFile(interFace, null, rootNode,
                                                  false));
         insertDataIntoJavaFile(interFace, CLOSE_CURLY_BRACKET);
+    }
+
+    /**
+     * Updates java file info for nodes in target linking.
+     *
+     * @param node   node
+     * @param config plugin config
+     */
+    static void updateJavaInfo(YangNode node, YangPluginConfig config) {
+        if (node instanceof YangModule) {
+            //handle module
+            YangModule module = (YangModule) node;
+            String modulePkg = getRootPackage(module.getVersion(),
+                                              module.getModuleNamespace(),
+                                              module.getRevision(),
+                                              null);
+            updatePackageInfo((JavaCodeGeneratorInfo) node, config, modulePkg);
+        } else if (node instanceof YangSubModule) {
+            //handle submodule
+            YangJavaSubModuleTranslator subModule = (YangJavaSubModuleTranslator) node;
+            String subModulePkg = getRootPackage(
+                    subModule.getVersion(), subModule.getNameSpaceFromModule(),
+                    subModule.getRevision(),
+                    null);
+            updatePackageInfo((JavaCodeGeneratorInfo) node, config, subModulePkg);
+        } else {
+            //handle other nodes and also handle grouping
+            if (node.getReferredSchema() != null) {
+                //in case of grouping in normal case we generate java file
+                // info for node even before cloning so when we clone the
+                // actual java file info will be cloned but in this case we
+                // will clone first so in the cloned node , we have to update
+                // the actual java file info for correct operations. because
+                // code will be generated only for actual node.
+                YangNode n = (YangNode) getRefSchema((JavaCodeGeneratorInfo) node);
+                if (n != null) {
+                    updatePackageInfo((JavaCodeGeneratorInfo) n, config);
+                    ((JavaCodeGeneratorInfo) node).setJavaFileInfo(
+                            ((JavaCodeGeneratorInfo) n).getJavaFileInfo());
+                }
+            } else {
+                updatePackageInfo((JavaCodeGeneratorInfo) node, config);
+            }
+        }
+        if (node instanceof YangLeavesHolder) {
+            YangLeavesHolder holder = (YangLeavesHolder) node;
+            for (YangLeaf leaf : holder.getListOfLeaf()) {
+                updateLeavesJavaQualifiedInfo((JavaLeafInfoContainer) leaf);
+            }
+            for (YangLeafList leaf : holder.getListOfLeafList()) {
+                updateLeavesJavaQualifiedInfo((JavaLeafInfoContainer) leaf);
+            }
+        }
     }
 }

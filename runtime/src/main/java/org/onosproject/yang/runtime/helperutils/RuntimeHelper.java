@@ -16,15 +16,23 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
+import org.onosproject.yang.compiler.datamodel.YangDeviationHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.linker.YangLinker;
+import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
+import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
+import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translate;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents utility for runtime. These utilities can be used by application
@@ -33,11 +41,11 @@ import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangMo
  */
 public final class RuntimeHelper {
 
-    public static final String OP_PARAM = "OpParam";
     public static final String PERIOD = ".";
-    public static final String SERVICE = "Service";
+    private static final String SERVICE = "Service";
     public static final String DEFAULT_CAPS = "Default";
     public static final String UNDER_SCORE = "_";
+    private static final Logger log = getLogger(RuntimeHelper.class);
 
     // Forbid construction.
     private RuntimeHelper() {
@@ -65,9 +73,32 @@ public final class RuntimeHelper {
             YangModuleExtendedInfo ex = (YangModuleExtendedInfo) info;
             nodes.add(ex.getSchema());
         }
-        return nodes;
+        //Target linking.
+        return addLinkerAndJavaInfo(nodes);
     }
 
+    /**
+     * Adds linker and translator info for each data model tree.
+     *
+     * @param nodes YANG node
+     */
+    public static Set<YangNode> addLinkerAndJavaInfo(Set<YangNode> nodes) {
+        YangLinker yangLinker = new YangLinkerManager();
+        //Do the linking.
+        yangLinker.resolveDependencies(nodes);
+
+        //add the java info.
+        for (YangNode node : nodes) {
+            if (!((YangDeviationHolder) node).isModuleForDeviation()) {
+                try {
+                    translate(node, new YangPluginConfig(), false);
+                } catch (IOException e) {
+                    log.error("failed to target link node {},", node.getName());
+                }
+            }
+        }
+        return nodes;
+    }
 
     /**
      * Returns schema node's generated interface class name.
@@ -78,16 +109,6 @@ public final class RuntimeHelper {
     public static String getInterfaceClassName(YangSchemaNode schemaNode) {
         return schemaNode.getJavaPackage() + PERIOD +
                 getCapitalCase(schemaNode.getJavaClassNameOrBuiltInType());
-    }
-
-    /**
-     * Returns schema node's generated op param class name.
-     *
-     * @param schemaNode schema node
-     * @return schema node's generated op param class name
-     */
-    public static String getOpParamClassName(YangSchemaNode schemaNode) {
-        return getInterfaceClassName(schemaNode) + OP_PARAM;
     }
 
     /**

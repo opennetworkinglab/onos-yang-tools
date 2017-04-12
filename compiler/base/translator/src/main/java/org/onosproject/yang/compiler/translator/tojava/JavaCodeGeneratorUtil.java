@@ -16,13 +16,16 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeType;
+import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
+import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
@@ -33,6 +36,8 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.updateJavaInfo;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
 
 /**
@@ -47,16 +52,17 @@ public final class JavaCodeGeneratorUtil {
     }
 
     /**
-     * Generates Java code files corresponding to the YANG schema.
+     * Translated YANG info to java info.
      *
-     * @param rootNode   root node of the data model tree
-     * @param yangPlugin YANG plugin config
+     * @param rootNode   root node
+     * @param yangPlugin YANG plugin configurations
+     * @param codeGen    true if code generation is required
      * @throws TranslatorException when fails to generate java code file the current node
      * @throws IOException         when fails to do IO operations
      */
-    public static void generateJavaCode(YangNode rootNode, YangPluginConfig yangPlugin)
+    public static void translate(YangNode rootNode, YangPluginConfig yangPlugin,
+                                 boolean codeGen)
             throws TranslatorException, IOException {
-
         YangNode codeGenNode = rootNode;
         TraversalType curTraversal = ROOT;
 
@@ -70,7 +76,35 @@ public final class JavaCodeGeneratorUtil {
                                                           codeGenNode.getFileName());
                 }
                 try {
-                    generateCodeEntry(codeGenNode, yangPlugin, rootNode);
+                    if (codeGen) {
+                        generateCodeEntry(codeGenNode, yangPlugin, rootNode);
+                    } else {
+                        //for uses java info is not required so need to skip
+                        // it and go to its sibling or parent node.
+                        if (!(codeGenNode instanceof YangUses)) {
+                            //this will update java file info for the target
+                            // node.
+                            updateJavaInfo(codeGenNode, yangPlugin);
+                            if (codeGenNode instanceof YangNotification) {
+                                //to know in generated code what was the enum
+                                // name generated for current notification
+                                String enumName = getEnumJavaAttribute(codeGenNode.getName()
+                                                                               .toUpperCase());
+                                ((RpcNotificationContainer) codeGenNode.getParent())
+                                        .addToNotificationEnumMap(enumName, codeGenNode);
+                            }
+                        } else {
+                            //handle uses ,its java info is not required.
+                            if (codeGenNode.getNextSibling() != null) {
+                                curTraversal = SIBLING;
+                                codeGenNode = codeGenNode.getNextSibling();
+                            } else {
+                                curTraversal = PARENT;
+                                codeGenNode = codeGenNode.getParent();
+                            }
+                            continue;
+                        }
+                    }
                     codeGenNode.setNameSpaceAndAddToParentSchemaMap();
                     if (codeGenNode instanceof YangLeavesHolder ||
                             codeGenNode instanceof SchemaDataNode) {
@@ -96,7 +130,9 @@ public final class JavaCodeGeneratorUtil {
                 codeGenNode = codeGenNode.getChild();
             } else if (codeGenNode.getNextSibling() != null) {
                 try {
-                    generateCodeExit(codeGenNode, yangPlugin, rootNode);
+                    if (codeGen) {
+                        generateCodeExit(codeGenNode, yangPlugin, rootNode);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     close(codeGenNode, yangPlugin, rootNode);
@@ -106,7 +142,9 @@ public final class JavaCodeGeneratorUtil {
                 codeGenNode = codeGenNode.getNextSibling();
             } else {
                 try {
-                    generateCodeExit(codeGenNode, yangPlugin, rootNode);
+                    if (codeGen) {
+                        generateCodeExit(codeGenNode, yangPlugin, rootNode);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     close(codeGenNode, yangPlugin, rootNode);
@@ -116,6 +154,19 @@ public final class JavaCodeGeneratorUtil {
                 codeGenNode = codeGenNode.getParent();
             }
         }
+    }
+
+    /**
+     * Generates Java code files corresponding to the YANG schema.
+     *
+     * @param rootNode   root node of the data model tree
+     * @param yangPlugin YANG plugin config
+     * @throws TranslatorException when fails to generate java code file the current node
+     * @throws IOException         when fails to do IO operations
+     */
+    public static void generateJavaCode(YangNode rootNode, YangPluginConfig yangPlugin)
+            throws TranslatorException, IOException {
+        translate(rootNode, yangPlugin, true);
     }
 
     /**

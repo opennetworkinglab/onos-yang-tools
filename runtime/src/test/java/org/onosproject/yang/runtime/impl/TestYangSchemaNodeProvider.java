@@ -36,6 +36,7 @@ import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processMo
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processYangModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
+import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.addLinkerAndJavaInfo;
 import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getInterfaceClassName;
 
 /**
@@ -67,6 +68,7 @@ public class TestYangSchemaNodeProvider {
         try {
             //Need to deserialize generated meta data file for unit tests.
             Set<YangNode> appNode = deSerializeDataModel(META_PATH);
+            addLinkerAndJavaInfo(appNode);
             nodes.addAll(appNode);
             reg.registerModel(prepareParam(nodes));
             deleteDirectory(TEMP_FOLDER_PATH);

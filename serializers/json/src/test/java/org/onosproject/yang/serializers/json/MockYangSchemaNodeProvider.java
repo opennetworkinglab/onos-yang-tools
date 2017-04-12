@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.deSerializeDataModel;
+import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.addLinkerAndJavaInfo;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processModuleId;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processYangModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
@@ -69,6 +70,7 @@ public class MockYangSchemaNodeProvider {
         try {
             //Need to deserialize generated meta data file for unit tests.
             Set<YangNode> appNode = deSerializeDataModel(META_PATH);
+            addLinkerAndJavaInfo(appNode);
             nodes.addAll(appNode);
             reg.registerModel(prepareParam(nodes));
             deleteDirectory(TEMP_FOLDER_PATH);

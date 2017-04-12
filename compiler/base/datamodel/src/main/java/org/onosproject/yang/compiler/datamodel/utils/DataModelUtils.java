@@ -404,7 +404,8 @@ public final class DataModelUtils {
             objectInputStream.close();
             fileInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
-            throw new IOException(serializedFileInfo + " not found.");
+            throw new IOException(serializedFileInfo + " failed to fetch " +
+                                          "nodes due to " + e.getLocalizedMessage());
         }
         return nodes;
     }

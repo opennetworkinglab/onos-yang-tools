@@ -138,15 +138,26 @@ public final class YangApacheUtils {
      */
     private static String getJarPathFromBundleLocation(String mvnLocationPath,
                                                        String currentDirectory) {
-        String path = currentDirectory + SYSTEM;
+        StringBuilder builder = new StringBuilder();
+        builder.append(currentDirectory).append(SYSTEM);
+        StringBuilder ver = new StringBuilder();
         if (mvnLocationPath.contains(MAVEN)) {
             String[] strArray = mvnLocationPath.split(MAVEN);
             if (strArray[1].contains(File.separator)) {
                 String[] split = strArray[1].split(File.separator);
                 if (split[0].contains(PERIOD)) {
                     String[] groupId = split[0].split(Pattern.quote(PERIOD));
-                    return path + groupId[0] + SLASH + groupId[1] + SLASH + split[1] +
-                            SLASH + split[2] + SLASH + split[1] + HYPHEN + split[2];
+
+                    for (String s : groupId) {
+                        builder.append(s).append(SLASH);
+                    }
+                    for (int i = 1; i < split.length; i++) {
+                        builder.append(split[i]).append(SLASH);
+                        ver.append(split[i]).append(HYPHEN);
+                    }
+                    builder.append(ver);
+                    builder.deleteCharAt(builder.length() - 1);
+                    return builder.toString();
                 }
             }
         }
