@@ -20,7 +20,8 @@ import java.util.List;
 
 /**
  * Representation of an entity which defines additional information about the
- * module required for the model registration.
+ * module required for the model registration. App info should only contain
+ * interface/service file generated for module node.
  */
 public interface AppModuleInfo {
 

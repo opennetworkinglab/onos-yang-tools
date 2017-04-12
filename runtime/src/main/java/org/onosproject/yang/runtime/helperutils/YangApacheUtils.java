@@ -17,12 +17,9 @@
 package org.onosproject.yang.runtime.helperutils;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DefaultYangModel;
-import org.onosproject.yang.model.DefaultYangModule;
 import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.model.YangModuleId;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -31,7 +28,6 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -97,12 +93,11 @@ public final class YangApacheUtils {
                                              List<YangNode> curNodes) {
         YangModel.Builder b = DefaultYangModel.builder();
         YangModuleId id;
-        Iterator<YangNode> it = curNodes.iterator();
-        while (it.hasNext()) {
-            YangSchemaNode node = it.next();
-            id = processModuleId((YangNode) node);
-            YangModule module =
-                    new DefaultYangModule(id, get(node.getFileName()), get(path));
+        for (YangNode node : curNodes) {
+            id = processModuleId(node);
+            YangModuleExtendedInfo module =
+                    new YangModuleExtendedInfo(id, get(node.getFileName()), get(path));
+            module.setSchema(node);
             b.addModule(id, module);
         }
         return b.build();

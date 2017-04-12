@@ -16,9 +16,7 @@
 
 package org.onosproject.yang.runtime.impl;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRevision;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
@@ -36,71 +34,31 @@ import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getDateIn
  */
 public class DefaultYangModelRegistryTest {
 
-    private static final String SERVICE_NAME_3 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network3.rev20151208.IetfNetwork3Service";
     private static final String SCHEMA_NAME_3 = "ietf-network3";
     private static final String INTERFACE_NAME_3 =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network3.rev20151208.IetfNetwork3";
-    private static final String OP_PARAM_NAME_3 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network3.rev20151208.IetfNetwork3OpParam";
 
     private static final String SCHEMA_NAME_4_14 = "ietf-network4@2014-00-08";
     private static final String SCHEMA_NAME_4_15 = "ietf-network4@2015-00-08";
     private static final String SCHEMA_NAME_4_16 = "ietf-network4@2016-00-08";
     private static final String SCHEMA_NAME_4_17 = "ietf-network4@2017-00-08";
     private static final String SCHEMA_NAME_4 = "ietf-network4";
-    private static final String SERVICE_NAME_REV_14 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20141208.IetfNetwork4Service";
     private static final String INTERFACE_NAME_REV_14 =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network4.rev20141208.IetfNetwork4";
-    private static final String OP_PARAM_NAME_REV_14 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20141208.IetfNetwork4OpParam";
-
-    private static final String SERVICE_NAME_REV_15 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20151208.IetfNetwork4Service";
     private static final String INTERFACE_NAME_REV_15 =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network4.rev20151208.IetfNetwork4";
-    private static final String OP_PARAM_NAME_REV_15 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20151208.IetfNetwork4OpParam";
-
-    private static final String SERVICE_NAME_REV_16 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20161208.IetfNetwork4Service";
     private static final String INTERFACE_NAME_REV_16 =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network4.rev20161208.IetfNetwork4";
-    private static final String OP_PARAM_NAME_REV_16 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20161208.IetfNetwork4OpParam";
-
-    private static final String SERVICE_NAME_REV_17 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20171208.IetfNetwork4Service";
     private static final String INTERFACE_NAME_REV_17 =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network4.rev20171208.IetfNetwork4";
-    private static final String OP_PARAM_NAME_REV_17 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20171208.IetfNetwork4OpParam";
-
-    private static final String SERVICE_NAME_NO_REV =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.IetfNetwork4Service";
     private static final String INTERFACE_NAME_NO_REV =
             "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
                     ".network4.IetfNetwork4";
-    private static final String OP_PARAM_NAME_NO_REV =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.IetfNetwork4OpParam";
 
     private static final String CHECK = "check";
     private static final String DATE_NAMESPACE = "2015-00-08";
@@ -109,8 +67,6 @@ public class DefaultYangModelRegistryTest {
 
     private final TestYangSchemaNodeProvider provider =
             new TestYangSchemaNodeProvider();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Unit test case in which schema node should be present.
@@ -129,10 +85,7 @@ public class DefaultYangModelRegistryTest {
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_3);
         assertThat(true, is(SCHEMA_NAME_3.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_3);
-        assertThat(true, is(SCHEMA_NAME_3.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_3);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_3);
         assertThat(true, is(SCHEMA_NAME_3.equals(yangNode.getName())));
 
         Class<?> cls = registry.getRegisteredClass(yangNode);
@@ -142,16 +95,10 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_3);
-        assertThat(true, is(yangNode == null));
-
         yangNode = registry.getForSchemaName(SCHEMA_NAME_3);
         assertThat(true, is(yangNode == null));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_3);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_3);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_3);
         assertThat(true, is(yangNode == null));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -176,10 +123,7 @@ public class DefaultYangModelRegistryTest {
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_4_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_15);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_15);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         Class<?> cls = registry.getRegisteredClass(yangNode);
@@ -189,16 +133,10 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_15);
-        assertThat(true, is(yangNode == null));
-
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_15);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_15);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(yangNode == null));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -214,10 +152,7 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_NO_REV);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_NO_REV);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -227,18 +162,12 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_NO_REV);
-        assertThat(true, is(yangNode == null));
-
         //Here the yangNode should be the node which have different revision.
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
         assertThat(true, is(((YangNode) yangNode).getRevision() != null));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_NO_REV);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_NO_REV);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(yangNode == null));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -263,10 +192,7 @@ public class DefaultYangModelRegistryTest {
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_4_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_15);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_15);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         Class<?> cls = registry.getRegisteredClass(yangNode);
@@ -276,16 +202,10 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_15);
-        assertThat(true, is(yangNode == null));
-
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_15);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_15);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(yangNode == null));
 
         //Here the yangNode should be the node which does not have revision.
@@ -303,17 +223,10 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(((YangNode) yangNode).getRevision() == null));
 
-        //Service with different revision.
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_16);
-        assertThat(true, is(yangNode == null));
-
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4_16);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_16);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_16);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_16);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -323,13 +236,7 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_16);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_16);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_16);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_16);
         assertThat(true, is(yangNode == null));
 
         //Here the yangNode should be the node which have different revision.
@@ -342,16 +249,11 @@ public class DefaultYangModelRegistryTest {
         //---------------------------------------------------------------//
 
         //Service with different revision.
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_17);
-        assertThat(true, is(yangNode == null));
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4_17);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_17);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_17);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_17);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -361,13 +263,7 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_17);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_17);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_17);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_17);
         assertThat(true, is(yangNode == null));
 
         //Here the yangNode should be the node which have different revision.
@@ -380,16 +276,11 @@ public class DefaultYangModelRegistryTest {
         //---------------------------------------------------------------//
 
         //Service no revision.
-        yangNode = registry.getForAppName(SERVICE_NAME_NO_REV);
-        assertThat(true, is(yangNode == null));
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_NO_REV);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_NO_REV);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -399,13 +290,7 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_NO_REV);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_NO_REV);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_NO_REV);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(yangNode == null));
 
         //Here the yangNode should be the node which have different revision.
@@ -419,16 +304,11 @@ public class DefaultYangModelRegistryTest {
         //---------------------------------------------------------------//
 
         //Service with different revision.
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_14);
-        assertThat(true, is(yangNode == null));
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4_14);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_14);
-        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_14);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_14);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
         cls = registry.getRegisteredClass(yangNode);
@@ -438,16 +318,10 @@ public class DefaultYangModelRegistryTest {
         nodes.add((YangNode) yangNode);
         provider.unRegister(nodes);
 
-        yangNode = registry.getForAppName(SERVICE_NAME_REV_14);
-        assertThat(true, is(yangNode == null));
-
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode == null));
 
-        yangNode = registry.getForInterfaceFileName(INTERFACE_NAME_REV_14);
-        assertThat(true, is(yangNode == null));
-
-        yangNode = registry.getForOpPramFileName(OP_PARAM_NAME_REV_14);
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_14);
         assertThat(true, is(yangNode == null));
 
         cls = registry.getRegisteredClass(yangNode);

@@ -21,11 +21,7 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
@@ -65,22 +61,9 @@ public final class RuntimeHelper {
      */
     public static Set<YangNode> getNodes(YangModel model) {
         Set<YangNode> nodes = new HashSet<>();
-        Iterator<YangModule> it = model.getYangModules().iterator();
-        YangModule module;
-        InputStream is;
-        if (it.hasNext()) {
-            module = it.next();
-            is = module.getMetadata();
-            ObjectInputStream os;
-            try {
-                os = new ObjectInputStream(is);
-                nodes.addAll((Set<YangNode>) os.readObject());
-                os.close();
-                is.close();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("failed to deserialize model" + e
-                        .getLocalizedMessage());
-            }
+        for (YangModule info : model.getYangModules()) {
+            YangModuleExtendedInfo ex = (YangModuleExtendedInfo) info;
+            nodes.add(ex.getSchema());
         }
         return nodes;
     }
