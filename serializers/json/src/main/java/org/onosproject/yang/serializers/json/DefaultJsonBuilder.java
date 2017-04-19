@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.serializers.json;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -167,7 +168,9 @@ public class DefaultJsonBuilder implements JsonBuilder {
     public ObjectNode getTreeNode() {
         ObjectNode node = null;
         try {
-            node = (ObjectNode) (new ObjectMapper()).readTree(getTreeString());
+            ObjectMapper m = new ObjectMapper();
+            m.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+            node = (ObjectNode) m.readTree(getTreeString());
         } catch (IOException e) {
             e.printStackTrace();
         }
