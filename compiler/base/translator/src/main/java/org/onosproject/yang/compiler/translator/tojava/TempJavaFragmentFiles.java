@@ -106,8 +106,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRA
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
-import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_CLASS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_IMPORT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
@@ -125,6 +123,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_JOINER_CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.readAppendFile;
@@ -1579,8 +1578,7 @@ public class TempJavaFragmentFiles {
                                 getGeneratedJavaClassName(),
                                 getJavaFileInfo().getPackage(), false);
             //more objects.
-            addImportInfoOfNode(GOOGLE_MORE_OBJECT_IMPORT_CLASS,
-                                GOOGLE_MORE_OBJECT_IMPORT_PKG,
+            addImportInfoOfNode(STRING_JOINER_CLASS, JAVA_UTIL_PKG,
                                 getGeneratedJavaClassName(),
                                 getJavaFileInfo().getPackage(), false);
         }

@@ -71,7 +71,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getListAttribute;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getNewInstance;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getNewLineAndSpace;
-import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOmitNullValueString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOpenCloseParaWithValue;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getParseFromStringMethod;
@@ -139,7 +138,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.GET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET_DECODER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET_ENCODER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET_METHOD_PREFIX;
-import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_METHOD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH_CODE_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IF;
@@ -162,6 +160,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEG_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_STRING_JOINER_OBJECT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NOT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NULL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OBJ;
@@ -778,9 +777,8 @@ public final class MethodsGenerator {
         builder.append(methodSignature(TO_STRING_METHOD, EMPTY_STRING,
                                        PUBLIC, null, STRING_DATA_TYPE, null,
                                        CLASS_TYPE));
-        builder.append(getReturnString(GOOGLE_MORE_OBJECT_METHOD_STRING,
-                                       EIGHT_SPACE_INDENTATION)).append(NEW_LINE)
-                .append(getOmitNullValueString());
+        builder.append(getReturnString(NEW_STRING_JOINER_OBJECT,
+                                       EIGHT_SPACE_INDENTATION)).append(NEW_LINE);
         return builder.toString();
     }
 

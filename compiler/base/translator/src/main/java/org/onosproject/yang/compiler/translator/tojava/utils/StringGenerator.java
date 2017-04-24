@@ -48,6 +48,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.APP_INSTANCE;
@@ -61,7 +62,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CATCH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CHECK_NOT_NULL_STRING;
-import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
@@ -85,7 +85,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.FOR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FROM_STRING_METHOD_NAME;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.GOOGLE_MORE_OBJECT_METHOD_STATIC_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPORT;
@@ -102,7 +101,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.LONG_MAX_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LONG_MIN_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LONG_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MAP;
-import static org.onosproject.yang.compiler.utils.UtilConstants.MORE_OBJ_ATTR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT;
@@ -374,7 +372,7 @@ public final class StringGenerator {
      */
     static String getToStringMethodsAddString(String space, String paraName) {
         return space + PERIOD + ADD_STRING + OPEN_PARENTHESIS +
-                getQuotedString(paraName) + COMMA + SPACE;
+                getQuotedString(paraName + EQUAL) + SPACE + ADD + SPACE;
     }
 
     /**
@@ -1213,23 +1211,6 @@ public final class StringGenerator {
     static String getSetValueParaCondition(int count) {
         return SET_VALUE_PARA + PERIOD + GET + getOpenCloseParaWithValue(
                 count + EMPTY_STRING);
-    }
-
-    /**
-     * Returns more object attr for union to string method.
-     *
-     * @param name name of generate class
-     * @return more object attr for union to string method
-     */
-    static String getMoreObjectAttr(String name) {
-        String cls = name + PERIOD + CLASS;
-        StringBuilder attr = new StringBuilder(EIGHT_SPACE_INDENTATION);
-        String[] array = {NEW_LINE};
-        attr.append(MORE_OBJ_ATTR).append(GOOGLE_MORE_OBJECT_METHOD_STATIC_STRING)
-                .append(getOpenCloseParaWithValue(cls)).append(NEW_LINE)
-                .append(FOUR_SPACE_INDENTATION).append(trimAtLast(
-                getOmitNullValueString(), array)).append(signatureClose());
-        return attr.toString();
     }
 
     /**

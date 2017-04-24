@@ -1355,36 +1355,11 @@ public final class UtilConstants {
      */
     public static final String HASH_MAP = "HashMap";
 
-
     /**
-     * Static attribute for more object import package.
+     * Static attribute for new string joiner object.
      */
-    public static final String GOOGLE_MORE_OBJECT_IMPORT_PKG =
-            "com.google.common.base";
-
-    /**
-     * Static attribute for more object import class.
-     */
-    public static final String GOOGLE_MORE_OBJECT_IMPORT_CLASS =
-            "MoreObjects";
-
-    /**
-     * Static attribute for more object import class.
-     */
-    public static final String MORE_OBJ_ATTR =
-            "MoreObjects.ToStringHelper helper = ";
-
-    /**
-     * Static attribute for to string method.
-     */
-    public static final String GOOGLE_MORE_OBJECT_METHOD_STRING =
-            "MoreObjects.toStringHelper(getClass())";
-
-    /**
-     * Static attribute for to string method.
-     */
-    public static final String GOOGLE_MORE_OBJECT_METHOD_STATIC_STRING =
-            "MoreObjects.toStringHelper";
+    public static final String NEW_STRING_JOINER_OBJECT =
+            "new StringJoiner(\", \", getClass().getSimpleName() +\"{\", \"}\")";
 
     /**
      * Static attribute for java utilities import package.
@@ -1969,6 +1944,7 @@ public final class UtilConstants {
     public static final String MODEL_OBJECT_DATA = "ModelObjectData";
     public static final String DEFAULT_MODEL_OBJECT_DATA =
             "DefaultModelObjectData";
+    public static final String STRING_JOINER_CLASS = "StringJoiner";
 
     // No instantiation.
     private UtilConstants() {
