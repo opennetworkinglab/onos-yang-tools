@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
-import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcNotificationPresent;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.isRpcChildNodePresent;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles.addCurNodeInfoInParentTempFile;
@@ -501,7 +501,7 @@ public final class YangJavaModelUtils {
         }
         updatePackageInfo(info, config, rootPkg);
 
-        if (isRpcNotificationPresent((YangNode) info)) {
+        if (isRpcChildNodePresent((YangNode) info)) {
             info.getJavaFileInfo().addGeneratedFileTypes(GENERATE_SERVICE_AND_MANAGER);
         }
         generateTempFiles(info, config);

@@ -23,8 +23,6 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
-import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaModuleTranslator;
-import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaSubModuleTranslator;
 import org.onosproject.yang.compiler.translator.tojava.utils.JavaExtendsListHolder;
 
 import java.io.File;
@@ -34,7 +32,6 @@ import java.util.List;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileType.RPC_INTERFACE_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
 import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnippetGen.addListenersImport;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateServiceInterfaceFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.addResolvedAugmentedDataNodeImports;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
@@ -43,7 +40,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OUTPUT;
-import static org.onosproject.yang.compiler.utils.UtilConstants.Operation.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT_VAR_NAME;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
@@ -118,7 +114,7 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles()
                 .getJavaImportData().getImports(true);
         createPackage(curNode);
-        boolean notification = false;
+        /*boolean notification = false;
         if (curNode instanceof YangJavaModuleTranslator) {
             if (!((YangJavaModuleTranslator) curNode).getNotificationNodes()
                     .isEmpty()) {
@@ -133,7 +129,7 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
 
         if (notification) {
             addListenersImport(curNode, imports, ADD);
-        }
+        } */
 
         serviceJavaFileHandle = getJavaFileHandle(getJavaClassName(SERVICE));
         generateServiceInterfaceFile(serviceJavaFileHandle, curNode, imports);

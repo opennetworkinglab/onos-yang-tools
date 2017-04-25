@@ -143,7 +143,7 @@ public class YangJavaNotificationTranslator
         // with builder class.
         try {
             generateCodeOfAugmentableNode(this, yangPlugin);
-            addNotificationToExtendsList();
+            //addNotificationToExtendsList();
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
                                                       e.getLocalizedMessage()));
