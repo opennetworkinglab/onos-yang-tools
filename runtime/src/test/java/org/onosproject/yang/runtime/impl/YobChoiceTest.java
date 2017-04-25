@@ -27,7 +27,7 @@ import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.runtime.DefaultResourceData;
+import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 

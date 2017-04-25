@@ -27,7 +27,7 @@ module test1 {
         }
     }
 
-    /* rpc rpc-input {
+    rpc rpc-input {
        input {
             leaf leaf1 {
                  type int32;
@@ -54,7 +54,5 @@ module test1 {
                  type int32;
              }
        }
-    }*/
-
+    }
 }
-    

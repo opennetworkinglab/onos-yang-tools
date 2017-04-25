@@ -138,7 +138,7 @@ module test {
         }
      }
 
-   /* augment /test1:rpc-input/test1:input {
+   augment /test1:rpc-input/test1:input {
            leaf leaf2 {
                 type int32;
             }
@@ -160,8 +160,5 @@ module test {
            leaf leaf2 {
                 type int32;
             }
-   }*/
-
-
+   }
 }
-    

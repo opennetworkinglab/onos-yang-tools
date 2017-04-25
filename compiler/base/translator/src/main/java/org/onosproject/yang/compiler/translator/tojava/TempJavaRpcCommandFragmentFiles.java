@@ -48,7 +48,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.CREATE_MODEL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_MODEL_OBJECT_DATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RESOURCE_DATA;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DYNAMIC_CONFIG_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
@@ -72,7 +71,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COM
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SUCCESS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.RUNTIME_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
@@ -82,6 +80,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.STATIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SUPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.THIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
+import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RPC_SERVICE;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDocForExecuteMethod;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDocForRpcCommandConstructor;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
@@ -104,8 +103,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     private static final String VAR_INPUT = "input";
     private static final String VAR_OUTPUT = "output";
     private static final String VAR_MSG_ID = "msgId";
-    private static final String VAR_STORE = "store";
-    private static final String VAR_STORE_SERVICE = "storeService";
+    private static final String VAR_CFG_SERVICE = "cfgService";
     private static final String VAR_MODEL_CONVERTER = "modelConverter";
     private static final String EXECUTE = "execute";
     private static final String GET_RESOURCE_ID = "getResourceId";
@@ -120,6 +118,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     private static final String ADD_DATA_NODE = "addDataNode";
     private static final String ADD_MODEL_OBJECT = "addModelObject";
     private static final String VAR_RESOURCE_ID = "resourceId";
+    private static final String VAR_APP_SERVICE = "appService";
 
     @Override
     public void generateJavaFile(int fileType, YangNode curNode) throws IOException {
@@ -130,7 +129,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         String parentClassName = getCapitalCase(getCamelCase(
                 curNode.getParent().getJavaClassNameOrBuiltInType(), null));
         String className = getCapitalCase(getCamelCase(
-                curNode.getJavaClassNameOrBuiltInType(), null) + COMMAND);
+                curNode.getJavaClassNameOrBuiltInType(), null)) + COMMAND;
         createPackage(curNode);
 
         // add RPC input import
@@ -198,7 +197,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
             imports.add(getImportString(MODEL_PKG, MODEL_OBJECT_DATA));
         }
         if (inputNode != null) {
-            imports.add(getImportString(RUNTIME_PKG, DEFAULT_RESOURCE_DATA));
+            imports.add(getImportString(MODEL_PKG, DEFAULT_RESOURCE_DATA));
         }
         if (outputNode != null) {
             imports.add(getImportString(MODEL_PKG, DEFAULT_MODEL_OBJECT_DATA));
@@ -257,17 +256,18 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
 
         // parameters for constructors
         Map<String, String> param = new LinkedHashMap<>();
-        param.put(VAR_STORE, DYNAMIC_CONFIG_SERVICE);
+        param.put(VAR_CFG_SERVICE, YANG_RPC_SERVICE);
         param.put(VAR_MODEL_CONVERTER, MODEL_CONVERTER);
-        param.put(appService, getCapitalCase(appService));
+        param.put(VAR_APP_SERVICE, getCapitalCase(appService));
 
         StringBuilder builder = new StringBuilder();
         // add attributes
         builder.append(getVariableDeclaration(VAR_MODEL_CONVERTER, MODEL_CONVERTER,
                                               FOUR_SPACE_INDENTATION, PRIVATE))
-                .append(getVariableDeclaration(appService, getCapitalCase(appService),
+                .append(getVariableDeclaration(VAR_APP_SERVICE, getCapitalCase(appService),
                                                FOUR_SPACE_INDENTATION, PRIVATE))
-                .append(getVariableDeclaration(VAR_STORE_SERVICE, DYNAMIC_CONFIG_SERVICE,
+                .append(getVariableDeclaration(VAR_CFG_SERVICE,
+                                               YANG_RPC_SERVICE,
                                                FOUR_SPACE_INDENTATION, PRIVATE))
                 .append(NEW_LINE)
 
@@ -282,19 +282,19 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(OPEN_PARENTHESIS).append(GET_RESOURCE_ID)
                 .append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS)
                 .append(CLOSE_PARENTHESIS).append(SEMI_COLON).append(NEW_LINE)
-                .append(valueAssign(THIS + PERIOD + VAR_STORE_SERVICE, VAR_STORE,
-                                    EIGHT_SPACE_INDENTATION))
+                .append(valueAssign(THIS + PERIOD + VAR_CFG_SERVICE,
+                                    VAR_CFG_SERVICE, EIGHT_SPACE_INDENTATION))
                 .append(valueAssign(THIS + PERIOD + VAR_MODEL_CONVERTER,
                                     VAR_MODEL_CONVERTER,
                                     EIGHT_SPACE_INDENTATION))
-                .append(valueAssign(THIS + PERIOD + appService, appService,
-                                    EIGHT_SPACE_INDENTATION))
+                .append(valueAssign(THIS + PERIOD + VAR_APP_SERVICE,
+                                    VAR_APP_SERVICE, EIGHT_SPACE_INDENTATION))
 
                 .append(FOUR_SPACE_INDENTATION).append(CLOSE_CURLY_BRACKET)
                 .append(NEW_LINE)
 
                 //add execute method
-                .append(getRpcCommandExecuteMethod(appService, node))
+                .append(getRpcCommandExecuteMethod(node))
 
                 //add get resource id method
                 .append(getResourceIdMethod(node));
@@ -306,10 +306,10 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns RPC command execute method.
      *
+     * @param node Yang RPC node
      * @return RPC command execute method
      */
-    private static String getRpcCommandExecuteMethod(String appService,
-                                                     YangNode node) {
+    private static String getRpcCommandExecuteMethod(YangNode node) {
         StringBuilder builder = new StringBuilder(getOverRideString())
 
                 // execute method with only RPC input
@@ -330,7 +330,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(SPACE).append(VAR_MSG_ID).append(CLOSE_PARENTHESIS)
                 .append(SPACE).append(OPEN_CURLY_BRACKET).append(NEW_LINE)
 
-                .append(getExecuteMethodContents(node, appService))
+                .append(getExecuteMethodContents(node))
                 .append(FOUR_SPACE_INDENTATION).append(CLOSE_CURLY_BRACKET)
                 .append(NEW_LINE);
 
@@ -340,6 +340,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns get resource id method.
      *
+     * @param node YANG RPC node
      * @return get resource id method
      */
     private static String getResourceIdMethod(YangNode node) {
@@ -376,13 +377,13 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns execute method contents.
      *
+     * @param node YANG RPC node
      * @return execute method contents
      */
-    private static String getExecuteMethodContents(YangNode node, String
-            appService) {
+    private static String getExecuteMethodContents(YangNode node) {
         StringBuilder builder = new StringBuilder();
         builder.append(invokeCreateModelString(node))
-                .append(invokeRpcString(node, appService))
+                .append(invokeRpcString(node))
                 .append(invokeCreateDataNodeString(node))
                 .append(createRpcOutputString(node))
                 .append(invokeRpcResponseString());
@@ -392,6 +393,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns create model for input data node statement.
      *
+     * @param node YANG RPC node
      * @return create model for input data node statement
      */
     private static String invokeCreateModelString(YangNode node) {
@@ -413,6 +415,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns creating data node for output object.
      *
+     * @param node YANG RPC node
      * @return creating data node for output object
      */
     private static String invokeCreateDataNodeString(YangNode node) {
@@ -423,10 +426,11 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
             builder.append(buildModelObjectData());
             builder.append(EIGHT_SPACE_INDENTATION).append(RESOURCE_DATA)
                     .append(SPACE).append(VAR_OUTPUT_DATA).append(SPACE)
-                    .append(EQUAL).append(SPACE).append(VAR_MODEL_CONVERTER).append(PERIOD)
-                    .append(CREATE_DATA_NODE).append(OPEN_PARENTHESIS)
-                    .append(VAR_OUTPUT_MO).append(CLOSE_PARENTHESIS)
-                    .append(SEMI_COLON).append(NEW_LINE);
+                    .append(EQUAL).append(SPACE).append(VAR_MODEL_CONVERTER)
+                    .append(PERIOD).append(CREATE_DATA_NODE)
+                    .append(OPEN_PARENTHESIS).append(VAR_OUTPUT_MO)
+                    .append(CLOSE_PARENTHESIS).append(SEMI_COLON)
+                    .append(NEW_LINE);
         }
         return builder.toString();
     }
@@ -434,11 +438,10 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns execute method contents.
      *
-     * @param node       YANG RPC node
-     * @param appService application service name
+     * @param node YANG RPC node
      * @return execute method contents
      */
-    private static String invokeRpcString(YangNode node, String appService) {
+    private static String invokeRpcString(YangNode node) {
         StringBuilder builder = new StringBuilder();
         String rpc = getCamelCase(node.getJavaClassNameOrBuiltInType(), null);
         YangNode inputNode = findRpcInput(node);
@@ -455,12 +458,12 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                     .append(outputName).append(SPACE).append(VAR_OUTPUT_OBJECT)
                     .append(SPACE).append(EQUAL).append(SPACE).append(OPEN_PARENTHESIS)
                     .append(DEFAULT_CAPS).append(outputName).append(CLOSE_PARENTHESIS)
-                    .append(SPACE).append(appService).append(PERIOD).append(rpc)
+                    .append(SPACE).append(VAR_APP_SERVICE).append(PERIOD).append(rpc)
                     .append(OPEN_PARENTHESIS).append(VAR_INPUT_OBJECT).append(CLOSE_PARENTHESIS)
                     .append(SEMI_COLON).append(NEW_LINE);
         } else if (inputNode != null && outputNode == null) {
             builder.append(getInputObject(inputNode));
-            builder.append(EIGHT_SPACE_INDENTATION).append(appService)
+            builder.append(EIGHT_SPACE_INDENTATION).append(VAR_APP_SERVICE)
                     .append(PERIOD).append(rpc).append(OPEN_PARENTHESIS)
                     .append(VAR_INPUT_OBJECT).append(CLOSE_PARENTHESIS)
                     .append(SEMI_COLON).append(NEW_LINE);
@@ -469,11 +472,11 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                     .append(outputName).append(SPACE).append(VAR_OUTPUT_OBJECT)
                     .append(SPACE).append(EQUAL).append(SPACE).append(OPEN_PARENTHESIS)
                     .append(DEFAULT_CAPS).append(outputName).append(CLOSE_PARENTHESIS)
-                    .append(SPACE).append(appService).append(PERIOD).append(rpc)
+                    .append(SPACE).append(VAR_APP_SERVICE).append(PERIOD).append(rpc)
                     .append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS).append(SEMI_COLON)
                     .append(NEW_LINE);
         } else {
-            builder.append(EIGHT_SPACE_INDENTATION).append(appService)
+            builder.append(EIGHT_SPACE_INDENTATION).append(VAR_APP_SERVICE)
                     .append(PERIOD).append(rpc).append(OPEN_PARENTHESIS)
                     .append(CLOSE_PARENTHESIS).append(SEMI_COLON)
                     .append(NEW_LINE);
@@ -510,7 +513,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
      */
     private static String invokeRpcResponseString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(EIGHT_SPACE_INDENTATION).append(VAR_STORE_SERVICE)
+        builder.append(EIGHT_SPACE_INDENTATION).append(VAR_CFG_SERVICE)
                 .append(PERIOD).append(RPC_RESPONSE).append(OPEN_PARENTHESIS)
                 .append(VAR_MSG_ID).append(COMMA).append(SPACE)
                 .append(VAR_OUTPUT).append(CLOSE_PARENTHESIS).append(SEMI_COLON)

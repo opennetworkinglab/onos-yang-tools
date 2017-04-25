@@ -50,7 +50,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CREATE_RPC_CMD_JAVADOC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DYNAMIC_CONFIG_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
@@ -86,6 +85,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SUPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.THIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
+import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RPC_SERVICE;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDocForExtendedExecuteMethod;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDocForRpcExecuterConstructor;
@@ -126,11 +126,11 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
     private static final String VAR_CMD = "cmd";
     private static final String VAR_INPUT = "input";
     private static final String VAR_MSG_ID = "msgId";
-    private static final String VAR_STORE = "store";
     private static final String VAR_RPC_COMMANDS = "rpcCommands";
     private static final String VAR_RPC_COMMAND = "rpcCommand";
-    private static final String VAR_STORE_SERVICE = "storeService";
+    private static final String VAR_CFG_SERVICE = "cfgService";
     private static final String VAR_MODEL_CONVERTER = "modelConverter";
+    private static final String VAR_APP_SERVICE = "appService";
     private static final String EXECUTE = "execute";
     private static final String EXECUTE_RPC = "executeRpc";
     private static final String REGISTER_RPC_METHOD = "registerRpc";
@@ -342,22 +342,22 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
                                          null) + SERVICE;
 
         Map<String, String> param = new LinkedHashMap<>();
-        param.put(VAR_STORE, DYNAMIC_CONFIG_SERVICE);
+        param.put(VAR_CFG_SERVICE, YANG_RPC_SERVICE);
         param.put(VAR_MODEL_CONVERTER, MODEL_CONVERTER);
-        param.put(appService, getCapitalCase(appService));
+        param.put(VAR_APP_SERVICE, getCapitalCase(appService));
 
         // add attributes
         builder.append(getVariableDeclaration(VAR_RPC_COMMANDS, "List<RpcCommand>",
                                               FOUR_SPACE_INDENTATION, PRIVATE))
                 .append(getVariableDeclaration(VAR_RPC_HANDLER, RPC_HANDLER,
                                                FOUR_SPACE_INDENTATION, PRIVATE))
-                .append(getVariableDeclaration(VAR_STORE_SERVICE,
-                                               DYNAMIC_CONFIG_SERVICE,
+                .append(getVariableDeclaration(VAR_CFG_SERVICE,
+                                               YANG_RPC_SERVICE,
                                                FOUR_SPACE_INDENTATION, PRIVATE))
                 .append(getVariableDeclaration(VAR_MODEL_CONVERTER,
                                                MODEL_CONVERTER,
                                                FOUR_SPACE_INDENTATION, PRIVATE))
-                .append(getVariableDeclaration(appService, getCapitalCase(appService),
+                .append(getVariableDeclaration(VAR_APP_SERVICE, getCapitalCase(appService),
                                                FOUR_SPACE_INDENTATION, PRIVATE))
                 .append(NEW_LINE)
 
@@ -372,12 +372,12 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
                 .append(valueAssign("this." + VAR_RPC_HANDLER,
                                     "new DefaultRpcHandler()",
                                     EIGHT_SPACE_INDENTATION))
-                .append(valueAssign(THIS + PERIOD + VAR_STORE_SERVICE, VAR_STORE,
-                                    EIGHT_SPACE_INDENTATION))
+                .append(valueAssign(THIS + PERIOD + VAR_CFG_SERVICE,
+                                    VAR_CFG_SERVICE, EIGHT_SPACE_INDENTATION))
                 .append(valueAssign(THIS + PERIOD + VAR_MODEL_CONVERTER,
                                     VAR_MODEL_CONVERTER,
                                     EIGHT_SPACE_INDENTATION))
-                .append(valueAssign(THIS + PERIOD + appService, appService,
+                .append(valueAssign(THIS + PERIOD + VAR_APP_SERVICE, VAR_APP_SERVICE,
                                     EIGHT_SPACE_INDENTATION))
 
                 .append(FOUR_SPACE_INDENTATION).append(CLOSE_CURLY_BRACKET)
@@ -512,7 +512,7 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
 
                 .append(getForLoopString(EIGHT_SPACE_INDENTATION, RPC_COMMAND,
                                          VAR_RPC_COMMAND, VAR_RPC_COMMANDS))
-                .append(TWELVE_SPACE_INDENTATION).append(VAR_STORE_SERVICE)
+                .append(TWELVE_SPACE_INDENTATION).append(VAR_CFG_SERVICE)
                 .append(PERIOD).append(REGISTER_HANDLER).append(OPEN_PARENTHESIS)
                 .append(VAR_RPC_HANDLER).append(COMMA).append(SPACE)
                 .append(VAR_RPC_COMMAND).append(CLOSE_PARENTHESIS)
@@ -570,8 +570,6 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
      */
     public static String getCreateRpcCommand(YangNode node) {
         StringBuilder builder = new StringBuilder();
-        String appService = node.getParent().getJavaClassNameOrBuiltInType()
-                + SERVICE;
         String cmdName = getSmallCase(node.getJavaClassNameOrBuiltInType());
 
         // creates RPC command
@@ -579,9 +577,9 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
                 .append(cmdName).append(SPACE).append(EQUAL).append(SPACE)
                 .append(NEW).append(SPACE).append(getCapitalCase(
                 node.getJavaClassNameOrBuiltInType())).append(COMMAND)
-                .append(OPEN_PARENTHESIS).append(VAR_STORE_SERVICE).append(COMMA).append(SPACE)
+                .append(OPEN_PARENTHESIS).append(VAR_CFG_SERVICE).append(COMMA).append(SPACE)
                 .append(VAR_MODEL_CONVERTER).append(COMMA)
-                .append(SPACE).append(appService).append(CLOSE_PARENTHESIS)
+                .append(SPACE).append(VAR_APP_SERVICE).append(CLOSE_PARENTHESIS)
                 .append(SEMI_COLON).append(NEW_LINE)
 
                 // adds RPC command to list

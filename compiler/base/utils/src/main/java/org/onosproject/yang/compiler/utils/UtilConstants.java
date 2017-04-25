@@ -906,7 +906,8 @@ public final class UtilConstants {
      */
     public static final String LEAF_IDENTIFIER = "LeafIdentifier";
 
-    public static final String MODEL_LEAF_IDENTIFIER = "org.onosproject.yang.model.LeafIdentifier";
+    public static final String MODEL_LEAF_IDENTIFIER = "org.onosproject.yang" +
+            ".model.LeafIdentifier";
 
     /**
      * Static attribute for is leaf.
@@ -1790,25 +1791,15 @@ public final class UtilConstants {
             ".concurrent";
 
     /**
-     * Static attribute for config import package.
-     */
-    public static final String CONFIG_PKG = "org.onosproject.config";
-
-    /**
      * Static attribute for model import package.
      */
     public static final String MODEL_PKG = "org.onosproject.yang.model";
 
     /**
-     * Static attribute for runtime import package.
-     */
-    public static final String RUNTIME_PKG = "org.onosproject.yang.runtime";
-
-    /**
      * Static attribute for RPC execution status import package.
      */
-    public static final String RPC_OUTPUT_STATUS_PKG = "org.onosproject.config" +
-            ".RpcOutput.Status";
+    public static final String RPC_OUTPUT_STATUS_PKG = "org.onosproject.yang" +
+            ".model.RpcOutput.Status";
 
     /**
      * Static param for model converter.
@@ -1821,9 +1812,9 @@ public final class UtilConstants {
     public static final String RESOURCE_ID = "ResourceId";
 
     /**
-     * Static param for dynamic config service.
+     * Static param for YANG RPC service.
      */
-    public static final String DYNAMIC_CONFIG_SERVICE = "DynamicConfigService";
+    public static final String YANG_RPC_SERVICE = "YangRpcService";
 
     /**
      * Static param for RPC handler.

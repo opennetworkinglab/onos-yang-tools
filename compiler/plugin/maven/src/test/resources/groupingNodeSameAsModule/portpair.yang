@@ -1,27 +1,22 @@
 module port-pair {
 
     yang-version 1;
-
     namespace "sfc.portpair";
-
     prefix "port-pair";
-   
+
      grouping port-pair {
         container  port-pair {
-
             leaf name {
                type string;
             }
-
             leaf description {
                type string;
             }
         }
     }
-   
-    /* rpc get-port-pair {
+    rpc get-port-pair {
       output {
           uses port-pair;
       }
-    } */
+    }
 }

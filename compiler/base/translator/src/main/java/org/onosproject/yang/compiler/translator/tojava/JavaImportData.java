@@ -29,9 +29,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ARRAY_LIST_IMPOR
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIG_INTEGER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BITSET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLLECTION_IMPORTS;
-import static org.onosproject.yang.compiler.utils.UtilConstants.CONFIG_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DATA_NODE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DYNAMIC_CONFIG_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EVENT_LISTENER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EXECUTORS;
@@ -59,6 +57,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_OUTPUT_STATUS_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SUCCESS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RPC_SERVICE;
 
 /**
  * Represents that generated Java file can contain imports.
@@ -373,7 +372,7 @@ public class JavaImportData {
      * @return import for RPC command
      */
     public String getImportForRpcCommand() {
-        return getImportString(CONFIG_PKG, RPC_COMMAND);
+        return getImportString(MODEL_PKG, RPC_COMMAND);
     }
 
     /**
@@ -382,7 +381,7 @@ public class JavaImportData {
      * @return import for RPC handler
      */
     public String getImportForRpcHandler() {
-        return getImportString(CONFIG_PKG, RPC_HANDLER);
+        return getImportString(MODEL_PKG, RPC_HANDLER);
     }
 
     /**
@@ -391,7 +390,7 @@ public class JavaImportData {
      * @return import for dynamic store service
      */
     public String getImportForDynamicStoreService() {
-        return getImportString(CONFIG_PKG, DYNAMIC_CONFIG_SERVICE);
+        return getImportString(MODEL_PKG, YANG_RPC_SERVICE);
     }
 
     /**
@@ -418,7 +417,7 @@ public class JavaImportData {
      * @return import for RPC input
      */
     public String getImportForRpcInput() {
-        return getImportString(CONFIG_PKG, RPC_INPUT);
+        return getImportString(MODEL_PKG, RPC_INPUT);
     }
 
     /**
@@ -427,7 +426,7 @@ public class JavaImportData {
      * @return import for RPC output
      */
     public String getImportForRpcOutput() {
-        return getImportString(CONFIG_PKG, RPC_OUTPUT);
+        return getImportString(MODEL_PKG, RPC_OUTPUT);
     }
 
     /**

@@ -729,11 +729,10 @@ public final class JavaDocGen {
      */
     public static String getJavaDocForRpcCommandConstructor(String rpcName) {
         return "    /**\n" +
-                "     * Constructs a " + rpcName + " command for the given " +
-                "cmd id, model converter,\n     * application service.\n     *\n" +
-                "     * @param cmdId identifier of RPC command\n" +
+                "     * Constructs a " + rpcName + " command.\n" +
+                "     * @param cfgService dynamic config service\n" +
                 "     * @param modelConverter model converter for convertion\n" +
-                "     * @param allService application service\n     */";
+                "     * @param appService application service\n     */";
     }
 
     /**
@@ -758,7 +757,7 @@ public final class JavaDocGen {
         return "    /**\n" +
                 "     * Executes the RPC command.\n" +
                 "     *\n" +
-                "     * @param input input data to the RPC command\n" +
+                "     * @param rpcInput input data to the RPC command\n" +
                 "     * @param msgId of the RPC message to be executed\n" +
                 "     */";
     }
@@ -784,12 +783,13 @@ public final class JavaDocGen {
      */
     public static String getJavadocForRegisterRpcConstructor() {
         return "    /**\n" +
-                "     * Constructs a register rpc for the given store service, mode converter and\n" +
+                "     * Constructs a register rpc for the given cfg service, " +
+                "model converter and\n" +
                 "     * application service.\n" +
                 "     *\n" +
-                "     * @param store dynamic config service\n" +
+                "     * @param cfgService dynamic config service\n" +
                 "     * @param modelConverter model converter for convertion\n" +
-                "     * @param allService application service\n" +
+                "     * @param appService application service\n" +
                 "     */";
     }
 
