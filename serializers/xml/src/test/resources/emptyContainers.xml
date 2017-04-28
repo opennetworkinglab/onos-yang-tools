@@ -1,0 +1,7 @@
+<animal xmlns="yrt:animal">
+<c3/>
+</animal>
+<c4 xmlns="yrt:animal"></c4>
+<c2 xmlns="yrt:animal">
+<p3/>
+</c2>

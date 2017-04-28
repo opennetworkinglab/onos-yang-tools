@@ -1,0 +1,41 @@
+module animal {
+
+    yang-version 1;
+
+    namespace "yrt:animal";
+
+    prefix "foodType";
+
+    organization "ON-LAB";
+
+    description "This module defines for food.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+    container animal {
+        container c3 {
+        }
+        leaf p7 {
+            type string;
+        }
+    }
+
+    container c4 {
+    }
+
+    container c2 {
+        leaf p3 {
+            type string;
+        }
+    }
+
+    leaf bool {
+        type boolean;
+    }
+
+    leaf-list boolean {
+        type boolean;
+    }
+}

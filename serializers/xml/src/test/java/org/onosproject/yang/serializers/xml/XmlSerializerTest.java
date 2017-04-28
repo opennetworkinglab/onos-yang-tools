@@ -91,6 +91,34 @@ public class XmlSerializerTest {
     }
 
     /**
+     * Validates data node in which XML element is of type YANG empty
+     * container and empty leaf inside a container.
+     */
+    @Test
+    public void testEmptyContainer() {
+        String path = "src/test/resources/emptyContainers.xml";
+
+        DefaultCompositeStream external =
+                new DefaultCompositeStream(null, parseInput(path));
+        CompositeData compositeData = xmlSerializer.decode(external, context);
+        DataNode rootNode = validateRootDataNode(compositeData.resourceData());
+        DataNode animal = validateContainerDataNode(rootNode, "animal",
+                                                    "yrt:animal");
+        DataNode c3 = validateContainerDataNode(animal, "c3",
+                                                "yrt:animal");
+        DataNode c4 = validateContainerDataNode(rootNode, "c4", "yrt:animal");
+        DataNode c2 = validateContainerDataNode(rootNode, "c2",
+                                                "yrt:animal");
+        validateNullLeafDataNode(c2, "p3", "yrt:animal", null);
+
+        // encode test
+        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
+                                                               context);
+        InputStream inputStream = compositeStream.resourceData();
+        assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
+    }
+
+    /**
      * Validates data node in which XML element is of type YANG leaf.
      */
     @Test
@@ -328,6 +356,26 @@ public class XmlSerializerTest {
         assertThat(schemaId.name(), is(name));
         assertThat(schemaId.namespace(), is(namespace));
         assertThat(dataNode.value().toString(), is(value));
+    }
+
+    /**
+     * Validates an empty leaf data node.
+     *
+     * @param parent    data node holding leaf
+     * @param name      name of the leaf
+     * @param namespace namespace of the leaf
+     * @param value     leaf value
+     */
+    private static void validateNullLeafDataNode(DataNode parent,
+                                                 String name, String namespace,
+                                                 Object value) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        LeafNode dataNode = ((LeafNode) childNodes.get(key));
+        SchemaId schemaId = dataNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        assertThat(dataNode.value(), is(value));
     }
 
     /**

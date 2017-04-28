@@ -91,11 +91,6 @@ class XmlSerializerListener implements XmlListener {
             return;
         }
 
-        if (nodeType == OBJECT_NODE && element.content() == null ||
-                element.content().isEmpty()) {
-            nodeType = TEXT_NODE;
-        }
-
         if (nodeType == OBJECT_NODE) {
             if (dnBuilder != null) {
                 dnBuilder = addDataNode(dnBuilder, element.getName(),
