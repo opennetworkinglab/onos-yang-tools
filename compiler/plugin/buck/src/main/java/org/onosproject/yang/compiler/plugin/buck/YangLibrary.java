@@ -34,8 +34,14 @@ import com.google.common.collect.ImmutableSortedSet;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +52,26 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.YANG;
  * Buck rule to define a library built form a Yang model.
  */
 public class YangLibrary extends AbstractBuildRule {
+
+    // Inject the SHA of this rule's jar into the rule key
+    private static String pluginJarHash;
+    static {
+        URL pluginJarLocation = YangLibrary.class.getProtectionDomain().getCodeSource().getLocation();
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA");
+            DigestInputStream dis = new DigestInputStream(pluginJarLocation.openStream(), md);
+            //CHECKSTYLE:OFF Consume the InputStream...
+            while (dis.read() != -1);
+            //CHECKSTYLE:ON
+            pluginJarHash = String.format("%032x", new BigInteger(1, md.digest()));
+        } catch (NoSuchAlgorithmException | IOException e) {
+            System.err.println("Failed to compute hash for YangLibrary rule");
+            pluginJarHash = "nil";
+            //TODO consider bailing here instead
+        }
+    }
+    @AddToRuleKey
+    private final String ruleVersion = pluginJarHash;
 
     @AddToRuleKey
     private final ImmutableSortedSet<SourcePath> srcs;
