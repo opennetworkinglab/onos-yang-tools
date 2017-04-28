@@ -97,7 +97,9 @@ public class YangLibraryDescription
         BuildRuleParams yangParams = params.copyWithBuildTarget(
                 BuildTargets.createFlavoredBuildTarget(
                         unflavoredBuildTarget, SOURCES));
-        BuildRule yangLib = resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs));
+
+        BuildRule yangLib = resolver.getRuleOptional(yangParams.getBuildTarget())
+                .or(resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs)));
 
         if (params.getBuildTarget().getFlavors().contains(SOURCES)) {
             return yangLib;
