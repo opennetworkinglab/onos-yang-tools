@@ -1,0 +1,61 @@
+module ietf-otn-topology {
+    yang-version 1;
+
+    namespace "urn:ietf:params:xml:ns:yang:ietf-otn-topology";
+    prefix "otntopo";
+
+    import ietf-network {
+     prefix "nd";
+    }
+
+    import ietf-network-topology {
+     prefix "lnk";
+    }
+
+    import ietf-te-topology {
+     prefix "tet";
+    }
+
+
+    revision 2017-04-25 {
+     description
+      "Revision 0.3";
+     reference
+      "draft-zhang-ccamp-l1-topo-yang-07.txt";
+    }
+
+
+    grouping otn-link-attributes {
+
+        list available-odu-info{
+            key "priority";
+            max-elements "8";
+
+            leaf priority {
+                type uint8 {
+                range "0..7";
+                }
+            }
+
+            list odulist {
+                key "odu-type";
+
+                leaf odu-type {
+                    type string;
+                 }
+
+                leaf number {
+                    type uint16;
+                }
+            }
+        }
+
+        leaf distance {
+            type uint32;
+        }
+    }
+
+    augment "/nd:networks/nd:network/lnk:link/tet:te/tet:config" {
+       uses otn-link-attributes;
+    }
+   }

@@ -152,4 +152,37 @@ public class AugmentTranslatorTest {
         utilManager.translateToJava(yangPluginConfig);
         deleteDirectory(DIR);
     }
+
+    /**
+     * Checks the augment statements linking with prefix change from inter to.
+     * inter
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processActnAugmentInterTranslator() throws IOException,
+            ParserException,
+            MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String searchDir = "src/test/resources/actnInterAugments";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
 }

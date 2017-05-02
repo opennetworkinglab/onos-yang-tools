@@ -1,0 +1,26 @@
+module ietf-te-topology {
+     yang-version 1;
+     namespace "urn:ietf:params:xml:ns:yang:ietf-te-topology";
+
+     prefix "tet";
+
+     import ietf-network {
+       prefix "nw";
+     }
+
+     import ietf-network-topology {
+       prefix "nt";
+     }
+
+     revision "2017-03-12" {
+       description "Initial revision";
+       reference "TBD";
+     }
+
+     augment "/nw:networks/nw:network/nt:link" {
+         container te {
+             container config {
+             } // config
+         } // te
+     }
+}

@@ -308,7 +308,7 @@ public class YangXpathLinker<T> {
             if (tempPath.getNodeIdentifier().getPrefix() == null) {
                 tempAugment = resolveIntraFileAugment(tempPath, root);
             } else {
-                tempAugment = resolveInterFileAugment(tempPath, root);
+                tempAugment = resolveInterFileAugment(tempPath, root, index);
             }
             if (tempAugment != null) {
                 linkerStack.push(tempNode);
@@ -396,10 +396,12 @@ public class YangXpathLinker<T> {
      * Resolves inter file augment linking.
      *
      * @param tempPath temporary absolute path
-     * @param root     root node
+     * @param root root node
+     * @param size node size
      * @return linked target node
      */
-    private YangNode resolveInterFileAugment(YangAtomicPath tempPath, YangNode root) {
+    private YangNode resolveInterFileAugment(YangAtomicPath tempPath,
+                                             YangNode root, int size) {
 
         YangNode tempAugment;
         if (!tempPath.getNodeIdentifier().getPrefix().equals(curPrefix)) {
@@ -408,20 +410,21 @@ public class YangXpathLinker<T> {
         }
         tempAugment = getAugment(tempPath.getNodeIdentifier(), root, absPaths);
         if (tempAugment == null) {
-            return resolveInterToInterFileAugment(root);
+            return resolveInterToInterFileAugment(root, size);
         }
         return tempAugment;
     }
 
     /**
      * Resolves augment when prefix changed from inter file to inter file.
-     * it may be possible that the prefix used in imported module is different the
-     * given list of node identifiers.
+     * it may be possible that the prefix used in imported module is different
+     * the given list of node identifiers.
      *
      * @param root root node
+     * @param size node size
      * @return target node
      */
-    private YangNode resolveInterToInterFileAugment(YangNode root) {
+    private YangNode resolveInterToInterFileAugment(YangNode root, int size) {
         List<YangAugment> augments = getListOfYangAugment(root);
         int index;
         List<YangAtomicPath> paths = new ArrayList<>();
@@ -430,14 +433,15 @@ public class YangXpathLinker<T> {
 
             for (YangAtomicPath path : augment.getTargetNode()) {
 
-                if (!searchForAugmentInImportedNode(path.getNodeIdentifier(), index)) {
+                if (!searchForAugmentInImportedNode(path.getNodeIdentifier(),
+                                                    index)) {
                     paths.clear();
                     break;
                 }
                 paths.add(path);
                 index++;
             }
-            if (!paths.isEmpty() && paths.size() == absPaths.size() - 1) {
+            if (!paths.isEmpty() && paths.size() == size) {
                 return augment;
             } else {
                 paths.clear();

@@ -1,0 +1,17 @@
+module ietf-network {
+    yang-version 1;
+    namespace "urn:ietf:params:xml:ns:yang:ietf-network";
+    prefix nd;
+    revision 2017-03-01 {
+        reference
+        "draft-ietf-i2rs-yang-network-topo-12";
+    }
+    container networks {
+        list network {
+            key "network-id";
+            leaf network-id {
+                type string;
+            }
+        }
+    }
+}
