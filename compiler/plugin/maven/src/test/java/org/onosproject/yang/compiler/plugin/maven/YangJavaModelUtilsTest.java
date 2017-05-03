@@ -21,7 +21,7 @@ import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.tool.YangCompilerManager;
 
 import java.io.IOException;
 import java.nio.file.Path;

@@ -19,7 +19,7 @@ package org.onosproject.yang.compiler.plugin.maven;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.tool.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
 import java.io.File;

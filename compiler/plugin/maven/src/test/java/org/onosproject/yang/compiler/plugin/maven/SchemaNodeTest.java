@@ -26,7 +26,7 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNodeContextInfo;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
-import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.tool.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 

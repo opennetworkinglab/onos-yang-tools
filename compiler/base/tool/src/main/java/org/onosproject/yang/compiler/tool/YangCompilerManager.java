@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.tool.impl;
+package org.onosproject.yang.compiler.tool;
 
 import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
@@ -30,7 +30,6 @@ import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.parser.YangUtilsParser;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
-import org.onosproject.yang.compiler.tool.YangFileInfo;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.DefaultYangModel;
 import org.onosproject.yang.model.DefaultYangModule;

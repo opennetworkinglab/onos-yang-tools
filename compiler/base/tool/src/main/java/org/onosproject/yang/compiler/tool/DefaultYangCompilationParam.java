@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.tool.impl;
+package org.onosproject.yang.compiler.tool;
 
 import org.onosproject.yang.compiler.api.YangCompilationParam;
 

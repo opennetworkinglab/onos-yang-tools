@@ -24,7 +24,7 @@ import org.onosproject.yang.compiler.datamodel.YangGrouping;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.tool.YangFileInfo;
-import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.tool.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
 import java.io.File;

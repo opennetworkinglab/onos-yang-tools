@@ -20,8 +20,8 @@ import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
 import org.onosproject.yang.compiler.api.YangCompilerService;
-import org.onosproject.yang.compiler.tool.impl.DefaultYangCompilationParam;
-import org.onosproject.yang.compiler.tool.impl.YangCompilerManager;
+import org.onosproject.yang.compiler.tool.DefaultYangCompilationParam;
+import org.onosproject.yang.compiler.tool.YangCompilerManager;
 
 import java.io.File;
 import java.io.IOException;
