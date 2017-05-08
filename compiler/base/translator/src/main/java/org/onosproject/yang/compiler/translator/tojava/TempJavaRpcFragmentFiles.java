@@ -348,17 +348,22 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
 
         // add attributes
         builder.append(getVariableDeclaration(VAR_RPC_COMMANDS, "List<RpcCommand>",
-                                              FOUR_SPACE_INDENTATION, PRIVATE))
+                                              FOUR_SPACE_INDENTATION,
+                                              PRIVATE, null))
                 .append(getVariableDeclaration(VAR_RPC_HANDLER, RPC_HANDLER,
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
                 .append(getVariableDeclaration(VAR_CFG_SERVICE,
                                                YANG_RPC_SERVICE,
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
                 .append(getVariableDeclaration(VAR_MODEL_CONVERTER,
                                                MODEL_CONVERTER,
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
                 .append(getVariableDeclaration(VAR_APP_SERVICE, getCapitalCase(appService),
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
                 .append(NEW_LINE)
 
                 // add constructor
@@ -449,11 +454,14 @@ public class TempJavaRpcFragmentFiles extends TempJavaFragmentFiles {
 
                 // add attributes
                 .append(getVariableDeclaration(VAR_MSG_ID, INTEGER_WRAPPER,
-                                               EIGHT_SPACE_INDENTATION, null))
+                                               EIGHT_SPACE_INDENTATION, null,
+                                               null))
                 .append(getVariableDeclaration(VAR_CMD, RPC_EXTENDED_COMMAND,
-                                               EIGHT_SPACE_INDENTATION, null))
+                                               EIGHT_SPACE_INDENTATION, null,
+                                               null))
                 .append(getVariableDeclaration(VAR_INPUT, RPC_INPUT,
-                                               EIGHT_SPACE_INDENTATION, null))
+                                               EIGHT_SPACE_INDENTATION, null,
+                                               null))
 
                 // add constructor
                 .append(getJavaDocForRpcExecuterConstructor()).append(NEW_LINE)

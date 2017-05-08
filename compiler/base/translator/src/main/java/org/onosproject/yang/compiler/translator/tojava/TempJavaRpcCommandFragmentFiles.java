@@ -50,6 +50,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_MODEL_OB
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RESOURCE_DATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
+import static org.onosproject.yang.compiler.utils.UtilConstants.FINAL;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_CONVERTER;
@@ -77,6 +78,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SIXTEEN_SPACE_IN
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH_FOR_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STATIC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_DATA_TYPE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SUPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.THIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
@@ -119,6 +121,9 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     private static final String ADD_MODEL_OBJECT = "addModelObject";
     private static final String VAR_RESOURCE_ID = "resourceId";
     private static final String VAR_APP_SERVICE = "appService";
+    private static final String STR_CONST_RPC_NAME = "RPC_NAME";
+    private static final String STR_CONST_RPC_NAMESPACE = "RPC_NAMESPACE";
+    private static final String STR_CONST_SLASH = "SLASH";
 
     @Override
     public void generateJavaFile(int fileType, YangNode curNode) throws IOException {
@@ -260,15 +265,36 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
         param.put(VAR_MODEL_CONVERTER, MODEL_CONVERTER);
         param.put(VAR_APP_SERVICE, getCapitalCase(appService));
 
-        StringBuilder builder = new StringBuilder();
+        String modifier = PRIVATE + SPACE + STATIC + SPACE + FINAL;
+        String nameSpace = QUOTES + node.getParent().getNameSpace()
+                .getModuleNamespace() + QUOTES;
+        String slashValue = QUOTES + SLASH_FOR_STRING + QUOTES;
+        String rpcName = QUOTES + node.getName() + QUOTES;
+
         // add attributes
+        StringBuilder builder = new StringBuilder();
         builder.append(getVariableDeclaration(VAR_MODEL_CONVERTER, MODEL_CONVERTER,
-                                              FOUR_SPACE_INDENTATION, PRIVATE))
+                                              FOUR_SPACE_INDENTATION,
+                                              PRIVATE, null))
                 .append(getVariableDeclaration(VAR_APP_SERVICE, getCapitalCase(appService),
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
                 .append(getVariableDeclaration(VAR_CFG_SERVICE,
                                                YANG_RPC_SERVICE,
-                                               FOUR_SPACE_INDENTATION, PRIVATE))
+                                               FOUR_SPACE_INDENTATION,
+                                               PRIVATE, null))
+                .append(getVariableDeclaration(STR_CONST_RPC_NAME,
+                                               STRING_DATA_TYPE,
+                                               FOUR_SPACE_INDENTATION,
+                                               modifier, rpcName))
+                .append(getVariableDeclaration(STR_CONST_RPC_NAMESPACE,
+                                               STRING_DATA_TYPE,
+                                               FOUR_SPACE_INDENTATION,
+                                               modifier, nameSpace))
+                .append(getVariableDeclaration(STR_CONST_SLASH,
+                                               STRING_DATA_TYPE,
+                                               FOUR_SPACE_INDENTATION,
+                                               modifier, slashValue))
                 .append(NEW_LINE)
 
                 // add constructor
@@ -297,7 +323,7 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(getRpcCommandExecuteMethod(node))
 
                 //add get resource id method
-                .append(getResourceIdMethod(node));
+                .append(getResourceIdMethod());
 
         // add execute method with msgid
         return builder.toString();
@@ -340,10 +366,9 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
     /**
      * Returns get resource id method.
      *
-     * @param node YANG RPC node
      * @return get resource id method
      */
-    private static String getResourceIdMethod(YangNode node) {
+    private static String getResourceIdMethod() {
         StringBuilder builder = new StringBuilder(NEW_LINE);
 
         builder.append(FOUR_SPACE_INDENTATION).append(PRIVATE).append(SPACE)
@@ -358,18 +383,16 @@ public class TempJavaRpcCommandFragmentFiles extends TempJavaFragmentFiles {
                 .append(BUILDER).append(OPEN_PARENTHESIS)
                 .append(CLOSE_PARENTHESIS).append(PERIOD)
                 .append(ADD_BRANCH_POINT_SCHEMA).append(OPEN_PARENTHESIS)
-                .append(QUOTES).append(SLASH_FOR_STRING).append(QUOTES)
-                .append(COMMA).append(SPACE).append(NULL)
-                .append(CLOSE_PARENTHESIS).append(NEW_LINE)
+                .append(STR_CONST_SLASH).append(COMMA).append(SPACE)
+                .append(NULL).append(CLOSE_PARENTHESIS).append(NEW_LINE)
                 .append(SIXTEEN_SPACE_INDENTATION).append(PERIOD)
                 .append(ADD_BRANCH_POINT_SCHEMA).append(OPEN_PARENTHESIS)
-                .append(QUOTES).append(node.getName()).append(QUOTES)
-                .append(COMMA).append(SPACE).append(QUOTES).append(
-                node.getParent().getNameSpace().getModuleNamespace())
-                .append(QUOTES).append(CLOSE_PARENTHESIS).append(PERIOD)
-                .append(BUILD).append(OPEN_PARENTHESIS).append(CLOSE_PARENTHESIS)
-                .append(SEMI_COLON).append(NEW_LINE).append(FOUR_SPACE_INDENTATION)
-                .append(CLOSE_CURLY_BRACKET).append(NEW_LINE);
+                .append(STR_CONST_RPC_NAME).append(COMMA).append(SPACE)
+                .append(STR_CONST_RPC_NAMESPACE).append(CLOSE_PARENTHESIS)
+                .append(PERIOD).append(BUILD).append(OPEN_PARENTHESIS)
+                .append(CLOSE_PARENTHESIS).append(SEMI_COLON).append(NEW_LINE)
+                .append(FOUR_SPACE_INDENTATION).append(CLOSE_CURLY_BRACKET)
+                .append(NEW_LINE);
 
         return builder.toString();
     }

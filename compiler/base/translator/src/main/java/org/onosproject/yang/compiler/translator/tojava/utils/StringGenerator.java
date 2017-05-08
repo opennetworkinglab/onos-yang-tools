@@ -1312,16 +1312,23 @@ public final class StringGenerator {
      * @param varType  type of variable
      * @param space    indentation of the statement
      * @param modifier modifier name
+     * @param value    value to intialize the variable
      * @return return variable declaration string
      */
     public static String getVariableDeclaration(String varName, String varType,
-                                                String space, String modifier) {
+                                                String space, String modifier,
+                                                String value) {
         StringBuilder builder = new StringBuilder(space);
         if (modifier != null) {
             builder.append(modifier).append(SPACE);
         }
-        builder.append(varType).append(SPACE)
-                .append(varName).append(SEMI_COLON).append(NEW_LINE);
+        builder.append(varType).append(SPACE).append(varName);
+
+        // variable intialization
+        if (value != null) {
+            builder.append(SPACE).append(EQUAL).append(SPACE).append(value);
+        }
+        builder.append(SEMI_COLON).append(NEW_LINE);
 
         return builder.toString();
     }
@@ -1362,5 +1369,4 @@ public final class StringGenerator {
                 .append(pkg).append(PERIOD).append(cls).append(signatureClose());
         return builder.toString();
     }
-
 }
