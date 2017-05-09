@@ -25,7 +25,7 @@
     </parent>
 
     <artifactId>onos-yang-tools</artifactId>
-    <version>1.12.0-b8</version>
+    <version>1.12-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
