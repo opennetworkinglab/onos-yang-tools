@@ -176,12 +176,12 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.UNION_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.MANAGER_SETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.replaceLast;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.trimAtLast;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
  * Representation of java file generator.
@@ -623,7 +623,7 @@ public final class JavaFileGenerator {
         }
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -780,7 +780,7 @@ public final class JavaFileGenerator {
         }
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -904,7 +904,7 @@ public final class JavaFileGenerator {
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -956,7 +956,7 @@ public final class JavaFileGenerator {
         }
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -999,7 +999,7 @@ public final class JavaFileGenerator {
         }
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
-        validateLineLength(file);
+        formatFile(file);
     }
 
     /**
@@ -1021,7 +1021,7 @@ public final class JavaFileGenerator {
         initiateJavaFileGeneration(file, GENERATE_EVENT_LISTENER_INTERFACE,
                                    imports, curNode, className);
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
-        validateLineLength(file);
+        formatFile(file);
     }
 
     /**
@@ -1068,7 +1068,7 @@ public final class JavaFileGenerator {
         }
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
-        validateLineLength(file);
+        formatFile(file);
     }
 
     /**
@@ -1115,7 +1115,7 @@ public final class JavaFileGenerator {
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -1137,7 +1137,7 @@ public final class JavaFileGenerator {
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -1161,7 +1161,7 @@ public final class JavaFileGenerator {
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 
     /**
@@ -1183,6 +1183,6 @@ public final class JavaFileGenerator {
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET + NEW_LINE);
 
-        return validateLineLength(file);
+        return formatFile(file);
     }
 }

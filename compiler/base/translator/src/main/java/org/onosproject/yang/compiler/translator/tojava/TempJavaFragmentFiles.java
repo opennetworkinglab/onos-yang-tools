@@ -131,12 +131,12 @@ import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.GETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.SETTER_METHOD;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
  * Represents implementation of java code fragments temporary implementations.
@@ -1598,7 +1598,7 @@ public class TempJavaFragmentFiles {
                                           curNode, isAttributePresent);
 
             insertDataIntoJavaFile(interfaceJavaFileHandle, CLOSE_CURLY_BRACKET);
-            validateLineLength(interfaceJavaFileHandle);
+            formatFile(interfaceJavaFileHandle);
         }
 
         //add imports for default class.
@@ -1633,7 +1633,7 @@ public class TempJavaFragmentFiles {
                                              imports);
 
             insertDataIntoJavaFile(implClassJavaFileHandle, CLOSE_CURLY_BRACKET);
-            validateLineLength(implClassJavaFileHandle);
+            formatFile(implClassJavaFileHandle);
         }
 
         if (curNode instanceof YangList) {

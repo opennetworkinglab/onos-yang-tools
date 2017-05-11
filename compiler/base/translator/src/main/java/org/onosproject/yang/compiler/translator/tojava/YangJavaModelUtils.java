@@ -77,12 +77,12 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.INPUT_KEYWORD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OUTPUT_KEYWORD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.addPackageInfo;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.trimAtLast;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -789,9 +789,10 @@ public final class YangJavaModelUtils {
         File interFace = tempFile.getBeanTempFiles().getJavaFileHandle(
                 name);
         //generate java code for interface file.
-        validateLineLength(generateInterfaceFile(interFace, null, rootNode,
-                                                 false));
-        insertDataIntoJavaFile(interFace, CLOSE_CURLY_BRACKET);
+        insertDataIntoJavaFile((generateInterfaceFile(interFace, null,
+                                                      rootNode, false)),
+                               CLOSE_CURLY_BRACKET);
+        formatFile(interFace);
     }
 
     /**

@@ -44,9 +44,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRAC
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_FILE_EXTENSION;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.validateLineLength;
 
 /**
  * Represents input information extended to support java code generation.
@@ -160,11 +160,10 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             File file = getFileObject(path, className, JAVA_FILE_EXTENSION, itsInfo);
 
             initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
-            file = validateLineLength(file);
             //Add to string and from string method to class
             addStringMethodsToClass(file, name);
             insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
-
+            formatFile(file);
             closeFile(file, false);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,

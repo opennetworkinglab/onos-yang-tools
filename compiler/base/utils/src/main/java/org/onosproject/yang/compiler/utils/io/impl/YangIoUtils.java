@@ -17,23 +17,40 @@
 package org.onosproject.yang.compiler.utils.io.impl;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jdt.core.formatter.CodeFormatter;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
 import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
+import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_COMPLIANCE;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_SOURCE;
+import static org.eclipse.jdt.core.JavaCore.VERSION_1_8;
+import static org.eclipse.jdt.core.ToolFactory.createCodeFormatter;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.FORMATTER_ALIGNMENT_FOR_ENUM_CONSTANTS;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.INDENT_ON_COLUMN;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.WRAP_ONE_PER_LINE;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.createAlignmentValue;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.getEclipseDefaultSettings;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
@@ -42,7 +59,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_KEY_WORDS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ONE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ORG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PACKAGE;
@@ -63,13 +79,13 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
-import static org.onosproject.yang.compiler.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.UNDER_SCORE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.UNUSED;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_AUTO_PREFIX;
 import static org.onosproject.yang.compiler.utils.io.impl.CopyrightHeader.parseCopyrightHeader;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.PACKAGE_INFO;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.getJavaDoc;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents common utility functionalities for code generation.
@@ -79,6 +95,7 @@ public final class YangIoUtils {
     private static final int LINE_SIZE = 118;
     private static final int SUB_LINE_SIZE = 116;
     private static final int SUB_SIZE = 60;
+    private static final Logger log = getLogger(YangIoUtils.class);
 
     /**
      * Creates an instance of YANG io utils.
@@ -136,9 +153,6 @@ public final class YangIoUtils {
             bufferedWriter.write(getJavaDoc(PACKAGE_INFO, classInfo, isChildNode,
                                             null));
             String pkg = PACKAGE + SPACE + pack + SEMI_COLON;
-            if (pkg.length() >= LINE_SIZE) {
-                pkg = processModifications(pkg, LINE_SIZE);
-            }
             bufferedWriter.write(pkg);
             bufferedWriter.close();
             fileWriter.close();
@@ -343,253 +357,60 @@ public final class YangIoUtils {
     }
 
     /**
-     * Validates a line size in given file whether it is having more then 120 characters.
-     * If yes it will update and give a new file.
+     * Formats the generated file.
      *
      * @param dataFile file in which need to verify all lines.
      * @return updated file
      * @throws IOException when fails to do IO operations.
      */
-    public static File validateLineLength(File dataFile)
-            throws IOException {
-        FileReader fileReader = new FileReader(dataFile);
-        BufferedReader bufferReader = new BufferedReader(fileReader);
+    public static File formatFile(File dataFile) throws IOException {
+
+        // take default Eclipse formatting options.
+        Map options = getEclipseDefaultSettings();
+
+        // initialize the compiler settings to be able to format 1.8 code.
+        options.put(COMPILER_COMPLIANCE, VERSION_1_8);
+        options.put(COMPILER_CODEGEN_TARGET_PLATFORM, VERSION_1_8);
+        options.put(COMPILER_SOURCE, VERSION_1_8);
+
+        options.put(FORMATTER_TAB_CHAR, SPACE);
+
+        // change the option to wrap each enum constant on a new line.
+        options.put(FORMATTER_ALIGNMENT_FOR_ENUM_CONSTANTS,
+                    createAlignmentValue(true, WRAP_ONE_PER_LINE,
+                                         INDENT_ON_COLUMN));
+
+        // instantiate the default code formatter with the given options.
+        final CodeFormatter codeFormatter = createCodeFormatter(options);
+
+        String source = FileUtils.readFileToString(dataFile, UTF_8);
+
+        final TextEdit edit = codeFormatter.format(
+                CodeFormatter.K_COMPILATION_UNIT, // format a compilation unit
+                source, // source to format
+                0, // starting position
+                source.length(), // length
+                0, // initial indentation
+                System.getProperty("line.separator") // line separator
+        );
+
+        IDocument document = new Document(source);
         try {
-            StringBuilder stringBuilder = new StringBuilder();
-            String line = bufferReader.readLine();
-
-            while (line != null) {
-                if (line.length() >= LINE_SIZE) {
-                    line = processModifications(line, LINE_SIZE);
-                }
-                stringBuilder.append(line);
-                stringBuilder.append(NEW_LINE);
-                line = bufferReader.readLine();
-            }
-            FileWriter writer = new FileWriter(dataFile);
-            writer.write(stringBuilder.toString());
-            writer.close();
-            return dataFile;
-        } finally {
-            fileReader.close();
-            bufferReader.close();
+            edit.apply(document);
+        } catch (MalformedTreeException e) {
+            log.info(" failed to format the file {} due to malformed tree.",
+                     dataFile.getName());
+        } catch (BadLocationException e) {
+            log.info(" failed to format the file {} due to bad location.",
+                     dataFile.getName());
+        } catch (NullPointerException e) {
+            log.info(" failed to format the file {} due to incomplete file ",
+                     dataFile.getName());
         }
-    }
-
-    /**
-     * Resolves validation of line length by modifying the string.
-     *
-     * @param line     current line string
-     * @param lineSize line size for change
-     * @return modified line string
-     */
-    private static String processModifications(String line, int lineSize) {
-        int period = getArrayLength(line, PERIOD);
-        int space = getArrayLength(line, SPACE);
-        if (period > space) {
-            return merge(getForPeriod(line), PERIOD, lineSize);
-        }
-        return merge(getForSpace(line), SPACE, lineSize);
-    }
-
-    /**
-     * Returns count of pattern in line.
-     *
-     * @param line    line string
-     * @param pattern pattern followed in line
-     * @return count of pattern in line
-     */
-    private static int getArrayLength(String line, String pattern) {
-        String[] array = line.split(Pattern.quote(pattern));
-        int len = array.length;
-        if (pattern.equals(SPACE)) {
-            for (String str : array) {
-                if (str.equals(EMPTY_STRING)) {
-                    len--;
-                }
-            }
-        }
-        return len - 1;
-    }
-
-    /**
-     * Returns array list of string in case of period.
-     *
-     * @param line line string
-     * @return array list of string in case of period
-     */
-    private static ArrayList<String> getForPeriod(String line) {
-        String[] array = line.split(Pattern.quote(PERIOD));
-        return getSplitArray(array, PERIOD);
-    }
-
-    /**
-     * Returns array list of string in case of space.
-     *
-     * @param line line string
-     * @return array list of string in case of space
-     */
-    private static ArrayList<String> getForSpace(String line) {
-        String[] array = line.split(SPACE);
-        return getSplitArray(array, SPACE);
-    }
-
-    /**
-     * Merges strings to form a new string.
-     *
-     * @param list     list of strings
-     * @param pattern  pattern
-     * @param lineSize line size
-     * @return merged string
-     */
-    private static String merge(ArrayList<String> list, String pattern, int lineSize) {
-        StringBuilder builder = new StringBuilder();
-        StringBuilder fine = new StringBuilder();
-        String append;
-        String pre;
-        String present = EMPTY_STRING;
-        //Add one blank string in list to handle border limit cases.
-        list.add(EMPTY_STRING);
-        Iterator<String> listIt = list.iterator();
-        ArrayList<String> arrayList = new ArrayList<>();
-        int length;
-        StringBuilder spaces = new StringBuilder();
-        while (listIt.hasNext()) {
-            pre = present;
-            present = listIt.next();
-            //check is present string is more than 80 char.
-            if (present.length() > SUB_SIZE) {
-                int period = getArrayLength(present, PERIOD);
-                int space = getArrayLength(present, SPACE);
-                if (period > space) {
-                    // in such case present string should be resolved.
-                    present = processModifications(present, SUB_SIZE);
-                    builder.append(present);
-                }
-            }
-            length = builder.length();
-            //If length of builder is less than the given length then append
-            // it to builder.
-            if (length <= lineSize) {
-                //fill the space builder to provide proper indentation.
-                if (present.equals(EMPTY_STRING)) {
-                    spaces.append(SPACE);
-                }
-                //append to builder
-                builder.append(present);
-                builder.append(pattern);
-                fine.append(pre);
-                //do not append pattern in case of empty strings.
-                if (!pre.equals(EMPTY_STRING)) {
-                    fine.append(pattern);
-                }
-            } else {
-                // now the length is more than given size so trim the pattern
-                // for the string and add it to list,
-                fine = getReplacedString(fine, pattern);
-                arrayList.add(fine.toString());
-                // clear all.
-                builder.delete(0, length);
-                fine.delete(0, fine.length());
-                // append indentation
-                if (pattern.contains(PERIOD)) {
-                    append = NEW_LINE + spaces +
-                            TWELVE_SPACE_INDENTATION +
-                            PERIOD;
-                } else {
-                    append = NEW_LINE + spaces + TWELVE_SPACE_INDENTATION;
-                }
-                // builder needs to move one step forward to fine builder so
-                // append present and pre strings to builder with pattern.
-                builder.append(append);
-                builder.append(pre);
-                builder.append(pattern);
-                builder.append(present);
-                builder.append(pattern);
-                fine.append(append);
-                fine.append(pre);
-                if (!pre.equals(EMPTY_STRING)) {
-                    fine.append(pattern);
-                }
-            }
-        }
-
-        builder = getReplacedString(builder, pattern);
-
-        //need to remove extra string added from the builder.
-        if (builder.toString().lastIndexOf(pattern) == builder.length() - 1) {
-            builder = getReplacedString(builder, pattern);
-        }
-        arrayList.add(builder.toString());
-        fine.delete(0, fine.length());
-        for (String str : arrayList) {
-            fine.append(str);
-        }
-        //No need to append extra spaces.
-        if (pattern.equals(PERIOD)) {
-            return fine.toString();
-        }
-        return spaces + fine.toString();
-    }
-
-    /**
-     * Trims extra pattern strings for builder string.
-     *
-     * @param builder builder
-     * @param pattern pattern
-     * @return modified string
-     */
-    private static StringBuilder getReplacedString(StringBuilder builder, String
-            pattern) {
-        String temp = builder.toString();
-        temp = trimAtLast(temp, pattern);
-        int length = builder.length();
-        builder.delete(0, length);
-        builder.append(temp);
-        return builder;
-    }
-
-    /**
-     * Creates array list to process line string modification.
-     *
-     * @param array   array of strings
-     * @param pattern pattern
-     * @return list to process line string modification
-     */
-    private static ArrayList<String> getSplitArray(String[] array, String pattern) {
-        ArrayList<String> newArray = new ArrayList<>();
-        int count = 0;
-        String temp;
-        for (String str : array) {
-            if (!str.contains(OPEN_CURLY_BRACKET)) {
-                if (str.length() >= SUB_LINE_SIZE) {
-                    count = getSplitString(str, newArray, count);
-                } else {
-                    newArray.add(str);
-                    count++;
-                }
-            } else {
-                if (newArray.isEmpty()) {
-                    newArray.add(str);
-                } else {
-                    temp = newArray.get(count - 1);
-                    newArray.remove(count - 1);
-                    newArray.add(count - 1, temp + pattern + str);
-                }
-            }
-        }
-
-        return newArray;
-    }
-
-    private static int getSplitString(String str,
-                                      ArrayList<String> newArray, int count) {
-        String[] array = str.split(SPACE);
-        for (String st : array) {
-            newArray.add(st + SPACE);
-            count++;
-        }
-        return count;
+        FileWriter writer = new FileWriter(dataFile);
+        writer.write(document.get());
+        writer.close();
+        return dataFile;
     }
 
     /**
