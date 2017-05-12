@@ -59,12 +59,13 @@ public final class EncoderUtils {
         checkNotNull(dataNode, "data node cannot be null");
 
         JsonBuilder jsonBuilder = new DefaultJsonBuilder();
+        jsonBuilder.initializeJson();
         DataNodeVisitor treeNodeListener = new DataNodeJsonVisitor(jsonBuilder, context);
 
         DataNodeSiblingPositionType siblingType = NOT_MULTI_INSTANCE_NODE;
         walkDataNodeTree(treeNodeListener, dataNode, siblingType);
 
-        jsonBuilder.removeExtraTerminator();
+        jsonBuilder.finalizeJson();
         ObjectNode resultData = jsonBuilder.getTreeNode();
         return resultData;
     }

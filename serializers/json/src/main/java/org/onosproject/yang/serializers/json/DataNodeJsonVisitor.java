@@ -40,7 +40,7 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
     /**
      * Creates an instance of data node JSON visitor.
      *
-     * @param jb json builder
+     * @param jb      json builder
      * @param context yang serializer context
      */
     public DataNodeJsonVisitor(JsonBuilder jb, YangSerializerContext context) {
@@ -51,7 +51,7 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
     @Override
     public void enterDataNode(DataNode dataNode,
                               DataNodeSiblingPositionType siblingType) {
-        String nodeName = getNodeNameWithModuleName(dataNode.key().schemaId());
+        String nodeName = getNodeName(dataNode);
         switch (dataNode.type()) {
             case SINGLE_INSTANCE_NODE:
                 jsonBuilder.addNodeTopHalf(nodeName, JsonNodeType.OBJECT);
@@ -79,17 +79,22 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
             default:
                 break;
         }
+        jsonBuilder.pushModuleName(getModuleNameFromDataNode(dataNode));
     }
 
-    private String getNodeNameWithModuleName(SchemaId schemaId) {
+    private String getModuleNameFromDataNode(DataNode dataNode) {
+        String nameSpace = dataNode.key().schemaId().namespace();
+        return getModuleNameFromNameSpace(jsonSerializerContext, nameSpace);
+    }
+
+    private String getNodeName(DataNode dataNode) {
+        SchemaId schemaId = dataNode.key().schemaId();
         String nodeName = schemaId.name();
-        String nameSpace = schemaId.namespace();
-        String moduleName = getModuleNameFromNameSpace(jsonSerializerContext,
-                                                       nameSpace);
+        String moduleName = getModuleNameFromDataNode(dataNode);
 
         StringBuilder builder = new StringBuilder();
 
-        if (nameSpace != null) {
+        if (moduleName != null && !moduleName.equals(jsonBuilder.subTreeModuleName())) {
             builder.append(moduleName);
             builder.append(COLON);
         }
@@ -126,5 +131,6 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
             default:
                 break;
         }
+        jsonBuilder.popModuleName();
     }
 }
