@@ -50,7 +50,7 @@ public final class YangApacheUtils {
     private static final String MAVEN = "mvn:";
     private static final String JAR = ".jar";
     private static final String USER_DIRECTORY = "user.dir";
-    private static final String DATE_FORMAT = "yyyy-mm-dd";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final Logger log = getLogger(YangApacheUtils.class);
 
     // Forbid construction.
