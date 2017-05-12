@@ -78,7 +78,7 @@ public class UnitsListenerTest {
     @Test
     public void processUnitsWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input '}' expecting {';', '+'}");
+        thrown.expectMessage("mismatched input '}' expecting {'{', ';', '+'}");
         YangNode node = manager.getDataModel("src/test/resources/UnitsWithoutStatementEnd.yang");
     }
 

@@ -101,7 +101,7 @@ public class KeyListenerTest {
     @Test
     public void processKeyWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input 'leaf' expecting {';', '+'}");
+        thrown.expectMessage("mismatched input 'leaf' expecting {'{', ';', '+'");
         YangNode node = manager.getDataModel("src/test/resources/KeyWithoutStatementEnd.yang");
     }
 

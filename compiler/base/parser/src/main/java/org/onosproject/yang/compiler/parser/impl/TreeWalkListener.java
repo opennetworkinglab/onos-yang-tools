@@ -23,7 +23,6 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangListener;
-import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppDataStructureListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppExtendedNameListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.ArgumentListener;
@@ -41,6 +40,8 @@ import org.onosproject.yang.compiler.parser.impl.listeners.ContactListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.ContainerListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DataStructureKeyListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.Decimal64Listener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyAllExtRefListener;
+import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyWriteExtRefListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DefaultListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DescriptionListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.DeviateAddListener;
@@ -99,13 +100,11 @@ import org.onosproject.yang.compiler.parser.impl.listeners.UsesListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.ValueListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.VersionListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.WhenListener;
-import org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil;
-import org.onosproject.yang.compiler.utils.UtilConstants;
-import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyAllExtRefListener;
-import org.onosproject.yang.compiler.parser.impl.listeners.DefaultDenyWriteExtRefListener;
 
 import java.util.Stack;
 
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.REFINE_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.UNKNOWN_STATEMENT;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AnyxmlStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AppDataStructureContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AppDataStructureStatementContext;
@@ -134,6 +133,8 @@ import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangPar
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DataStructureKeyStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DateArgumentStringContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.Decimal64SpecificationContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DefaultDenyAllStatementContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DefaultDenyWriteStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DefaultStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DescriptionStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.DeviateAddStatementContext;
@@ -221,6 +222,8 @@ import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangPar
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.ShortCaseStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StatusContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StatusStatementContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StmtEndContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StmtSepContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StringContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.StringRestrictionsContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.SubModuleStatementContext;
@@ -233,6 +236,10 @@ import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangPar
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UniqueContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UniqueStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UnitsStatementContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.Unknown2Context;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UnknownContext;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UnknownStatement2Context;
+import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UnknownStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.UsesStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.ValueContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.ValueStatementContext;
@@ -242,6 +249,9 @@ import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangPar
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YangVersionStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YangfileContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YinElementStatementContext;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.handleUnsupportedYangConstruct;
+import static org.onosproject.yang.compiler.utils.UtilConstants.CURRENTLY_UNSUPPORTED;
+import static org.onosproject.yang.compiler.utils.UtilConstants.UNSUPPORTED_YANG_CONSTRUCT;
 
 /**
  * Represents ANTLR generates parse-tree. ANTLR generates a parse-tree listener interface that responds to events
@@ -1128,8 +1138,9 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterOrderedByStatement(OrderedByStatementContext ctx) {
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx,
-                                                    UtilConstants.CURRENTLY_UNSUPPORTED, getFileName());
+        handleUnsupportedYangConstruct(YangConstructType.ORDERED_BY_DATA, ctx,
+                                       CURRENTLY_UNSUPPORTED, getFileName(),
+                                       ctx.orderedBy().getText());
     }
 
     @Override
@@ -1316,8 +1327,9 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void enterAnyxmlStatement(AnyxmlStatementContext ctx) {
         increaseUnsupportedYangConstructDepth();
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx,
-                                                    UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
+        handleUnsupportedYangConstruct(YangConstructType.ANYXML_DATA, ctx,
+                                       UNSUPPORTED_YANG_CONSTRUCT,
+                                       getFileName(), ctx.identifier().getText());
     }
 
     @Override
@@ -1338,8 +1350,9 @@ public class TreeWalkListener implements GeneratedYangListener {
     @Override
     public void enterRefineStatement(RefineStatementContext ctx) {
         increaseUnsupportedYangConstructDepth();
-        ListenerUtil.handleUnsupportedYangConstruct(YangConstructType.REFINE_DATA, ctx,
-                                                    UtilConstants.UNSUPPORTED_YANG_CONSTRUCT, getFileName());
+        handleUnsupportedYangConstruct(REFINE_DATA, ctx,
+                                       UNSUPPORTED_YANG_CONSTRUCT,
+                                       getFileName(), ctx.refine().getText());
     }
 
     @Override
@@ -1853,27 +1866,90 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void enterDefaultDenyWriteStatement(
-            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext) {
+            DefaultDenyWriteStatementContext ctx) {
         DefaultDenyWriteExtRefListener
-            .processDefaultDenyWriteStructureEntry(this, currentContext);
+                .processDefaultDenyWriteStructureEntry(this, ctx);
     }
 
     @Override
     public void exitDefaultDenyWriteStatement(
-            GeneratedYangParser.DefaultDenyWriteStatementContext currentContext) {
+            DefaultDenyWriteStatementContext ctx) {
         // do nothing
     }
 
     @Override
     public void enterDefaultDenyAllStatement(
-            GeneratedYangParser.DefaultDenyAllStatementContext currentContext) {
+            DefaultDenyAllStatementContext ctx) {
         DefaultDenyAllExtRefListener
-            .processDefaultDenyAllStructureEntry(this, currentContext);
+                .processDefaultDenyAllStructureEntry(this, ctx);
     }
 
     @Override
     public void exitDefaultDenyAllStatement(
-            GeneratedYangParser.DefaultDenyAllStatementContext currentContext) {
+            DefaultDenyAllStatementContext ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void enterUnknownStatement(UnknownStatementContext ctx) {
+        increaseUnsupportedYangConstructDepth();
+        handleUnsupportedYangConstruct(UNKNOWN_STATEMENT, ctx,
+                                       CURRENTLY_UNSUPPORTED, getFileName(),
+                                       ctx.unknown().getText());
+    }
+
+    @Override
+    public void exitUnknownStatement(UnknownStatementContext ctx) {
+        decreaseUnsupportedYangConstructDepth();
+    }
+
+    @Override
+    public void enterUnknownStatement2(UnknownStatement2Context ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void exitUnknownStatement2(UnknownStatement2Context ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void enterStmtEnd(StmtEndContext ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void exitStmtEnd(StmtEndContext ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void enterStmtSep(StmtSepContext ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void exitStmtSep(StmtSepContext ctx) {
+        // do nothing
+    }
+
+    @Override
+    public void enterUnknown(UnknownContext currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void exitUnknown(UnknownContext currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void enterUnknown2(Unknown2Context currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void exitUnknown2(Unknown2Context currentContext) {
         // do nothing
     }
 }

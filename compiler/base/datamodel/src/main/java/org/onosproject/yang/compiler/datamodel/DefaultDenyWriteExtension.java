@@ -17,7 +17,7 @@ package org.onosproject.yang.compiler.datamodel;
 
 /**
  * Methods related to the extensions defined in ietf-netconf-acm.yang RFC 6536.
- *
+ * <p>
  * RFC 6536 defines two extensions default-deny-write and default-deny-all
  * that can be used to mark exceptions for data nodes to the standard access
  * control exceptions.
@@ -27,14 +27,15 @@ package org.onosproject.yang.compiler.datamodel;
 public interface DefaultDenyWriteExtension {
     /**
      * Returns the defaultDenyWrite.
-     * @return
+     *
+     * @return the defaultDenyAll
      */
     public boolean getDefaultDenyWrite();
 
     /**
      * Sets the defaultDenyWrite.
      *
-     * @param defaultDenyWrite
+     * @param defaultDenyWrite the defaultDenyAll value
      */
     public void setDefaultDenyWrite(boolean defaultDenyWrite);
 }

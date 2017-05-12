@@ -1,0 +1,24 @@
+module TestUnknown {
+    yang-version 1;
+    namespace http://huawei.com/unknown;
+    prefix Ant  {
+        abc:statistics {
+            xyz:stats;
+        }
+    }
+    container nacm {
+        abc:statistics;
+        leaf enable-nacm {
+            abc:statistics;
+            type boolean;
+        }
+    }
+    list nacm1 {
+        abc:statistics;
+        config false;
+        leaf read-default {
+          type boolean;
+          description RFC:6020:;
+        }
+    }
+}

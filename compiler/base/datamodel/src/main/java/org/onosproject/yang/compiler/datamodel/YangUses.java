@@ -82,7 +82,8 @@ public abstract class YangUses
         extends YangNode
         implements YangCommonInfo, Parsable, Resolvable, CollisionDetector,
         YangWhenHolder, YangIfFeatureHolder, YangTranslatorOperatorNode,
-        LeafRefInvalidHolder {
+        LeafRefInvalidHolder, DefaultDenyWriteExtension,
+        DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201617L;
 
@@ -138,6 +139,16 @@ public abstract class YangUses
      * Current grouping depth for uses.
      */
     private int currentGroupingDepth;
+
+    /**
+     * References the extension default-deny-write.
+     */
+    private boolean defaultDenyWrite;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Creates an YANG uses node.
@@ -566,5 +577,25 @@ public abstract class YangUses
         clnNode.setNextSibling(null);
         clnNode.setPreviousSibling(null);
         return clnNode;
+    }
+
+    @Override
+    public boolean getDefaultDenyWrite() {
+        return defaultDenyWrite;
+    }
+
+    @Override
+    public void setDefaultDenyWrite(boolean defaultDenyWrite) {
+        this.defaultDenyWrite = defaultDenyWrite;
+    }
+
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 }

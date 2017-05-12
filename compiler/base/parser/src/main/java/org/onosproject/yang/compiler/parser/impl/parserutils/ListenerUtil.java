@@ -33,6 +33,7 @@ import org.onosproject.yang.compiler.datamodel.YangRelativePath;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.slf4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,6 +54,7 @@ import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangPar
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YangVersionStatementContext;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ANCESTOR;
+import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CARET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CHAR_OF_OPEN_SQUARE_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CHAR_OF_SLASH;
@@ -61,6 +63,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CURRENT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FALSE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INVALID_TREE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_SQUARE_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
@@ -69,11 +72,13 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH_ANCESTOR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH_FOR_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TRUE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_FILE_ERROR;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents an utility for listener.
  */
 public final class ListenerUtil {
+    private static final Logger log = getLogger(ListenerUtil.class);
 
     private static final Pattern IDENTIFIER_PATTERN =
             Pattern.compile("[a-zA-Z_][a-zA-Z0-9_.-]*");
@@ -91,6 +96,9 @@ public final class ListenerUtil {
     private static final String REGEX_EQUAL = "[=]";
     private static final String REGEX_OPEN_BRACE = "[(]";
     public static final String SPACE = " ";
+    public static final String LINE_NUMBER = "line number ";
+    public static final String CHARACTER_POSITION = "character position ";
+    public static final String FILE = "file ";
 
     // No instantiation.
     private ListenerUtil() {
@@ -632,22 +640,27 @@ public final class ListenerUtil {
     /**
      * Throws parser exception for unsupported YANG constructs.
      *
-     * @param type      construct type
-     * @param ctx       construct context
-     * @param errorInfo error msg
-     * @param fileName  YANG file name
+     * @param type       construct type
+     * @param ctx        construct context
+     * @param errorInfo  error msg
+     * @param fileName   YANG file name
+     * @param identifier identifier of the node
      */
     public static void handleUnsupportedYangConstruct(YangConstructType type,
                                                       ParserRuleContext ctx,
                                                       String errorInfo,
-                                                      String fileName) {
-        ParserException parserException = new ParserException(
-                YANG_FILE_ERROR + QUOTES + getYangConstructType(
-                        type) + QUOTES + errorInfo);
-        parserException.setLine(ctx.getStart().getLine());
-        parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-        //FIXME this exception should probably be thrown rather than just logged
-        //throw parserException;
+                                                      String fileName,
+                                                      String identifier) {
+        StringBuilder b = new StringBuilder();
+        int lineNumber = ctx.getStart().getLine();
+        int charPostion = ctx.getStart().getCharPositionInLine();
+        b.append(YANG_FILE_ERROR).append(QUOTES).append(
+                getYangConstructType(type)).append(SPACE).append(identifier)
+                .append(QUOTES).append(AT).append(LINE_NUMBER)
+                .append(lineNumber).append(AT).append(CHARACTER_POSITION)
+                .append(charPostion).append(IN).append(FILE)
+                .append(fileName).append(errorInfo);
+        log.info(b.toString());
     }
 
     /**

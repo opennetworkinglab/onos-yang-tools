@@ -46,7 +46,7 @@ public class BelongstoListenerTest {
     @Test
     public void processBelongsToWithoutPrefix() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input '}' expecting 'prefix'");
+        thrown.expectMessage("mismatched input '}' expecting {'prefix', UNKNOWN_STATEMENT}");
         thrown.expect(CustomExceptionMatcher.errorLocation(4, 0));
         YangNode node = manager.getDataModel("src/test/resources/BelongsToWithoutPrefix.yang");
     }
@@ -57,7 +57,7 @@ public class BelongstoListenerTest {
     @Test
     public void processBelongsToDualPrefix() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input 'prefix' expecting '}'");
+        thrown.expectMessage("mismatched input 'prefix' expecting {'}', UNKNOWN_STATEMENT}");
         thrown.expect(CustomExceptionMatcher.errorLocation(5, 0));
         YangNode node = manager.getDataModel("src/test/resources/BelongsToDualPrefix.yang");
     }
@@ -79,7 +79,7 @@ public class BelongstoListenerTest {
     @Test
     public void processSubModuleWithoutBelongsTo() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input '}' expecting 'belongs-to'");
+        thrown.expectMessage("mismatched input '}' expecting {'belongs-to', UNKNOWN_STATEMENT");
         thrown.expect(CustomExceptionMatcher.errorLocation(3, 0));
         YangNode node = manager.getDataModel("src/test/resources/SubModuleWithoutBelongsTo.yang");
     }

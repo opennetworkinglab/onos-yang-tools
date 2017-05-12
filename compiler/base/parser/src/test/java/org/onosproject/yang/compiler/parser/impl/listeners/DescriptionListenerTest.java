@@ -79,7 +79,7 @@ public class DescriptionListenerTest {
     @Test
     public void processDescriptionWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("extraneous input '}' expecting {';', '+'}");
+        thrown.expectMessage("extraneous input '}' expecting {'{', ';', '+'}");
         YangNode node = manager.getDataModel("src/test/resources/DescriptionWithoutStatementEnd.yang");
     }
 

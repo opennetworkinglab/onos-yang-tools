@@ -230,4 +230,19 @@ public class ContainerListenerTest {
         thrown.expectMessage("YANG file error : container name 1valid is not valid.");
         YangNode node = manager.getDataModel("src/test/resources/ContainerInvalidIdentifier.yang");
     }
+
+    /**
+     * Checks container statement with unknown statement.
+     */
+    @Test
+    public void processContainerWithUnknownStatements() throws IOException,
+            ParserException {
+
+        YangNode node = manager.getDataModel("src/test/resources/" +
+                                                     "UnknownStatement.yang");
+        assertThat((node instanceof YangModule), is(true));
+        assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
+        YangModule yangNode = (YangModule) node;
+        assertThat(yangNode.getName(), is("TestUnknown"));
+    }
 }

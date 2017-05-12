@@ -80,7 +80,8 @@ public abstract class YangChoice
         implements YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangWhenHolder, YangIfFeatureHolder,
         YangAppErrorHolder, YangIsFilterContentNodes, YangConfig,
-        YangDefault, YangMandatory {
+        YangDefault, YangMandatory, DefaultDenyAllExtension,
+        DefaultDenyWriteExtension {
 
     private static final long serialVersionUID = 806201604L;
 
@@ -172,6 +173,16 @@ public abstract class YangChoice
      * If mandatory leaf.
      */
     private boolean isMandatory;
+
+    /**
+     * References the extension default-deny-write.
+     */
+    private boolean defaultDenyWrite;
+
+    /**
+     * References the extension default-deny-all.
+     */
+    private boolean defaultDenyAll;
 
     /**
      * Create a choice node.
@@ -515,5 +526,25 @@ public abstract class YangChoice
      */
     public void setMandatory(boolean isReq) {
         isMandatory = isReq;
+    }
+
+    @Override
+    public boolean getDefaultDenyWrite() {
+        return defaultDenyWrite;
+    }
+
+    @Override
+    public void setDefaultDenyWrite(boolean defaultDenyWrite) {
+        this.defaultDenyWrite = defaultDenyWrite;
+    }
+
+    @Override
+    public boolean getDefaultDenyAll() {
+        return defaultDenyAll;
+    }
+
+    @Override
+    public void setDefaultDenyAll(boolean defaultDenyAll) {
+        this.defaultDenyAll = defaultDenyAll;
     }
 }

@@ -94,7 +94,7 @@ public class PresenceListenerTest {
     @Test
     public void processPresenceWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("mismatched input 'leaf' expecting {';', '+'}");
+        thrown.expectMessage("mismatched input 'leaf' expecting {'{', ';', '+'}");
         YangNode node = manager.getDataModel("src/test/resources/PresenceWithoutStatementEnd.yang");
     }
 }

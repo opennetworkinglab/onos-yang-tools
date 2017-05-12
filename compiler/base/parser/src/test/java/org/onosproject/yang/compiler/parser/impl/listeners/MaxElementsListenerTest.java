@@ -98,7 +98,7 @@ public class MaxElementsListenerTest {
     @Test
     public void processMaxElementsWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("missing ';' at 'description'");
+        thrown.expectMessage("no viable alternative at input 'description'");
         YangNode node = manager.getDataModel("src/test/resources/MaxElementsWithoutStatementEnd.yang");
     }
 

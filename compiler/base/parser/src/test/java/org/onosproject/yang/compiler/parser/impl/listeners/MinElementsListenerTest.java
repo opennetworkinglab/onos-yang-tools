@@ -120,7 +120,7 @@ public class MinElementsListenerTest {
     @Test
     public void processMinElementsWithoutStatementEnd() throws IOException, ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("missing ';' at 'description'");
+        thrown.expectMessage("no viable alternative at input 'description'");
         YangNode node = manager.getDataModel("src/test/resources/MinElementsWithoutStatementEnd.yang");
     }
 

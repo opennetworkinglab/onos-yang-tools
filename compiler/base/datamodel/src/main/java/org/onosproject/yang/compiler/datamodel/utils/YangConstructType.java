@@ -432,7 +432,12 @@ public enum YangConstructType {
     /**
      * Identifies deviation replace element parsed data.
      */
-    DEVIATE_REPLACE;
+    DEVIATE_REPLACE,
+
+    /**
+     * Identifies unknown statement data.
+     */
+    UNKNOWN_STATEMENT;
 
     /**
      * Returns the YANG construct keyword corresponding to enum values.
@@ -609,6 +614,8 @@ public enum YangConstructType {
                 return "deviate-delete";
             case DEVIATE_REPLACE:
                 return "deviate-replace";
+            case UNKNOWN_STATEMENT:
+                return "unknown-statement";
             default:
                 return "yang";
         }

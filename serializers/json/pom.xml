@@ -93,7 +93,9 @@
                         <configuration>
                             <target>
                                 <delete>
-                                    <fileset dir="${project.build.outputDirectory}/org/onosproject/yang/gen" includes="**/*"/>
+                                    <fileset
+                                            dir="${project.build.outputDirectory}/org/onosproject/yang/gen"
+                                            includes="**/*"/>
                                 </delete>
                             </target>
                         </configuration>

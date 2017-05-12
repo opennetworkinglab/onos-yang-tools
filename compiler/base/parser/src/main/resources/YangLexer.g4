@@ -142,6 +142,8 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
     PLUS : '+';
     MINUS: '-';
 
+    UNKNOWN_STATEMENT : IDENTIFIER COLON IDENTIFIER;
+
     STRING : ((~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '"' | '+' | '\'')~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '+')* ) | SUB_STRING );
 
     //Fragment rules

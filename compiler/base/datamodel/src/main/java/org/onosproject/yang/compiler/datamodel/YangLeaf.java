@@ -399,39 +399,21 @@ public abstract class YangLeaf extends DefaultLocationInfo
         return cl;
     }
 
-    /**
-     * Returns the defaultDenyWrite.
-     * @return
-     */
     @Override
     public boolean getDefaultDenyWrite() {
         return defaultDenyWrite;
     }
 
-    /**
-     * Sets the defaultDenyWrite.
-     *
-     * @param defaultDenyWrite
-     */
     @Override
     public void setDefaultDenyWrite(boolean defaultDenyWrite) {
         this.defaultDenyWrite = defaultDenyWrite;
     }
 
-    /**
-     * Returns the defaultDenyAll.
-     * @return
-     */
     @Override
     public boolean getDefaultDenyAll() {
         return defaultDenyAll;
     }
 
-    /**
-     * Sets the defaultDenyAll.
-     *
-     * @param defaultDenyAll
-     */
     @Override
     public void setDefaultDenyAll(boolean defaultDenyAll) {
         this.defaultDenyAll = defaultDenyAll;
@@ -514,10 +496,10 @@ public abstract class YangLeaf extends DefaultLocationInfo
             YangSchemaNodeIdentifier dataNodeIdentifier)
             throws DataModelException {
         throw new DataModelException("leaf cannot have any child schema nodes " +
-                getName() + " in " +
-                getLineNumber() + " at " +
-                getCharPosition() +
-                " in " + getFileName() + "\"");
+                                             getName() + " in " +
+                                             getLineNumber() + " at " +
+                                             getCharPosition() +
+                                             " in " + getFileName() + "\"");
     }
 
     @Override
@@ -530,10 +512,10 @@ public abstract class YangLeaf extends DefaultLocationInfo
     public int getMandatoryChildCount()
             throws DataModelException {
         throw new DataModelException("Leaf can't have child. " +
-                getName() + " in " +
-                getLineNumber() + " at " +
-                getCharPosition() +
-                " in " + getFileName() + "\"");
+                                             getName() + " in " +
+                                             getLineNumber() + " at " +
+                                             getCharPosition() +
+                                             " in " + getFileName() + "\"");
     }
 
     @Override

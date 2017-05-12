@@ -366,20 +366,11 @@ public abstract class YangNotification
         }
     }
 
-    /**
-     * Returns the defaultDenyAll.
-     * @return
-     */
     @Override
     public boolean getDefaultDenyAll() {
         return defaultDenyAll;
     }
 
-    /**
-     * Sets the defaultDenyAll.
-     *
-     * @param defaultDenyAll
-     */
     @Override
     public void setDefaultDenyAll(boolean defaultDenyAll) {
         this.defaultDenyAll = defaultDenyAll;
