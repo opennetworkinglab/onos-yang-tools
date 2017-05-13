@@ -32,6 +32,7 @@ import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.LeafNode;
@@ -40,7 +41,6 @@ import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.Iterator;
 import java.util.List;
@@ -53,11 +53,11 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.DEFAULT_CAPS;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.PERIOD;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getCapitalCase;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getJavaName;
+import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
+import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
+import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 
 /**
  * Representation of data tree builder which generates YANG data tree from the

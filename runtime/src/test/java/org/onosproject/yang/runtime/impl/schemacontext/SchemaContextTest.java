@@ -24,8 +24,8 @@ import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
-import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
+import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 
 import java.util.List;
 

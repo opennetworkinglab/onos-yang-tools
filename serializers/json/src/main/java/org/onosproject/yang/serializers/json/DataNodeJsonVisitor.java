@@ -22,7 +22,7 @@ import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.YangSerializerContext;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getModuleNameFromNameSpace;
+import static org.onosproject.yang.runtime.SerializerHelper.getModuleNameFromNameSpace;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.FIRST_INSTANCE;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.LAST_INSTANCE;
 import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.SINGLE_INSTANCE_IN_MULTI_NODE;

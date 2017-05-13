@@ -36,8 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
-import static org.onosproject.yang.runtime.helperutils.DefaultDataNodeWalker.walk;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getChildSchemaContext;
+import static org.onosproject.yang.runtime.DefaultDataNodeWalker.walk;
+import static org.onosproject.yang.runtime.SerializerHelper.getChildSchemaContext;
 import static org.onosproject.yang.runtime.impl.YobUtils.FORWARD_SLASH;
 import static org.onosproject.yang.runtime.impl.YobUtils.handleLeafListKey;
 import static org.onosproject.yang.runtime.impl.YobUtils.handleListKey;

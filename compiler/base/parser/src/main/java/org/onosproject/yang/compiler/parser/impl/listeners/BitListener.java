@@ -76,7 +76,10 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_CONTENT;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidIdentifier;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 

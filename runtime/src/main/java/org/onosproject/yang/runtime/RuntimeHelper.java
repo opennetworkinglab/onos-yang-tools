@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.compiler.datamodel.YangDeviationHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -24,6 +24,7 @@ import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.runtime.helperutils.YangModuleExtendedInfo;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -42,9 +43,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public final class RuntimeHelper {
 
     public static final String PERIOD = ".";
-    private static final String SERVICE = "Service";
     public static final String DEFAULT_CAPS = "Default";
     public static final String UNDER_SCORE = "_";
+    private static final String SERVICE = "Service";
     private static final Logger log = getLogger(RuntimeHelper.class);
 
     // Forbid construction.
@@ -119,16 +120,6 @@ public final class RuntimeHelper {
      */
     public static String getServiceName(YangSchemaNode schemaNode) {
         return getInterfaceClassName(schemaNode) + SERVICE;
-    }
-
-    /**
-     * Returns date in string format.
-     *
-     * @param schemaNode schema node
-     * @return date in string format
-     */
-    public static String getDateInStringFormat(YangNode schemaNode) {
-        return YangApacheUtils.getDateInStringFormat(schemaNode);
     }
 
     /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.runtime;
 
 /**
  * Representation of an entity which maintains additional information
@@ -33,7 +33,7 @@ public class HelperContext {
     private ExtResourceIdBldr parentResourceIdBldr;
 
     // Forbid construction.
-    HelperContext() {
+    public HelperContext() {
         resourceIdBldr = new ExtResourceIdBldr();
     }
 
@@ -51,7 +51,7 @@ public class HelperContext {
      *
      * @param builder resource identifier builder
      */
-    void setResourceIdBuilder(ExtResourceIdBldr builder) {
+    public void setResourceIdBuilder(ExtResourceIdBldr builder) {
         resourceIdBldr = builder;
     }
 
@@ -70,7 +70,7 @@ public class HelperContext {
      *
      * @param prid parent resource id builder
      */
-    void setParentResourceIdBldr(ExtResourceIdBldr prid) {
+    public void setParentResourceIdBldr(ExtResourceIdBldr prid) {
         parentResourceIdBldr = prid;
     }
 }

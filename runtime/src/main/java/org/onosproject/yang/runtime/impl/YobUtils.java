@@ -58,7 +58,7 @@ import java.util.List;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_AUGMENT_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getChildSchemaContext;
+import static org.onosproject.yang.runtime.SerializerHelper.getChildSchemaContext;
 import static org.onosproject.yang.runtime.impl.YobConstants.DEFAULT;
 import static org.onosproject.yang.runtime.impl.YobConstants.E_DATA_TYPE_NOT_SUPPORT;
 import static org.onosproject.yang.runtime.impl.YobConstants.E_FAIL_TO_CREATE_OBJ;

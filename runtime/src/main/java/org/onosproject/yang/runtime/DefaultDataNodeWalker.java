@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.runtime;
 
 
 import org.onosproject.yang.model.DataNode;

@@ -39,11 +39,11 @@ import java.util.regex.Pattern;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.DEFAULT_CAPS;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.PERIOD;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getCapitalCase;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.fetchPackage;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
+import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
+import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
+import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 
 /**
  * Converts model object identifier to resource identifier.

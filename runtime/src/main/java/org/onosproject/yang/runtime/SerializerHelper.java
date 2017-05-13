@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
@@ -27,7 +27,6 @@ import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.SingleInstanceNodeContext;
-import org.onosproject.yang.runtime.YangSerializerContext;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.util.Iterator;

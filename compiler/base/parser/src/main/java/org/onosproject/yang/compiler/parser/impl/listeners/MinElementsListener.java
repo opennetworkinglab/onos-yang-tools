@@ -16,8 +16,8 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import org.onosproject.yang.compiler.datamodel.YangMinElementHolder;
 import org.onosproject.yang.compiler.datamodel.YangMinElement;
+import org.onosproject.yang.compiler.datamodel.YangMinElementHolder;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;

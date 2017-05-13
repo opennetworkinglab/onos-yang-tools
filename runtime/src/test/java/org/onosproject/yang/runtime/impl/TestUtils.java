@@ -29,7 +29,7 @@ import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
-import org.onosproject.yang.runtime.helperutils.DataNodeListener;
+import org.onosproject.yang.runtime.DataNodeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNull;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.DefaultDataNodeWalker.walk;
+import static org.onosproject.yang.runtime.DefaultDataNodeWalker.walk;
 
 public final class TestUtils implements DataNodeListener {
 

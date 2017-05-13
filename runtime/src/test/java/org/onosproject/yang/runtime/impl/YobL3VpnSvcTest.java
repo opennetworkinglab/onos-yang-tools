@@ -35,6 +35,7 @@ import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.l3vpn.svc.ext.rev
 import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.l3vpn.svc.ext.rev20160730.l3vpnsvcext.requestedtypegrouping.requestedtypeprofile.requestedtypechoice.physicalcase.Physical;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.KeyInfo;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
@@ -43,7 +44,6 @@ import org.onosproject.yang.model.MultiInstanceNode;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SingleInstanceNode;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
@@ -51,11 +51,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests the YANG object building for the L3 VPN YANG data nodes.

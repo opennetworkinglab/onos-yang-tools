@@ -30,8 +30,8 @@ import org.onosproject.yang.runtime.AnnotatedNodeInfo;
 import org.onosproject.yang.runtime.Annotation;
 import org.onosproject.yang.runtime.DefaultAnnotatedNodeInfo;
 import org.onosproject.yang.runtime.DefaultAnnotation;
+import org.onosproject.yang.runtime.SerializerHelper;
 import org.onosproject.yang.runtime.YangSerializerContext;
-import org.onosproject.yang.runtime.helperutils.SerializerHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;

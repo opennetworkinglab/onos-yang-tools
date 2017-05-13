@@ -44,12 +44,12 @@ import java.util.concurrent.ConcurrentMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSet;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getDateInStringFormat;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getInterfaceClassName;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getNodes;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getServiceName;
+import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
+import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
+import static org.onosproject.yang.runtime.RuntimeHelper.getServiceName;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -58,9 +58,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DefaultYangModelRegistry implements YangModelRegistry,
         SingleInstanceNodeContext {
 
-    private final Logger log = getLogger(getClass());
     private static final String AT = "@";
-
+    private final Logger log = getLogger(getClass());
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.

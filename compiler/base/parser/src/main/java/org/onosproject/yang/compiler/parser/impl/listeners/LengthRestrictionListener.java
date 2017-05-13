@@ -27,13 +27,18 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
 import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processLengthRestriction;
-import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.*;
-import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.*;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.LENGTH_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.TYPE_DATA;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructListenerErrorMessage;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.*;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.INVALID_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 
 /*

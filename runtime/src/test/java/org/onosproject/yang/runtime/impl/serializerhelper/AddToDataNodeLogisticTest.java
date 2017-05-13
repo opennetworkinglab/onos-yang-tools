@@ -23,7 +23,7 @@ import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.HelperContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import java.util.Iterator;
@@ -33,10 +33,10 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.getResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.LMNG;
 import static org.onosproject.yang.runtime.impl.TestUtils.LMNG_N;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;

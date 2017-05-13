@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -60,6 +59,7 @@ import static java.util.Collections.sort;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTITYREF;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.deSerializeDataModel;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.resolveGroupingInDefinationScope;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translatorErrorHandler;
@@ -76,7 +76,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class YangCompilerManager implements YangCompilerService {
 
     private static final Logger log = getLogger(YangCompilerManager.class);
-    private static final String DATE_FORMAT = "yyyy-mm-dd";
     private final YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
     private final YangLinker yangLinker = new YangLinkerManager();
     private final Set<YangNode> yangNodeSet = new HashSet<>();
@@ -131,22 +130,6 @@ public class YangCompilerManager implements YangCompilerService {
     private YangModuleId processModuleId(YangNode module) {
         String rev = getDateInStringFormat(module);
         return new DefaultYangModuleId(module.getName(), rev);
-    }
-
-    /**
-     * Returns date in string format.
-     *
-     * @param schemaNode schema node
-     * @return date in string format
-     */
-    private String getDateInStringFormat(YangNode schemaNode) {
-        if (schemaNode != null) {
-            if (schemaNode.getRevision() != null) {
-                return new SimpleDateFormat(DATE_FORMAT)
-                        .format(schemaNode.getRevision().getRevDate());
-            }
-        }
-        return null;
     }
 
     /**

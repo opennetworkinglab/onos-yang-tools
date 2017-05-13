@@ -22,8 +22,8 @@ import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
 
 /**
  * Tests the serializer helper methods.

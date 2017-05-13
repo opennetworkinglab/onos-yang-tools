@@ -29,8 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.onosproject.yang.model.DataNode.Type.*;
-import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.*;
+import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.FIRST_INSTANCE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.LAST_INSTANCE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.MIDDLE_INSTANCE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.NOT_MULTI_INSTANCE_NODE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.SINGLE_INSTANCE_IN_MULTI_NODE;
+import static org.onosproject.yang.serializers.json.DataNodeSiblingPositionType.UNKNOWN_TYPE;
 
 /**
  * Utilities for converting Data Nodes into JSON format.

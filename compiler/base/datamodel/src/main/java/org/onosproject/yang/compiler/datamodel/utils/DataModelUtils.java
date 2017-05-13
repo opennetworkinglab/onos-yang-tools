@@ -71,6 +71,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -117,6 +118,7 @@ public final class DataModelUtils {
             "Requested %s is not child in %s.";
     private static final String E_DATATYPE = "Data type not supported.";
     public static final String E_ID = "Schema id should not be null.";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     /**
      * Creates a new data model tree utility.
@@ -1385,5 +1387,21 @@ public final class DataModelUtils {
             default:
                 throw new IllegalArgumentException(E_DATATYPE);
         }
+    }
+
+    /**
+     * Returns date in string format.
+     *
+     * @param schemaNode schema node
+     * @return date in string format
+     */
+    public static String getDateInStringFormat(YangNode schemaNode) {
+        if (schemaNode != null) {
+            if (schemaNode.getRevision() != null) {
+                return new SimpleDateFormat(DATE_FORMAT)
+                        .format(schemaNode.getRevision().getRevDate());
+            }
+        }
+        return null;
     }
 }

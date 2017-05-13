@@ -25,7 +25,7 @@ import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.Annotation;
-import org.onosproject.yang.runtime.helperutils.DataNodeListener;
+import org.onosproject.yang.runtime.DataNodeListener;
 
 import java.util.List;
 import java.util.Map;

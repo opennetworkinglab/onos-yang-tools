@@ -21,11 +21,11 @@ import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.AnnotatedNodeInfo;
 import org.onosproject.yang.runtime.CompositeData;
-import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.HelperContext;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.getResourceId;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertXmlAttributesToAnnotations;
 import static org.onosproject.yang.serializers.xml.XmlNodeType.OBJECT_NODE;
 import static org.onosproject.yang.serializers.xml.XmlNodeType.TEXT_NODE;

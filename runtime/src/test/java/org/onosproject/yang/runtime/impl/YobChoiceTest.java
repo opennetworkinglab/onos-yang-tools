@@ -23,21 +23,21 @@ import org.onosproject.yang.gen.v1.urn.topo.rev20140101.ymstopology.node.choice1
 import org.onosproject.yang.gen.v1.urn.topo.rev20140101.ymstopology.node.choice1.Case1b;
 import org.onosproject.yang.gen.v1.urn.topo.rev20140101.ymstopology.node.choice1.case1b.choice1b.Case1Bi;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests the YANG object building for the YANG data nodes.

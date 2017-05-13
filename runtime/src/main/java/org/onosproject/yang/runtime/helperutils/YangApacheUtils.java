@@ -17,6 +17,7 @@
 package org.onosproject.yang.runtime.helperutils;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
 import org.onosproject.yang.model.DefaultYangModel;
 import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
@@ -27,7 +28,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -50,7 +50,6 @@ public final class YangApacheUtils {
     private static final String MAVEN = "mvn:";
     private static final String JAR = ".jar";
     private static final String USER_DIRECTORY = "user.dir";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final Logger log = getLogger(YangApacheUtils.class);
 
     // Forbid construction.
@@ -110,24 +109,8 @@ public final class YangApacheUtils {
      * @return YANG module id for a given YANG module node
      */
     public static YangModuleId processModuleId(YangNode module) {
-        String rev = getDateInStringFormat(module);
+        String rev = DataModelUtils.getDateInStringFormat(module);
         return new DefaultYangModuleId(module.getName(), rev);
-    }
-
-    /**
-     * Returns date in string format.
-     *
-     * @param schemaNode schema node
-     * @return date in string format
-     */
-    public static String getDateInStringFormat(YangNode schemaNode) {
-        if (schemaNode != null) {
-            if (schemaNode.getRevision() != null) {
-                return new SimpleDateFormat(DATE_FORMAT)
-                        .format(schemaNode.getRevision().getRevDate());
-            }
-        }
-        return null;
     }
 
     /**

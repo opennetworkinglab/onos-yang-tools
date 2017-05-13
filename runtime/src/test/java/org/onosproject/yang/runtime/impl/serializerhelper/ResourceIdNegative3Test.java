@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests the serializer helper methods.

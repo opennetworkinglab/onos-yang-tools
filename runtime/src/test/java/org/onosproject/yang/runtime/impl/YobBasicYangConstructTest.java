@@ -23,12 +23,12 @@ import org.onosproject.yang.gen.v1.samplenamespace.sample.top.DefaultYangAutoPre
 import org.onosproject.yang.gen.v1.samplenamespace.sample.top.YangAutoPrefixInterface;
 import org.onosproject.yang.gen.v1.samplenamespace.sample.top.yangautoprefixinterface.Address;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,11 +37,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.onosproject.yang.gen.v1.samplenamespace.Sample.LeafIdentifier.LEAF5;
 import static org.onosproject.yang.gen.v1.samplenamespace.Sample.LeafIdentifier.LEAF6;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests the YANG object building for the YANG data nodes.

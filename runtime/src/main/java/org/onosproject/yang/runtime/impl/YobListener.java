@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
@@ -23,13 +22,13 @@ import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
-import org.onosproject.yang.runtime.helperutils.DataNodeListener;
+import org.onosproject.yang.runtime.DataNodeListener;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getChildSchemaContext;
+import static org.onosproject.yang.runtime.SerializerHelper.getChildSchemaContext;
 import static org.onosproject.yang.runtime.impl.YobHandlerFactory.instance;
 import static org.onosproject.yang.runtime.impl.YobUtils.FORWARD_SLASH;
 import static org.onosproject.yang.runtime.impl.YobUtils.buildLeafModelObject;
@@ -40,25 +39,21 @@ import static org.onosproject.yang.runtime.impl.YobUtils.buildLeafModelObject;
 class YobListener implements DataNodeListener {
 
     /**
-     * Reference to parent schema.
-     */
-    private YangSchemaNode lastIndexSchema;
-
-    /**
      * Reference to YOB handler.
      */
     private final YobHandlerFactory handlerFactory;
-
     /**
      * Reference to YANG model registry.
      */
     private final DefaultYangModelRegistry registry;
-
     /**
      * Stack of YOB workbench.
      */
     private final Stack<YobWorkBench> wbStack;
-
+    /**
+     * Reference to parent schema.
+     */
+    private YangSchemaNode lastIndexSchema;
     /**
      * List of model objects.
      */

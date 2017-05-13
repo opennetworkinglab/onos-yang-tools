@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.onosproject.yang.gen.v1.simple.data.types.ll.rev20131112.simpledatatypesll.DefaultCont1;
 import org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.DefaultCont;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
@@ -31,9 +31,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.gen.v1.simple.data.types.ll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
 import static org.onosproject.yang.gen.v1.simple.data.types.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
 
 /**
  * Tests the YANG object building for different data types.

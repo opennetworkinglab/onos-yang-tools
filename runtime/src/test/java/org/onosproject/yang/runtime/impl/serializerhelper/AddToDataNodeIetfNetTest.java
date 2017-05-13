@@ -19,13 +19,13 @@ package org.onosproject.yang.runtime.impl.serializerhelper;
 import org.junit.Test;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
-import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.HelperContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.exitDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.getResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.IETFNAME;
 import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;

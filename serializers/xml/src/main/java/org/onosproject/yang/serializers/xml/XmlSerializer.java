@@ -22,6 +22,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.AnnotatedNodeInfo;
@@ -30,7 +31,6 @@ import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
 import org.onosproject.yang.runtime.DefaultCompositeData;
 import org.onosproject.yang.runtime.DefaultCompositeStream;
-import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
 
@@ -41,8 +41,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.onosproject.yang.runtime.helperutils.DefaultDataNodeWalker.walk;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.DefaultDataNodeWalker.walk;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.addRootElementWithAnnotation;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertUriToRid;

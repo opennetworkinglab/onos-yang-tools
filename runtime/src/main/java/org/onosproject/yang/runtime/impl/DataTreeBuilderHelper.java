@@ -54,9 +54,6 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.DEFAULT_CAPS;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.PERIOD;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getCapitalCase;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAugmentObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getClassLoaderForAugment;
@@ -70,6 +67,9 @@ import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNodeProcess
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNonProcessableNode;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypePrimitive;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isValueOrSelectLeafSet;
+import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
+import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
+import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 
 
 /**

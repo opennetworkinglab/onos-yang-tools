@@ -30,6 +30,7 @@ import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topol
 import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.tetopologyaugment.te.DefaultConfig;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.MultiInstanceLeaf;
@@ -38,15 +39,14 @@ import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SingleInstanceLeaf;
 import org.onosproject.yang.model.SingleInstanceNode;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests resource id to model object id convertion.

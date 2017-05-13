@@ -19,8 +19,8 @@ package org.onosproject.yang.serializers.json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
+import org.onosproject.yang.runtime.SerializerHelper;
 import org.onosproject.yang.runtime.YangSerializerContext;
-import org.onosproject.yang.runtime.helperutils.SerializerHelper;
 
 
 /**

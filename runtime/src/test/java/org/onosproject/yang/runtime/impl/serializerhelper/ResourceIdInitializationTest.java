@@ -21,8 +21,8 @@ import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.addToResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;

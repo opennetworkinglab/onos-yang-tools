@@ -15,15 +15,6 @@
  */
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangContainer;
 import org.onosproject.yang.compiler.datamodel.YangExtension;
@@ -37,6 +28,15 @@ import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+
+import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test cases for testing default-deny-all extension reference listener.

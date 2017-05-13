@@ -22,9 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.onosproject.yang.model.DataNode;
-//import org.onosproject.yang.model.DataNode.Type;
-//import org.onosproject.yang.model.InnerNode;
-//import org.onosproject.yang.model.LeafNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
@@ -33,7 +31,6 @@ import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.CompositeStream;
 import org.onosproject.yang.runtime.DefaultCompositeData;
 import org.onosproject.yang.runtime.DefaultCompositeStream;
-import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.runtime.DefaultRuntimeContext;
 import org.onosproject.yang.runtime.RuntimeContext;
 import org.onosproject.yang.runtime.YangSerializer;
@@ -51,6 +48,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+
+//import org.onosproject.yang.model.DataNode.Type;
+//import org.onosproject.yang.model.InnerNode;
+//import org.onosproject.yang.model.LeafNode;
 
 /**
  * Unit Test for Json Serializer.

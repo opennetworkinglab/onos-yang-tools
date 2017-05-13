@@ -56,9 +56,9 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT16;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT32;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.PERIOD;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.UNDER_SCORE;
-import static org.onosproject.yang.runtime.helperutils.RuntimeHelper.getCapitalCase;
+import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
+import static org.onosproject.yang.runtime.RuntimeHelper.UNDER_SCORE;
+import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 
 
 /**

@@ -15,7 +15,6 @@
  */
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
-import java.io.IOException;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangContainer;
 import org.onosproject.yang.compiler.datamodel.YangExtension;
@@ -27,6 +26,8 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeType;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
+
+import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getDateInStringFormat;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 
 /**
  * Unit test for model registry.

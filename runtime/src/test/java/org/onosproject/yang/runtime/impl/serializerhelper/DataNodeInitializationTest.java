@@ -20,13 +20,13 @@ import org.junit.Test;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
-import org.onosproject.yang.runtime.helperutils.HelperContext;
+import org.onosproject.yang.runtime.HelperContext;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.getResourceId;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeDataNode;
-import static org.onosproject.yang.runtime.helperutils.SerializerHelper.initializeResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.getResourceId;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkRootLevelContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateResourceId;

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.onosproject.yang.model.DataNode;
-import org.onosproject.yang.runtime.helperutils.SerializerHelper;
+import org.onosproject.yang.runtime.SerializerHelper;
 
 import java.util.Iterator;
 import java.util.Map;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafListKey;
@@ -50,10 +50,10 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
 
     /**
      * Traverses up in current resource id by deleting the last key entry.
-     *
+     * <p>
      * This shouldn't be called for key leaf.
      */
-    void traveseToParent() {
+    public void traveseToParent() {
         if (curKeyBuilder != null) {
             curKeyBuilder = builders.get(builders.size() - 1);
             builders.remove(builders.size() - 1);
@@ -70,7 +70,7 @@ public final class ExtResourceIdBldr extends ResourceId.Builder {
      *
      * @return resource Id
      */
-    ResourceId getResourceId() {
+    public ResourceId getResourceId() {
         if (curKeyBuilder != null) {
             builders.add(curKeyBuilder);
         }
