@@ -114,4 +114,18 @@ public class JavaExtendsListHolder {
     private void addToExtendsList(JavaQualifiedTypeInfoTranslator classInfo) {
         getExtendsList().add(classInfo);
     }
+
+    /**
+     * Removes from extends list.
+     *
+     * @param info              java file info
+     * @param javaFragmentFiles temp java fragment files
+     */
+    public void removeFromExtendsList(JavaQualifiedTypeInfoTranslator info,
+                                      TempJavaFragmentFiles javaFragmentFiles) {
+        JavaImportData importData = javaFragmentFiles.getJavaImportData();
+        importData.removeFromImportData(info);
+        getExtendedClassStore().remove(info, false);
+        getExtendsList().remove(info);
+    }
 }

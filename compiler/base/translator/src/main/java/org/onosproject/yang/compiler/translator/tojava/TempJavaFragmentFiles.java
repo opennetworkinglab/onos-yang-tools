@@ -17,6 +17,7 @@ package org.onosproject.yang.compiler.translator.tojava;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
+import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
@@ -96,6 +97,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorEr
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.MISSING_PARENT_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
+import static org.onosproject.yang.compiler.utils.UtilConstants.AUGMENTABLE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
@@ -1566,6 +1568,13 @@ public class TempJavaFragmentFiles {
         addImportInfoOfNode(MODEL_OBJECT, MODEL_OBJECT_PKG, getGeneratedJavaClassName(),
                             getJavaFileInfo().getPackage(), false);
 
+        JavaQualifiedTypeInfoTranslator info = null;
+        if (curNode instanceof YangAugmentableNode) {
+            info = addImportInfoOfNode(AUGMENTABLE, MODEL_OBJECT_PKG,
+                                       getGeneratedJavaClassName(),
+                                       getJavaFileInfo().getPackage(), true);
+        }
+
         if (curNode instanceof RpcNotificationContainer) {
             addImportInfoOfNode(MAP, JAVA_UTIL_PKG,
                                 getGeneratedJavaClassName(),
@@ -1593,12 +1602,28 @@ public class TempJavaFragmentFiles {
             //Create interface file.
             interfaceJavaFileHandle =
                     getJavaFileHandle(getJavaClassName(INTERFACE_FILE_NAME_SUFFIX));
+
+            // extend Augmentable interface
+            if (curNode instanceof YangAugmentableNode) {
+                getBeanFiles(curNode).getJavaExtendsListHolder()
+                        .addToExtendsList(info, curNode, getBeanFiles(curNode));
+            }
+
             interfaceJavaFileHandle =
                     generateInterfaceFile(interfaceJavaFileHandle, imports,
                                           curNode, isAttributePresent);
 
             insertDataIntoJavaFile(interfaceJavaFileHandle, CLOSE_CURLY_BRACKET);
             formatFile(interfaceJavaFileHandle);
+
+            /*
+             * remove augmentable from extend list as it is not required for
+             * default class.
+             */
+            if (curNode instanceof YangAugmentableNode) {
+                getBeanFiles(curNode).getJavaExtendsListHolder()
+                        .removeFromExtendsList(info, getBeanFiles(curNode));
+            }
         }
 
         //add imports for default class.

@@ -1936,6 +1936,7 @@ public final class UtilConstants {
     public static final String DEFAULT_MODEL_OBJECT_DATA =
             "DefaultModelObjectData";
     public static final String STRING_JOINER_CLASS = "StringJoiner";
+    public static final String AUGMENTABLE = "Augmentable";
 
     // No instantiation.
     private UtilConstants() {

@@ -16,6 +16,7 @@
 package org.onosproject.yang.compiler.translator.tojava;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -201,6 +202,25 @@ public class JavaImportData {
          */
         importSet.add(newImportInfo);
         return false;
+    }
+
+    /**
+     * Removes the import info from importSet.
+     *
+     * @param importInfo import info to be removed
+     */
+    public void removeFromImportData(JavaQualifiedTypeInfoTranslator
+                                             importInfo) {
+        Iterator<JavaQualifiedTypeInfoTranslator> it = getImportSet().iterator();
+        while (it.hasNext()) {
+            JavaQualifiedTypeInfoTranslator info = it.next();
+            if (info.getClassInfo().contentEquals(importInfo.getClassInfo())
+                    && info.getPkgInfo()
+                    .contentEquals(importInfo.getPkgInfo())) {
+                importSet.remove(importInfo);
+                return;
+            }
+        }
     }
 
     /**
