@@ -72,9 +72,9 @@ public class InterJarLinkerTest {
     private static final String SER_FILE_NAME = "portPair.ser";
 
     private static final String FLOW_CLASSIFIER_FOLDER = "target/interJarFileLinking/org/onosproject"
-            + "/yang/gen/v1/sfc/flowclassifier/rev20160524";
+            + "/yang/gen/v1/flowclassifier/rev20160524";
     private static final String PORT_PAIR_FOLDER = "target/interJarFileLinking/org/onosproject"
-            + "/yang/gen/v1/sfc/portpair/rev20160524";
+            + "/yang/gen/v1/portpair/rev20160524";
     private static final String FLOW_CLASSIFIER_MANAGER = FLOW_CLASSIFIER_FOLDER + SLASH + "FlowClassifierManager.java";
 
     /**

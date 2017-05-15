@@ -17,14 +17,15 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.Cont53;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.DefaultCont50;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.DefaultCont53;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.DefaultList52;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.DefaultList56;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.List52Keys;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.List56;
-import org.onosproject.yang.gen.v1.modelobjecttest.check.List56Keys;
+
+import org.onosproject.yang.gen.v1.check.check.Cont53;
+import org.onosproject.yang.gen.v1.check.check.DefaultCont50;
+import org.onosproject.yang.gen.v1.check.check.DefaultCont53;
+import org.onosproject.yang.gen.v1.check.check.DefaultList52;
+import org.onosproject.yang.gen.v1.check.check.DefaultList56;
+import org.onosproject.yang.gen.v1.check.check.List52Keys;
+import org.onosproject.yang.gen.v1.check.check.List56;
+import org.onosproject.yang.gen.v1.check.check.List56Keys;
 import org.onosproject.yang.model.ModelObjectId;
 
 import java.io.IOException;

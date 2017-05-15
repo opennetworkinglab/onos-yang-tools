@@ -36,8 +36,7 @@ public class DefaultYangModelRegistryTest {
 
     private static final String SCHEMA_NAME_3 = "ietf-network3";
     private static final String INTERFACE_NAME_3 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network3.rev20151208.IetfNetwork3";
+            "org.onosproject.yang.gen.v1.ietfnetwork3.rev20151208.IetfNetwork3";
 
     private static final String SCHEMA_NAME_4_14 = "ietf-network4@2014-12-08";
     private static final String SCHEMA_NAME_4_15 = "ietf-network4@2015-12-08";
@@ -45,20 +44,15 @@ public class DefaultYangModelRegistryTest {
     private static final String SCHEMA_NAME_4_17 = "ietf-network4@2017-12-08";
     private static final String SCHEMA_NAME_4 = "ietf-network4";
     private static final String INTERFACE_NAME_REV_14 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20141208.IetfNetwork4";
+            "org.onosproject.yang.gen.v1.ietfnetwork4.rev20141208.IetfNetwork4";
     private static final String INTERFACE_NAME_REV_15 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20151208.IetfNetwork4";
+            "org.onosproject.yang.gen.v1.ietfnetwork4.rev20151208.IetfNetwork4";
     private static final String INTERFACE_NAME_REV_16 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20161208.IetfNetwork4";
+            "org.onosproject.yang.gen.v1.ietfnetwork4.rev20161208.IetfNetwork4";
     private static final String INTERFACE_NAME_REV_17 =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.rev20171208.IetfNetwork4";
+            "org.onosproject.yang.gen.v1.ietfnetwork4.rev20171208.IetfNetwork4";
     private static final String INTERFACE_NAME_NO_REV =
-            "org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf" +
-                    ".network4.IetfNetwork4";
+            "org.onosproject.yang.gen.v1.ietfnetwork4.IetfNetwork4";
 
     private static final String CHECK = "check";
     private static final String DATE_NAMESPACE = "2015-12-08";

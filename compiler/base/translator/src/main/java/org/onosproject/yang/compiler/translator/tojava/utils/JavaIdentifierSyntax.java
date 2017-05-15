@@ -28,19 +28,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_BASE_PKG;
-import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
-import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_KEY_WORDS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
-import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
-import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX_FOR_FIRST_DIGIT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX_WITH_ALL_SPECIAL_CHAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REVISION_PREFIX;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
@@ -49,9 +44,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.VERSION_PREFIX;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.addPackageInfo;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.createDirectories;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getJavaPackageFromPackagePath;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPrefixForIdentifier;
 
 /**
  * Represents an utility Class for translating the name from YANG to java convention.
@@ -73,13 +68,13 @@ public final class JavaIdentifierSyntax {
     /**
      * Returns the root package string.
      *
-     * @param version   YANG version
-     * @param nameSpace name space of the module
-     * @param revision  revision of the module defined
-     * @param resolver  object of YANG to java naming conflict util
+     * @param version  YANG version
+     * @param name     name of the module
+     * @param revision revision of the module defined
+     * @param resolver object of YANG to java naming conflict util
      * @return the root package string
      */
-    public static String getRootPackage(byte version, String nameSpace,
+    public static String getRootPackage(byte version, String name,
                                         YangRevision revision,
                                         YangToJavaNamingConflictUtil resolver) {
 
@@ -87,14 +82,13 @@ public final class JavaIdentifierSyntax {
                 .append(PERIOD)
                 .append(getYangVersion(version))
                 .append(PERIOD)
-                .append(getPkgFromNameSpace(nameSpace, resolver));
+                .append(getCamelCase(name, resolver));
         if (revision != null) {
             pkg.append(PERIOD)
                     .append(getYangRevisionStr(revision.getRevDate()));
         }
         return pkg.toString().toLowerCase();
     }
-
 
     /**
      * Returns version.
@@ -104,25 +98,6 @@ public final class JavaIdentifierSyntax {
      */
     private static String getYangVersion(byte ver) {
         return VERSION_PREFIX + ver;
-    }
-
-    /**
-     * Returns package name from name space.
-     *
-     * @param nameSpace name space of YANG module
-     * @param resolver  object of YANG to java naming conflict util
-     * @return java package name as per java rules
-     */
-    private static String getPkgFromNameSpace(String nameSpace,
-                                              YangToJavaNamingConflictUtil resolver) {
-
-        ArrayList<String> pkgArr = new ArrayList<>();
-        nameSpace = nameSpace.replace(QUOTES, EMPTY_STRING);
-        String properNameSpace = nameSpace.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
-        String[] nameSpaceArr = properNameSpace.split(COLON);
-
-        Collections.addAll(pkgArr, nameSpaceArr);
-        return getPkgFrmArr(pkgArr, resolver);
     }
 
     /**
@@ -147,33 +122,6 @@ public final class JavaIdentifierSyntax {
             rev.append(val);
         }
         return rev.toString();
-    }
-
-    /**
-     * Returns the package string.
-     *
-     * @param pkgArr           package array
-     * @param conflictResolver object of YANG to java naming conflict util
-     * @return package string
-     */
-    private static String getPkgFrmArr(ArrayList<String> pkgArr, YangToJavaNamingConflictUtil conflictResolver) {
-
-        StringBuilder pkg = new StringBuilder();
-        int size = pkgArr.size();
-        int i = 0;
-        for (String member : pkgArr) {
-            boolean presenceOfKeyword = JAVA_KEY_WORDS.contains(member.toLowerCase());
-            if (presenceOfKeyword || member.matches(REGEX_FOR_FIRST_DIGIT)) {
-                String prefix = getPrefixForIdentifier(conflictResolver);
-                member = prefix + member;
-            }
-            pkg.append(member);
-            if (i != size - 1) {
-                pkg.append(PERIOD);
-            }
-            i++;
-        }
-        return pkg.toString();
     }
 
     /**
@@ -248,7 +196,7 @@ public final class JavaIdentifierSyntax {
      * @param pkg Package to check if it is created
      * @return existence status of package
      */
-    public static boolean doesPackageExist(String pkg) {
+    static boolean doesPackageExist(String pkg) {
         File pkgDir = new File(getPackageDirPathFromJavaJPackage(pkg));
         File pkgWithFile = new File(pkgDir + SLASH + "package-info.java");
         return pkgDir.exists() && pkgWithFile.isFile();

@@ -477,12 +477,12 @@ public final class AttributesJavaDataType {
             String pkg;
             if (yangNode instanceof YangJavaModuleTranslator) {
                 YangJavaModuleTranslator module = (YangJavaModuleTranslator) yangNode;
-                pkg = getRootPackage(module.getVersion(), module.getModuleNamespace(),
+                pkg = getRootPackage(module.getVersion(), module.getModuleName(),
                                      module.getRevision(), conflictResolver);
             } else if (yangNode instanceof YangJavaSubModuleTranslator) {
                 YangJavaSubModuleTranslator submodule = (YangJavaSubModuleTranslator) yangNode;
                 pkg = getRootPackage(submodule.getVersion(),
-                                     submodule.getNameSpaceFromModule(),
+                                     submodule.getModuleName(),
                                      submodule.getRevision(), conflictResolver);
             } else {
                 throw new TranslatorException("Invalid root node of data model tree " +

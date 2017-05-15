@@ -16,12 +16,12 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.DefaultL1;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.DefaultTop;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.l1.C1;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.top.DefaultYangAutoPrefixInterface;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.top.YangAutoPrefixInterface;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.top.yangautoprefixinterface.Address;
+import org.onosproject.yang.gen.v1.sample.sample.DefaultL1;
+import org.onosproject.yang.gen.v1.sample.sample.DefaultTop;
+import org.onosproject.yang.gen.v1.sample.sample.l1.C1;
+import org.onosproject.yang.gen.v1.sample.sample.top.DefaultYangAutoPrefixInterface;
+import org.onosproject.yang.gen.v1.sample.sample.top.YangAutoPrefixInterface;
+import org.onosproject.yang.gen.v1.sample.sample.top.yangautoprefixinterface.Address;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.LeafModelObject;
@@ -35,8 +35,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.onosproject.yang.gen.v1.samplenamespace.Sample.LeafIdentifier.LEAF5;
-import static org.onosproject.yang.gen.v1.samplenamespace.Sample.LeafIdentifier.LEAF6;
+import static org.onosproject.yang.gen.v1.sample.Sample.LeafIdentifier.LEAF5;
+import static org.onosproject.yang.gen.v1.sample.Sample.LeafIdentifier.LEAF6;
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;

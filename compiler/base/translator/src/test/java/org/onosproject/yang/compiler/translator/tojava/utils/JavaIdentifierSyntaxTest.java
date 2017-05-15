@@ -51,11 +51,11 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getSmallCa
 public final class JavaIdentifierSyntaxTest {
 
     private static final String PARENT_PACKAGE = "test5/test6/test7";
-    private static final String CHILD_PACKAGE = "test1:test2:test3";
+    private static final String CHILD_PACKAGE = "test1-test2-test3";
     private static final String DATE1 = "2000-1-5";
     private static final String DATE2 = "1992-01-25";
     private static final String PARENT_WITH_PERIOD = "test5.test6.test7";
-    private static final String CHILD_WITH_PERIOD = "test1.test2.test3";
+    private static final String CHILD_WITH_PERIOD = "test1test2test3";
     private static final String DATE_WITH_REV1 = "rev20000105";
     private static final String DATE_WITH_REV2 = "rev19920125";
     private static final String VERSION_NUMBER = "v1";
@@ -164,33 +164,6 @@ public final class JavaIdentifierSyntaxTest {
         conflictResolver.setPrefixForIdentifier(INVALID_PREFIX);
         String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE_FOR_INVALID_PREFIX, getYangRevision(DATE1),
                                              conflictResolver);
-    }
-
-    /**
-     * Unit test for root package generation with special characters presence.
-     */
-    @Test
-    public void getRootPackageWithSpecialCharactersTest()
-            throws ParseException {
-        conflictResolver.setPrefixForIdentifier(VALID_PREFIX);
-        String rootPackage = getRootPackage((byte) 1, INVALID_NAME_SPACE1, getYangRevision(DATE1), conflictResolver);
-        assertThat(rootPackage.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER +
-                                              UtilConstants.PERIOD + VALID_NAME_SPACE1 +
-                                              UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
-        conflictResolver.setPrefixForIdentifier(null);
-        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
-        assertThat(rootPackage1.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE2 + UtilConstants.PERIOD
-                                               + DATE_WITH_REV1), is(true));
-        String rootPackage2 = getRootPackage((byte) 1, INVALID_NAME_SPACE3, getYangRevision(DATE1), conflictResolver);
-        assertThat(rootPackage2.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE4 + UtilConstants.PERIOD
-                                               + DATE_WITH_REV1), is(true));
-        conflictResolver.setPrefixForIdentifier(INVALID_PREFIX1);
-        String rootPackage3 = getRootPackage((byte) 1, INVALID_NAME_SPACE2, getYangRevision(DATE1), conflictResolver);
-        assertThat(rootPackage3.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
-                                               + UtilConstants.PERIOD + VALID_NAME_SPACE3 + UtilConstants.PERIOD
-                                               + DATE_WITH_REV1), is(true));
     }
 
     /**

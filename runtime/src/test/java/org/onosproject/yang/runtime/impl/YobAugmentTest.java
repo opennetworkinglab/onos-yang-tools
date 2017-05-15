@@ -17,18 +17,19 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.DefaultNetworks;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.networks.Network;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.topology.rev20151208.yrtnetworktopology.networks.network.DefaultAugmentedNdNetwork;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.topology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.topology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.networks.network.link.DefaultAugmentedNtLink;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.telinkaugment.te.Config;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.Bundle;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.bundle.bundledlinks.BundledLink;
-import org.onosproject.yang.gen.v1.urn.ip.topo.rev20140101.ymsiptopology.node.DefaultAugmentedTopoNode;
-import org.onosproject.yang.gen.v1.urn.topo.rev20140101.ymstopology.DefaultNode;
+
+import org.onosproject.yang.gen.v1.ymsiptopology.rev20140101.ymsiptopology.node.DefaultAugmentedTopoNode;
+import org.onosproject.yang.gen.v1.ymstopology.rev20140101.ymstopology.DefaultNode;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.Network;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.networks.network.link.DefaultAugmentedNtLink;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkaugment.te.Config;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.Bundle;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.bundle.bundledlinks.BundledLink;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.DefaultAugmentedNdNetwork;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;

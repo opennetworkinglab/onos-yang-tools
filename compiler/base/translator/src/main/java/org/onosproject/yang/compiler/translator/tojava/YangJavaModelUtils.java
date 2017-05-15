@@ -620,14 +620,14 @@ public final class YangJavaModelUtils {
         if (node instanceof YangJavaModuleTranslator) {
             YangJavaModuleTranslator module = (YangJavaModuleTranslator) node;
             pkg.append(getRootPackage(module.getVersion(),
-                                      module.getModuleNamespace(),
+                                      module.getModuleName(),
                                       module.getRevision(),
                                       config.getConflictResolver()));
         } else if (node instanceof YangJavaSubModuleTranslator) {
             YangJavaSubModuleTranslator subModule =
                     (YangJavaSubModuleTranslator) node;
             pkg.append(getRootPackage(subModule.getVersion(),
-                                      subModule.getNameSpaceFromModule(),
+                                      subModule.getModuleName(),
                                       subModule.getRevision(),
                                       config.getConflictResolver()));
         }
@@ -806,7 +806,7 @@ public final class YangJavaModelUtils {
             //handle module
             YangModule module = (YangModule) node;
             String modulePkg = getRootPackage(module.getVersion(),
-                                              module.getModuleNamespace(),
+                                              module.getModuleName(),
                                               module.getRevision(),
                                               null);
             updatePackageInfo((JavaCodeGeneratorInfo) node, config, modulePkg);
@@ -814,7 +814,7 @@ public final class YangJavaModelUtils {
             //handle submodule
             YangJavaSubModuleTranslator subModule = (YangJavaSubModuleTranslator) node;
             String subModulePkg = getRootPackage(
-                    subModule.getVersion(), subModule.getNameSpaceFromModule(),
+                    subModule.getVersion(), subModule.getModuleName(),
                     subModule.getRevision(),
                     null);
             updatePackageInfo((JavaCodeGeneratorInfo) node, config, subModulePkg);

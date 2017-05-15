@@ -63,12 +63,12 @@ public class RootClassGeneratorTest {
         String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
         YangPluginConfig.compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/single/test5/test/rev20160704" +
+                "org/onosproject/yang/gen/v1/test5/rev20160704" +
                 "/Test5.java";
         assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/single/test5/test/rev20160704" +
+                "org/onosproject/yang/gen/v1/test7/rev20160704" +
                 "/Test7.java";
         assertThat(true, is((new File(path)).exists()));
         YangIoUtils.deleteDirectory("target/manager/");
@@ -95,7 +95,7 @@ public class RootClassGeneratorTest {
         String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
         YangPluginConfig.compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/test5/test/Test5.java";
+                "org/onosproject/yang/gen/v1/test5/Test5.java";
 
         assertThat(true, is((new File(path)).exists()));
         YangIoUtils.deleteDirectory("target/manager/");
@@ -122,17 +122,17 @@ public class RootClassGeneratorTest {
         String dir1 = System.getProperty("user.dir") + File.separator + "target/manager/";
         YangPluginConfig.compileCode(dir1);
         String path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/multi/test5/test/rev20160704" +
+                "org/onosproject/yang/gen/v1/test5/rev20160704" +
                 "/Test5.java";
         assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/multi/test5/test/rev20160704" +
+                "org/onosproject/yang/gen/v1/test7/rev20160704" +
                 "/Test7.java";
         assertThat(true, is((new File(path)).exists()));
 
         path = System.getProperty("user.dir") + "/target/manager/" +
-                "org/onosproject/yang/gen/v1/multi/test8/test/rev20160704" +
+                "org/onosproject/yang/gen/v1/test8/rev20160704" +
                 "/Test8.java";
         assertThat(true, is((new File(path)).exists()));
 

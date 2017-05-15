@@ -17,10 +17,10 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.DefaultNetworks;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.schedule.rev20160301.yrtietfschedule.schedules.schedules.Schedule;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.networks.DefaultAugmentedNwNetworks;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.tetopologiesaugment.te.templates.LinkTemplate;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfschedule.rev20160301.yrtietfschedule.schedules.schedules.Schedule;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.networks.DefaultAugmentedNwNetworks;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.tetopologiesaugment.te.templates.LinkTemplate;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;

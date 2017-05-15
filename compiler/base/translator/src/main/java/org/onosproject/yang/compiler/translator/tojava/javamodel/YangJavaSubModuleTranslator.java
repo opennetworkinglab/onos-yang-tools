@@ -137,7 +137,7 @@ public class YangJavaSubModuleTranslator
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
         String subModulePkg = getRootPackage(
-                getVersion(), getNameSpaceFromModule(), getRevision(),
+                getVersion(), getModuleName(), getRevision(),
                 yangPlugin.getConflictResolver());
 
         /*if (isNotificationChildNodePresent(this)) {

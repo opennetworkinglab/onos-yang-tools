@@ -17,17 +17,17 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.samplenamespace.Sample;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.DefaultL2;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.DefaultTop;
-import org.onosproject.yang.gen.v1.samplenamespace.sample.L2Keys;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.DefaultNetworks;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.topology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.network.topology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.link.DefaultSource;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.bundle.DefaultBundledLinks;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.tetopologyaugment.DefaultTe;
-import org.onosproject.yang.gen.v1.urn.ietf.params.xml.ns.yang.yrt.ietf.te.topology.rev20160317.yrtietftetopology.tetopologyaugment.te.DefaultConfig;
+import org.onosproject.yang.gen.v1.sample.Sample;
+import org.onosproject.yang.gen.v1.sample.sample.DefaultL2;
+import org.onosproject.yang.gen.v1.sample.sample.DefaultTop;
+import org.onosproject.yang.gen.v1.sample.sample.L2Keys;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.bundle.DefaultBundledLinks;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.tetopologyaugment.DefaultTe;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.tetopologyaugment.te.DefaultConfig;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.link.DefaultSource;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
@@ -271,16 +271,14 @@ public class YobRIdToMoIdConverterTest {
         assertEquals(link.listClass(), DefaultLink.class);
         SingleInstanceNode te = (SingleInstanceNode) atomicPaths.get(3);
         assertThat(te.type(), is(DataNode.Type.SINGLE_INSTANCE_NODE));
-        assertEquals(te.container(), org.onosproject.yang.gen.v1.urn.ietf
-                .params.xml.ns.yang.yrt.ietf.te.topology.rev20160317
-                .yrtietftetopology.telinkaugment.DefaultTe.class);
+        assertEquals(te.container(), org.onosproject.yang.gen.v1.yrtietftetopology
+                .rev20160317.yrtietftetopology.telinkaugment.DefaultTe.class);
         SingleInstanceNode config = (SingleInstanceNode) atomicPaths.get(4);
         assertThat(config.type(), is(DataNode.Type.SINGLE_INSTANCE_NODE));
-        assertEquals(config.container(), org.onosproject.yang.gen.v1.urn.ietf
-                .params.xml.ns.yang.yrt.ietf.te.topology.rev20160317
-                .yrtietftetopology.telinkaugment.te.DefaultConfig.class);
-        SingleInstanceNode bundledlinks = (SingleInstanceNode) atomicPaths
-                .get(5);
+        assertEquals(config.container(), org.onosproject.yang.gen.v1.yrtietftetopology
+                .rev20160317.yrtietftetopology.telinkaugment.te.DefaultConfig.class);
+        SingleInstanceNode bundledlinks =
+                (SingleInstanceNode) atomicPaths.get(5);
         assertThat(bundledlinks.type(), is(DataNode.Type.SINGLE_INSTANCE_NODE));
         assertEquals(bundledlinks.container(), DefaultBundledLinks.class);
     }
