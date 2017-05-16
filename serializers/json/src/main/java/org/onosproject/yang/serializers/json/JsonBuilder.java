@@ -88,5 +88,46 @@ public interface JsonBuilder {
      */
     ObjectNode getTreeNode();
 
-    void removeExtraTerminator();
+    /**
+     * Returns the YANG module name of the JSON subtree that the builder
+     * is currently building. The YANG module name represents the name
+     * space of the subtree.
+     *
+     * @return YANG module name
+     */
+    String subTreeModuleName();
+
+    /**
+     * Updates the YANG module name of the JSON subtree that the builder
+     * is currently building. The YANG module name represents the name
+     * space of the subtree. This function may be called when the builder
+     * starts to build a data node.
+     *
+     * @param moduleName YANG module name of the current subtree
+     */
+    void pushModuleName(String moduleName);
+
+    /**
+     * Removes the YANG module name of the JSON subtree that the builder
+     * is currently building. This function may be called when the builder
+     * finishes building a data node.
+     */
+    void popModuleName();
+
+    /**
+     * Initializes the output JSON and emits the JSON starting symbol
+     * (e.g., the left curly bracket). This method should be the first method
+     * to be called when a JSON building process starts.
+     */
+    void initializeJson();
+
+    /**
+     * Finalizes the output JSON and emits the JSON terminating symbol
+     * (e.g., the right curly bracket). This method should be the last method
+     * to be called when a JSON building process finishes.
+     *
+     * @param isRootTypeMultiInstance true if the root node of the JSON
+     *                                tree has the multi-instance node type
+     */
+    void finalizeJson(boolean isRootTypeMultiInstance);
 }

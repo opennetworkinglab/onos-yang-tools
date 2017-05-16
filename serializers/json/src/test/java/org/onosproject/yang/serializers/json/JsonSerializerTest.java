@@ -49,9 +49,6 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-//import org.onosproject.yang.model.DataNode.Type;
-//import org.onosproject.yang.model.InnerNode;
-//import org.onosproject.yang.model.LeafNode;
 
 /**
  * Unit Test for Json Serializer.
@@ -69,82 +66,6 @@ public class JsonSerializerTest {
         jsonSerializer = new JsonSerializer();
     }
 
-//    @Test
-//    public void jsonSerializerTest() {
-//        String path = "src/test/resources/testinput.json";
-//        DefaultCompositeStream external =
-//                new DefaultCompositeStream(null, parseInput(path));
-//        CompositeData compositeData = jsonSerializer.decode(external, context);
-//        ResourceData resourceData = compositeData.resourceData();
-//        DataNode rootNode = resourceData.dataNodes().get(0);
-//
-//        // 1. test if rootNode is SINGLE_INSTANCE_NODE.
-//        assertEquals(WRONG_TYPE, Type.SINGLE_INSTANCE_NODE, rootNode.type());
-//        InnerNode innerNode = (InnerNode) rootNode;
-//        Map<NodeKey, DataNode> nodeChilds = innerNode.childNodes();
-//        // 2. test if Root Node only have one child.
-//        assertEquals(WRONG_STRUCTURE, 1, nodeChilds.size());
-//        NodeKey nodeChildKey = convertNameStringToNodeKey("top1", "jsonlist");
-//        // 3. test if l1 is the only child of Root Node.
-//        assertEquals(WRONG_STRUCTURE, true, nodeChilds.containsKey(nodeChildKey));
-//        InnerNode nodeTop1 = (InnerNode) nodeChilds.get(nodeChildKey);
-//        Map<NodeKey, DataNode> nodeTop1Childs = nodeTop1.childNodes();
-//        // 4. test if top1 contains three childs.
-//        assertEquals(WRONG_STRUCTURE, 3, nodeTop1Childs.size());
-//        DataNode l1DataNode = getDataNode(nodeTop1Childs, "l1");
-//        // 5. test if l1 is multi_instance_node
-//        assertEquals(WRONG_TYPE, Type.MULTI_INSTANCE_NODE, l1DataNode.type());
-//
-//        InnerNode l1InnerNode = (InnerNode) l1DataNode;
-//        Map<NodeKey, DataNode> l1ChildNodes = l1InnerNode.childNodes();
-//        DataNode k1DataNode = getDataNode(l1ChildNodes, "k1");
-//        LeafNode k1LeafNode = (LeafNode) k1DataNode;
-//        DataNode k2DataNode = getDataNode(l1ChildNodes, "k2");
-//        LeafNode k2LeafNode = (LeafNode) k2DataNode;
-//        DataNode k3DataNode = getDataNode(l1ChildNodes, "k3");
-//        LeafNode k3LeafNode = (LeafNode) k3DataNode;
-//        // 6. test if k1, k2, k3 are with the right value.
-//        assertEquals(WRONG_STRUCTURE, true,
-//                     k1LeafNode.asString().equals("k1value"));
-//        assertEquals(WRONG_STRUCTURE, true,
-//                     k2LeafNode.asString().equals("k2value"));
-//        assertEquals(WRONG_STRUCTURE, true,
-//                     k3LeafNode.asString().equals("k3value"));
-//
-//        // 7. test if c1 is in the right structure.
-//        DataNode c1DataNode = getDataNode(l1ChildNodes, "c1");
-//        InnerNode c1InnerNode = (InnerNode) c1DataNode;
-//        DataNode leafC1DataNode = getDataNode(c1InnerNode.childNodes(), "leaf_c1");
-//        LeafNode leafC1LeafNode = (LeafNode) leafC1DataNode;
-//        assertEquals(WRONG_STRUCTURE, 1, c1InnerNode.childNodes().size());
-//        assertEquals(WRONG_TYPE, Type.SINGLE_INSTANCE_LEAF_VALUE_NODE, leafC1DataNode.type());
-//        assertEquals(WRONG_STRUCTURE, true, leafC1LeafNode.asString().equals("c1leaf"));
-//
-//        DataNode c2DataNode = getDataNode(nodeTop1Childs, "c2");
-//        // 8. test if c2 is single_instance_node.
-//        assertEquals(WRONG_TYPE, Type.SINGLE_INSTANCE_NODE, c2DataNode.type());
-//
-//        InnerNode c2InnerNode = (InnerNode) c2DataNode;
-//        Map<NodeKey, DataNode> c2ChildNodes = c2InnerNode.childNodes();
-//        DataNode leaflist1DataNode = getDataNode(c2ChildNodes, "leaflist1");
-//        LeafNode leafList1LeafNode = (LeafNode) leaflist1DataNode;
-//        // 9. test if leaflist1 is in the right structure.
-//        assertEquals(WRONG_TYPE, Type.MULTI_INSTANCE_LEAF_VALUE_NODE, leafList1LeafNode.type());
-//
-//    }
-//
-//    @Test
-//    public void encodeTest() {
-//        String path = "src/test/resources/testinput.json";
-//        DefaultCompositeStream external =
-//                new DefaultCompositeStream(null, parseInput(path));
-//        CompositeData compositeData = jsonSerializer.decode(external, context);
-//        CompositeStream compositeStream = jsonSerializer.encode(compositeData, context);
-//        InputStream inputStream = compositeStream.resourceData();
-//        String expectString = parseJsonToString(path);
-//        assertEquals(WRONG_STRUCTURE, expectString, convertInputStreamToString(inputStream));
-//    }
-
     @Test
     public void demo1Test() {
         String path = "src/test/resources/test.json";
@@ -155,6 +76,7 @@ public class JsonSerializerTest {
         ResourceData resourceData = compositeData.resourceData();
         ResourceId rid = resourceData.resourceId();
         DataNode rootNode = resourceData.dataNodes().get(0);
+
 
         // encode
         RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
@@ -283,7 +205,7 @@ public class JsonSerializerTest {
     /**
      * Converts name and name space to NodeKey.
      *
-     * @param name name
+     * @param name      name
      * @param nameSpace name space
      * @return NodeKey
      */
@@ -324,7 +246,7 @@ public class JsonSerializerTest {
      * Obtain the DataNode for Map with specific name.
      *
      * @param nodeChils Map container of InnerNode
-     * @param keyName name of the DataNode which also shown in Json File.
+     * @param keyName   name of the DataNode which also shown in Json File.
      * @return DataNode
      */
     private DataNode getDataNode(Map<NodeKey, DataNode> nodeChils, String keyName) {

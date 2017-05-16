@@ -52,19 +52,21 @@ public final class EncoderUtils {
      * Converts a data node to JSON data.
      *
      * @param dataNode given data node
-     * @param context jsonserializer context
+     * @param context  jsonserializer context
      * @return JSON
      */
     public static ObjectNode convertDataNodeToJson(DataNode dataNode, YangSerializerContext context) {
         checkNotNull(dataNode, "data node cannot be null");
 
         JsonBuilder jsonBuilder = new DefaultJsonBuilder();
+        jsonBuilder.initializeJson();
         DataNodeVisitor treeNodeListener = new DataNodeJsonVisitor(jsonBuilder, context);
 
-        DataNodeSiblingPositionType siblingType = NOT_MULTI_INSTANCE_NODE;
+        DataNodeSiblingPositionType siblingType = (dataNode.type() == MULTI_INSTANCE_NODE) ?
+                FIRST_INSTANCE : NOT_MULTI_INSTANCE_NODE;
         walkDataNodeTree(treeNodeListener, dataNode, siblingType);
 
-        jsonBuilder.removeExtraTerminator();
+        jsonBuilder.finalizeJson((dataNode.type() == MULTI_INSTANCE_NODE) ? true : false);
         ObjectNode resultData = jsonBuilder.getTreeNode();
         return resultData;
     }
@@ -201,15 +203,15 @@ public final class EncoderUtils {
         Iterator it = childrenList.entrySet().iterator();
 
         while (it.hasNext()) {
-               DataNode dataNode = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
-               String nodeName = dataNode.key().schemaId().name();
-                List<DataNode> group = groupedBucket.get(nodeName);
-                if (group == null) {
-                    group = new ArrayList<>();
-                    groupedBucket.put(nodeName, group);
-                }
+            DataNode dataNode = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
+            String nodeName = dataNode.key().schemaId().name();
+            List<DataNode> group = groupedBucket.get(nodeName);
+            if (group == null) {
+                group = new ArrayList<>();
+                groupedBucket.put(nodeName, group);
+            }
 
-                group.add(dataNode);
+            group.add(dataNode);
 
         }
 
