@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.Stack;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -43,19 +42,15 @@ public class DefaultJsonBuilder implements JsonBuilder {
     private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String QUOTE = "\"";
-    private static final String ROOT_MODULE_NAME = "ROOT";
 
-    private Stack<String> moduleNameStack;
 
     public DefaultJsonBuilder(String rootName) {
         checkNotNull(rootName);
-        treeString = new StringBuilder(rootName);
-        moduleNameStack = new Stack<>();
+        this.treeString = new StringBuilder(rootName);
     }
 
     public DefaultJsonBuilder() {
-        treeString = new StringBuilder();
-        moduleNameStack = new Stack<>();
+        this.treeString = new StringBuilder();
     }
 
     @Override
@@ -146,6 +141,8 @@ public class DefaultJsonBuilder implements JsonBuilder {
 
     @Override
     public String getTreeString() {
+        removeCommaIfExist();
+        removeFirstFieldNameIfExist();
         return treeString.toString();
     }
 
@@ -181,34 +178,8 @@ public class DefaultJsonBuilder implements JsonBuilder {
     }
 
     @Override
-    public String subTreeModuleName() {
-        return moduleNameStack.peek();
-    }
-
-    @Override
-    public void pushModuleName(String moduleName) {
-        moduleNameStack.push(moduleName);
-    }
-
-    @Override
-    public void popModuleName() {
-        moduleNameStack.pop();
-    }
-
-    @Override
-    public void initializeJson() {
-        if (!moduleNameStack.empty()) {
-            moduleNameStack.removeAllElements();
-        }
-        moduleNameStack.push(ROOT_MODULE_NAME);
-        treeString.setLength(0);
-        treeString.append(LEFT_BRACE);
-    }
-
-    @Override
-    public void finalizeJson() {
+    public void removeExtraTerminator() {
         removeCommaIfExist();
-        treeString.append(RIGHT_BRACE);
     }
 
     private void appendField(String fieldName) {
