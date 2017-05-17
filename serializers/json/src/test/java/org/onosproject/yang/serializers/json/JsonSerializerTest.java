@@ -49,25 +49,16 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-
 /**
  * Unit Test for Json Serializer.
  */
 public class JsonSerializerTest {
-    private static final String WRONG_STRUCTURE = "The Data Node structure is wrong!";
-    private static final String WRONG_TYPE = "The Data Node type is wrong!";
 
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
 
-    @BeforeClass
-    public static void prepare() {
-        context = new MockYangSerializerContext();
-        jsonSerializer = new JsonSerializer();
-    }
-
     @Test
-    public void demo1Test() {
+    public void demo1Test() throws IOException {
         String path = "src/test/resources/test.json";
         // decode
         DefaultCompositeStream external =
@@ -76,7 +67,6 @@ public class JsonSerializerTest {
         ResourceData resourceData = compositeData.resourceData();
         ResourceId rid = resourceData.resourceId();
         DataNode rootNode = resourceData.dataNodes().get(0);
-
 
         // encode
         RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
@@ -99,8 +89,75 @@ public class JsonSerializerTest {
             rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
             assertEquals(true, rootNodeOutput != null);
         } catch (IOException e) {
-            System.out.println("inputstream failed to parse");
+            throw e;
         }
+    }
+
+    /**
+     * Converts name and name space to NodeKey.
+     *
+     * @param name      name
+     * @param nameSpace name space
+     * @return NodeKey
+     */
+    private NodeKey convertNameStringToNodeKey(String name, String nameSpace) {
+        SchemaId schemaId = new SchemaId("top1", "jsonlist");
+        NodeKey.NodeKeyBuilder nodeKeyBuilder =
+                new NodeKey.NodeKeyBuilder<>().schemaId(schemaId);
+        NodeKey nodeKey = nodeKeyBuilder.build();
+        return nodeKey;
+    }
+
+    /**
+     * Obtain a list of NodeKey from Map container.
+     *
+     * @param nodeChils Map container of InnerNode
+     * @return List<NodeKey> list of nodeChils' key
+     */
+    private List<NodeKey> listNodeChildsKey(Map<NodeKey, DataNode> nodeChils) {
+        Set<NodeKey> set = nodeChils.keySet();
+        List<NodeKey> list = new ArrayList<>();
+        list.addAll(set);
+        return list;
+    }
+
+    /**
+     * Obtain a list of DataNode from Map container.
+     *
+     * @param nodeChils Map container of InnerNode
+     * @return List<NodeKey> list of nodeChils' value
+     */
+    private List<DataNode> listNodeChildsValue(Map<NodeKey, DataNode> nodeChils) {
+        Collection<DataNode> coll = nodeChils.values();
+        List<DataNode> list = new ArrayList(coll);
+        return list;
+    }
+
+    /**
+     * Obtain the DataNode for Map with specific name.
+     *
+     * @param nodeChils Map container of InnerNode
+     * @param keyName   name of the DataNode which also shown in Json File.
+     * @return DataNode
+     */
+    private DataNode getDataNode(Map<NodeKey, DataNode> nodeChils, String keyName) {
+        List<DataNode> top1DataNodeList = listNodeChildsValue(nodeChils);
+        DataNode l1DataNode = null;
+        for (DataNode node : top1DataNodeList) {
+            String actualName = String.valueOf(node.key().schemaId().name());
+            String expectName = String.valueOf(keyName);
+            if (actualName.equals(expectName)) {
+                l1DataNode = node;
+                break;
+            }
+        }
+        return l1DataNode;
+    }
+
+    @BeforeClass
+    public static void prepare() {
+        context = new MockYangSerializerContext();
+        jsonSerializer = new JsonSerializer();
     }
 
     /**
@@ -200,67 +257,6 @@ public class JsonSerializerTest {
             sb.append(line.charAt(i));
         }
         return sb.toString();
-    }
-
-    /**
-     * Converts name and name space to NodeKey.
-     *
-     * @param name      name
-     * @param nameSpace name space
-     * @return NodeKey
-     */
-    private NodeKey convertNameStringToNodeKey(String name, String nameSpace) {
-        SchemaId schemaId = new SchemaId("top1", "jsonlist");
-        NodeKey.NodeKeyBuilder nodeKeyBuilder =
-                new NodeKey.NodeKeyBuilder<>().schemaId(schemaId);
-        NodeKey nodeKey = nodeKeyBuilder.build();
-        return nodeKey;
-    }
-
-    /**
-     * Obtain a list of NodeKey from Map container.
-     *
-     * @param nodeChils Map container of InnerNode
-     * @return List<NodeKey> list of nodeChils' key
-     */
-    private List<NodeKey> listNodeChildsKey(Map<NodeKey, DataNode> nodeChils) {
-        Set<NodeKey> set = nodeChils.keySet();
-        List<NodeKey> list = new ArrayList<>();
-        list.addAll(set);
-        return list;
-    }
-
-    /**
-     * Obtain a list of DataNode from Map container.
-     *
-     * @param nodeChils Map container of InnerNode
-     * @return List<NodeKey> list of nodeChils' value
-     */
-    private List<DataNode> listNodeChildsValue(Map<NodeKey, DataNode> nodeChils) {
-        Collection<DataNode> coll = nodeChils.values();
-        List<DataNode> list = new ArrayList(coll);
-        return list;
-    }
-
-    /**
-     * Obtain the DataNode for Map with specific name.
-     *
-     * @param nodeChils Map container of InnerNode
-     * @param keyName   name of the DataNode which also shown in Json File.
-     * @return DataNode
-     */
-    private DataNode getDataNode(Map<NodeKey, DataNode> nodeChils, String keyName) {
-        List<DataNode> top1DataNodeList = listNodeChildsValue(nodeChils);
-        DataNode l1DataNode = null;
-        for (DataNode node : top1DataNodeList) {
-            String actualName = String.valueOf(node.key().schemaId().name());
-            String expectName = String.valueOf(keyName);
-            if (actualName.equals(expectName)) {
-                l1DataNode = node;
-                break;
-            }
-        }
-        return l1DataNode;
     }
 
     /**
