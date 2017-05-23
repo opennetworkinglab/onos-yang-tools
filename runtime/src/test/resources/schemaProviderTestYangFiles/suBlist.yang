@@ -1,14 +1,10 @@
-module list {
+submodule list2 {
 
     yang-version 1;
-
-    namespace "yrt:list";
-
-    prefix "l";
-    include list2;
+    belongs-to "list"{
+        prefix l1;
+    }
     include list3;
-    include list4;
-
     organization "ON-LAB";
 
     description "This module defines for list.";
@@ -17,18 +13,10 @@ module list {
         description "Initial revision.";
     }
 
-    list l1 {
-        key "k1 k2 k3";
+    list l2 {
+        key "k1";
             leaf k1 {
                type string;
-            }
-
-            leaf k2 {
-              type string;
-            }
-
-            leaf k3 {
-              type string;
             }
 
             container c1 {
@@ -38,7 +26,7 @@ module list {
             }
     }
 
-    leaf-list leaf1 {
+    leaf-list leaf2 {
         type string;
     }
 }

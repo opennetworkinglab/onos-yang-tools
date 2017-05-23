@@ -446,6 +446,9 @@ public final class SerializerHelper {
 
         SchemaId id = new SchemaId(name, namespace);
         child = ((SingleInstanceNodeContext) context).getChildContext(id);
+        if (child == null) {
+            throw new IllegalArgumentException(errorMsg(FMT_NOT_EXIST, name));
+        }
         return child;
     }
 

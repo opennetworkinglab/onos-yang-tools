@@ -877,7 +877,7 @@ public abstract class YangSubModule
 
     @Override
     public String getModuleName() {
-        return getName();
+        return getBelongsTo().getBelongsToModuleName();
     }
 
     public void setModuleNamespace(String namespace) {

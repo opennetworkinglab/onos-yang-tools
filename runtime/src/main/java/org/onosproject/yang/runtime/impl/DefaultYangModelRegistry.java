@@ -18,9 +18,12 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.YangChoice;
+import org.onosproject.yang.compiler.datamodel.YangInclude;
+import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
+import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaContext;
@@ -60,6 +63,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
     private static final String AT = "@";
     private final Logger log = getLogger(getClass());
+    private static final String E_NEXIST = "node with {} namespace not found.";
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -252,7 +256,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
         YangSchemaNode node = nameSpaceSchemaStore.get(nameSpace);
         if (node == null && !isForChildContext) {
-            log.error("node with {} namespace not found.", nameSpace);
+            log.error(E_NEXIST, nameSpace);
         }
         return node;
     }
@@ -295,9 +299,18 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
         qNameKeyStore.put(getInterfaceClassName(appNode).toLowerCase(), appNode);
 
-        //update namespaceSchema store.
-        nameSpaceSchemaStore.put(appNode.getNameSpace().getModuleNamespace(),
-                                 appNode);
+        /*
+         * The name of a module determines the namespace of all data node names
+         * defined in that module.  If a data node is defined in a submodule,
+         * then the namespace-qualified member name uses the name of the main
+         * module to which the submodule belongs.
+         * So skipping the submodule entry in namespace map.
+         */
+        if (!(appNode instanceof YangSubModule)) {
+            //update namespaceSchema store.
+            nameSpaceSchemaStore.put(appNode.getNameSpace().getModuleNamespace(),
+                                     appNode);
+        }
 
         log.info("successfully registered this application {}", name);
     }
@@ -405,6 +418,42 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         return new SchemaId("/", null);
     }
 
+    @Override
+    public SchemaContext getChildContext(SchemaId schemaId) {
+
+        checkNotNull(schemaId);
+        String ns = schemaId.namespace();
+        if (ns == null) {
+            log.error("namespace should not be null for a node");
+        }
+        YangSchemaNode schemaNode = null;
+
+        YangSchemaNode node = getForNameSpace(ns, true);
+        if (node == null) {
+            //If namespace is module name.
+            node = getForSchemaName(ns);
+        }
+        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(schemaId, ns);
+
+        if (node != null) {
+            try {
+                schemaNode = node.getChildSchema(id).getSchemaNode();
+            } catch (DataModelException e) {
+                // if exception occurs check for submodule
+            }
+            if (schemaNode == null) {
+                List<YangInclude> includeList = ((YangModule) node)
+                        .getIncludeList();
+                // Checking requested node in submodule.
+                schemaNode = getSubModlueChildNode(id, includeList);
+            }
+            return schemaNode;
+        } else {
+            log.error(E_NEXIST, ns);
+        }
+        return null;
+    }
+
     /**
      * Updates child's context. It sets itself as a parent context for first
      * level child's in module/sub-module.
@@ -468,32 +517,33 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         updateContextForChoiceCase(child);
     }
 
-    @Override
-    public SchemaContext getChildContext(SchemaId schemaId) {
-
-        checkNotNull(schemaId);
-        if (schemaId.namespace() == null) {
-            log.error("node with {} namespace not found.", schemaId.namespace());
-        }
-
-        String namespace = schemaId.namespace();
-        YangSchemaNode node = getForNameSpace(namespace, true);
-        if (node == null) {
-            //If namespace if module name.
-            node = getForSchemaName(schemaId.namespace());
-        }
-        YangSchemaNodeIdentifier id = getNodeIdFromSchemaId(schemaId, namespace);
-
-        try {
-            if (node != null) {
-                return node.getChildSchema(id).getSchemaNode();
-            } else {
-                log.error("node with {} namespace not found.", schemaId
-                        .namespace());
+    /**
+     * Returns the child schema for given node id from the list of included
+     * submodule.
+     * <p>
+     * To reference an item that is defined in one of its
+     * submodules, the module MUST include the submodule and if
+     * a submodule that needs to reference an item defined in another
+     * submodule of the same module, MUST include this submodule.
+     * <p>
+     * In other words if submodule is including any submodule which
+     * belongs to same module then module should also include that
+     * submodule.
+     *
+     * @param id   child node identifier
+     * @param list list of included submodule
+     */
+    private YangSchemaNode getSubModlueChildNode(YangSchemaNodeIdentifier id,
+                                                 List<YangInclude> list) {
+        YangSchemaNode schemaNode = null;
+        for (YangInclude l : list) {
+            try {
+                schemaNode = l.getIncludedNode().getChildSchema(id)
+                        .getSchemaNode();
+            } catch (DataModelException e) {
+                log.error("failed to get child schema", e);
             }
-        } catch (DataModelException e) {
-            log.error("failed to get child schema", e);
         }
-        return null;
+        return schemaNode;
     }
 }

@@ -1,0 +1,18 @@
+submodule list3 {
+
+    yang-version 1;
+    belongs-to "list"{
+        prefix l;
+    }
+    include list4;
+    organization "ON-LAB";
+
+    description "This module defines for list.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+    leaf-list leaf3 {
+        type string;
+    }
+}
