@@ -99,7 +99,7 @@ public class YangLibraryDescription
                         unflavoredBuildTarget, SOURCES));
 
         BuildRule yangLib = resolver.getRuleOptional(yangParams.getBuildTarget())
-                .or(resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs)));
+                .or(() -> resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs)));
 
         if (params.getBuildTarget().getFlavors().contains(SOURCES)) {
             return yangLib;
