@@ -1,0 +1,52 @@
+module yrt-ietf-te {
+
+  namespace "urn:ietf:params:xml:ns:yang:ietf-te";
+  prefix "te";
+  import yrt-ietf-te-types {
+    prefix te-types;
+  }
+
+  revision "2017-03-10";
+
+  grouping tunnels-grouping {
+    container tunnels {
+      list tunnel {
+        key "name";
+        leaf name {
+          type string;
+        }
+        uses tunnel-p2p-properties;
+      }
+    }
+  }
+
+  grouping tunnel-p2p-params_config {
+    leaf name {
+      type string;
+    }
+    leaf type {
+      type identityref {
+        base te-types:tunnel-type;
+      }
+    }
+  }
+
+  grouping tunnel-p2p-params_state {
+    leaf oper-status {
+      type identityref {
+        base te-types:state-type;
+      }
+    }
+  }
+
+  grouping tunnel-p2p-properties {
+    container state {
+      config false;
+      uses tunnel-p2p-params_config;
+    }
+  }
+
+  container te {
+    uses tunnels-grouping;
+  }
+}

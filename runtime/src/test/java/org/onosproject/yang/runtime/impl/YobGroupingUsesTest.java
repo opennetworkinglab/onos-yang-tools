@@ -19,13 +19,15 @@ package org.onosproject.yang.runtime.impl;
 import org.junit.Test;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
 import org.onosproject.yang.gen.v1.yrtietfschedule.rev20160301.yrtietfschedule.schedules.schedules.Schedule;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.DefaultTe;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelp2pproperties.DefaultState;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.networks.DefaultAugmentedNwNetworks;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.tetopologiesaugment.te.templates.LinkTemplate;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class YobGroupingUsesTest {
     TestYangSerializerContext context = new TestYangSerializerContext();
     private static final String NW_NS = "urn:ietf:params:xml:ns:yang:yrt-ietf-network";
     private static final String TE_NS = "urn:ietf:params:xml:ns:yang:yrt-ietf-te-topology";
+    private static final String TE = "urn:ietf:params:xml:ns:yang:ietf-te";
     private DataNode.Builder dBlr;
     private String value;
 
@@ -102,5 +105,49 @@ public class YobGroupingUsesTest {
         assertThat(sh.start().toString(), is("start"));
         assertThat(sh.scheduleDuration(), is("schedule-duration"));
         assertThat(sh.repeatInterval(), is("repeat-interval"));
+    }
+
+    private DataNode buildDataNodeWithIdentityRef() {
+        dBlr = initializeDataNode(context);
+        value = null;
+        dBlr = addDataNode(dBlr, "te", TE, value, null);
+        dBlr = addDataNode(dBlr, "tunnels", TE, value, null);
+        dBlr = addDataNode(dBlr, "tunnel", TE, value, null);
+        value = "name";
+        dBlr = addDataNode(dBlr, "name", TE, value, null);
+        dBlr = exitDataNode(dBlr);
+        value = null;
+        dBlr = addDataNode(dBlr, "state", TE, value, null);
+        value = "statename";
+        dBlr = addDataNode(dBlr, "name", TE, value, null);
+        dBlr = exitDataNode(dBlr);
+        value = "tunnel-p2p";
+        dBlr = addDataNode(dBlr, "type", TE, value, null);
+        dBlr = exitDataNode(dBlr); // tunnel-p2p
+        dBlr = exitDataNode(dBlr); // state
+        dBlr = exitDataNode(dBlr); // tunnel
+        dBlr = exitDataNode(dBlr); // tunnels
+        dBlr = exitDataNode(dBlr); // te
+        return dBlr.build();
+    }
+
+    /**
+     * Unit test for identity-ref.
+     */
+    @Test
+    public void testIdentityRef() {
+        DataNode dataNode = buildDataNodeWithIdentityRef();
+        ResourceData data = DefaultResourceData.builder().
+                addDataNode(dataNode).build();
+        DefaultYobBuilder builder = new DefaultYobBuilder(
+                (DefaultYangModelRegistry) context.getContext());
+        ModelObjectData modelObjectData = builder.getYangObject(data);
+        List<ModelObject> modelObjectList = modelObjectData.modelObjects();
+        ModelObject modelObject = modelObjectList.get(0);
+        DefaultTe te = ((DefaultTe) modelObject);
+        DefaultState state = ((DefaultState) te.tunnels()
+                .tunnel().get(0).state());
+        assertThat(state.name().toString(), is("statename"));
+        assertThat(state.type().getSimpleName().toString(), is("TunnelP2p"));
     }
 }

@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
@@ -355,7 +356,10 @@ final class ModelConverterUtil {
     private static String getIdentityRefValue(Object fieldObj, YangIdentityRef ir,
                                               Object holderObj) {
 
-        YangIdentity id = ir.getReferredIdentity();
+        YangIdentity id = getDerivedIdentity(fieldObj, ir);
+        if (id == null) {
+            throw new ModelConvertorException("Value for identity is invalid");
+        }
         String idName = id.getJavaClassNameOrBuiltInType();
         String idPkg = id.getJavaPackage() + PERIOD + getCapitalCase(idName);
         String methodName = idName + getCapitalCase(TO_STRING);
@@ -371,6 +375,28 @@ final class ModelConverterUtil {
                 InvocationTargetException | IllegalAccessException e) {
             throw new ModelConvertorException(e);
         }
+    }
+
+    private static YangIdentity getDerivedIdentity(Object fieldObj,
+                                                   YangIdentityRef ir) {
+        YangIdentity id = ir.getReferredIdentity();
+        String idName = id.getJavaClassNameOrBuiltInType();
+        String[] objValue = fieldObj.toString().split("\\.");
+        String value = objValue[objValue.length - 1];
+        if (value.equalsIgnoreCase(idName)) {
+            return id;
+        }
+        List<YangIdentity> identities = id.getExtendList();
+        if (identities != null && !identities.isEmpty()) {
+            for (YangIdentity identity : identities) {
+                if (identity.getJavaClassNameOrBuiltInType()
+                        .equalsIgnoreCase(value)) {
+                    return identity;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -19,16 +19,21 @@ package org.onosproject.yang.runtime.impl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.DefaultCont;
-import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.Tpdfun0;
-import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.DefaultSched;
-import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.YtbIetfSchedule;
-import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum1Enum;
-import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum2Enum;
-import org.onosproject.yang.gen.v1.ytbmodulewithleaflist.rev20160826.YtbModuleWithLeafList;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.DefaultModKey;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.ModKey;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.ModKeyKeys;
+import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.DefaultCont;
+import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.Tpdfun0;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.DefaultTe;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelp2pproperties.DefaultState;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelsgrouping.DefaultTunnels;
+import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelsgrouping.tunnels.DefaultTunnel;
+import org.onosproject.yang.gen.v1.yrtietftetypes.rev20160320.yrtietftetypes.TunnelP2p;
+import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.YtbIetfSchedule;
+import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum1Enum;
+import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum2Enum;
+import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.DefaultSched;
+import org.onosproject.yang.gen.v1.ytbmodulewithleaflist.rev20160826.YtbModuleWithLeafList;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.DefaultCarrier;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.DefaultMultiplexes;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.Multiplexes;
@@ -1144,5 +1149,40 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(node, "lfenum1", nameSpace,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE,
                          true, "successful exit");
+    }
+
+    /**
+     * Unit test for identity-ref.
+     */
+    @Test
+    public void processIdentityRef() {
+        setUp();
+        DefaultState state = new DefaultState();
+        state.type(TunnelP2p.class);
+        DefaultTunnel tunnel = new DefaultTunnel();
+        tunnel.state(state);
+        DefaultTunnels tunnels = new DefaultTunnels();
+        tunnels.addToTunnel(tunnel);
+        DefaultTe te = new DefaultTe();
+        te.tunnels(tunnels);
+
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject(te);
+        DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
+        rscData = builder.getResourceData(data.build());
+
+        DataNode node = rscData.dataNodes().get(0);
+        String ns = "urn:ietf:params:xml:ns:yang:ietf-te";
+        validateDataNode(node, "te", ns, SINGLE_INSTANCE_NODE, true, null);
+        NodeKey key = NodeKey.builder().schemaId("tunnels", ns).build();
+        DataNode childNode = ((InnerNode) node).childNodes().get(key);
+        key = NodeKey.builder().schemaId("tunnel", ns).build();
+        childNode = ((InnerNode) childNode).childNodes().get(key);
+        key = NodeKey.builder().schemaId("state", ns).build();
+        childNode = ((InnerNode) childNode).childNodes().get(key);
+        key = NodeKey.builder().schemaId("type", ns).build();
+        childNode = ((InnerNode) childNode).childNodes().get(key);
+        validateDataNode(childNode, "type", ns, SINGLE_INSTANCE_LEAF_VALUE_NODE,
+                         false, "tunnel-p2p");
     }
 }
