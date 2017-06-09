@@ -115,7 +115,6 @@ public class DeviationListenerTest {
         assertThat(deviateAdd.getUnits(), is("\"units\""));
         assertThat(deviateAdd.getListOfMust().get(0).getConstraint(),
                    is("/base:system"));
-        assertThat(deviateAdd.getUniqueList().get(0), is("id"));
         assertThat(deviateAdd.getDefaultValueInString(), is("admin"));
         assertThat(deviateAdd.isConfig(), is(true));
         assertThat(deviateAdd.isMandatory(), is(true));
@@ -152,7 +151,6 @@ public class DeviationListenerTest {
         assertThat(deviateDelete.getUnits(), is("\"units\""));
         assertThat(deviateDelete.getListOfMust().get(0).getConstraint(),
                    is("daytime or time"));
-        assertThat(deviateDelete.getUniqueList().get(0), is("id"));
         assertThat(deviateDelete.getDefaultValueInString(), is("defaultValue"));
         assertThat(deviation.getResolvableStatus(), is(UNRESOLVED));
     }

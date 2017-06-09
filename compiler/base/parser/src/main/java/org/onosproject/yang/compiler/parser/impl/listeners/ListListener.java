@@ -52,8 +52,8 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.addUniqueHolderToRoot;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidIdentifier;
-import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.validateUniqueInList;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.getParentNodeConfig;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.validateCardinalityMaxOne;
@@ -163,33 +163,38 @@ public final class ListListener {
     }
 
     /**
-     * It is called when parser exits from grammar rule (list), it performs
-     * validation and updates the data model tree.
+     * Processes parser exits from grammar rule (list), performing validation
+     * and update on the date model tree.
      *
      * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param ctx      context object
      */
     public static void processListExit(TreeWalkListener listener,
                                        ListStatementContext ctx) {
 
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, LIST_DATA, ctx.identifier().getText(), EXIT);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, LIST_DATA,
+                             ctx.identifier().getText(), EXIT);
 
         if (listener.getParsedDataStack().peek() instanceof YangList) {
             YangList yangList = (YangList) listener.getParsedDataStack().peek();
             try {
                 yangList.validateDataOnExit();
-                validateUniqueInList(yangList, ctx);
+                addUniqueHolderToRoot(yangList);
             } catch (DataModelException e) {
-                ParserException parserException = new ParserException(constructExtendedListenerErrorMessage(
-                        UNHANDLED_PARSED_DATA, LIST_DATA, ctx.identifier().getText(), EXIT, e.getMessage()));
-                parserException.setLine(ctx.getStart().getLine());
-                parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-                throw parserException;
+                ParserException exc = new ParserException(
+                        constructExtendedListenerErrorMessage(
+                                UNHANDLED_PARSED_DATA, LIST_DATA,
+                                ctx.identifier().getText(), EXIT,
+                                e.getMessage()));
+                exc.setLine(ctx.getStart().getLine());
+                exc.setCharPosition(ctx.getStart().getCharPositionInLine());
+                throw exc;
             }
             listener.getParsedDataStack().pop();
         } else {
-            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, LIST_DATA,
-                                                                    ctx.identifier().getText(), EXIT));
+            throw new ParserException(constructListenerErrorMessage(
+                    MISSING_CURRENT_HOLDER, LIST_DATA,
+                    ctx.identifier().getText(), EXIT));
         }
     }
 

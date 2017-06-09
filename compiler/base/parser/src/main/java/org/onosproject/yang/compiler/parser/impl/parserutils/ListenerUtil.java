@@ -19,10 +19,7 @@ package org.onosproject.yang.compiler.parser.impl.parserutils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangImport;
-import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
-import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
-import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
@@ -31,6 +28,7 @@ import org.onosproject.yang.compiler.datamodel.YangPathPredicate;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangRelativePath;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
+import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.slf4j.Logger;
@@ -40,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +96,8 @@ public final class ListenerUtil {
     public static final String LINE_NUMBER = "line number ";
     public static final String CHARACTER_POSITION = "character position ";
     public static final String FILE = "file ";
+    private static final String E_LEAF_REF = "YANG file error : A leaf " +
+            "reference, in unique, must refer to a leaf in the list";
 
     // No instantiation.
     private ListenerUtil() {
@@ -435,135 +434,56 @@ public final class ListenerUtil {
     /**
      * Validates the unique syntax from the reference path.
      *
-     * @param uniquePath   path of unique
-     * @param prefixOfFile current file's prefix
-     * @param ctx          yang construct's context to get the line number and character position
+     * @param val    path of unique
+     * @param prefix current file's prefix
+     * @param ctx    yang construct's context to get the line number and character position
      * @return list of absolute path
      */
-    private static List<YangAtomicPath> validateUniqueValues(String uniquePath, String prefixOfFile,
+    private static List<YangAtomicPath> validateUniqueValues(String val,
+                                                             String prefix,
                                                              ParserRuleContext ctx) {
-        List<YangAtomicPath> atomicPath = new LinkedList<>();
-        String[] pathInUnique = uniquePath.split(SLASH_FOR_STRING);
-        for (String uniqueValue : pathInUnique) {
-            YangAtomicPath yangAtomicPathPath = new YangAtomicPath();
-            YangNodeIdentifier nodeIdentifier = getValidNodeIdentifier(uniqueValue, UNIQUE_DATA, ctx);
-            yangAtomicPathPath.setNodeIdentifier(nodeIdentifier);
-            atomicPath.add(yangAtomicPathPath);
-            if (nodeIdentifier.getPrefix() != null && nodeIdentifier.getPrefix() != prefixOfFile) {
-                ParserException parserException =
-                        new ParserException("YANG file error : A leaf reference, in unique," +
-                                                    " must refer to a leaf in the list");
-                parserException.setLine(ctx.getStart().getLine());
-                parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-                throw parserException;
+        List<YangAtomicPath> pathList = new LinkedList<>();
+        String[] path = val.split(SLASH_FOR_STRING);
+        for (String uniVal : path) {
+            YangAtomicPath atomicPath = new YangAtomicPath();
+            YangNodeIdentifier nodeId = getValidNodeIdentifier(
+                    uniVal, UNIQUE_DATA, ctx);
+            atomicPath.setNodeIdentifier(nodeId);
+            pathList.add(atomicPath);
+            if (nodeId.getPrefix() != null &&
+                    !nodeId.getPrefix().equals(prefix)) {
+                ParserException exc = new ParserException(E_LEAF_REF);
+                exc.setLine(ctx.getStart().getLine());
+                exc.setCharPosition(ctx.getStart().getCharPositionInLine());
+                throw exc;
             }
         }
-        return atomicPath;
+        return pathList;
     }
 
-    /**
-     * Validates unique field from the list.
-     *
-     * @param yangList instance of YANG list
-     * @param ctx      yang construct's context to get the line number and character position
-     */
-    public static void validateUniqueInList(YangList yangList, ParserRuleContext ctx) {
-        YangLeaf leaf;
-        // Returns the prefix for the file where unique is present.
-        String prefixOfTheFile = getRootPrefix(yangList);
-        List<String> uniques = yangList.getUniqueList();
+    public static void addUniqueHolderToRoot(YangUniqueHolder holder) {
+        List<List<YangAtomicPath>> uniques = holder.getPathList();
         if (uniques != null && !uniques.isEmpty()) {
-            Iterator<String> uniqueList = uniques.listIterator();
-            while (uniqueList.hasNext()) {
-                String pathInUnique = uniqueList.next();
-                List<YangAtomicPath> atomicPathInUnique = validateUniqueValues(pathInUnique, prefixOfTheFile, ctx);
-                YangAtomicPath leafInPath = atomicPathInUnique.get(atomicPathInUnique.size() - 1);
-                if (atomicPathInUnique.size() == 1) {
-                    leaf = getReferenceLeafFromUnique(yangList, leafInPath);
-                } else {
-                    atomicPathInUnique.remove(atomicPathInUnique.size() - 1);
-                    YangNode holderOfLeaf = getNodeUnderListFromPath(atomicPathInUnique, yangList, ctx);
-                    leaf = getReferenceLeafFromUnique(holderOfLeaf, leafInPath);
-                }
-                if (leaf == null) {
-                    ParserException parserException =
-                            new ParserException("YANG file error : A leaf reference, in unique," +
-                                                        " must refer to a leaf under the list");
-                    parserException.setLine(ctx.getStart().getLine());
-                    parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-                    throw parserException;
-                }
-            }
+            YangReferenceResolver root = (YangReferenceResolver) getRootNode(
+                    (YangNode) holder);
+            root.addToUniqueHolderList(holder);
         }
     }
 
     /**
-     * Returns the last node under the unique path.
+     * Validates unique from the list.
      *
-     * @param uniquePath atomic path list
-     * @param node       root node from where it starts searching
-     * @param ctx        yang construct's context to get the line number and character position
-     * @return last node in the list
+     * @param holder unique holder
+     * @param val    path of unique
+     * @param ctx    yang construct's context
+     * @return list of yang atomic path
      */
-    private static YangNode getNodeUnderListFromPath(List<YangAtomicPath> uniquePath, YangNode node,
-                                                     ParserRuleContext ctx) {
-        Iterator<YangAtomicPath> nodesInReference = uniquePath.listIterator();
-        YangNode potentialReferredNode = node.getChild();
-        while (nodesInReference.hasNext()) {
-            YangAtomicPath nodeInUnique = nodesInReference.next();
-            YangNode referredNode = getReferredNodeFromTheUniqueNodes(nodeInUnique.getNodeIdentifier(),
-                                                                      potentialReferredNode);
-            if (referredNode == null) {
-                ParserException parserException =
-                        new ParserException("YANG file error : The target node in unique " +
-                                                    "reference path is invalid");
-                parserException.setLine(ctx.getStart().getLine());
-                parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-                throw parserException;
-            } else {
-                potentialReferredNode = referredNode.getChild();
-            }
-        }
-        return potentialReferredNode;
-    }
-
-    /**
-     * Returns the node that matches with the name of the node in path.
-     *
-     * @param nodeInUnique          node name in path
-     * @param potentialReferredNode node under which it has to match
-     * @return referred node
-     */
-    private static YangNode getReferredNodeFromTheUniqueNodes(YangNodeIdentifier nodeInUnique, YangNode
-            potentialReferredNode) {
-        while (potentialReferredNode != null) {
-            // Check if the potential referred node is the actual referred node
-            if (potentialReferredNode.getName().equals(nodeInUnique.getName())) {
-                return potentialReferredNode;
-            }
-            potentialReferredNode = potentialReferredNode.getNextSibling();
-        }
-        return null;
-    }
-
-    /**
-     * Returns the leaf which unique refers.
-     *
-     * @param nodeForLeaf  last node where leaf is referred
-     * @param leafInUnique leaf in unique path
-     * @return YANG leaf
-     */
-    private static YangLeaf getReferenceLeafFromUnique(YangNode nodeForLeaf, YangAtomicPath leafInUnique) {
-        YangLeavesHolder leavesHolder = (YangLeavesHolder) nodeForLeaf;
-        List<YangLeaf> leaves = leavesHolder.getListOfLeaf();
-        if (leaves != null && !leaves.isEmpty()) {
-            for (YangLeaf leaf : leaves) {
-                if (leafInUnique.getNodeIdentifier().getName().equals(leaf.getName())) {
-                    return leaf;
-                }
-            }
-        }
-        return null;
+    public static List<YangAtomicPath> validateUniqueInList(YangUniqueHolder holder,
+                                                            String val,
+                                                            ParserRuleContext ctx) {
+        YangNode node = (YangNode) holder;
+        String rootPre = getRootPrefix(node);
+        return validateUniqueValues(val, rootPre, ctx);
     }
 
     /**
@@ -572,7 +492,7 @@ public final class ListenerUtil {
      * @param curNode YANG node
      * @return prefix of the root node
      */
-    public static String getRootPrefix(YangNode curNode) {
+    private static String getRootPrefix(YangNode curNode) {
 
         String prefix;
         YangNode node = getRootNode(curNode);

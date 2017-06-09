@@ -76,9 +76,9 @@ public class YangDeviateAdd implements YangConfig, Parsable,
     private List<YangMust> mustConstraintList;
 
     /**
-     * List of unique leaf names.
+     * List of unique atomic path list.
      */
-    private List<String> uniqueList;
+    private List<List<YangAtomicPath>> pathList;
 
     /**
      * Default value in string, needs to be converted to the target object,
@@ -107,11 +107,17 @@ public class YangDeviateAdd implements YangConfig, Parsable,
     private YangMinElement minElements;
 
     /**
+     * List of unique leaves.
+     */
+    private List<YangLeaf> uniqueLeaves;
+
+    /**
      * Creates a YANG deviate add object.
      */
     public YangDeviateAdd() {
         mustConstraintList = new LinkedList<>();
-        uniqueList = new LinkedList<>();
+        pathList = new LinkedList<>();
+        uniqueLeaves = new LinkedList<>();
     }
 
     @Override
@@ -255,37 +261,52 @@ public class YangDeviateAdd implements YangConfig, Parsable,
     }
 
     /**
-     * Returns the list of unique field names.
+     * Adds unique path in data holder.
      *
-     * @return the list of unique field names
+     * @param path unique path
      */
     @Override
-    public List<String> getUniqueList() {
-        return uniqueList;
+    public void addUnique(List<YangAtomicPath> path) {
+        pathList.add(path);
     }
 
     /**
-     * Sets the list of unique field names.
+     * Sets the list of unique path.
      *
-     * @param uniqueList the list of unique field names
+     * @param pathList unique path list
      */
     @Override
-    public void setUniqueList(List<String> uniqueList) {
-        this.uniqueList = uniqueList;
+    public void setPathList(List<List<YangAtomicPath>> pathList) {
+        this.pathList = pathList;
     }
 
     /**
-     * Adds a unique field name.
+     * Returns the list of unique path from data holder.
      *
-     * @param unique unique field name
-     * @throws DataModelException a violation of data model rules
+     * @return unique path list
      */
     @Override
-    public void addUnique(String unique) throws DataModelException {
-        if (uniqueList.contains(unique)) {
-            throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                                                 " unique");
-        }
-        uniqueList.add(unique);
+    public List<List<YangAtomicPath>> getPathList() {
+        return pathList;
+    }
+
+    /**
+     * Returns the list of unique leaves.
+     *
+     * @return unique leaves
+     */
+    @Override
+    public List<YangLeaf> getUniqueLeaves() {
+        return uniqueLeaves;
+    }
+
+    /**
+     * Adds unique leaf to the unique leaves.
+     *
+     * @param uniqueLeaf YANG leaf
+     */
+    @Override
+    public void addUniqueLeaf(YangLeaf uniqueLeaf) {
+        uniqueLeaves.add(uniqueLeaf);
     }
 }

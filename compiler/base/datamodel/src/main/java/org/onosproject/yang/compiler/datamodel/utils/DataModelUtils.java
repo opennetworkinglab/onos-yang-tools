@@ -48,6 +48,7 @@ import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangMust;
 import org.onosproject.yang.compiler.datamodel.YangMustHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
@@ -75,9 +76,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -119,6 +122,12 @@ public final class DataModelUtils {
     private static final String E_DATATYPE = "Data type not supported.";
     public static final String E_ID = "Schema id should not be null.";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final String E_INVALID_REF = "YANG file error: A leaf " +
+            "reference, in unique, does not refer to a leaf under the list";
+    private static final String E_UNIQUE = "YANG file error: Same leaf " +
+            "cannot be mentioned more than one time in the unique statement";
+    private static final String E_TARGET_NODE = "YANG file error: The target" +
+            " node in unique reference path is invalid";
 
     /**
      * Creates a new data model tree utility.
@@ -1088,8 +1097,8 @@ public final class DataModelUtils {
 
         // delete unique statement
         if (targetNode instanceof YangUniqueHolder
-                && !deviateDelete.getUniqueList().isEmpty()) {
-            deviateDelete.setUniqueList(new LinkedList<>());
+                && !deviateDelete.getPathList().isEmpty()) {
+            deviateDelete.setPathList(new LinkedList<>());
         }
 
         // delete units statement
@@ -1125,9 +1134,9 @@ public final class DataModelUtils {
 
         // update unique statement
         if (targetNode instanceof YangUniqueHolder
-                && !deviateAdd.getUniqueList().isEmpty()) {
-            Iterator<String> uniqueList = deviateAdd.getUniqueList()
-                    .listIterator();
+                && !deviateAdd.getPathList().isEmpty()) {
+            ListIterator<List<YangAtomicPath>> uniqueList = deviateAdd
+                    .getPathList().listIterator();
             while (uniqueList.hasNext()) {
                 ((YangUniqueHolder) targetNode).addUnique(uniqueList.next());
             }
@@ -1387,6 +1396,105 @@ public final class DataModelUtils {
             default:
                 throw new IllegalArgumentException(E_DATATYPE);
         }
+    }
+
+    /**
+     * Validates the path in unique and gets the referred leaf.
+     *
+     * @param holder holder of unique
+     * @throws DataModelException a violation of data model rules
+     */
+    public static void validateUniqueInList(YangUniqueHolder holder)
+            throws DataModelException {
+        YangLeaf leaf;
+        List<List<YangAtomicPath>> uniques = holder.getPathList();
+        if (uniques != null && !uniques.isEmpty()) {
+            for (List<YangAtomicPath> path : uniques) {
+                List<YangAtomicPath> newPath = new LinkedList<>(path);
+                YangAtomicPath pLeaf = newPath.get(newPath.size() - 1);
+                if (newPath.size() == 1) {
+                    leaf = getLeaf((YangNode) holder, pLeaf);
+                } else {
+                    newPath.remove(newPath.size() - 1);
+                    YangNode leafHolder = getRefNode(newPath, (YangNode) holder);
+                    leaf = getLeaf(leafHolder, pLeaf);
+                }
+                if (leaf == null) {
+                    throw new DataModelException(E_INVALID_REF);
+                }
+                holder.addUniqueLeaf(leaf);
+            }
+            List<YangLeaf> leaves = holder.getUniqueLeaves();
+            Map<YangLeaf, Integer> map = new HashMap<YangLeaf, Integer>();
+            for (YangLeaf lf : leaves) {
+                if (map.containsKey(lf)) {
+                    throw new DataModelException(E_UNIQUE);
+                }
+                map.put(lf, 0);
+            }
+        }
+    }
+
+    /**
+     * Returns the leaf from leaves holder.
+     *
+     * @param holder root node from where it starts searching
+     * @param pLeaf  yang atomic path
+     * @return yang leaf from leaves holder
+     */
+    private static YangLeaf getLeaf(YangNode holder, YangAtomicPath pLeaf) {
+        YangLeavesHolder leavesHolder = (YangLeavesHolder) holder;
+        List<YangLeaf> leaves = leavesHolder.getListOfLeaf();
+        if (leaves != null && !leaves.isEmpty()) {
+            for (YangLeaf leaf : leaves) {
+                if (pLeaf.getNodeIdentifier().getName()
+                        .equals(leaf.getName())) {
+                    return leaf;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the last node under the unique path.
+     *
+     * @param path   atomic path list
+     * @param holder root node
+     * @return last node in the list
+     * @throws DataModelException a violation of data model rules
+     */
+    private static YangNode getRefNode(List<YangAtomicPath> path, YangNode holder)
+            throws DataModelException {
+        Iterator<YangAtomicPath> nodes = path.listIterator();
+        YangNode potRefNode = null;
+        while (nodes.hasNext()) {
+            potRefNode = holder.getChild();
+            YangAtomicPath node = nodes.next();
+            potRefNode = getNode(node.getNodeIdentifier(), potRefNode);
+            if (potRefNode == null) {
+                throw new DataModelException(E_TARGET_NODE);
+            }
+        }
+        return potRefNode;
+    }
+
+    /**
+     * Returns referred node.
+     *
+     * @param nodeId     node identifier
+     * @param potRefNode potential referred node
+     * @return potential referred node
+     */
+    private static YangNode getNode(YangNodeIdentifier nodeId,
+                                    YangNode potRefNode) {
+        while (potRefNode != null) {
+            if (potRefNode.getName().equals(nodeId.getName())) {
+                return potRefNode;
+            }
+            potRefNode = potRefNode.getNextSibling();
+        }
+        return null;
     }
 
     /**

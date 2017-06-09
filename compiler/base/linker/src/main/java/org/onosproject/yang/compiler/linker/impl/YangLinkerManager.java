@@ -93,6 +93,8 @@ public class YangLinkerManager
 
         // Carry out inter-file linking.
         processInterFileLinking(yangNodeSet);
+
+        processUniqueLinking(yangNodeSet);
     }
 
     /**
@@ -203,6 +205,42 @@ public class YangLinkerManager
                         yangNode.getFileName() + " at " +
                         "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                         + e.getLocalizedMessage();
+                throw new LinkerException(errorInfo);
+                // TODO add file path in exception message in util manager.
+            }
+        }
+    }
+
+    /**
+     * Processes unique linking, which takes place after all linking.
+     *
+     * @param nodeSet set of YANG files info
+     * @throws LinkerException a violation in linker execution
+     */
+    public void processUniqueLinking(Set<YangNode> nodeSet)
+            throws LinkerException {
+        List<YangNode> list = new LinkedList<>();
+        list.addAll(nodeSet);
+        sort(list);
+        for (YangNode yangNode : list) {
+            try {
+                YangReferenceResolver resolver =
+                        ((YangReferenceResolver) yangNode);
+                resolver.resolveUniqueLinking();
+            } catch (DataModelException e) {
+                String errorInfo = "Error in file: " + yangNode.getName() +
+                        " in " + yangNode.getFileName() + " at " +
+                        "line: " + e.getLineNumber() + " at position: " +
+                        e.getCharPositionInLine() + NEW_LINE +
+                        e.getLocalizedMessage();
+                throw new LinkerException(errorInfo);
+                // TODO add file path in exception message in util manager.
+            } catch (LinkerException e) {
+                String errorInfo = "Error in file: " + yangNode.getName() +
+                        " in " + yangNode.getFileName() + " at " +
+                        "line: " + e.getLineNumber() + " at position: " +
+                        e.getCharPositionInLine() + NEW_LINE +
+                        e.getLocalizedMessage();
                 throw new LinkerException(errorInfo);
                 // TODO add file path in exception message in util manager.
             }

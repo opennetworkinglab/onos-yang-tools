@@ -1,0 +1,12 @@
+module TestDescendent {
+    yang-version 1;
+    namespace http://huawei.com;
+    prefix Ant;
+    list networks {
+        key "abc";
+        unique "/abc";
+        leaf abc {
+        type "String";
+        }
+    }
+}

@@ -148,9 +148,12 @@ public abstract class YangList
      * default values, MUST be unique within all list entry instances in
      * which all referenced leafs exist.
      * <p>
-     * List of unique leaf/leaf-list names
      */
-    private List<String> uniqueList;
+
+    /**
+     * List of unique atomic path list.
+     */
+    private List<List<YangAtomicPath>> pathList;
 
     /**
      * List of leaves.
@@ -242,6 +245,11 @@ public abstract class YangList
     private boolean defaultDenyAll;
 
     /**
+     * List of unique leaves.
+     */
+    private List<YangLeaf> uniqueLeaves;
+
+    /**
      * Creates a YANG list object.
      */
     public YangList() {
@@ -250,7 +258,8 @@ public abstract class YangList
         listOfLeafList = new LinkedList<>();
         mustConstraintList = new LinkedList<>();
         ifFeatureList = new LinkedList<>();
-        uniqueList = new LinkedList<>();
+        pathList = new LinkedList<>();
+        uniqueLeaves = new LinkedList<>();
         keyList = new LinkedHashSet<>();
     }
 
@@ -354,26 +363,6 @@ public abstract class YangList
     }
 
     /**
-     * Returns the list of unique field names.
-     *
-     * @return the list of unique field names
-     */
-    @Override
-    public List<String> getUniqueList() {
-        return uniqueList;
-    }
-
-    /**
-     * Sets the list of unique field names.
-     *
-     * @param uniqueList the list of unique field names
-     */
-    @Override
-    public void setUniqueList(List<String> uniqueList) {
-        this.uniqueList = uniqueList;
-    }
-
-    /**
      * Returns the set of key field names.
      *
      * @return the set of key field names
@@ -421,26 +410,31 @@ public abstract class YangList
     }
 
     /**
-     * Adds a unique field name.
+     * Adds a unique path to the list.
      *
-     * @param unique unique field name.
-     * @throws DataModelException a violation of data model rules
+     * @param path unique path
      */
     @Override
-    public void addUnique(String unique)
-            throws DataModelException {
-        if (getUniqueList() == null) {
-            setUniqueList(new LinkedList<>());
-        }
-        if (getUniqueList().contains(unique)) {
-            throw new DataModelException("A leaf identifier must not appear more than once in the\n" +
-                                                 "   unique" +
-                                                 getName() + " in " +
-                                                 getLineNumber() + " at " +
-                                                 getCharPosition() +
-                                                 " in " + getFileName() + "\"");
-        }
-        getUniqueList().add(unique);
+    public void addUnique(List<YangAtomicPath> path) {
+        pathList.add(path);
+    }
+
+    /**
+     * Sets the list of unique path list.
+     *
+     * @param pathList the list of unique path list
+     */
+    public void setPathList(List<List<YangAtomicPath>> pathList) {
+        this.pathList = pathList;
+    }
+
+    /**
+     * Returns the list of unique field names.
+     *
+     * @return the list of unique field names
+     */
+    public List<List<YangAtomicPath>> getPathList() {
+        return pathList;
     }
 
     /**
@@ -461,6 +455,26 @@ public abstract class YangList
     @Override
     public void setListOfLeaf(List<YangLeaf> leafsList) {
         listOfLeaf = leafsList;
+    }
+
+    /**
+     * Returns a list of unique leaves.
+     *
+     * @return the list of unique leaves
+     */
+    @Override
+    public List<YangLeaf> getUniqueLeaves() {
+        return uniqueLeaves;
+    }
+
+    /**
+     * Adds a unique leaf to unique leaves.
+     *
+     * @param uniqueLeaf YANG leaf
+     */
+    @Override
+    public void addUniqueLeaf(YangLeaf uniqueLeaf) {
+        uniqueLeaves.add(uniqueLeaf);
     }
 
     /**

@@ -39,6 +39,7 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SI
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateUniqueInList;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.MODULE_DATA;
 
 /*-
@@ -271,6 +272,11 @@ public abstract class YangModule
     private final List<YangAugment> augments;
 
     /**
+     * List of unique identifiers List.
+     */
+    private List<YangUniqueHolder> uniqueHolderList;
+
+    /**
      * YANG defined namespace.
      */
     private String namespace;
@@ -310,6 +316,7 @@ public abstract class YangModule
         listOfFeature = new LinkedList<>();
         notificationEnumMap = new HashMap<>();
         augments = new LinkedList<>();
+        uniqueHolderList = new LinkedList<>();
     }
 
     @Override
@@ -420,6 +427,16 @@ public abstract class YangModule
     @Override
     public void setIncludeList(List<YangInclude> includeList) {
         this.includeList = includeList;
+    }
+
+    /**
+     * Adds a unique holder to a unique holder list.
+     *
+     * @param uniqueHolder
+     */
+    @Override
+    public void addToUniqueHolderList(YangUniqueHolder uniqueHolder) {
+        uniqueHolderList.add(uniqueHolder);
     }
 
     /**
@@ -657,6 +674,17 @@ public abstract class YangModule
     }
 
     /**
+     * Validates each yang unique holder in the unique holder list.
+     *
+     * @throws DataModelException a violation of data model rules
+     */
+    public void resolveUniqueLinking() throws DataModelException {
+        for (YangUniqueHolder holder : uniqueHolderList) {
+            validateUniqueInList(holder);
+        }
+    }
+
+    /**
      * Returns the type of the parsed data.
      *
      * @return returns MODULE_DATA
@@ -863,6 +891,15 @@ public abstract class YangModule
      */
     public List<YangAugment> getAugmentList() {
         return unmodifiableList(augments);
+    }
+
+    /**
+     * Returns a list of uniqueholders.
+     *
+     * @return unique holder list
+     */
+    public List<YangUniqueHolder> getUniqueHolderList() {
+        return uniqueHolderList;
     }
 
     @Override

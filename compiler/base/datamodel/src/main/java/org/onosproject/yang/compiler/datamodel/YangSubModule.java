@@ -40,6 +40,7 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SI
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateUniqueInList;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.SUB_MODULE_DATA;
 
 /*
@@ -270,6 +271,11 @@ public abstract class YangSubModule
     private final List<YangAugment> augments;
 
     /**
+     * List of unique identifiers List.
+     */
+    private List<YangUniqueHolder> uniqueHolderList;
+
+    /**
      * YANG defined namespace.
      */
     private String namespace;
@@ -313,6 +319,7 @@ public abstract class YangSubModule
         listOfFeature = new LinkedList<>();
         notificationEnumMap = new HashMap<>();
         augments = new LinkedList<>();
+        uniqueHolderList = new LinkedList<>();
     }
 
     @Override
@@ -870,6 +877,25 @@ public abstract class YangSubModule
         return unmodifiableList(augments);
     }
 
+    /**
+     * Returns a list of unique holders.
+     *
+     * @return uniqueHolderList
+     */
+    public List<YangUniqueHolder> getUniqueHolderList() {
+        return uniqueHolderList;
+    }
+
+    /**
+     * Add a unique holder to unique holder list.
+     *
+     * @param uniqueHolder yanguniqueholder
+     */
+    @Override
+    public void addToUniqueHolderList(YangUniqueHolder uniqueHolder) {
+        uniqueHolderList.add(uniqueHolder);
+    }
+
     @Override
     public String getModuleNamespace() {
         return namespace;
@@ -902,6 +928,18 @@ public abstract class YangSubModule
     @Override
     public void setModuleForDeviation(boolean moduleForDeviation) {
         isModuleForDeviation = moduleForDeviation;
+    }
+
+    /**
+     * Resolve unique linking.
+     *
+     * @throws DataModelException a violation in data model rule
+     */
+    @Override
+    public void resolveUniqueLinking() throws DataModelException {
+        for (YangUniqueHolder holder : uniqueHolderList) {
+            validateUniqueInList(holder);
+        }
     }
 
     /**

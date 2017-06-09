@@ -1,0 +1,11 @@
+module TestHolder {
+    yang-version 1;
+    namespace http://huawei.com;
+    prefix Hold;
+    container birds {
+            unique "abc"
+            leaf abc {
+                type "String";
+            }
+    }
+}

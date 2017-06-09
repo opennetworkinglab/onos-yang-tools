@@ -16,8 +16,6 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
-import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-
 import java.util.List;
 
 /**
@@ -27,24 +25,37 @@ import java.util.List;
 public interface YangUniqueHolder {
 
     /**
-     * Adds unique in data holder like list.
+     * Adds unique path in data holder like list.
      *
-     * @param unique the unique to be added
-     * @throws DataModelException if any violation of data model rules
+     * @param path unique path
      */
-    void addUnique(String unique) throws DataModelException;
+    void addUnique(List<YangAtomicPath> path);
 
     /**
-     * Sets the list of unique.
+     * Sets the list of unique path.
      *
-     * @param uniqueList the list of unique to set
+     * @param pathList unique path list
      */
-    void setUniqueList(List<String> uniqueList);
+    void setPathList(List<List<YangAtomicPath>> pathList);
 
     /**
-     * Returns the list of unique from data holder like list.
+     * Returns the list of unique path from data holder like list.
      *
-     * @return the list of unique
+     * @return unique path list
      */
-    List<String> getUniqueList();
+    List<List<YangAtomicPath>> getPathList();
+
+    /**
+     * Returns the list of YANG leaves, unique was referring to.
+     *
+     * @return YANG leaves list
+     */
+    List<YangLeaf> getUniqueLeaves();
+
+    /**
+     * Adds the YANG leaf, unique is referring to.
+     *
+     * @param uniqueLeaf YANG leaf
+     */
+    void addUniqueLeaf(YangLeaf uniqueLeaf);
 }

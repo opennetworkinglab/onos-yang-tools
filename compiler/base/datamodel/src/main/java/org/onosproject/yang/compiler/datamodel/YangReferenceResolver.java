@@ -45,6 +45,13 @@ public interface YangReferenceResolver {
                              ResolvableType type);
 
     /**
+     * Adds a unique holder to unique holder list.
+     *
+     * @param uniqueHolder yanguniqueholder
+     */
+    void addToUniqueHolderList(YangUniqueHolder uniqueHolder);
+
+    /**
      * Creates resolution list.
      *
      * @param resolutionList resolution list
@@ -80,6 +87,13 @@ public interface YangReferenceResolver {
      * @return unresolved include list
      */
     List<YangInclude> getIncludeList();
+
+    /**
+     * Returns list of unique holders.
+     *
+     * @return unique holder list
+     */
+    List<YangUniqueHolder> getUniqueHolderList();
 
     /**
      * Adds to the include list.
@@ -126,6 +140,13 @@ public interface YangReferenceResolver {
      */
     void resolveInterFileLinking(ResolvableType type)
             throws DataModelException;
+
+    /**
+     * Resolves unique linking.
+     *
+     * @throws DataModelException a violation in data model rule
+     */
+    void resolveUniqueLinking() throws DataModelException;
 
     /**
      * Adds references to include.

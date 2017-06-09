@@ -1,0 +1,19 @@
+module ietf-network {
+    yang-version 1;
+    namespace http://huawei.com;
+    prefix net;
+    list networks {
+        key "val";
+        unique "groupingleaf";
+        leaf val {
+            type string;
+        }
+        uses forgrouping;
+    }
+
+    grouping forgrouping {
+        leaf groupingleaf {
+            type string;
+        }
+    }
+}
