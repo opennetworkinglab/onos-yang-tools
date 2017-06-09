@@ -116,7 +116,7 @@ public class JsonSerializer implements YangSerializer {
         checkNotNull(compositeData, "compositeData cannot be null");
 
         String uriString = convertRidToUri(compositeData.resourceData().
-                resourceId());
+                resourceId(), yangSerializerContext);
         InputStream inputStream = null;
         ObjectNode rootNode = null;
 

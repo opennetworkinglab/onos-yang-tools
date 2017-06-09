@@ -47,7 +47,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
 
 /**
  * Unit Test for Json Serializer.
@@ -91,6 +94,32 @@ public class JsonSerializerTest {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    @Test
+    public void testContainerInResourceIdToUri() {
+        ResourceId rid = ResourceId.builder().addBranchPointSchema("/", null)
+                .addBranchPointSchema("device", "namespace1")
+                .addBranchPointSchema("device", "namespace1")
+                .addKeyLeaf("deviceid", "namespace1", "val").build();
+        String uriString = convertRidToUri(rid, context);
+        assertThat(uriString, is("demo1:device/device=val"));
+        rid = ResourceId.builder().addBranchPointSchema("/", null)
+                .addBranchPointSchema("device", "namespace1")
+                .addBranchPointSchema("Purchasing-supervisor", "namespace1")
+                .addBranchPointSchema("cont7", "namespace1").build();
+        uriString = convertRidToUri(rid, context);
+        assertThat(uriString, is("demo1:device/Purchasing-supervisor/cont7"));
+    }
+
+    @Test
+    public void testListInResourceIdToUri() {
+        ResourceId rid = ResourceId.builder().addBranchPointSchema("/", null)
+                .addBranchPointSchema("list1", "namespace1")
+                .addKeyLeaf("leaf1", "namespace1", "val")
+                .build();
+        String uriString = convertRidToUri(rid, context);
+        assertThat(uriString, is("demo1:list1=val"));
     }
 
     /**

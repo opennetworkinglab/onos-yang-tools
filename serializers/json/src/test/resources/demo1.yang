@@ -9,55 +9,67 @@ module demo1 {
             leaf deviceid {
                 type string;
             }
-    	    leaf Customs-supervisor {
-        	type string;
-        	description "name of the customs-supervisor.";
-    	    }
+            leaf Customs-supervisor {
+                type string;
+                description "name of the customs-supervisor.";
+            }
 
-    	    leaf Merchandiser-supervisor {
-        	type string;
-        	description "name of merchandiser-supervisor";
-    	    }
+            leaf Merchandiser-supervisor {
+                type string;
+                description "name of merchandiser-supervisor";
+            }
 
-    	    list Material-supervisor {
-        	key "name";
-        	leaf name {
-            		type string;
-            		description "name of logistics-supervisor";
-        	}
+            list Material-supervisor {
+                key "name";
+                leaf name {
+                    type string;
+                    description "name of logistics-supervisor";
+            }
 
-        	leaf departmentId {
-            		type string;
-            		description "name of department";
-        	}
-    	    }
+            leaf departmentId {
+                type string;
+                description "name of department";
+            }
+        }
 
-    	    container Purchasing-supervisor {
-        	leaf purchasing-specialist {
-            		type string;
-            		description "name of the purchasing-specialist person";
-        	}
+        container Purchasing-supervisor {
+            leaf purchasing-specialist {
+                type string;
+                description "name of the purchasing-specialist person";
+            }
 
-        	leaf-list support {
-            		type string;
-            		description "name of the support person";
-        	}
-    	    }
+            leaf-list support {
+                type string;
+                description "name of the support person";
+            }
+            }
 
-    	    leaf-list Warehouse-supervisor {
-        	type string;
-        	description "name of the warehouse-supervisor's";
-    	    }
+            leaf-list Warehouse-supervisor {
+                type string;
+                description "name of the warehouse-supervisor's";
+            }
 
-    	    leaf Trading-supervisor {
-        	type string;
-        	description "name of the trading-supervisor";
-    	    }
+            leaf Trading-supervisor {
+                type string;
+                description "name of the trading-supervisor";
+            }
 
-    	    leaf-list Employee-id {
-        	type string;
-        	description "list of the employee id";
-    	    }
+            leaf-list Employee-id {
+                type string;
+                description "list of the employee id";
+            }
+            container cont7 {
+               leaf leaf8 {
+                  type string;
+               }
+            }
+        }
+    }
+
+    list list1 {
+        key leaf1;
+        leaf leaf1 {
+            type string;
         }
     }
 }

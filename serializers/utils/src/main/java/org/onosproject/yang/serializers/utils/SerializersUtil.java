@@ -44,6 +44,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.trimAtLast;
+import static org.onosproject.yang.runtime.SerializerHelper.getModuleNameFromNameSpace;
 
 /**
  * Utilities for serializers.
@@ -306,10 +308,12 @@ public final class SerializersUtil {
     /**
      * Converts a resource identifier to URI string.
      *
-     * @param rid resource identifier
+     * @param rid     resource identifier
+     * @param context YANG serializer context
      * @return URI
      */
-    public static String convertRidToUri(ResourceId rid) {
+    public static String convertRidToUri(ResourceId rid,
+                                         YangSerializerContext context) {
         if (rid == null) {
             return null;
         }
@@ -318,31 +322,39 @@ public final class SerializersUtil {
         List<NodeKey> nodeKeyList = rid.nodeKeys();
         String curNameSpace = null;
         for (NodeKey key : nodeKeyList) {
-            curNameSpace = addNodeKeyToUri(key, curNameSpace, uriBuilder);
+            curNameSpace = addNodeKeyToUri(key, curNameSpace, uriBuilder, context);
         }
-        return uriBuilder.toString();
+        return trimAtLast(uriBuilder.toString(), SLASH);
     }
 
     private static String addNodeKeyToUri(NodeKey key,
                                           String curNameSpace,
-                                          StringBuilder uriBuilder) {
-        String newNameSpace;
+                                          StringBuilder uriBuilder,
+                                          YangSerializerContext context) {
+        String newNameSpace = null;
         if (key instanceof LeafListKey) {
-            newNameSpace = addLeafListNodeToUri((LeafListKey) key, curNameSpace, uriBuilder);
+            newNameSpace = addLeafListNodeToUri((LeafListKey) key,
+                                                curNameSpace, uriBuilder, context);
         } else if (key instanceof ListKey) {
-            newNameSpace = addListNodeToUri((ListKey) key, curNameSpace, uriBuilder);
+            newNameSpace = addListNodeToUri((ListKey) key, curNameSpace,
+                                            uriBuilder, context);
         } else {
-            uriBuilder.append(SLASH);
-            newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
+            String name = key.schemaId().name();
+            if (!name.equals(SLASH)) {
+                newNameSpace = addNodeNameToUri(key, curNameSpace,
+                                                uriBuilder, context);
+            }
         }
         return newNameSpace;
     }
 
     private static String addLeafListNodeToUri(LeafListKey key,
                                                String curNameSpace,
-                                               StringBuilder uriBuilder) {
+                                               StringBuilder uriBuilder,
+                                               YangSerializerContext context) {
 
-        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
+        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder,
+                                               context);
         uriBuilder.append(EQUAL);
         uriBuilder.append(key.asString());
         return newNameSpace;
@@ -350,8 +362,10 @@ public final class SerializersUtil {
 
     private static String addListNodeToUri(ListKey key,
                                            String curNameSpace,
-                                           StringBuilder uriBuilder) {
-        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder);
+                                           StringBuilder uriBuilder,
+                                           YangSerializerContext context) {
+        String newNameSpace = addNodeNameToUri(key, curNameSpace, uriBuilder,
+                                               context);
         uriBuilder.append(EQUAL);
         String prefix = "";
         for (KeyLeaf keyLeaf : key.keyLeafs()) {
@@ -365,20 +379,19 @@ public final class SerializersUtil {
 
     private static String addNodeNameToUri(NodeKey key,
                                            String curNameSpace,
-                                           StringBuilder uriBuilder) {
-        String nodeName = key.schemaId().name();
+                                           StringBuilder uriBuilder,
+                                           YangSerializerContext context) {
         String newNameSpace = key.schemaId().namespace();
-
-        uriBuilder.append(nodeName);
-
         if (newNameSpace == null) {
             return curNameSpace;
         }
 
         if (!newNameSpace.equals(curNameSpace)) {
+            uriBuilder.append(getModuleNameFromNameSpace(context, newNameSpace));
             uriBuilder.append(COLON);
-            uriBuilder.append(newNameSpace);
         }
+        uriBuilder.append(key.schemaId().name());
+        uriBuilder.append(SLASH);
 
         return newNameSpace;
     }

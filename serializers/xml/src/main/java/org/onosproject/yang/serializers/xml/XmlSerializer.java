@@ -118,7 +118,7 @@ public class XmlSerializer implements YangSerializer {
         ResourceId resourceId = internal.resourceData().resourceId();
         if (resourceId != null && resourceId.nodeKeys() != null &&
                 !resourceId.nodeKeys().isEmpty()) {
-            uriString = convertRidToUri(resourceId);
+            uriString = convertRidToUri(resourceId, context);
             try {
                 builder = resourceId.copyBuilder();
             } catch (CloneNotSupportedException e) {
