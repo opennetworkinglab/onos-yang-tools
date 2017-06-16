@@ -63,6 +63,8 @@ public final class SerializersUtil {
     private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String SLASH = "/";
+    private static final String URI_ENCODED_SLASH = "%2F";
+    private static final String URI_ENCODED_COLON = "%3A";
 
     // no instantiation
     private SerializersUtil() {
@@ -201,15 +203,7 @@ public final class SerializersUtil {
 
     private static void processSinglePathSegment(String pathSegment,
                                                  ResourceId.Builder builder) {
-        String name = getPreSegment(pathSegment, EQUAL);
-        if (name != null) {
-            String c = getPreSegment(name, COLON);
-            if (c == null) {
-                processPathSegmentWithoutNamespace(pathSegment, builder);
-            } else {
-                // TODO
-            }
-        } else if (pathSegment.contains(COLON)) {
+        if (pathSegment.contains(COLON)) {
             processPathSegmentWithNamespace(pathSegment, builder);
         } else {
             processPathSegmentWithoutNamespace(pathSegment, builder);
@@ -248,14 +242,41 @@ public final class SerializersUtil {
             throw new SerializerUtilException(ERROR_LIST_MSG);
         }
 
+        List<String> keys = uriDecodedKeys(keyStr);
+        SerializerHelper.addToResourceId(builder, nodeName, namespace, keys);
+    }
+
+    private static List<String> uriDecodedKeys(String keyStr) {
+        List<String> decodedKeys = Lists.newArrayList();
+
         if (keyStr.contains(COMMA)) {
-            List<String> keys = Lists.
-                    newArrayList(COMMA_SPLITTER.split(keyStr));
-            SerializerHelper.addToResourceId(builder, nodeName, namespace, keys);
+            List<String> encodedKeys = Lists.newArrayList(COMMA_SPLITTER.split(keyStr));
+            for (String encodedKey : encodedKeys) {
+                decodedKeys.add(uriDecodedString(encodedKey));
+            }
         } else {
-            SerializerHelper.addToResourceId(builder, nodeName, namespace,
-                                             Lists.newArrayList(keyStr));
+            decodedKeys.add(uriDecodedString(keyStr));
         }
+
+        return decodedKeys;
+    }
+
+
+    private static String uriDecodedString(String keyStr) {
+        /*
+         * replaceAll() may be an expensive operation. So, call
+         * contains() to determine if replaceAll() is really need
+         * to be invoked.
+         */
+        if (keyStr.contains(URI_ENCODED_SLASH)) {
+            keyStr = keyStr.replaceAll(URI_ENCODED_SLASH, SLASH);
+        }
+        if (keyStr.contains(URI_ENCODED_COLON)) {
+            keyStr = keyStr.replaceAll(URI_ENCODED_COLON, COLON);
+        }
+        //TODO: need to decode other percentage encoded characters.
+
+        return keyStr;
     }
 
     private static void addLeaf(String nodeName,
