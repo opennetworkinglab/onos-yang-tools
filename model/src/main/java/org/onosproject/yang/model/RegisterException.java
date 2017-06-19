@@ -13,43 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.onosproject.yang.model;
-
-import com.google.common.annotations.Beta;
-
 /**
- * Abstract implementation of an RPC command.
+ * Exceptions for use by the {@code DynamicConfigService}.
  */
-@Beta
-public abstract class RpcCommand {
+public class RegisterException extends RuntimeException {
     /**
-     * Identifier of an RPC command.
+     * Constructs a new runtime exception with no error message.
      */
-    ResourceId cmdId;
-
-    /**
-     * Creates an instance of RpcCommand.
-     *
-     * @param cmdId of RPC command
-     */
-    public RpcCommand(ResourceId cmdId) {
-        this.cmdId = cmdId;
+    public RegisterException() {
+        super();
     }
 
     /**
-     * Returns the RPC command id.
+     * Constructs a new runtime exception with the given error message.
      *
-     * @return cmdId
+     * @param message error message
      */
-    public ResourceId cmdId() {
-        return this.cmdId;
+    public RegisterException(String message) {
+        super(message);
     }
-
-    /**
-     * Executes the RPC command.
-     *
-     * @param input input data to the RPC command.
-     */
-    public abstract void execute(RpcInput input);
 }

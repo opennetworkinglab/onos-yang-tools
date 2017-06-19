@@ -16,12 +16,9 @@
 
 package org.onosproject.yang.model;
 
-import com.google.common.annotations.Beta;
-
 /**
  * Abstraction for RPC output.
  */
-@Beta
 public class RpcOutput {
     public enum Status {
         /**
@@ -41,7 +38,10 @@ public class RpcOutput {
          */
         RPC_TIMEOUT,
     }
-
+    /**
+     * Message id of the Rpc request.
+     */
+    String messageId;
     /**
      * Status of RPC execution.
      */
@@ -49,23 +49,45 @@ public class RpcOutput {
     /**
      * Output data from the RPC execution.
      */
-    DataNode output;
+    DataNode data;
 
     /**
      * Creates an instance of RpcOutput.
      *
      * @param status of RPC execution
-     * @param output of RPC execution
+     * @param data of RPC execution
      */
-    public RpcOutput(Status status, DataNode output) {
+    public RpcOutput(Status status, DataNode data) {
         this.status = status;
-        this.output = output;
+        this.data = data;
+    }
+
+    /**
+     * Creates an instance of RpcOutput.
+     *
+     * @param messageId of the Rpc request
+     * @param status of RPC execution
+     * @param data of RPC execution
+     */
+    public RpcOutput(String messageId, Status status, DataNode data) {
+        this.messageId = messageId;
+        this.status = status;
+        this.data = data;
+    }
+
+    /**
+     * Returns messageId of the Rpc request.
+     *
+     * @return messageId
+     */
+    public String messageId() {
+        return this.messageId;
     }
 
     /**
      * Returns RPC status.
      *
-     * @return Status
+     * @return status
      */
     public RpcOutput.Status status() {
         return this.status;
@@ -74,9 +96,17 @@ public class RpcOutput {
     /**
      * Returns RPC output.
      *
-     * @return DataNode
+     * @return output data
      */
-    public DataNode output() {
-        return this.output;
+    public DataNode data() {
+        return this.data;
+    }
+
+    /**
+     * Sets the messageId in the Rpc output.
+     * @param msgId the msgId to be set in the Rpc output
+     */
+    public void messageId(String msgId) {
+        this.messageId = msgId;
     }
 }

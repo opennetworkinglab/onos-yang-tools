@@ -18,7 +18,7 @@ package org.onosproject.yang.model;
 
 /**
  * Token representation of a YANG RPC end-point.
- * <p>
+ *
  * All generated RPC interfaces will extend this interface.
  */
 public interface RpcService {

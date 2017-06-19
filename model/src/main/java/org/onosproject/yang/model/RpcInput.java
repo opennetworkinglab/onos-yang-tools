@@ -16,17 +16,14 @@
 
 package org.onosproject.yang.model;
 
-import com.google.common.annotations.Beta;
-
 /**
  * Abstraction for RPC input.
  */
-@Beta
 public class RpcInput {
     /**
      * Input data to the RPC execution.
      */
-    DataNode input;
+    private DataNode data;
 
     /**
      * TODO
@@ -39,18 +36,18 @@ public class RpcInput {
     /**
      * Creates an instance of RpcInput.
      *
-     * @param input to RPC execution
+     * @param data input for thr Rpc execution
      */
-    public RpcInput(DataNode input) {
-        this.input = input;
+    public RpcInput(DataNode data) {
+        this.data = data;
     }
 
     /**
-     * Returns RPC input.
+     * Returns the data specified in this input.
      *
-     * @return DataNode
+     * @return data specified in this input
      */
-    public DataNode input() {
-        return this.input;
+    public DataNode data() {
+        return this.data;
     }
 }
