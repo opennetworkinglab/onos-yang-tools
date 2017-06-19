@@ -34,6 +34,11 @@ import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.E
 import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum2Enum;
 import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.DefaultSched;
 import org.onosproject.yang.gen.v1.ytbmodulewithleaflist.rev20160826.YtbModuleWithLeafList;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.DefaultContentInput;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.DefaultContentOutput;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentinput.DefaultIn;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentinput.InTypedef;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentoutput.outch.DefaultFirst;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.DefaultCarrier;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.DefaultMultiplexes;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.Multiplexes;
@@ -60,6 +65,7 @@ import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestOutp
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -91,9 +97,10 @@ import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
  */
 public class DefaultDataTreeBuilderTest {
 
+    private final TestYangSchemaNodeProvider schemaProvider = new
+            TestYangSchemaNodeProvider();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
     private ResourceData rscData;
     private DefaultDataTreeBuilder treeBuilder;
     private DefaultYangModelRegistry registry;
@@ -105,8 +112,6 @@ public class DefaultDataTreeBuilderTest {
     private DataNode node;
     private ModelObjectId mid;
     private DefaultModelObjectData.Builder data;
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
 
     /**
      * Do the prior setup for each UT.
@@ -1184,5 +1189,67 @@ public class DefaultDataTreeBuilderTest {
         childNode = ((InnerNode) childNode).childNodes().get(key);
         validateDataNode(childNode, "type", ns, SINGLE_INSTANCE_LEAF_VALUE_NODE,
                          false, "tunnel-p2p");
+    }
+
+    /**
+     * Unit test for RPC with grouping and augment in file.
+     */
+    @Test
+    public void processRpc() {
+        setUp();
+        InTypedef typedef = new InTypedef("con-leaf");
+        DefaultIn con = new DefaultIn();
+        DefaultContentInput input = new DefaultContentInput();
+        con.conIn(typedef);
+        input.in(con);
+
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject(input);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        String ns = "yms:test:ytb:ytb:rpc";
+        List<DataNode> inDn = rscData.dataNodes();
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(2, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = keys.get(1).schemaId();
+        assertThat("content", is(sid.name()));
+        assertThat(ns, is(sid.namespace()));
+
+        DataNode node = inDn.get(0);
+        validateDataNode(node, "input", ns, SINGLE_INSTANCE_NODE, true, null);
+
+        List<Short> ll = new LinkedList<>();
+        DefaultFirst first = new DefaultFirst();
+        DefaultContentOutput output = new DefaultContentOutput();
+
+        ll.add((short) 9);
+        first.call(ll);
+        output.outCh(first);
+
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject(output);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        inDn = rscData.dataNodes();
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(2, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        sid = keys.get(1).schemaId();
+        assertThat("content", is(sid.name()));
+        assertThat(ns, is(sid.namespace()));
+
+        node = inDn.get(0);
+        validateDataNode(node, "output", ns, SINGLE_INSTANCE_NODE, true, null);
     }
 }

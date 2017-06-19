@@ -24,6 +24,7 @@ import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNodeType;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.MultiInstanceLeaf;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_AUGMENT_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
@@ -172,9 +174,10 @@ class ModIdToRscIdConverter {
             // with the input fetchNode's data
             node = node.getChild();
             while (node != null) {
-                if (node.getJavaAttributeName().toLowerCase()
-                        .equals(strArray[i]) &&
-                        node.getYangSchemaNodeType() != YANG_NON_DATA_NODE) {
+                YangSchemaNodeType type = node.getYangSchemaNodeType();
+                if (type != YANG_NON_DATA_NODE && type != YANG_AUGMENT_NODE &&
+                        node.getJavaAttributeName().toLowerCase()
+                                .equals(strArray[i])) {
                     //last index fetchNode will be input fetchNode.
                     lastIndexNode = node.getChild();
                     break;

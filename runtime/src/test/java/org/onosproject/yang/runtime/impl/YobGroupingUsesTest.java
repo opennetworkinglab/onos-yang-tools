@@ -23,31 +23,42 @@ import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.DefaultTe;
 import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelp2pproperties.DefaultState;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.networks.DefaultAugmentedNwNetworks;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.tetopologiesaugment.te.templates.LinkTemplate;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.DefaultContentInput;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.DefaultContentOutput;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentinput.In;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentinput.InTypedef;
+import org.onosproject.yang.gen.v1.ytbrpc.rev20160826.ytbrpc.content.contentoutput.outch.First;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
+import org.onosproject.yang.model.ResourceId;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 
 /**
  * Tests the YANG object building for the YANG data tree based on the non
  * schema augmented nodes.
  */
 public class YobGroupingUsesTest {
-    TestYangSerializerContext context = new TestYangSerializerContext();
+
     private static final String NW_NS = "urn:ietf:params:xml:ns:yang:yrt-ietf-network";
     private static final String TE_NS = "urn:ietf:params:xml:ns:yang:yrt-ietf-te-topology";
     private static final String TE = "urn:ietf:params:xml:ns:yang:ietf-te";
+    private static final String RPC_NS = "yms:test:ytb:ytb:rpc";
+    TestYangSerializerContext context = new TestYangSerializerContext();
     private DataNode.Builder dBlr;
     private String value;
+    private ResourceId.Builder rIdBlr;
 
 
     public DataNode buildDataNodeForInterFileGrouping() {
@@ -129,6 +140,69 @@ public class YobGroupingUsesTest {
         dBlr = exitDataNode(dBlr); // tunnels
         dBlr = exitDataNode(dBlr); // te
         return dBlr.build();
+    }
+
+    private ResourceData.Builder buildDataNodeWithInput() {
+        value = null;
+        rIdBlr = initializeResourceId(context);
+        rIdBlr = addToResourceId(rIdBlr, "content", RPC_NS, value);
+        dBlr = initializeDataNode(rIdBlr);
+        dBlr = addDataNode(dBlr, "input", RPC_NS, value, null);
+        dBlr = addDataNode(dBlr, "in", RPC_NS, value, null);
+        value = "name";
+        dBlr = addDataNode(dBlr, "con-in", RPC_NS, value, null);
+        dBlr = exitDataNode(dBlr);
+        dBlr = exitDataNode(dBlr);
+        return DefaultResourceData.builder().addDataNode(dBlr.build())
+                .resourceId(rIdBlr.build());
+    }
+
+    private ResourceData.Builder buildDataNodeWithOutput() {
+        value = null;
+        rIdBlr = initializeResourceId(context);
+        rIdBlr = addToResourceId(rIdBlr, "content", RPC_NS, value);
+        dBlr = initializeDataNode(rIdBlr);
+        dBlr = addDataNode(dBlr, "output", RPC_NS, value, null);
+        value = "8";
+        dBlr = addDataNode(dBlr, "call", RPC_NS, value, null);
+        dBlr = exitDataNode(dBlr);
+        return DefaultResourceData.builder().addDataNode(dBlr.build())
+                .resourceId(rIdBlr.build());
+    }
+
+    /**
+     * Unit test for rpc input.
+     */
+    @Test
+    public void testRpcInput() {
+        ResourceData.Builder data = buildDataNodeWithInput();
+        DefaultYobBuilder builder = new DefaultYobBuilder(
+                (DefaultYangModelRegistry) context.getContext());
+        ModelObjectData modelObjectData = builder.getYangObject(data.build());
+
+        List<ModelObject> objects = modelObjectData.modelObjects();
+        ModelObject obj = objects.get(0);
+        DefaultContentInput in = ((DefaultContentInput) obj);
+        In input = in.in();
+        InTypedef leaf = input.conIn();
+        assertThat(leaf.string(), is("name"));
+    }
+
+    /**
+     * Unit test for rpc output.
+     */
+    @Test
+    public void testRpcOutput() {
+        ResourceData.Builder data = buildDataNodeWithOutput();
+        DefaultYobBuilder builder = new DefaultYobBuilder(
+                (DefaultYangModelRegistry) context.getContext());
+        ModelObjectData modelObjectData = builder.getYangObject(data.build());
+        List<ModelObject> objects = modelObjectData.modelObjects();
+        ModelObject obj = objects.get(0);
+        DefaultContentOutput out = ((DefaultContentOutput) obj);
+        First first = (First) out.outCh();
+        List<Short> call = first.call();
+        assertThat(call.get(0), is((short) 8));
     }
 
     /**

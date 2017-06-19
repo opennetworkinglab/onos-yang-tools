@@ -1,0 +1,46 @@
+module YtbRpc {
+    yang-version 1;
+    namespace "yms:test:ytb:ytb:rpc";
+    prefix "sch";
+    revision "2016-08-26";
+
+    augment "/content/input/in" {
+        container real {
+            leaf in {
+                type string;
+            }
+        }
+    }
+
+    grouping rpc-group {
+        leaf val {
+            type string;
+        }
+    }
+
+    rpc content {
+        input {
+            typedef in-typedef {
+                type string;
+            }
+            container in {
+                leaf con-in {
+                    type in-typedef;
+                }
+            }
+        }
+
+        output {
+            grouping in-group {
+                leaf-list call {
+                    type uint8;
+                }
+            }
+            choice out-ch {
+                case first {
+                    uses in-group;
+                }
+            }
+        }
+    }
+}
