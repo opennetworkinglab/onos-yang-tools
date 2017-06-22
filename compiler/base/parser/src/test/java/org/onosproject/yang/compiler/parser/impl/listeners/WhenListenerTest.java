@@ -49,7 +49,7 @@ public class WhenListenerTest {
         assertThat(yangNode.getName(), is("Test"));
 
         YangList yangList = (YangList) yangNode.getChild();
-        String expectedConstraint = "../switching-capability = 'TDM'";
+        String expectedConstraint = "../switching-capability = TDM";
         assertThat(yangList.getName(), is("interface-switching-capability"));
         assertThat(yangList.getWhen().getCondition(), is(expectedConstraint));
 
@@ -71,6 +71,6 @@ public class WhenListenerTest {
         ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
         YangLeaf leafInfo = leafIterator.next();
 
-        assertThat(leafInfo.getWhen().getCondition(), is("ifType != 'ethernet'"));
+        assertThat(leafInfo.getWhen().getCondition(), is("ifType != ethernet"));
     }
 }

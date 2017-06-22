@@ -7,7 +7,7 @@ module Test {
             enum ethernet;
             enum atm;
         }
-        must "ifType != 'ethernet'" {
+        must "ifType != ethernet" {
             description "ifType is not ethernet";
         }
     }

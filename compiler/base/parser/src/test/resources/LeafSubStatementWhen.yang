@@ -3,7 +3,7 @@ module Test {
     namespace http://huawei.com;
     prefix Ant;
     leaf ifType {
-        when "ifType != 'ethernet'" {
+        when "ifType != ethernet" {
             description "ifType is not ethernet";
         }
         type enumeration {

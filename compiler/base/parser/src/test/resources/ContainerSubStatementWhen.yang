@@ -3,7 +3,7 @@ module Test {
     namespace "http://huawei.com";
     prefix Ant;
     list interface-switching-capability {
-         when "../switching-capability = 'TDM'" {
+         when "../switching-capability = TDM" {
                  description "Valid only for TDM";
          }
          key "switching-capability";
@@ -22,7 +22,7 @@ module Test {
          }
      }
      container time-division-multiplex-capable {
-         when "../switching-capability = 'TDM'" {
+         when "../switching-capability = TDM" {
              description "Valid only for TDM";
          }
          description

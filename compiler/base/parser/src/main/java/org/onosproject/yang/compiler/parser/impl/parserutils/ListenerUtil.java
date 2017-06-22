@@ -111,7 +111,7 @@ public final class ListenerUtil {
      */
     public static String removeQuotesAndHandleConcat(String yangStringData) {
 
-        yangStringData = yangStringData.replace("\"", EMPTY_STRING);
+        yangStringData = yangStringData.replaceAll("[\'\"]", EMPTY_STRING);
         String[] tmpData = yangStringData.split(Pattern.quote(ADD));
         StringBuilder builder = new StringBuilder();
         for (String yangString : tmpData) {

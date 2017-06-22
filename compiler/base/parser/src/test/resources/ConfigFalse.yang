@@ -11,4 +11,13 @@ module Test {
         status current;
         reference "RFC 6020";
     }
+    leaf invalid-interval1 {
+            type "uint16";
+            units "seconds";
+            description "Interval before a route is declared invalid";
+            config 'false';
+            mandatory 'true';
+            status current;
+            reference "RFC 6020";
+        }
 }

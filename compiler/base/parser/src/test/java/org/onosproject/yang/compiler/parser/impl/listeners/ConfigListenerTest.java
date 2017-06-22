@@ -97,6 +97,11 @@ public class ConfigListenerTest {
         // Check whether the Config value is set correctly.
         assertThat(leafInfo.getName(), is("invalid-interval"));
         assertThat(leafInfo.isConfig(), is(false));
+
+        // Check whether the Config value is validated for single quoted boolean
+        leafInfo = leafIterator.next();
+        assertThat(leafInfo.getName(), is("invalid-interval1"));
+        assertThat(leafInfo.isConfig(), is(false));
     }
 
     /**

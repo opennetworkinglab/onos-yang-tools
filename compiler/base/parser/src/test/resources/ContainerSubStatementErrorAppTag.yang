@@ -12,8 +12,8 @@ module ErrorAppTag {
         leaf ifMTU {
             type uint32;
         }
-        must "ifType != 'ethernet' or " +
-             "(ifType = 'ethernet' and ifMTU = 1500)" {
+        must "ifType != ethernet or " +
+             "(ifType = ethernet and ifMTU = 1500)" {
             description "An ethernet MTU must be 1500";
             error-app-tag "An ethernet MTU must be 1500";
         }

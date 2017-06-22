@@ -50,7 +50,7 @@ public class ErrorAppTagListenerTest {
         YangContainer yangContainer = (YangContainer) yangNode.getChild();
         assertThat(yangContainer.getName(), is("interface"));
 
-        String expectedConstraint = "ifType != 'ethernet' or (ifType = 'ethernet' and ifMTU = 1500)";
+        String expectedConstraint = "ifType != ethernet or (ifType = ethernet and ifMTU = 1500)";
         List<YangMust> mustConstraintList = yangContainer.getListOfMust();
         assertThat(mustConstraintList.iterator().next().getConstraint(), is(expectedConstraint));
 
@@ -72,7 +72,7 @@ public class ErrorAppTagListenerTest {
         YangContainer yangContainer = (YangContainer) yangNode.getChild();
         assertThat(yangContainer.getName(), is("interface"));
 
-        String expectedConstraint = "ifType != 'ethernet' or (ifType = 'ethernet' and ifMTU = 1500)";
+        String expectedConstraint = "ifType != ethernet or (ifType = ethernet and ifMTU = 1500)";
         List<YangMust> mustConstraintList = yangContainer.getListOfMust();
         assertThat(mustConstraintList.iterator().next().getConstraint(), is(expectedConstraint));
 
