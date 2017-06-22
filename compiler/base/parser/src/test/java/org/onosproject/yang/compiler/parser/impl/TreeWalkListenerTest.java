@@ -19,6 +19,7 @@ package org.onosproject.yang.compiler.parser.impl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 
 import java.io.IOException;
@@ -79,5 +80,10 @@ public class TreeWalkListenerTest {
         thrown.expect(ParserException.class);
         thrown.expectMessage("mismatched input 'container' expecting <EOF>");
         manager.getDataModel("src/test/resources/ProcessFileWithExtraBraceInBetween.yang");
+    }
+
+    @Test
+    public void processRightBraceComment() throws IOException, ParserException {
+        YangNode node = manager.getDataModel("src/test/resources/RightBraceComment.yang");
     }
 }

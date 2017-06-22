@@ -1,0 +1,32 @@
+module test {
+    namespace "test:test";
+    prefix test;
+    typedef type1 {
+        type string;
+    }
+    list list1 {
+       key "name sur-name";
+       leaf name {
+          type string;
+       }
+       leaf sur-name {
+           type type1;
+       }
+       choice c1 {
+          case ca1 {
+             leaf a {
+                type int32;
+             }
+          }
+       }
+    }
+    list list2 {
+           key "name sur-name";
+           leaf name {
+              type string;
+           }
+           leaf sur-name {
+               type type1;
+           }
+        }
+}//module

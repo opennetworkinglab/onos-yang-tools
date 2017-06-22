@@ -126,7 +126,7 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
     WS  :   [ \r\t\u000C\n]+ -> channel(HIDDEN)
         ;
     LINE_COMMENT
-        : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
+        : '//' ~[\r\n]* -> channel(HIDDEN)
         ;
 
     // Additional rules
@@ -144,7 +144,7 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
 
     UNKNOWN_STATEMENT : IDENTIFIER COLON IDENTIFIER;
 
-    STRING : ((~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '"' | '+' | '\'')~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '+')* ) | SUB_STRING );
+    STRING : ((~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '}' | '"' | '+' | '\'')~( '\r' | '\n' | '\t' | ' ' | ';' | '{' | '+')* ) | SUB_STRING );
 
     //Fragment rules
     fragment SUB_STRING : ('"' (ESC | ~["])*'"') | ('\'' (ESC | ~['])*'\'') ;
