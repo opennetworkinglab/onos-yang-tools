@@ -59,36 +59,42 @@ public final class RestrictionResolver {
      * @param line     error line number
      * @param position error character position in line
      * @param hasRefR  whether has referred restriction
-     * @param curRange caller type's range string
+     * @param curRr    caller type's range restriction
      * @param type     effective type, when called from linker
      * @param fileName file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
-    public static YangRangeRestriction processRangeRestriction(
-            YangRangeRestriction refRr, int line, int position,
-            boolean hasRefR, String curRange, YangDataTypes type, String fileName)
+    public static YangRangeRestriction processRangeRestriction(YangRangeRestriction refRr,
+                                                               int line, int position,
+                                                               boolean hasRefR,
+                                                               YangRangeRestriction curRr,
+                                                               YangDataTypes type,
+                                                               String fileName)
             throws DataModelException {
-        return getRestriction(refRr, line, position, hasRefR, curRange, fileName,
+        return getRestriction(refRr, line, position, hasRefR, curRr, fileName,
                               type, RANGE_DATA);
     }
 
     /**
      * Processes the length restriction for parser and linker.
      *
-     * @param refLr     length restriction of referred typedef
-     * @param line      error line number
-     * @param position  error character position in line
-     * @param hasRefR   whether has referred restriction
-     * @param curLenStr caller type's length string
-     * @param fileName  file name
+     * @param refLr    length restriction of referred typedef
+     * @param line     error line number
+     * @param position error character position in line
+     * @param hasRefR  whether has referred restriction
+     * @param curLr    caller type's length restriction
+     * @param fileName file name
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
-    public static YangRangeRestriction processLengthRestriction(
-            YangRangeRestriction refLr, int line, int position, boolean hasRefR,
-            String curLenStr, String fileName) throws DataModelException {
-        return getRestriction(refLr, line, position, hasRefR, curLenStr, fileName,
+    public static YangRangeRestriction processLengthRes(YangRangeRestriction refLr,
+                                                        int line, int position,
+                                                        boolean hasRefR,
+                                                        YangRangeRestriction curLr,
+                                                        String fileName)
+            throws DataModelException {
+        return getRestriction(refLr, line, position, hasRefR, curLr, fileName,
                               UINT64, LENGTH_DATA);
     }
 
@@ -99,23 +105,24 @@ public final class RestrictionResolver {
      * @param line     error line number
      * @param position error character position in line
      * @param hasRefR  whether has referred restriction
-     * @param curRange caller type's range string
+     * @param curR     caller type's range restriction
      * @param type     effective type, when called from linker
      * @param fileName file name
      * @param conType  construct type
      * @return YANG range restriction
      * @throws DataModelException a violation in data model rule
      */
-    private static YangRangeRestriction getRestriction(
-            YangRangeRestriction refR, int line, int position, boolean hasRefR,
-            String curRange, String fileName, YangDataTypes type,
-            YangConstructType conType) throws
-            DataModelException {
+    private static YangRangeRestriction getRestriction(YangRangeRestriction refR,
+                                                       int line, int position,
+                                                       boolean hasRefR,
+                                                       YangRangeRestriction curR,
+                                                       String fileName, YangDataTypes type,
+                                                       YangConstructType conType)
+            throws DataModelException {
         YangBuiltInDataTypeInfo<?> startValue;
         YangBuiltInDataTypeInfo<?> endValue;
-        YangRangeRestriction rr = new YangRangeRestriction();
 
-        String rangeArg = removeQuotesAndHandleConcat(curRange);
+        String rangeArg = removeQuotesAndHandleConcat(curR.getRangeValue());
         String[] rangeArguments = rangeArg.trim().split(quote(PIPE));
 
         for (String rangePart : rangeArguments) {
@@ -174,7 +181,7 @@ public final class RestrictionResolver {
             rangeInterval.setStartValue(startValue);
             rangeInterval.setEndValue(endValue);
             try {
-                rr.addRangeRestrictionInterval(rangeInterval);
+                curR.addRangeRestrictionInterval(rangeInterval);
             } catch (DataModelException ex) {
                 ex.setLine(line);
                 ex.setCharPosition(position);
@@ -182,7 +189,7 @@ public final class RestrictionResolver {
                 throw ex;
             }
         }
-        return rr;
+        return curR;
     }
 
     /**

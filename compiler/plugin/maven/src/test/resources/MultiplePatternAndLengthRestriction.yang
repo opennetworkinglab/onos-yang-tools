@@ -4,15 +4,27 @@ module Test {
     prefix Ant;
     leaf invalid-interval {
         type hello {
-            pattern "[a-z]";
-            pattern "[A-Z]";
+            pattern "[a-z]" {
+                description "pattern a-z description.";
+                reference "a-z reference";
+            }
+            pattern "[A-Z]" {
+                description "pattern A-Z description.";
+                reference "A-Z reference";
+            }
             length "min..20 | 201..max";
         }
     }
     typedef hello {
         type string {
-            pattern "[0-9]";
-            pattern "[\n]";
+            pattern "[0-9]" {
+                description "pattern 0-9 description.";
+                reference "0-9 reference";
+            }
+            pattern "[\n]" {
+                description "pattern \n description.";
+                reference "\n reference";
+            }
             length "0..100 | 101..200 | 201..300";
         }
     }

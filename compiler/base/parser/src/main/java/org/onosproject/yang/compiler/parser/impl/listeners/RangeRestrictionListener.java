@@ -22,6 +22,7 @@ import org.onosproject.yang.compiler.datamodel.YangRangeRestriction;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
@@ -55,7 +56,8 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  *                          "}")
  *
  * ANTLR grammar rule
- *  rangeStatement : RANGE_KEYWORD range (STMTEND | LEFT_CURLY_BRACE commonStatements RIGHT_CURLY_BRACE);
+ *  rangeStatement : RANGE_KEYWORD range (STMTEND | LEFT_CURLY_BRACE
+ *  commonStatements RIGHT_CURLY_BRACE);
  */
 
 /**
@@ -64,6 +66,9 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  */
 public final class RangeRestrictionListener {
 
+    private static final String E_INVALID_TYPE = "YANG file error: Range " +
+            "restriction can't be applied to a given type";
+
     /**
      * Creates a new range restriction listener.
      */
@@ -71,116 +76,115 @@ public final class RangeRestrictionListener {
     }
 
     /**
-     * It is called when parser receives an input matching the grammar
-     * rule (range), performs validation and updates the data model
+     * Processes pattern restriction, when parser receives an input matching
+     * the grammar rule (range), performs validation and updates the data model
      * tree.
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param lis listener object
+     * @param ctx context object
      */
-    public static void processRangeRestrictionEntry(TreeWalkListener listener,
+    public static void processRangeRestrictionEntry(TreeWalkListener lis,
                                                     RangeStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, RANGE_DATA, ctx.range().getText(), ENTRY);
+        checkStackIsNotEmpty(lis, MISSING_HOLDER, RANGE_DATA,
+                             ctx.range().getText(), ENTRY);
 
-        Parsable tmpData = listener.getParsedDataStack().peek();
+        Parsable tmpData = lis.getParsedDataStack().peek();
         if (tmpData.getYangConstructType() == TYPE_DATA) {
             YangType type = (YangType) tmpData;
-            setRangeRestriction(listener, type, ctx);
+            setRangeRestriction(lis, type, ctx);
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, RANGE_DATA,
-                                                                    ctx.range().getText(), ENTRY));
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, RANGE_DATA, ctx.range().getText(), ENTRY));
         }
     }
 
     /**
      * Sets the range restriction to type.
      *
-     * @param listener listener's object
-     * @param type     YANG type for which range restriction to be added
-     * @param ctx      context object of the grammar rule
+     * @param lis  listener's object
+     * @param type YANG type
+     * @param ctx  context object
      */
-    private static void setRangeRestriction(TreeWalkListener listener, YangType type,
+    private static void setRangeRestriction(TreeWalkListener lis, YangType type,
                                             RangeStatementContext ctx) {
+        String txt = ctx.range().getText();
+        int line = ctx.getStart().getLine();
+        int pos = ctx.getStart().getCharPositionInLine();
+        YangDataTypes dataType = type.getDataType();
 
-        if (type.getDataType() == DERIVED) {
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setRangeRestrictionString(ctx.range().getText());
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setLineNumber(ctx.getStart().getLine());
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setCharPosition(ctx.getStart().getCharPositionInLine());
+        YangRangeRestriction ranRes = new YangRangeRestriction(txt);
+        ranRes.setFileName(lis.getFileName());
+        ranRes.setCharPosition(pos);
+        ranRes.setLineNumber(line);
+        lis.getParsedDataStack().push(ranRes);
+
+        if (dataType == DERIVED) {
+            YangDerivedInfo info = (YangDerivedInfo<?>) type
+                    .getDataTypeExtendedInfo();
+            info.setRangeRes(ranRes);
+            info.setFileName(lis.getFileName());
+            info.setCharPosition(pos);
+            info.setLineNumber(line);
             return;
         }
 
-        if (!(isOfRangeRestrictedType(type.getDataType())) && (type.getDataType() != DECIMAL64)) {
-            ParserException parserException = new ParserException("YANG file error: Range restriction can't be " +
-                                                                          "applied to a given type");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        if (!(isOfRangeRestrictedType(dataType)) && (dataType != DECIMAL64)) {
+            ParserException exc = new ParserException(E_INVALID_TYPE);
+            exc.setLine(line);
+            exc.setCharPosition(pos);
+            throw exc;
         }
-
-        YangRangeRestriction rangeRestriction = null;
         try {
-            if (type.getDataType() == DECIMAL64) {
-                YangDecimal64 yangDecimal64 = (YangDecimal64) type.getDataTypeExtendedInfo();
-                rangeRestriction =
-                        processRangeRestriction(yangDecimal64.getDefaultRangeRestriction(),
-                                                ctx.getStart().getLine(),
-                                                ctx.getStart().getCharPositionInLine(),
-                                                true, ctx.range().getText(),
-                                                type.getDataType(), listener.getFileName());
+            if (dataType == DECIMAL64) {
+                YangDecimal64 deci64 = (YangDecimal64) type
+                        .getDataTypeExtendedInfo();
+                ranRes = processRangeRestriction(
+                        deci64.getDefaultRangeRestriction(), line, pos, true,
+                        ranRes, dataType, lis.getFileName());
             } else {
-                rangeRestriction =
-                        processRangeRestriction(null, ctx.getStart().getLine(),
-                                                ctx.getStart().getCharPositionInLine(),
-                                                false, ctx.range()
-                                                        .getText(), type
-                                                        .getDataType(),
-                                                listener.getFileName());
+                ranRes = processRangeRestriction(null, line, pos, false, ranRes,
+                                                 dataType, lis.getFileName());
             }
         } catch (DataModelException e) {
-            ParserException parserException = new ParserException(e.getMessage());
-            parserException.setCharPosition(e.getCharPositionInLine());
-            parserException.setLine(e.getLineNumber());
-            throw parserException;
+            ParserException exc = new ParserException(e.getMessage());
+            exc.setCharPosition(e.getCharPositionInLine());
+            exc.setLine(e.getLineNumber());
+            throw exc;
         }
 
-        if (rangeRestriction != null) {
-            if (type.getDataType() == DECIMAL64) {
-                ((YangDecimal64<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                        .setRangeRestrictedExtendedInfo(rangeRestriction);
+        if (ranRes != null) {
+            if (dataType == DECIMAL64) {
+                ((YangDecimal64<YangRangeRestriction>) type
+                        .getDataTypeExtendedInfo())
+                        .setRangeRestrictedExtendedInfo(ranRes);
             } else {
-                type.setDataTypeExtendedInfo(rangeRestriction);
+                type.setDataTypeExtendedInfo(ranRes);
             }
         }
-        listener.getParsedDataStack().push(rangeRestriction);
     }
 
     /**
      * Performs validation and updates the data model tree.
      * It is called when parser exits from grammar rule (range).
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param lis listener object
+     * @param ctx context object
      */
-    public static void processRangeRestrictionExit(TreeWalkListener listener,
+    public static void processRangeRestrictionExit(TreeWalkListener lis,
                                                    RangeStatementContext ctx) {
 
-        // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, RANGE_DATA, ctx.range().getText(), EXIT);
+        String txt = ctx.range().getText();
 
-        Parsable tmpData = listener.getParsedDataStack().peek();
-        if (tmpData instanceof YangRangeRestriction) {
-            listener.getParsedDataStack().pop();
-        } else if (tmpData instanceof YangType
-                && ((YangType) tmpData).getDataType() == DERIVED) {
-            // TODO : need to handle in linker
-        } else {
-            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, RANGE_DATA,
-                                                                    ctx.range().getText(), EXIT));
+        // Check for stack to be non empty.
+        checkStackIsNotEmpty(lis, MISSING_HOLDER, RANGE_DATA, txt, EXIT);
+
+        Parsable tmpData = lis.getParsedDataStack().peek();
+        if (!(tmpData instanceof YangRangeRestriction)) {
+            throw new ParserException(constructListenerErrorMessage(
+                    MISSING_CURRENT_HOLDER, RANGE_DATA, txt, EXIT));
         }
+        lis.getParsedDataStack().pop();
     }
 }

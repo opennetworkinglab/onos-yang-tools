@@ -22,7 +22,6 @@ import org.onosproject.yang.compiler.datamodel.YangPatternRestriction;
 import org.onosproject.yang.compiler.datamodel.YangStringRestriction;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
-import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
@@ -34,6 +33,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PA
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.TYPE_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.PatternStatementContext;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.EXIT;
@@ -42,6 +42,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 
 /*
  * Reference: RFC6020 and YANG ANTLR Grammar
@@ -58,7 +59,8 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  *                          "}")
  *
  * ANTLR grammar rule
- *  patternStatement : PATTERN_KEYWORD string (STMTEND | LEFT_CURLY_BRACE commonStatements RIGHT_CURLY_BRACE);
+ *  patternStatement : PATTERN_KEYWORD string (STMTEND |
+ *  LEFT_CURLY_BRACE commonStatements RIGHT_CURLY_BRACE);
  */
 
 /**
@@ -67,7 +69,9 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  */
 public final class PatternRestrictionListener {
 
-    private static final String EMPTY_STRING = "";
+    private static final String E_INVALID_TYPE = "YANG file error : Pattern " +
+            "can only be used to restrict the built-in type string or types" +
+            " derived from string.";
 
     /**
      * Creates a new pattern restriction listener.
@@ -76,128 +80,123 @@ public final class PatternRestrictionListener {
     }
 
     /**
-     * It is called when parser receives an input matching the grammar
-     * rule (pattern), performs validation and updates the data model
-     * tree.
+     * Processes pattern restriction, when parser receives an input matching
+     * the grammar rule (pattern), performs validation and updates the data
+     * model tree.
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param lis listener object
+     * @param ctx context object
      */
-    public static void processPatternRestrictionEntry(TreeWalkListener listener,
+    public static void processPatternRestrictionEntry(TreeWalkListener lis,
                                                       PatternStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, PATTERN_DATA, ctx.string().getText(), ENTRY);
+        checkStackIsNotEmpty(lis, MISSING_HOLDER, PATTERN_DATA,
+                             ctx.string().getText(), ENTRY);
 
-        Parsable tmpData = listener.getParsedDataStack().peek();
+        Parsable tmpData = lis.getParsedDataStack().peek();
         if (tmpData.getYangConstructType() == TYPE_DATA) {
             YangType type = (YangType) tmpData;
-            setPatternRestriction(listener, type, ctx);
+            setPatternRestriction(lis, type, ctx);
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, PATTERN_DATA,
-                                                                    ctx.string().getText(), ENTRY));
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, PATTERN_DATA,
+                    ctx.string().getText(), ENTRY));
         }
     }
 
     /**
      * Sets the pattern restriction to type.
      *
-     * @param listener listener's object
-     * @param type     Yang type for which pattern restriction to be set
-     * @param ctx      context object of the grammar rule
+     * @param lis  listener object
+     * @param type YANG type
+     * @param ctx  context object
      */
-    private static void setPatternRestriction(TreeWalkListener listener, YangType type,
+    private static void setPatternRestriction(TreeWalkListener lis,
+                                              YangType type,
                                               PatternStatementContext ctx) {
 
-        if (type.getDataType() != YangDataTypes.STRING && type.getDataType() != YangDataTypes.DERIVED) {
-
-            ParserException parserException =
-                    new ParserException("YANG file error : " + getYangConstructType(PATTERN_DATA) + " name " +
-                                                ctx.string().getText() + " can be used to restrict the built-in " +
-                                                "type string or types derived from string.");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        if (type.getDataType() != STRING && type.getDataType() != DERIVED) {
+            ParserException exc = new ParserException(E_INVALID_TYPE);
+            exc.setLine(ctx.getStart().getLine());
+            exc.setCharPosition(ctx.getStart().getCharPositionInLine());
+            throw exc;
         }
 
         // Validate and get valid pattern restriction string.
-        String patternArgument = getValidPattern(ctx);
+        String pattern = getValidPattern(ctx);
 
-        if (type.getDataType() == YangDataTypes.STRING) {
-            YangStringRestriction stringRestriction = (YangStringRestriction) type.getDataTypeExtendedInfo();
-            if (stringRestriction == null) {
-                stringRestriction = new YangStringRestriction();
-                stringRestriction.setFileName(listener.getFileName());
-                stringRestriction.setCharPosition(ctx.getStart().getCharPositionInLine());
-                stringRestriction.setLineNumber(ctx.getStart().getLine());
-                type.setDataTypeExtendedInfo(stringRestriction);
-                stringRestriction.addPattern(patternArgument);
-            } else {
-                stringRestriction.addPattern(patternArgument);
+        YangPatternRestriction patRes = new YangPatternRestriction(pattern);
+        patRes.setFileName(lis.getFileName());
+        patRes.setCharPosition(ctx.getStart().getCharPositionInLine());
+        patRes.setLineNumber(ctx.getStart().getLine());
+
+        if (type.getDataType() == STRING) {
+            YangStringRestriction strRes = (YangStringRestriction) type
+                    .getDataTypeExtendedInfo();
+            if (strRes == null) {
+                strRes = new YangStringRestriction();
+                strRes.setFileName(lis.getFileName());
+                strRes.setCharPosition(ctx.getStart().getCharPositionInLine());
+                strRes.setLineNumber(ctx.getStart().getLine());
+                type.setDataTypeExtendedInfo(strRes);
             }
-            listener.getParsedDataStack().push(stringRestriction);
+            strRes.addPaternRes(patRes);
         } else {
-            YangPatternRestriction patternRestriction = ((YangDerivedInfo<?>) type
-                    .getDataTypeExtendedInfo()).getPatternRestriction();
-            if (patternRestriction == null) {
-                patternRestriction = new YangPatternRestriction();
-                ((YangDerivedInfo<?>) type.getDataTypeExtendedInfo()).setPatternRestriction(patternRestriction);
-                patternRestriction.addPattern(patternArgument);
-            } else {
-                ((YangDerivedInfo<?>) type.getDataTypeExtendedInfo()).setPatternRestriction(patternRestriction);
-                patternRestriction.addPattern(patternArgument);
-            }
+            YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                    .getDataTypeExtendedInfo();
+            info.addPatternRes(patRes);
         }
+        lis.getParsedDataStack().push(patRes);
     }
 
     /**
      * Performs validation and updates the data model tree.
      * It is called when parser exits from grammar rule (pattern).
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param listener listener object
+     * @param ctx      context object
      */
     public static void processPatternRestrictionExit(TreeWalkListener listener,
                                                      PatternStatementContext ctx) {
 
+        String txt = ctx.string().getText();
+
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, PATTERN_DATA, ctx.string().getText(), EXIT);
+        checkStackIsNotEmpty(listener, MISSING_HOLDER, PATTERN_DATA, txt, EXIT);
 
         Parsable tmpData = listener.getParsedDataStack().peek();
-        if (tmpData instanceof YangStringRestriction) {
-            listener.getParsedDataStack().pop();
-        } else if (tmpData instanceof YangType
-                && ((YangType) tmpData).getDataType() == DERIVED) {
-            // TODO : need to handle in linker
-        } else {
-            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, PATTERN_DATA,
-                                                                    ctx.string().getText(), EXIT));
+        if (!(tmpData instanceof YangPatternRestriction)) {
+            throw new ParserException(constructListenerErrorMessage(
+                    MISSING_CURRENT_HOLDER, PATTERN_DATA, txt, EXIT));
         }
+        listener.getParsedDataStack().pop();
     }
 
     /**
      * Validates and return the valid pattern.
      *
-     * @param ctx context object of the grammar rule
+     * @param ctx context object
      * @return validated string
      */
     private static String getValidPattern(PatternStatementContext ctx) {
         List<TerminalNode> patternList = ctx.string().STRING();
-        StringBuilder userInputPattern = new StringBuilder();
+        StringBuilder inputPat = new StringBuilder();
         String compile;
         for (TerminalNode pattern : patternList) {
-            userInputPattern.append(pattern.getText());
+            inputPat.append(pattern.getText());
         }
-        compile = userInputPattern.toString().replaceAll("[\'\"]", EMPTY_STRING);
+        compile = inputPat.toString().replaceAll("[\'\"]", EMPTY_STRING);
         try {
             Pattern.compile(compile);
-        } catch (PatternSyntaxException exception) {
-            ParserException parserException =
-                    new ParserException("YANG file error : " + getYangConstructType(PATTERN_DATA) + " name " +
-                                                ctx.string().getText() + " is not a valid regular expression");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        } catch (PatternSyntaxException e) {
+            ParserException exc = new ParserException(
+                    "YANG file error : " + getYangConstructType(PATTERN_DATA)
+                            + " name " + ctx.string().getText()
+                            + " is not a valid regular expression");
+            exc.setLine(ctx.getStart().getLine());
+            exc.setCharPosition(ctx.getStart().getCharPositionInLine());
+            throw exc;
         }
         return compile;
     }

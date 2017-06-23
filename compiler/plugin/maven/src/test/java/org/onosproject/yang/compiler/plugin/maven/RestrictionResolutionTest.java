@@ -29,8 +29,6 @@ import org.onosproject.yang.compiler.datamodel.YangStringRestriction;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeDef;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
-import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt16;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt32;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint64;
@@ -42,12 +40,15 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ListIterator;
 
+import static java.math.BigInteger.valueOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.MODULE_NODE;
+import static org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus.RESOLVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.INT16;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
 
@@ -65,7 +66,8 @@ public final class RestrictionResolutionTest {
     public void processLengthRestrictionInTypedef()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/LengthRestrictionInTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/LengthRestrictionInTypedef.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -77,40 +79,45 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
+
+        assertThat(info.getReferredTypeDef(),
                    Is.is((YangTypeDef) node.getChild()));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
-
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangRangeRestriction lengthRestriction = stringRestriction.getLengthRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        YangRangeRestriction lenRes = strRes.getLengthRestriction();
 
-        ListIterator<YangRangeInterval> lengthListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> llIt = lenRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval = lengthListIterator.next();
+        YangRangeInterval range = llIt.next();
 
-        assertThat(((YangUint64) rangeInterval.getStartValue()).getValue(), is(BigInteger.valueOf(0)));
-        assertThat(((YangUint64) rangeInterval.getEndValue()).getValue(), is(BigInteger.valueOf(100)));
+        assertThat(((YangUint64) range.getStartValue()).getValue(),
+                   is(valueOf(0)));
+        assertThat(((YangUint64) range.getEndValue()).getValue(),
+                   is(valueOf(100)));
     }
 
     /**
@@ -120,7 +127,8 @@ public final class RestrictionResolutionTest {
     public void processLengthRestrictionInRefType()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/LengthRestrictionInRefType.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/LengthRestrictionInRefType.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -132,40 +140,44 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
-
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(notNullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangRangeRestriction lengthRestriction = stringRestriction.getLengthRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        YangRangeRestriction lenRes = strRes.getLengthRestriction();
 
-        ListIterator<YangRangeInterval> lengthListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> llIt = lenRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval = lengthListIterator.next();
+        YangRangeInterval range = llIt.next();
 
-        assertThat(((YangUint64) rangeInterval.getStartValue()).getValue(), is(BigInteger.valueOf(0)));
-        assertThat(((YangUint64) rangeInterval.getEndValue()).getValue(), is(BigInteger.valueOf(100)));
+        assertThat(((YangUint64) range.getStartValue()).getValue(),
+                   is(valueOf(0)));
+        assertThat(((YangUint64) range.getEndValue()).getValue(),
+                   is(valueOf(100)));
     }
 
     /**
@@ -175,7 +187,9 @@ public final class RestrictionResolutionTest {
     public void processLengthRestrictionInTypedefAndTypeValid()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/LengthRestrictionInTypedefAndTypeValid.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/LengthRestrictionInTypedefAndTypeValid." +
+                        "yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -187,45 +201,53 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
+
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(notNullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangRangeRestriction lengthRestriction = stringRestriction.getLengthRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        YangRangeRestriction lenRes = strRes.getLengthRestriction();
 
-        ListIterator<YangRangeInterval> lengthListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> llIt = lenRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = lengthListIterator.next();
+        YangRangeInterval range1 = llIt.next();
 
-        assertThat(((YangUint64) rangeInterval1.getStartValue()).getValue(), is(BigInteger.valueOf(0)));
-        assertThat(((YangUint64) rangeInterval1.getEndValue()).getValue(), is(BigInteger.valueOf(20)));
+        assertThat(((YangUint64) range1.getStartValue()).getValue(),
+                   is(valueOf(0)));
+        assertThat(((YangUint64) range1.getEndValue()).getValue(),
+                   is(valueOf(20)));
 
-        YangRangeInterval rangeInterval2 = lengthListIterator.next();
+        YangRangeInterval range2 = llIt.next();
 
-        assertThat(((YangUint64) rangeInterval2.getStartValue()).getValue(), is(BigInteger.valueOf(201)));
-        assertThat(((YangUint64) rangeInterval2.getEndValue()).getValue(), is(BigInteger.valueOf(300)));
+        assertThat(((YangUint64) range2.getStartValue()).getValue(),
+                   is(valueOf(201)));
+        assertThat(((YangUint64) range2.getEndValue()).getValue(),
+                   is(valueOf(300)));
     }
 
     /**
@@ -234,7 +256,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = LinkerException.class)
     public void processLengthRestrictionInTypedefAndTypeInValid()
             throws IOException, DataModelException {
-        YangNode node = manager.getDataModel("src/test/resources/LengthRestrictionInTypedefAndTypeInValid.yang");
+        manager.getDataModel("src/test/resources/LengthRestrictionInTypedef" +
+                                     "AndTypeInValid.yang");
     }
 
     /**
@@ -244,7 +267,8 @@ public final class RestrictionResolutionTest {
     public void processRangeRestrictionInTypedef()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/RangeRestrictionInTypedef.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -256,44 +280,48 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
+
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(INT32));
+        assertThat(info.getEffectiveBuiltInType(), is(INT32));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) derivedInfo.getResolvedExtendedInfo();
+        YangRangeRestriction ranRes = (YangRangeRestriction) info
+                .getResolvedExtendedInfo();
 
-        ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> rlIt = ranRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = rangeListIterator.next();
+        YangRangeInterval range1 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval1.getStartValue()).getValue(), is(1));
-        assertThat(((YangInt32) rangeInterval1.getEndValue()).getValue(), is(4));
+        assertThat(((YangInt32) range1.getStartValue()).getValue(), is(1));
+        assertThat(((YangInt32) range1.getEndValue()).getValue(), is(4));
 
-        YangRangeInterval rangeInterval2 = rangeListIterator.next();
+        YangRangeInterval range2 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval2.getStartValue()).getValue(), is(10));
-        assertThat(((YangInt32) rangeInterval2.getEndValue()).getValue(), is(20));
+        assertThat(((YangInt32) range2.getStartValue()).getValue(), is(10));
+        assertThat(((YangInt32) range2.getEndValue()).getValue(), is(20));
     }
 
     /**
@@ -303,7 +331,8 @@ public final class RestrictionResolutionTest {
     public void processRangeRestrictionInRefTypedef()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInRefTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/RangeRestrictionInRefTypedef.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -316,47 +345,55 @@ public final class RestrictionResolutionTest {
         assertThat(yangNode.getName(), is("Test"));
 
         // check top typedef
-        YangTypeDef topTypedef = (YangTypeDef) yangNode.getChild();
-        assertThat(topTypedef.getName(), is("Num3"));
-        YangType type = topTypedef.getTypeList().iterator().next();
-        assertThat(type.getDataType(), is(YangDataTypes.INT16));
+        YangTypeDef typeDef1 = (YangTypeDef) yangNode.getChild();
+        assertThat(typeDef1.getName(), is("Num3"));
+        YangType type = typeDef1.getTypeList().iterator().next();
+        assertThat(type.getDataType(), is(INT16));
         assertThat(type.getDataTypeName(), is("int16"));
 
         // Check for the restriction value.
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) type.getDataTypeExtendedInfo();
-        ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                .listIterator();
-        YangRangeInterval rangeInterval1 = rangeListIterator.next();
-        assertThat((int) ((YangInt16) rangeInterval1.getStartValue()).getValue(), is(-32000));
-        assertThat((int) ((YangInt16) rangeInterval1.getEndValue()).getValue(), is(4));
+        YangRangeRestriction ranRes = (YangRangeRestriction) type.
+                getDataTypeExtendedInfo();
+        ListIterator<YangRangeInterval> rlIt = ranRes
+                .getAscendingRangeIntervals().listIterator();
+        YangRangeInterval range1 = rlIt.next();
+        assertThat((int) ((YangInt16) range1.getStartValue()).getValue(),
+                   is(-32000));
+        assertThat((int) ((YangInt16) range1.getEndValue()).getValue(), is(4));
 
-        YangRangeInterval rangeInterval2 = rangeListIterator.next();
-        assertThat((int) ((YangInt16) rangeInterval2.getStartValue()).getValue(), is(32767));
-        assertThat((int) ((YangInt16) rangeInterval2.getEndValue()).getValue(), is(32767));
+        YangRangeInterval range2 = rlIt.next();
+        assertThat((int) ((YangInt16) range2.getStartValue()).getValue(),
+                   is(32767));
+        assertThat((int) ((YangInt16) range2.getEndValue()).getValue(),
+                   is(32767));
 
         // check referred typedef
-        YangTypeDef refTypedef = (YangTypeDef) topTypedef.getNextSibling();
+        YangTypeDef refTypedef = (YangTypeDef) typeDef1.getNextSibling();
         assertThat(refTypedef.getName(), is("Num6"));
         YangType refType = refTypedef.getTypeList().iterator().next();
-        assertThat(refType.getDataType(), is(YangDataTypes.DERIVED));
+        assertThat(refType.getDataType(), is(DERIVED));
         assertThat(refType.getDataTypeName(), is("Num3"));
-        YangDerivedInfo<YangRangeRestriction> derivedInfo =
-                (YangDerivedInfo<YangRangeRestriction>) refType.getDataTypeExtendedInfo();
+        YangDerivedInfo<YangRangeRestriction> info =
+                (YangDerivedInfo<YangRangeRestriction>) refType
+                        .getDataTypeExtendedInfo();
 
         // Check for the restriction value.
-        rangeRestriction = (YangRangeRestriction) derivedInfo.getResolvedExtendedInfo();
-        rangeListIterator = rangeRestriction.getAscendingRangeIntervals().listIterator();
-        rangeInterval1 = rangeListIterator.next();
-        assertThat((int) ((YangInt16) rangeInterval1.getStartValue()).getValue(), is(-3));
-        assertThat((int) ((YangInt16) rangeInterval1.getEndValue()).getValue(), is(-3));
+        ranRes = info.getResolvedExtendedInfo();
+        rlIt = ranRes.getAscendingRangeIntervals().listIterator();
+        range1 = rlIt.next();
+        assertThat((int) ((YangInt16) range1.getStartValue()).getValue(),
+                   is(-3));
+        assertThat((int) ((YangInt16) range1.getEndValue()).getValue(), is(-3));
 
-        rangeInterval2 = rangeListIterator.next();
-        assertThat((int) ((YangInt16) rangeInterval2.getStartValue()).getValue(), is(-2));
-        assertThat((int) ((YangInt16) rangeInterval2.getEndValue()).getValue(), is(2));
+        range2 = rlIt.next();
+        assertThat((int) ((YangInt16) range2.getStartValue()).getValue(),
+                   is(-2));
+        assertThat((int) ((YangInt16) range2.getEndValue()).getValue(), is(2));
 
-        YangRangeInterval rangeInterval3 = rangeListIterator.next();
-        assertThat((int) ((YangInt16) rangeInterval3.getStartValue()).getValue(), is(3));
-        assertThat((int) ((YangInt16) rangeInterval3.getEndValue()).getValue(), is(3));
+        YangRangeInterval range3 = rlIt.next();
+        assertThat((int) ((YangInt16) range3.getStartValue()).getValue(),
+                   is(3));
+        assertThat((int) ((YangInt16) range3.getEndValue()).getValue(), is(3));
     }
 
     /**
@@ -365,8 +402,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = LinkerException.class)
     public void processInvalidRangeRestrictionInRefTypedef()
             throws IOException, ParserException, DataModelException {
-
-        manager.getDataModel("src/test/resources/RangeRestrictionInvalidInRefTypedef.yang");
+        manager.getDataModel("src/test/resources/RangeRestrictionInvalidIn" +
+                                     "RefTypedef.yang");
     }
 
     /**
@@ -376,7 +413,8 @@ public final class RestrictionResolutionTest {
     public void processRangeRestrictionInRefType()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInRefType.yang");
+        YangNode node = manager.getDataModel("src/test/resources/RangeRes" +
+                                                     "trictionInRefType.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -388,44 +426,48 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
+
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(INT32));
+        assertThat(info.getEffectiveBuiltInType(), is(INT32));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(notNullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) derivedInfo.getResolvedExtendedInfo();
+        YangRangeRestriction ranRes = (YangRangeRestriction) info
+                .getResolvedExtendedInfo();
 
-        ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> rlIt = ranRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = rangeListIterator.next();
+        YangRangeInterval range1 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval1.getStartValue()).getValue(), is(1));
-        assertThat(((YangInt32) rangeInterval1.getEndValue()).getValue(), is(4));
+        assertThat(((YangInt32) range1.getStartValue()).getValue(), is(1));
+        assertThat(((YangInt32) range1.getEndValue()).getValue(), is(4));
 
-        YangRangeInterval rangeInterval2 = rangeListIterator.next();
+        YangRangeInterval range2 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval2.getStartValue()).getValue(), is(10));
-        assertThat(((YangInt32) rangeInterval2.getEndValue()).getValue(), is(20));
+        assertThat(((YangInt32) range2.getStartValue()).getValue(), is(10));
+        assertThat(((YangInt32) range2.getEndValue()).getValue(), is(20));
     }
 
     /**
@@ -435,7 +477,9 @@ public final class RestrictionResolutionTest {
     public void processRangeRestrictionInRefTypeAndTypedefValid()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInRefTypeAndTypedefValid.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/RangeRestrictionInRefTypeAndTypedef" +
+                        "Valid.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -447,44 +491,48 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
+
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(INT32));
+        assertThat(info.getEffectiveBuiltInType(), is(INT32));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(notNullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangRangeRestriction rangeRestriction = (YangRangeRestriction) derivedInfo.getResolvedExtendedInfo();
+        YangRangeRestriction ranRes = (YangRangeRestriction) info
+                .getResolvedExtendedInfo();
 
-        ListIterator<YangRangeInterval> rangeListIterator = rangeRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        ListIterator<YangRangeInterval> rlIt = ranRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = rangeListIterator.next();
+        YangRangeInterval range1 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval1.getStartValue()).getValue(), is(1));
-        assertThat(((YangInt32) rangeInterval1.getEndValue()).getValue(), is(4));
+        assertThat(((YangInt32) range1.getStartValue()).getValue(), is(1));
+        assertThat(((YangInt32) range1.getEndValue()).getValue(), is(4));
 
-        YangRangeInterval rangeInterval2 = rangeListIterator.next();
+        YangRangeInterval range2 = rlIt.next();
 
-        assertThat(((YangInt32) rangeInterval2.getStartValue()).getValue(), is(10));
-        assertThat(((YangInt32) rangeInterval2.getEndValue()).getValue(), is(20));
+        assertThat(((YangInt32) range2.getStartValue()).getValue(), is(10));
+        assertThat(((YangInt32) range2.getEndValue()).getValue(), is(20));
     }
 
     /**
@@ -493,7 +541,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = LinkerException.class)
     public void processRangeRestrictionInRefTypeAndTypedefInValid()
             throws IOException, ParserException, DataModelException {
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInRefTypeAndTypedefInValid.yang");
+        manager.getDataModel("src/test/resources/RangeRestrictionInRefType" +
+                                     "AndTypedefInValid.yang");
     }
 
     /**
@@ -502,7 +551,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = ParserException.class)
     public void processRangeRestrictionInString()
             throws IOException, ParserException, DataModelException {
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInString.yang");
+        manager.getDataModel("src/test/resources/RangeRestrictionInString." +
+                                     "yang");
     }
 
     /**
@@ -511,7 +561,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = LinkerException.class)
     public void processRangeRestrictionInStringInRefType()
             throws IOException, DataModelException {
-        YangNode node = manager.getDataModel("src/test/resources/RangeRestrictionInStringInRefType.yang");
+        manager.getDataModel("src/test/resources/RangeRestrictionInStringIn" +
+                                     "RefType.yang");
     }
 
     /**
@@ -521,7 +572,8 @@ public final class RestrictionResolutionTest {
     public void processPatternRestrictionInTypedef()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternRestrictionInTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternRestrictionInTypedef.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -533,37 +585,40 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
+        YangTypeDef typeDef = info.getReferredTypeDef();
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        assertThat(typeDef, is((YangTypeDef) node.getChild()));
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
+
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(nullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
 
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
-
-        assertThat(pattern1, is("[a-zA-Z]"));
+        assertThat(pattern1.getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -573,7 +628,8 @@ public final class RestrictionResolutionTest {
     public void processPatternRestrictionInRefType()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternRestrictionInRefType.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternRestrictionInRefType.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -585,37 +641,38 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
-
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(notNullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(notNullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
 
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
-
-        assertThat(pattern1, is("[a-zA-Z]"));
+        assertThat(pattern1.getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -625,7 +682,9 @@ public final class RestrictionResolutionTest {
     public void processPatternRestrictionInRefTypeAndTypedef()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternRestrictionInRefTypeAndTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternRestrictionInRefTypeAndTypedef" +
+                        ".yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -637,41 +696,40 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
-
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(notNullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(notNullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
+        assertThat(pattern1.getPattern(), is("[a-zA-Z]"));
 
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
-
-        assertThat(pattern1, is("[a-zA-Z]"));
-
-        String pattern2 = patternListIterator.next();
-
-        assertThat(pattern2, is("[0-9]"));
+        YangPatternRestriction pattern2 = patIt.next();
+        assertThat(pattern2.getPattern(), is("[0-9]"));
     }
 
     /**
@@ -681,7 +739,9 @@ public final class RestrictionResolutionTest {
     public void processMultiplePatternRestriction()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/MultiplePatternRestrictionInRefTypeAndTypedef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/MultiplePatternRestrictionInRefTypeAnd" +
+                        "Typedef.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -693,49 +753,46 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
-
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(notNullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(nullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(notNullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
+        assertThat(pattern1.getPattern(), is("[a-z]"));
 
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
+        YangPatternRestriction pattern2 = patIt.next();
+        assertThat(pattern2.getPattern(), is("[A-Z]"));
 
-        assertThat(pattern1, is("[a-z]"));
+        YangPatternRestriction pattern3 = patIt.next();
+        assertThat(pattern3.getPattern(), is("[0-9]"));
 
-        String pattern2 = patternListIterator.next();
-
-        assertThat(pattern2, is("[A-Z]"));
-
-        String pattern3 = patternListIterator.next();
-
-        assertThat(pattern3, is("[0-9]"));
-
-        String pattern4 = patternListIterator.next();
-
-        assertThat(pattern4, is("[\\n]"));
+        YangPatternRestriction pattern4 = patIt.next();
+        assertThat(pattern4.getPattern(), is("[\\n]"));
     }
 
     /**
@@ -746,7 +803,8 @@ public final class RestrictionResolutionTest {
     public void processMultiplePatternAndLengthRestriction()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/MultiplePatternAndLengthRestriction.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/MultiplePatternAndLengthRestriction.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -758,65 +816,78 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(notNullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(notNullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(notNullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
+        assertThat(pattern1.getPattern(), is("[a-z]"));
+        assertThat(pattern1.getDescription(),
+                   is("\"pattern a-z description.\""));
+        assertThat(pattern1.getReference(), is("\"a-z reference\""));
 
-        // Check for pattern restriction.
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
+        YangPatternRestriction pattern2 = patIt.next();
+        assertThat(pattern2.getPattern(), is("[A-Z]"));
+        assertThat(pattern2.getDescription(),
+                   is("\"pattern A-Z description.\""));
+        assertThat(pattern2.getReference(), is("\"A-Z reference\""));
 
-        assertThat(pattern1, is("[a-z]"));
+        YangPatternRestriction pattern3 = patIt.next();
+        assertThat(pattern3.getPattern(), is("[0-9]"));
+        assertThat(pattern3.getDescription(),
+                   is("\"pattern 0-9 description.\""));
+        assertThat(pattern3.getReference(), is("\"0-9 reference\""));
 
-        String pattern2 = patternListIterator.next();
-
-        assertThat(pattern2, is("[A-Z]"));
-
-        String pattern3 = patternListIterator.next();
-
-        assertThat(pattern3, is("[0-9]"));
-
-        String pattern4 = patternListIterator.next();
-
-        assertThat(pattern4, is("[\\n]"));
+        YangPatternRestriction pattern4 = patIt.next();
+        assertThat(pattern4.getPattern(), is("[\\n]"));
+        assertThat(pattern4.getDescription(),
+                   is("\"pattern \\n description.\""));
+        assertThat(pattern4.getReference(), is("\"\\n reference\""));
 
         // Check for length restriction.
-        YangRangeRestriction lengthRestriction = stringRestriction.getLengthRestriction();
-        ListIterator<YangRangeInterval> lengthListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        YangRangeRestriction lenRes = strRes.getLengthRestriction();
+        ListIterator<YangRangeInterval> lenIt = lenRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = lengthListIterator.next();
+        YangRangeInterval range1 = lenIt.next();
 
-        assertThat(((YangUint64) rangeInterval1.getStartValue()).getValue(), is(BigInteger.valueOf(0)));
-        assertThat(((YangUint64) rangeInterval1.getEndValue()).getValue(), is(BigInteger.valueOf(20)));
+        assertThat(((YangUint64) range1.getStartValue()).getValue(),
+                   is(valueOf(0)));
+        assertThat(((YangUint64) range1.getEndValue()).getValue(),
+                   is(valueOf(20)));
 
-        YangRangeInterval rangeInterval2 = lengthListIterator.next();
+        YangRangeInterval range2 = lenIt.next();
 
-        assertThat(((YangUint64) rangeInterval2.getStartValue()).getValue(), is(BigInteger.valueOf(201)));
-        assertThat(((YangUint64) rangeInterval2.getEndValue()).getValue(), is(BigInteger.valueOf(300)));
+        assertThat(((YangUint64) range2.getStartValue()).getValue(),
+                   is(valueOf(201)));
+        assertThat(((YangUint64) range2.getEndValue()).getValue(),
+                   is(valueOf(300)));
     }
 
     /**
@@ -827,7 +898,9 @@ public final class RestrictionResolutionTest {
     public void processMultiplePatternAndLengthRestrictionValid()
             throws IOException, ParserException, DataModelException {
 
-        YangNode node = manager.getDataModel("src/test/resources/MultiplePatternAndLengthRestrictionValid.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/MultiplePatternAndLengthRestric" +
+                        "tionValid.yang");
 
         // Check whether the data model tree returned is of type module.
         assertThat(node instanceof YangModule, is(true));
@@ -839,66 +912,66 @@ public final class RestrictionResolutionTest {
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
+        YangType<?> type = leaf.getDataType();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("hello"));
-        assertThat(leafInfo.getDataType().getDataType(), is(DERIVED));
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(type.getDataTypeName(), is("hello"));
+        assertThat(type.getDataType(), is(DERIVED));
+        YangDerivedInfo<?> info = (YangDerivedInfo<?>) type
+                .getDataTypeExtendedInfo();
 
-        assertThat(((YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo()).getReferredTypeDef(),
-                is((YangTypeDef) node.getChild()));
+        assertThat(info.getReferredTypeDef(),
+                   is((YangTypeDef) node.getChild()));
 
-        assertThat(leafInfo.getDataType().getResolvableStatus(), Is.is(ResolvableStatus.RESOLVED));
-
-        YangDerivedInfo<?> derivedInfo = (YangDerivedInfo<?>) leafInfo.getDataType().getDataTypeExtendedInfo();
+        assertThat(type.getResolvableStatus(), Is.is(RESOLVED));
 
         // Check for the effective built-in type.
-        assertThat(derivedInfo.getEffectiveBuiltInType(), is(STRING));
+        assertThat(info.getEffectiveBuiltInType(), is(STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(notNullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(notNullValue()));
-        assertThat(derivedInfo.getResolvedExtendedInfo(), is(notNullValue()));
+        assertThat(info.getLengthRes(), is(notNullValue()));
+        assertThat(info.getRangeRes(), is(nullValue()));
+        assertThat(info.getPatternResList(), is(notNullValue()));
+        assertThat(info.getResolvedExtendedInfo(), is(notNullValue()));
 
         // Check for the restriction value.
-        YangStringRestriction stringRestriction = (YangStringRestriction) derivedInfo.getResolvedExtendedInfo();
+        YangStringRestriction strRes = (YangStringRestriction) info
+                .getResolvedExtendedInfo();
 
-        // Check for pattern restriction.
-        YangPatternRestriction patternRestriction = stringRestriction.getPatternRestriction();
-        ListIterator<String> patternListIterator = patternRestriction.getPatternList().listIterator();
-        String pattern1 = patternListIterator.next();
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        YangPatternRestriction pattern1 = patIt.next();
+        assertThat(pattern1.getPattern(), is("[a-z]"));
 
-        assertThat(pattern1, is("[a-z]"));
+        YangPatternRestriction pattern2 = patIt.next();
+        assertThat(pattern2.getPattern(), is("[A-Z]"));
 
-        String pattern2 = patternListIterator.next();
+        YangPatternRestriction pattern3 = patIt.next();
+        assertThat(pattern3.getPattern(), is("[0-9]"));
 
-        assertThat(pattern2, is("[A-Z]"));
-
-        String pattern3 = patternListIterator.next();
-
-        assertThat(pattern3, is("[0-9]"));
-
-        String pattern4 = patternListIterator.next();
-
-        assertThat(pattern4, is("[\\n]"));
+        YangPatternRestriction pattern4 = patIt.next();
+        assertThat(pattern4.getPattern(), is("[\\n]"));
 
         // Check for length restriction.
-        YangRangeRestriction lengthRestriction = stringRestriction.getLengthRestriction();
-        ListIterator<YangRangeInterval> lengthListIterator = lengthRestriction.getAscendingRangeIntervals()
-                .listIterator();
+        YangRangeRestriction lenRes = strRes.getLengthRestriction();
+        ListIterator<YangRangeInterval> lenIt = lenRes
+                .getAscendingRangeIntervals().listIterator();
 
-        YangRangeInterval rangeInterval1 = lengthListIterator.next();
+        YangRangeInterval range1 = lenIt.next();
 
-        assertThat(((YangUint64) rangeInterval1.getStartValue()).getValue(), is(BigInteger.valueOf(0)));
-        assertThat(((YangUint64) rangeInterval1.getEndValue()).getValue(), is(BigInteger.valueOf(20)));
+        assertThat(((YangUint64) range1.getStartValue()).getValue(),
+                   is(valueOf(0)));
+        assertThat(((YangUint64) range1.getEndValue()).getValue(),
+                   is(valueOf(20)));
 
-        YangRangeInterval rangeInterval2 = lengthListIterator.next();
+        YangRangeInterval range2 = lenIt.next();
 
-        assertThat(((YangUint64) rangeInterval2.getStartValue()).getValue(), is(BigInteger.valueOf(100)));
-        assertThat(((YangUint64) rangeInterval2.getEndValue()).getValue(),
-                is(new BigInteger("18446744073709551615")));
+        assertThat(((YangUint64) range2.getStartValue()).getValue(),
+                   is(valueOf(100)));
+        assertThat(((YangUint64) range2.getEndValue()).getValue(),
+                   is(new BigInteger("18446744073709551615")));
     }
 
     /**
@@ -908,6 +981,8 @@ public final class RestrictionResolutionTest {
     @Test(expected = LinkerException.class)
     public void processMultiplePatternAndLengthRestrictionInValid()
             throws IOException, DataModelException {
-        YangNode node = manager.getDataModel("src/test/resources/MultiplePatternAndLengthRestrictionInValid.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/MultiplePatternAndLengthRestriction" +
+                        "InValid.yang");
     }
 }

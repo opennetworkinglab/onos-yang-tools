@@ -89,9 +89,21 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
     private YangAppErrorInfo yangAppErrorInfo;
 
     /**
+     * Range value in YANG file.
+     */
+    private String rangeValue;
+
+    /**
      * Creates YANG range restriction object.
      */
-    public YangRangeRestriction() {
+
+    /**
+     * Creates YANG range restriction object with range value.
+     *
+     * @param r range value
+     */
+    public YangRangeRestriction(String r) {
+        rangeValue = r;
         yangAppErrorInfo = new YangAppErrorInfo();
     }
 
@@ -304,5 +316,14 @@ public class YangRangeRestriction<T extends YangBuiltInDataTypeInfo<T>>
     @Override
     public YangAppErrorInfo getAppErrorInfo() {
         return yangAppErrorInfo;
+    }
+
+    /**
+     * Returns the range value.
+     *
+     * @return range value
+     */
+    public String getRangeValue() {
+        return rangeValue;
     }
 }

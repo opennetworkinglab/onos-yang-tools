@@ -31,6 +31,7 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.ListIterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,35 +50,35 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processValidPatternStatement() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/ValidPatternStatement.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/ValidPatternStatement.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), Is.is(YangNodeType.MODULE_NODE));
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        YangStringRestriction stringRestriction = (YangStringRestriction) leafInfo
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(leaf.getDataType().getDataTypeName(), is("string"));
+        assertThat(leaf.getDataType().getDataType(), is(YangDataTypes.STRING));
+        YangStringRestriction strRes = (YangStringRestriction) leaf
                 .getDataType().getDataTypeExtendedInfo();
-        ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
-        assertThat(patternListIterator.next(), is("[a-zA-Z]"));
+        ListIterator<YangPatternRestriction> patIt = strRes
+                .getPatternResList().listIterator();
+        assertThat(patIt.next().getPattern(), is("[a-zA-Z]"));
 
-        leafInfo = leafIterator.next();
+        leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("ipv4-address"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        stringRestriction = (YangStringRestriction) leafInfo
-                .getDataType().getDataTypeExtendedInfo();
-        patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
-        assertThat(patternListIterator.next(), is(
+        assertThat(leaf.getName(), is("ipv4-address"));
+        assertThat(leaf.getDataType().getDataTypeName(), is("string"));
+        assertThat(leaf.getDataType().getDataType(), is(YangDataTypes.STRING));
+        strRes = (YangStringRestriction) leaf.getDataType()
+                .getDataTypeExtendedInfo();
+        patIt = strRes.getPatternResList().listIterator();
+        assertThat(patIt.next().getPattern(), is(
                 "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}" +
                         "([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" +
                         "(%[\\p{N}\\p{L}]+)?"));
@@ -89,24 +90,26 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processPatternStatementInsideLeafList() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternStatementInsideLeafList.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternStatementInsideLeafList.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeafList> leafListIterator = yangNode.getListOfLeafList().listIterator();
-        YangLeafList leafListInfo = leafListIterator.next();
+        ListIterator<YangLeafList> it = yangNode.getListOfLeafList()
+                .listIterator();
+        YangLeafList ll = it.next();
 
-        assertThat(leafListInfo.getName(), is("invalid-interval"));
-        assertThat(leafListInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafListInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        YangStringRestriction stringRestriction = (YangStringRestriction) leafListInfo
+        assertThat(ll.getName(), is("invalid-interval"));
+        assertThat(ll.getDataType().getDataTypeName(), is("string"));
+        assertThat(ll.getDataType().getDataType(), is(YangDataTypes.STRING));
+        YangStringRestriction strRes = (YangStringRestriction) ll
                 .getDataType().getDataTypeExtendedInfo();
-        ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
-        assertThat(patternListIterator.next(), is("[a-zA-Z]"));
+        ListIterator<YangPatternRestriction> patIt = strRes.getPatternResList()
+                .listIterator();
+        assertThat(patIt.next().getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -115,7 +118,8 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processPatternStatementInsideTypeDef() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternStatementInsideTypeDef.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternStatementInsideTypeDef.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
@@ -123,11 +127,11 @@ public class PatternRestrictionListenerTest {
         assertThat(yangNode.getName(), is("Test"));
 
         YangTypeDef typedef = (YangTypeDef) yangNode.getChild();
-        YangStringRestriction stringRestriction = (YangStringRestriction) typedef.getTypeDefBaseType()
-                .getDataTypeExtendedInfo();
+        YangStringRestriction strRes = (YangStringRestriction) typedef
+                .getTypeDefBaseType().getDataTypeExtendedInfo();
 
-        YangPatternRestriction yangPatternRestriction = stringRestriction.getPatternRestriction();
-        assertThat(yangPatternRestriction.getPatternList().listIterator().next(), is("[a-zA-Z]"));
+        List<YangPatternRestriction> patRes = strRes.getPatternResList();
+        assertThat(patRes.listIterator().next().getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -136,24 +140,26 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processMultiplePatternStatement() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/MultiplePatternStatement.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/MultiplePatternStatement.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeafList> leafListIterator = yangNode.getListOfLeafList().listIterator();
-        YangLeafList leafListInfo = leafListIterator.next();
+        ListIterator<YangLeafList> it = yangNode.getListOfLeafList()
+                .listIterator();
+        YangLeafList ll = it.next();
 
-        assertThat(leafListInfo.getName(), is("invalid-interval"));
-        assertThat(leafListInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafListInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        YangStringRestriction stringRestriction = (YangStringRestriction) leafListInfo
-                .getDataType().getDataTypeExtendedInfo();
-        ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
-        assertThat(patternListIterator.next(), is("[a-zA-Z]"));
+        assertThat(ll.getName(), is("invalid-interval"));
+        assertThat(ll.getDataType().getDataTypeName(), is("string"));
+        assertThat(ll.getDataType().getDataType(), is(YangDataTypes.STRING));
+        YangStringRestriction strRes = (YangStringRestriction) ll.getDataType()
+                .getDataTypeExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes.getPatternResList()
+                .listIterator();
+        assertThat(patIt.next().getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -162,23 +168,25 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processPatternStatementWithPlus() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternStatementWithPlus.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternStatementWithPlus.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeafList> leafListIterator = yangNode.getListOfLeafList().listIterator();
-        YangLeafList leafListInfo = leafListIterator.next();
+        ListIterator<YangLeafList> it = yangNode.getListOfLeafList()
+                .listIterator();
+        YangLeafList ll = it.next();
 
-        assertThat(leafListInfo.getName(), is("invalid-interval"));
-        assertThat(leafListInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafListInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        YangStringRestriction stringRestriction = (YangStringRestriction) leafListInfo
-                .getDataType().getDataTypeExtendedInfo();
-        ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
+        assertThat(ll.getName(), is("invalid-interval"));
+        assertThat(ll.getDataType().getDataTypeName(), is("string"));
+        assertThat(ll.getDataType().getDataType(), is(YangDataTypes.STRING));
+        YangStringRestriction strRes = (YangStringRestriction) ll.getDataType()
+                .getDataTypeExtendedInfo();
+        ListIterator<YangPatternRestriction> patIt = strRes.getPatternResList()
+                .listIterator();
         //FIXME: + should not be remove from the end.
         //assertThat(patternListIterator.next(), is("-[0-9]+|[0-9]+"));
     }
@@ -189,26 +197,28 @@ public class PatternRestrictionListenerTest {
     @Test
     public void processPatternSubStatements() throws IOException, ParserException {
 
-        YangNode node = manager.getDataModel("src/test/resources/PatternSubStatements.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/PatternSubStatements.yang");
 
         assertThat((node instanceof YangModule), is(true));
         assertThat(node.getNodeType(), is(YangNodeType.MODULE_NODE));
         YangModule yangNode = (YangModule) node;
         assertThat(yangNode.getName(), is("Test"));
 
-        ListIterator<YangLeaf> leafIterator = yangNode.getListOfLeaf().listIterator();
-        YangLeaf leafInfo = leafIterator.next();
+        ListIterator<YangLeaf> it = yangNode.getListOfLeaf().listIterator();
+        YangLeaf leaf = it.next();
 
-        assertThat(leafInfo.getName(), is("invalid-interval"));
-        assertThat(leafInfo.getDataType().getDataTypeName(), is("string"));
-        assertThat(leafInfo.getDataType().getDataType(), is(YangDataTypes.STRING));
-        YangStringRestriction stringRestriction = (YangStringRestriction) leafInfo
+        assertThat(leaf.getName(), is("invalid-interval"));
+        assertThat(leaf.getDataType().getDataTypeName(), is("string"));
+        assertThat(leaf.getDataType().getDataType(), is(YangDataTypes.STRING));
+        YangStringRestriction strRes = (YangStringRestriction) leaf
                 .getDataType().getDataTypeExtendedInfo();
-        assertThat(stringRestriction.getDescription(), is("\"pattern description\""));
-        assertThat(stringRestriction.getReference(), is("\"pattern reference\""));
-        ListIterator<String> patternListIterator = stringRestriction.getPatternRestriction()
-                .getPatternList().listIterator();
-        assertThat(patternListIterator.next(), is("[a-zA-Z]"));
+        ListIterator<YangPatternRestriction> patIt = strRes.getPatternResList()
+                .listIterator();
+        YangPatternRestriction pat = patIt.next();
+        assertThat(pat.getDescription(), is("\"pattern description\""));
+        assertThat(pat.getReference(), is("\"pattern reference\""));
+        assertThat(pat.getPattern(), is("[a-zA-Z]"));
     }
 
     /**
@@ -216,6 +226,7 @@ public class PatternRestrictionListenerTest {
      */
     @Test(expected = ParserException.class)
     public void processInvalidPatternSubStatements() throws IOException, ParserException {
-        YangNode node = manager.getDataModel("src/test/resources/InvalidPatternSubStatements.yang");
+        YangNode node = manager.getDataModel(
+                "src/test/resources/InvalidPatternSubStatements.yang");
     }
 }

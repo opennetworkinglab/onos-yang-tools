@@ -16,11 +16,13 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.compiler.datamodel.utils.Parsable;
+import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
-import static java.util.Collections.unmodifiableList;
+import java.io.Serializable;
+
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PATTERN_DATA;
 
 /*-
  *  Reference RFC 6020.
@@ -55,14 +57,15 @@ import static java.util.Collections.unmodifiableList;
  * data type.
  */
 public class YangPatternRestriction extends DefaultLocationInfo
-        implements Serializable, YangAppErrorHolder {
+        implements Serializable, YangAppErrorHolder, YangReference, YangDesc,
+        Parsable {
 
     private static final long serialVersionUID = 806201649L;
 
     /**
-     * Pattern restriction defined for the current type.
+     * Pattern restriction.
      */
-    private final List<String> patternList;
+    private final String pattern;
 
     /**
      * YANG application error information.
@@ -70,29 +73,37 @@ public class YangPatternRestriction extends DefaultLocationInfo
     private YangAppErrorInfo yangAppErrorInfo;
 
     /**
-     * Creates a YANG pattern restriction object.
+     * Textual reference.
      */
-    public YangPatternRestriction() {
-        patternList = new LinkedList<>();
+    private String reference;
+
+    /**
+     * Textual description.
+     */
+    private String description;
+
+    /**
+     * Creates a YANG pattern restriction object.
+     *
+     * @param p pattern
+     */
+    public YangPatternRestriction(String p) {
+        pattern = p;
         yangAppErrorInfo = new YangAppErrorInfo();
     }
 
     /**
      * Returns the pattern restriction defined for the current type.
      *
-     * @return pattern restriction defined for the current type.
+     * @return pattern restriction
      */
-    public List<String> getPatternList() {
-        return unmodifiableList(patternList);
+    public String getPattern() {
+        return pattern;
     }
 
-    /**
-     * Adds a new pattern to the list of pattern restriction.
-     *
-     * @param newPattern pattern restriction.
-     */
-    public void addPattern(String newPattern) {
-        patternList.add(newPattern);
+    @Override
+    public YangAppErrorInfo getAppErrorInfo() {
+        return yangAppErrorInfo;
     }
 
     @Override
@@ -101,7 +112,37 @@ public class YangPatternRestriction extends DefaultLocationInfo
     }
 
     @Override
-    public YangAppErrorInfo getAppErrorInfo() {
-        return yangAppErrorInfo;
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String d) {
+        description = d;
+    }
+
+    @Override
+    public String getReference() {
+        return reference;
+    }
+
+    @Override
+    public void setReference(String r) {
+        reference = r;
+    }
+
+    @Override
+    public YangConstructType getYangConstructType() {
+        return PATTERN_DATA;
+    }
+
+    @Override
+    public void validateDataOnEntry() throws DataModelException {
+        // TODO auto-generated method stub
+    }
+
+    @Override
+    public void validateDataOnExit() throws DataModelException {
+        // TODO auto-generated method stub
     }
 }

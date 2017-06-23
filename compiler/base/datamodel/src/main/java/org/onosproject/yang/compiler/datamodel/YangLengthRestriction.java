@@ -100,7 +100,7 @@ public class YangLengthRestriction extends DefaultLocationInfo
      * Creates a YANG length restriction object.
      */
     public YangLengthRestriction() {
-        setLengthRestriction(new YangRangeRestriction<>());
+        setLengthRestriction(new YangRangeRestriction<>(null));
         yangAppErrorInfo = new YangAppErrorInfo();
     }
 

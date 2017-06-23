@@ -16,16 +16,13 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
-import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-import org.onosproject.yang.compiler.datamodel.utils.Parsable;
-import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint64;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
-
-import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PATTERN_DATA;
 
 /*-
  * Reference RFC 6020.
@@ -38,7 +35,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PA
  * Represents the restriction for string data type.
  */
 public class YangStringRestriction extends DefaultLocationInfo
-        implements YangDesc, YangReference, Parsable, Serializable {
+        implements YangDesc, YangReference, Serializable {
 
     /*-
      * Reference RFC 6020.
@@ -84,9 +81,9 @@ public class YangStringRestriction extends DefaultLocationInfo
     private YangRangeRestriction<YangUint64> lengthRestriction;
 
     /**
-     * Effective pattern restriction for the type.
+     * Effective pattern restriction list for the type.
      */
-    private YangPatternRestriction patternRestriction;
+    private List<YangPatternRestriction> patternResList;
 
     /**
      * Textual reference.
@@ -123,33 +120,33 @@ public class YangStringRestriction extends DefaultLocationInfo
     }
 
     /**
-     * Returns the pattern restriction for the type.
+     * Returns the pattern restriction list for the type.
      *
-     * @return pattern restriction for the type
+     * @return pattern restriction list
      */
-    public YangPatternRestriction getPatternRestriction() {
-        return patternRestriction;
+    public List<YangPatternRestriction> getPatternResList() {
+        return patternResList;
     }
 
     /**
-     * Sets the pattern restriction for the type.
+     * Sets the pattern restriction list for the type.
      *
-     * @param rest pattern restriction for the type
+     * @param restList pattern restriction list
      */
-    void setPatternRestriction(YangPatternRestriction rest) {
-        patternRestriction = rest;
+    void setPatternResList(List<YangPatternRestriction> restList) {
+        patternResList = restList;
     }
 
     /**
      * Adds a new pattern restriction for the type.
      *
-     * @param newPattern new pattern restriction for the type
+     * @param patRes pattern restriction
      */
-    public void addPattern(String newPattern) {
-        if (patternRestriction == null) {
-            patternRestriction = new YangPatternRestriction();
+    public void addPaternRes(YangPatternRestriction patRes) {
+        if (patternResList == null) {
+            patternResList = new LinkedList<>();
         }
-        patternRestriction.addPattern(newPattern);
+        patternResList.add(patRes);
     }
 
     /**
@@ -193,11 +190,6 @@ public class YangStringRestriction extends DefaultLocationInfo
 
     }
 
-    @Override
-    public YangConstructType getYangConstructType() {
-        return PATTERN_DATA;
-    }
-
     /**
      * Validates if the given value is correct as per the length restriction.
      *
@@ -235,34 +227,23 @@ public class YangStringRestriction extends DefaultLocationInfo
      * Validates if the given value is correct as per the pattern restriction.
      *
      * @param valueInString value
-     * @return true, if the value is confirming to pattern restriction, false otherwise
+     * @return true if the value is confirming to pattern restriction; false
+     * otherwise
      */
     boolean isValidStringOnPatternRestriction(String valueInString) {
-        if (patternRestriction == null
-                || patternRestriction.getPatternList().isEmpty()) {
+        if (patternResList == null || patternResList.isEmpty()) {
             // Pattern restriction is optional
             return true;
         }
 
-        ListIterator<String> patternListIterator =
-                patternRestriction.getPatternList().listIterator();
+        ListIterator<YangPatternRestriction> it = patternResList.listIterator();
         boolean isMatched = false;
-        while (patternListIterator.hasNext()) {
-            if (valueInString.matches(patternListIterator.next())) {
+        while (it.hasNext()) {
+            if (valueInString.matches(it.next().getPattern())) {
                 isMatched = true;
                 break;
             }
         }
         return isMatched;
-    }
-
-    @Override
-    public void validateDataOnEntry() throws DataModelException {
-        // TODO: implement the method.
-    }
-
-    @Override
-    public void validateDataOnExit() throws DataModelException {
-        // TODO: implement the method.
     }
 }

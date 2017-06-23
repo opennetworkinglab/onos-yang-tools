@@ -83,9 +83,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -132,9 +132,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -182,9 +182,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -232,9 +232,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.STRING));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -294,9 +294,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.INT32));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -357,9 +357,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), is(nullValue()));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -419,9 +419,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.INT32));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -477,9 +477,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), is(nullValue()));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 
@@ -557,9 +557,9 @@ public class IntraFileTypeLinkingTest {
         assertThat(derivedInfo.getEffectiveBuiltInType(), Is.is(YangDataTypes.BINARY));
 
         // Check for the restriction.
-        assertThat(derivedInfo.getLengthRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getRangeRestrictionString(), is(nullValue()));
-        assertThat(derivedInfo.getPatternRestriction(), is(nullValue()));
+        assertThat(derivedInfo.getLengthRes(), is(nullValue()));
+        assertThat(derivedInfo.getRangeRes(), is(nullValue()));
+        assertThat(derivedInfo.getPatternResList(), is(nullValue()));
         assertThat(derivedInfo.getResolvedExtendedInfo(), is(nullValue()));
     }
 }

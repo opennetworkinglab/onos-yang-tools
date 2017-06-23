@@ -326,7 +326,7 @@ public class YangDecimal64<T> extends DefaultLocationInfo
      * @throws DataModelException a violation of data model rules
      */
     public YangRangeRestriction getDefaultRangeRestriction() throws DataModelException {
-        YangRangeRestriction refRangeRestriction = new YangRangeRestriction();
+        YangRangeRestriction refRangeRestriction = new YangRangeRestriction(null);
         YangRangeInterval rangeInterval = new YangRangeInterval<>();
         rangeInterval.setCharPosition(getCharPosition());
         rangeInterval.setLineNumber(getLineNumber());

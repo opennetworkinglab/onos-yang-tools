@@ -22,14 +22,14 @@ import org.onosproject.yang.compiler.datamodel.YangStringRestriction;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
-import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
+import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.LengthStatementContext;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
-import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processLengthRestriction;
+import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processLengthRes;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.LENGTH_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.TYPE_DATA;
-import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.STRING;
@@ -57,8 +57,8 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  *
  *
  * ANTLR grammar rule
- * lengthStatement : LENGTH_KEYWORD length
- *                 (STMTEND | LEFT_CURLY_BRACE commonStatements RIGHT_CURLY_BRACE);
+ * lengthStatement : LENGTH_KEYWORD length (STMTEND | LEFT_CURLY_BRACE
+ * commonStatements RIGHT_CURLY_BRACE);
  */
 
 /**
@@ -67,6 +67,10 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerVali
  */
 public final class LengthRestrictionListener {
 
+    private static final String E_INVALID_TYPE = "YANG file error : Length can" +
+            " only be used to restrict the built-in type string/binary or " +
+            "types derived from string/binary.";
+
     /**
      * Creates a new length restriction listener.
      */
@@ -74,114 +78,115 @@ public final class LengthRestrictionListener {
     }
 
     /**
-     * It is called when parser receives an input matching the grammar
-     * rule (length), performs validation and updates the data model
-     * tree.
+     * Processes pattern restriction, when parser receives an input matching
+     * the grammar rule (length), performs validation and updates the data
+     * model tree.
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param lis listener object
+     * @param ctx context object
      */
-    public static void processLengthRestrictionEntry(TreeWalkListener listener,
-                                                     GeneratedYangParser.LengthStatementContext ctx) {
+    public static void processLengthRestrictionEntry(TreeWalkListener lis,
+                                                     LengthStatementContext ctx) {
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, LENGTH_DATA, ctx.length().getText(), ENTRY);
+        checkStackIsNotEmpty(lis, MISSING_HOLDER, LENGTH_DATA,
+                             ctx.length().getText(), ENTRY);
 
-        Parsable tmpData = listener.getParsedDataStack().peek();
+        Parsable tmpData = lis.getParsedDataStack().peek();
         if (tmpData.getYangConstructType() == TYPE_DATA) {
             YangType type = (YangType) tmpData;
-            setLengthRestriction(listener, type, ctx);
+            setLengthRestriction(lis, type, ctx);
         } else {
-            throw new ParserException(constructListenerErrorMessage(INVALID_HOLDER, LENGTH_DATA,
-                                                                    ctx.length().getText(), ENTRY));
+            throw new ParserException(constructListenerErrorMessage(
+                    INVALID_HOLDER, LENGTH_DATA,
+                    ctx.length().getText(), ENTRY));
         }
     }
 
     /**
      * Sets the length restriction to type.
      *
-     * @param listener listener's object
-     * @param type     Yang type for which length restriction to be set
-     * @param ctx      context object of the grammar rule
+     * @param lis  listener object
+     * @param type YANG type
+     * @param ctx  context object
      */
-    private static void setLengthRestriction(TreeWalkListener listener, YangType type,
-                                             GeneratedYangParser.LengthStatementContext ctx) {
+    private static void setLengthRestriction(TreeWalkListener lis,
+                                             YangType type,
+                                             LengthStatementContext ctx) {
 
-        if (type.getDataType() == DERIVED) {
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setLengthRestrictionString(ctx.length().getText());
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setLineNumber(ctx.getStart().getLine());
-            ((YangDerivedInfo<YangRangeRestriction>) type.getDataTypeExtendedInfo())
-                    .setCharPosition(ctx.getStart().getCharPositionInLine());
+        int line = ctx.getStart().getLine();
+        int pos = ctx.getStart().getCharPositionInLine();
+        String txt = ctx.length().getText();
+        YangDataTypes dataType = type.getDataType();
+
+        YangRangeRestriction lenRes = new YangRangeRestriction(txt);
+        lenRes.setFileName(lis.getFileName());
+        lenRes.setCharPosition(pos);
+        lenRes.setLineNumber(line);
+        lis.getParsedDataStack().push(lenRes);
+
+        if (dataType == DERIVED) {
+            YangDerivedInfo info = (YangDerivedInfo<?>) type
+                    .getDataTypeExtendedInfo();
+            info.setLengthRes(lenRes);
+            info.setFileName(lis.getFileName());
+            info.setCharPosition(pos);
+            info.setLineNumber(line);
             return;
         }
 
-        if (type.getDataType() != STRING && type.getDataType() != BINARY) {
-            ParserException parserException =
-                    new ParserException(
-                            "YANG file error : " +
-                                    getYangConstructType(LENGTH_DATA) +
-                                    " name " + ctx.length().getText() +
-                                    " can be used to restrict the built-in type string/binary" +
-                                    " or types derived from string/binary.");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        if (dataType != STRING && dataType != BINARY) {
+            ParserException exc = new ParserException(E_INVALID_TYPE);
+            exc.setLine(line);
+            exc.setCharPosition(pos);
+            throw exc;
         }
-
-        YangRangeRestriction lengthRestriction = null;
         try {
-            lengthRestriction = processLengthRestriction(null, ctx.getStart().getLine(),
-                                                         ctx.getStart().getCharPositionInLine(), false,
-                                                         ctx.length().getText(), listener.getFileName());
+            lenRes = processLengthRes(null, line, pos, false, lenRes,
+                                      lis.getFileName());
         } catch (DataModelException e) {
-            ParserException parserException = new ParserException(e.getMessage());
-            parserException.setCharPosition(e.getCharPositionInLine());
-            parserException.setLine(e.getLineNumber());
-            throw parserException;
+            ParserException exc = new ParserException(e.getMessage());
+            exc.setCharPosition(e.getCharPositionInLine());
+            exc.setLine(e.getLineNumber());
+            throw exc;
         }
 
-        if (type.getDataType() == STRING) {
-            YangStringRestriction stringRestriction = (YangStringRestriction) type.getDataTypeExtendedInfo();
-            if (stringRestriction == null) {
-                stringRestriction = new YangStringRestriction();
-                stringRestriction.setFileName(listener.getFileName());
-                stringRestriction.setCharPosition(ctx.getStart().getCharPositionInLine());
-                stringRestriction.setLineNumber(ctx.getStart().getLine());
-                type.setDataTypeExtendedInfo(stringRestriction);
+        if (dataType == STRING) {
+            YangStringRestriction strRes = (YangStringRestriction) type
+                    .getDataTypeExtendedInfo();
+            if (strRes == null) {
+                strRes = new YangStringRestriction();
+                strRes.setFileName(lis.getFileName());
+                strRes.setCharPosition(ctx.getStart().getCharPositionInLine());
+                strRes.setLineNumber(ctx.getStart().getLine());
+                type.setDataTypeExtendedInfo(strRes);
             }
-
-            stringRestriction.setLengthRestriction(lengthRestriction);
+            strRes.setLengthRestriction(lenRes);
         } else {
-            type.setDataTypeExtendedInfo(lengthRestriction);
+            type.setDataTypeExtendedInfo(lenRes);
         }
-
-        listener.getParsedDataStack().push(lengthRestriction);
     }
 
     /**
      * Performs validation and updates the data model tree.
      * It is called when parser exits from grammar rule (length).
      *
-     * @param listener listener's object
-     * @param ctx      context object of the grammar rule
+     * @param lis listener object
+     * @param ctx context object
      */
-    public static void processLengthRestrictionExit(TreeWalkListener listener,
-                                                    GeneratedYangParser.LengthStatementContext ctx) {
+    public static void processLengthRestrictionExit(TreeWalkListener lis,
+                                                    LengthStatementContext ctx) {
+
+        String txt = ctx.length().getText();
 
         // Check for stack to be non empty.
-        checkStackIsNotEmpty(listener, MISSING_HOLDER, LENGTH_DATA, ctx.length().getText(), EXIT);
+        checkStackIsNotEmpty(lis, MISSING_HOLDER, LENGTH_DATA, txt, EXIT);
 
-        Parsable tmpData = listener.getParsedDataStack().peek();
-        if (tmpData instanceof YangRangeRestriction) {
-            listener.getParsedDataStack().pop();
-        } else if (tmpData instanceof YangType
-                && ((YangType) tmpData).getDataType() == DERIVED) {
-            // TODO : need to handle in linker
-        } else {
-            throw new ParserException(constructListenerErrorMessage(MISSING_CURRENT_HOLDER, LENGTH_DATA,
-                                                                    ctx.length().getText(), EXIT));
+        Parsable tmpData = lis.getParsedDataStack().peek();
+        if (!(tmpData instanceof YangRangeRestriction)) {
+            throw new ParserException(constructListenerErrorMessage(
+                    MISSING_CURRENT_HOLDER, LENGTH_DATA, txt, EXIT));
         }
+        lis.getParsedDataStack().pop();
     }
 }

@@ -563,13 +563,15 @@ public class Decimal64ListenerTest {
     public void processDecimal64MultiTypedefMultiInvalidRangeStatement() throws IOException, LinkerException {
         thrown.expect(LinkerException.class);
         thrown.expectMessage(
-                "Range interval doesn't fall within the referred restriction ranges" +
-                        " restriction ranges. in 0 at 0 in src/test/resources/decimal64/" +
-                        "Decimal64MultiTypedefMultiInvalidRangeStatement.yang\"type." +
-                        " in 19 at 12 in src/test/resources/decimal64/Decimal64MultiTypedef" +
-                        "MultiInvalidRangeStatement.yang");
+                "Range interval doesn't fall within the referred restriction" +
+                        " ranges restriction ranges. in 9 at 12 in src/test/" +
+                        "resources/decimal64/Decimal64MultiTypedefMultiInval" +
+                        "idRangeStatement.yang\"type. in 19 at 12 in src/tes" +
+                        "t/resources/decimal64/Decimal64MultiTypedefMultiInv" +
+                        "alidRangeStatement.yang");
 
-        manager.getDataModel("src/test/resources/decimal64/Decimal64MultiTypedefMultiInvalidRangeStatement.yang");
+        manager.getDataModel("src/test/resources/decimal64/Decimal64MultiTyp" +
+                                     "edefMultiInvalidRangeStatement.yang");
     }
 
     /**

@@ -21,12 +21,13 @@ import org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsg;
 import static org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus.INTRA_FILE_RESOLVED;
 import static org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus.RESOLVED;
-import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processLengthRestriction;
+import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processLengthRes;
 import static org.onosproject.yang.compiler.datamodel.utils.RestrictionResolver.processRangeRestriction;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypeUtils.isOfRangeRestrictedType;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
@@ -65,22 +66,22 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
     private YangDataTypes effectiveBuiltInType;
 
     /**
-     * Length restriction string to temporary store the length restriction when the type
+     * Length restriction string to store the length restriction when the type
      * is derived.
      */
-    private String lengthRestrictionString;
+    private YangRangeRestriction lengthRes;
 
     /**
-     * Range restriction string to temporary store the range restriction when the type
+     * Range restriction string to store the range restriction when the type
      * is derived.
      */
-    private String rangeRestrictionString;
+    private YangRangeRestriction rangeRes;
 
     /**
-     * Pattern restriction string to  temporary store the pattern restriction when the type
-     * is derived.
+     * Pattern restriction list to store the pattern restriction when the
+     * type is derived.
      */
-    private YangPatternRestriction patternRestriction;
+    private List<YangPatternRestriction> patternResList;
 
     /**
      * Returns the referred typedef reference.
@@ -110,57 +111,60 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
     }
 
     /**
-     * Returns the length restriction string.
+     * Returns the length restriction.
      *
-     * @return the length restriction string
+     * @return length restriction
      */
-    public String getLengthRestrictionString() {
-        return lengthRestrictionString;
+    public YangRangeRestriction getLengthRes() {
+        return lengthRes;
     }
 
     /**
-     * Sets the length restriction string.
+     * Sets the length restriction.
      *
-     * @param lengthRestrictionString the length restriction string
+     * @param lr length restriction
      */
-    public void setLengthRestrictionString(String lengthRestrictionString) {
-        this.lengthRestrictionString = lengthRestrictionString;
+    public void setLengthRes(YangRangeRestriction lr) {
+        lengthRes = lr;
     }
 
     /**
-     * Returns the range restriction string.
+     * Returns the range restriction.
      *
-     * @return the range restriction string
+     * @return range restriction
      */
-    public String getRangeRestrictionString() {
-        return rangeRestrictionString;
+    public YangRangeRestriction getRangeRes() {
+        return rangeRes;
     }
 
     /**
-     * Sets the range restriction string.
+     * Sets the range restriction.
      *
-     * @param rangeRestrictionString the range restriction string
+     * @param rr range restriction
      */
-    public void setRangeRestrictionString(String rangeRestrictionString) {
-        this.rangeRestrictionString = rangeRestrictionString;
+    public void setRangeRes(YangRangeRestriction rr) {
+        rangeRes = rr;
     }
 
     /**
-     * Returns the pattern restriction.
+     * Returns the pattern restriction list.
      *
-     * @return the pattern restriction
+     * @return pattern restriction list
      */
-    public YangPatternRestriction getPatternRestriction() {
-        return patternRestriction;
+    public List<YangPatternRestriction> getPatternResList() {
+        return patternResList;
     }
 
     /**
-     * Sets the pattern restriction.
+     * Adds the pattern to the pattern restriction list.
      *
-     * @param patternRestriction the pattern restriction
+     * @param pr pattern restriction
      */
-    public void setPatternRestriction(YangPatternRestriction patternRestriction) {
-        this.patternRestriction = patternRestriction;
+    public void addPatternRes(YangPatternRestriction pr) {
+        if (patternResList == null) {
+            patternResList = new LinkedList<>();
+        }
+        patternResList.add(pr);
     }
 
     /**
@@ -219,9 +223,8 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * case check whether no self restrictions should be present.
          */
         if (effectiveBuiltInType.isNonRestrictedType()) {
-            if (isNullOrEmpty(getLengthRestrictionString()) &&
-                    isNullOrEmpty(getRangeRestrictionString()) &&
-                    getPatternRestriction() == null) {
+            if (lengthRes == null && rangeRes == null && (
+                    patternResList == null || patternResList.isEmpty())) {
                 return RESOLVED;
             } else {
                 throw new DataModelException(getErrorMsg(
@@ -426,13 +429,13 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             throws DataModelException {
         YangStringRestriction curSr = null;
         YangRangeRestriction refRr = null;
-        YangPatternRestriction refPr = null;
+        List<YangPatternRestriction> refPr = null;
 
         /*
          * Check that range restriction should be null when built-in type is
          * string.
          */
-        if (!isNullOrEmpty(getRangeRestrictionString())) {
+        if (rangeRes != null) {
             throw new DataModelException(getErrorMsg(
                     "YANG file error: Range restriction should't be present for" +
                             " string data type.", ".", getLineNumber(),
@@ -443,8 +446,8 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * If referred restriction and self restriction both are null, no
          * resolution is required.
          */
-        if (refSr == null && isNullOrEmpty(getLengthRestrictionString()) &&
-                getPatternRestriction() == null) {
+        if (refSr == null && lengthRes == null && (patternResList == null ||
+                patternResList.isEmpty())) {
             return;
         }
 
@@ -454,11 +457,11 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          */
         if (refSr != null) {
             refRr = refSr.getLengthRestriction();
-            refPr = refSr.getPatternRestriction();
+            refPr = refSr.getPatternResList();
         }
 
         YangRangeRestriction lr = resolveLengthRestriction(refRr);
-        YangPatternRestriction pr = resolvePatternRestriction(refPr);
+        List<YangPatternRestriction> pr = resolvePatternRestriction(refPr);
 
         /*
          * Check if either of length or pattern restriction is present, if yes
@@ -470,7 +473,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
             curSr.setFileName(getFileName());
             curSr.setLineNumber(getLineNumber());
             curSr.setLengthRestriction(lr);
-            curSr.setPatternRestriction(pr);
+            curSr.setPatternResList(pr);
         }
         resolvedExtendedInfo = (T) curSr;
     }
@@ -484,10 +487,11 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
     private void resolveBinaryRestriction(YangRangeRestriction refLr)
             throws DataModelException {
 
-        if (rangeRestrictionString != null || patternRestriction != null) {
+        if (rangeRes != null || !(patternResList == null ||
+                patternResList.isEmpty())) {
             throw new DataModelException(getErrorMsg(
-                    "YANG file error: for binary range restriction or pattern " +
-                            "restriction is not allowed.", "type.",
+                    "YANG file error: for binary range restriction or " +
+                            "pattern restriction is not allowed.", "type.",
                     getLineNumber(), getCharPosition(), getFileName()));
         }
 
@@ -503,12 +507,13 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
      * @param refPr referred pattern restriction of typedef
      * @return resolved pattern restriction
      */
-    private YangPatternRestriction resolvePatternRestriction(YangPatternRestriction refPr) {
+    private List<YangPatternRestriction> resolvePatternRestriction(List<YangPatternRestriction> refPr) {
         /*
          * If referred restriction and self restriction both are null, no
          * resolution is required.
          */
-        if (refPr == null && getPatternRestriction() == null) {
+        if ((refPr == null || refPr.isEmpty()) && (patternResList == null ||
+                patternResList.isEmpty())) {
             return null;
         }
 
@@ -516,7 +521,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * If self restriction is null, and referred restriction is present
          * shallow copy the referred to self.
          */
-        if (getPatternRestriction() == null) {
+        if (patternResList == null || patternResList.isEmpty()) {
             return refPr;
         }
 
@@ -524,35 +529,35 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * If referred restriction is null, and self restriction is present
          * carry out self resolution.
          */
-        if (refPr == null) {
-            return getPatternRestriction();
+        if (refPr == null || refPr.isEmpty()) {
+            return patternResList;
         }
 
         /*
          * Get patterns of referred type and add it to current pattern
          * restrictions.
          */
-        for (String pattern : refPr.getPatternList()) {
-            getPatternRestriction().addPattern(pattern);
+        for (YangPatternRestriction pattern : refPr) {
+            addPatternRes(pattern);
         }
-        return getPatternRestriction();
+        return patternResList;
     }
 
     /**
      * Resolves the length restrictions.
      *
-     * @param refLenRestriction referred length restriction of typedef
+     * @param refLr referred length restriction of typedef
      * @return resolved length restriction
      * @throws DataModelException a violation in data model rule
      */
-    private YangRangeRestriction resolveLengthRestriction(
-            YangRangeRestriction refLenRestriction) throws DataModelException {
+    private YangRangeRestriction resolveLengthRestriction(YangRangeRestriction refLr)
+            throws DataModelException {
 
         /*
          * If referred restriction and self restriction both are null, no
          * resolution is required.
          */
-        if (refLenRestriction == null && isNullOrEmpty(getLengthRestrictionString())) {
+        if (refLr == null && lengthRes == null) {
             return null;
         }
 
@@ -560,32 +565,30 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * If self restriction is null, and referred restriction is present
          * shallow copy the referred to self.
          */
-        if (isNullOrEmpty(getLengthRestrictionString())) {
-            return refLenRestriction;
+        if (lengthRes == null) {
+            return refLr;
         }
 
         /*
          * If referred restriction is null, and self restriction is present
          * carry out self resolution.
          */
-        if (refLenRestriction == null) {
-            return processLengthRestriction(
-                    null, getLineNumber(), getCharPosition(), false,
-                    getLengthRestrictionString(), getFileName());
+        if (refLr == null) {
+            return processLengthRes(null, getLineNumber(), getCharPosition(),
+                                    false, lengthRes, getFileName());
         }
 
         /*
          * Carry out self resolution based with obtained effective built-in type
          * and MIN/MAX values as per the referred typedef's values.
          */
-        YangRangeRestriction curLengthRestriction =
-                processLengthRestriction(refLenRestriction, getLineNumber(),
-                                         getCharPosition(), true,
-                                         getLengthRestrictionString(), getFileName());
+        YangRangeRestriction curLr = processLengthRes(
+                refLr, getLineNumber(), getCharPosition(), true,
+                lengthRes, getFileName());
 
         // Resolve the range with referred typedef's restriction.
-        resolveLengthAndRangeRestriction(refLenRestriction, curLengthRestriction);
-        return curLengthRestriction;
+        resolveLengthAndRangeRestriction(refLr, curLr);
+        return curLr;
     }
 
     /**
@@ -629,19 +632,19 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * Check that string restriction should be null when built-in type is of
          * range type.
          */
-        if (!isNullOrEmpty(getLengthRestrictionString())
-                || getPatternRestriction() != null) {
+        if (lengthRes != null || !(patternResList == null ||
+                patternResList.isEmpty())) {
             throw new DataModelException(getErrorMsg(
-                    "YANG file error: Length/Pattern restriction should't be present" +
-                            " for int/uint/decimal data type.", "type.", getLineNumber(),
-                    getCharPosition(), getFileName()));
+                    "YANG file error: Length/Pattern restriction should't be " +
+                            "present for int/uint/decimal data type.", "type.",
+                    getLineNumber(), getCharPosition(), getFileName()));
         }
 
         /*
          * If referred restriction and self restriction both are null, no
          * resolution is required.
          */
-        if (refRangeRestriction == null && isNullOrEmpty(getRangeRestrictionString())) {
+        if (refRangeRestriction == null && rangeRes == null) {
             return;
         }
 
@@ -649,7 +652,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          * If self restriction is null, and referred restriction is present
          * shallow copy the referred to self.
          */
-        if (isNullOrEmpty(getRangeRestrictionString())) {
+        if (rangeRes == null) {
             resolvedExtendedInfo = (T) refRangeRestriction;
             return;
         }
@@ -661,7 +664,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
         if (refRangeRestriction == null) {
             YangRangeRestriction curRangeRestriction =
                     processRangeRestriction(null, getLineNumber(),
-                                            getCharPosition(), false, getRangeRestrictionString(),
+                                            getCharPosition(), false, rangeRes,
                                             effectiveBuiltInType, getFileName());
             resolvedExtendedInfo = (T) curRangeRestriction;
             return;
@@ -673,8 +676,7 @@ public class YangDerivedInfo<T> extends DefaultLocationInfo
          */
         YangRangeRestriction curRangeRestriction =
                 processRangeRestriction(refRangeRestriction, getLineNumber(),
-                                        getCharPosition(), true,
-                                        getRangeRestrictionString(),
+                                        getCharPosition(), true, rangeRes,
                                         effectiveBuiltInType, getFileName());
 
         // Resolve the range with referred typedef's restriction.

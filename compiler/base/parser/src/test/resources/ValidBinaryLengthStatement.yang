@@ -4,7 +4,10 @@ module Test {
     prefix Ant;
     leaf message {
         type binary {
-            length "4";
+            length "4" {
+                description "binary description";
+                reference "binary reference";
+            }
         }
     }
 }

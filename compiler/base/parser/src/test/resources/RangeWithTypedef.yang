@@ -1,0 +1,22 @@
+module Test {
+    yang-version 1;
+    namespace http://huawei.com;
+    prefix Ant;
+
+    typedef value {
+        type uint8 {
+            range "1..100" {
+                description "typedef description";
+                reference "typedef reference";
+            }
+        }
+    }
+    leaf invalid-interval {
+        type value {
+            range "2..100" {
+                description "range description";
+                reference "range reference";
+            }
+         }
+    }
+}

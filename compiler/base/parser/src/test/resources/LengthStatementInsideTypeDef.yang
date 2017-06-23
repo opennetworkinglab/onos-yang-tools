@@ -4,12 +4,18 @@ module Test {
     prefix Ant;
     typedef invalid-interval {
         type string {
-            length "1..100";
+            length "1..100" {
+                description "length-description typedef";
+                reference "reference typedef";
+            }
          }
     }
     leaf xyz {
        type invalid-interval {
-           length "2..100";
+           length "2..100"{
+                description "length-description type";
+                reference "reference type";
+            }
        }
     }
 }
