@@ -1,0 +1,10 @@
+module module-a {
+
+    namespace "urn:ietf:params:xml:ns:yang:module:a";
+
+    prefix mod-a;
+
+    leaf a-leaf {
+        type uint8;
+    }
+}

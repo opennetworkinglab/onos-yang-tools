@@ -17,7 +17,10 @@
 package org.onosproject.yang.compiler.plugin.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.onosproject.yang.compiler.api.YangCompilerException;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.tool.YangCompilerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
@@ -37,10 +40,13 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDire
  */
 public class AugmentTranslatorTest {
 
-    private final YangCompilerManager utilManager = new YangCompilerManager();
     private static final String DIR = "target/augmentTranslator/";
     private static final String COMP = System.getProperty("user.dir") + File
             .separator + DIR;
+    private final YangCompilerManager utilManager = new YangCompilerManager();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Checks augment translation should not result in any exception.
@@ -171,6 +177,250 @@ public class AugmentTranslatorTest {
 
         Set<Path> paths = new HashSet<>();
         for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of an augment linked to a target having
+     * same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processSingleAugToTgt() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/singleaugtotgt";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of two augments from two different modules
+     * linked to a target having same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processTwoAugToTgt() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/twoaugtotgt";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of two augments from module and its
+     * sub-module linked to a target having same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processSingleSubModToTgt() throws IOException,
+            ParserException, MojoExecutionException {
+
+        thrown.expect(YangCompilerException.class);
+        thrown.expectMessage(
+                "YANG File Error: Identifier collision detected in target " +
+                        "node as \"val in 12 at 8");
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/singlesubmodtotgt";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of two augments from same namespace
+     * sub-modules linked to a target having same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processTwoSubModToTgt() throws IOException,
+            ParserException, MojoExecutionException {
+
+        thrown.expect(YangCompilerException.class);
+        thrown.expectMessage(
+                "YANG File Error: Identifier collision detected in target " +
+                        "node as \"val in 12 at 8");
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/twosubmodtotgt";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of an augment from the same module linked
+     * to a target having same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processSelfAug() throws IOException,
+            ParserException, MojoExecutionException {
+
+        thrown.expect(YangCompilerException.class);
+        thrown.expectMessage(
+                "YANG File Error: Identifier collision detected in target " +
+                        "node as \"val in 16 at 8");
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/selfaug";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of two augments from the same module linked
+     * to a target having same node in the same level.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processSelfAugWithAug() throws IOException,
+            ParserException, MojoExecutionException {
+
+        thrown.expect(YangCompilerException.class);
+        thrown.expectMessage(
+                "YANG File Error: Identifier collision detected in target " +
+                        "node as \"val in 24 at 8");
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/selfaugwithaug";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks collision detection of augments which are inter connected in
+     * multiple files.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processAugToAug() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augmentcollision/augtoaug";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
             paths.add(Paths.get(file));
         }
 

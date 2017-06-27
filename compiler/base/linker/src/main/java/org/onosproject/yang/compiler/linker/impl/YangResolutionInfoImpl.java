@@ -96,7 +96,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.PA
 import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
 import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.DEVIATION_LINKING;
 import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.LEAF_REF_LINKING;
-import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.detectCollisionForAugmentedNode;
+import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.detectCollisionForAugment;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.fillPathPredicates;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.getErrorInfoForLinker;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.getLeafRefErrorInfo;
@@ -1063,7 +1063,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                             root, AUGMENT_LINKING);
             if (targetNode != null) {
                 if (targetNode instanceof YangAugmentableNode) {
-                    detectCollisionForAugmentedNode(targetNode, augment);
+                    detectCollisionForAugment(targetNode, augment,
+                                              (YangNode) root);
                     ((YangAugmentableNode) targetNode).addAugmentation(augment);
                     augment.setAugmentedNode(targetNode);
                     setAugmentedFlagInAncestors(targetNode);

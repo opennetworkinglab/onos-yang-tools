@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.linker.impl;
 
+import org.onosproject.yang.compiler.datamodel.LocationInfo;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
@@ -33,6 +34,7 @@ import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
+import org.onosproject.yang.compiler.datamodel.YangNamespace;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangPathPredicate;
@@ -61,7 +63,7 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.COLLISION_DETECTION;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.FAILED_TO_ADD_CASE;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.TARGET_NODE;
-import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.TARGET_NODE_LEAF_INFO;
+import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.TGT_LEAF;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsg;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsgCollision;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.addResolutionInfo;
@@ -112,79 +114,175 @@ public final class YangLinkerUtils {
     }
 
     /**
-     * Detects collision between target nodes leaf/leaf-list or child node with
-     * augmented leaf/leaf-list or child node.
+     * Detects collision between target nodes' leaf/leaf-list or child node
+     * with augmented leaf/leaf-list or child node.
      *
-     * @param targetNode target node
-     * @param augment    augment node
+     * @param tgt     target node
+     * @param aug     YANG augment
+     * @param augRoot augment's root
      */
-    private static void detectCollision(YangNode targetNode, YangAugment augment) {
-        YangNode targetNodesChild = targetNode.getChild();
-        YangNode augmentsChild = augment.getChild();
-        if (targetNode instanceof YangChoice) {
-            addCaseNodeToChoiceTarget(augment);
-        } else {
-            detectCollisionInLeaveHolders(targetNode, augment);
-            while (augmentsChild != null) {
-                detectCollisionInChildNodes(targetNodesChild, augmentsChild);
-                augmentsChild = augmentsChild.getNextSibling();
+    private static void detectCollision(YangNode tgt, YangAugment aug,
+                                        YangNode augRoot) {
+        YangNode tgtRoot = getTgtRootNode(tgt);
+        String augNs = ((YangNamespace) augRoot).getModuleNamespace();
+        String tgtNs = ((YangNamespace) tgtRoot).getModuleNamespace();
+
+        if (tgt instanceof YangChoice) {
+            addCaseNodeToChoiceTarget(aug);
+        }
+        detectCollisionInTgt(tgt, aug, augNs, tgtNs);
+    }
+
+    /**
+     * Detects collision in the target node according to the namespace match
+     * of the nodes.
+     *
+     * @param tgt   target node
+     * @param aug   YANG augment
+     * @param augNs augment root namespace
+     * @param tgtNs target root namespace
+     */
+    private static void detectCollisionInTgt(YangNode tgt, YangAugment aug,
+                                             String augNs, String tgtNs) {
+        if (!(augNs.equals(tgtNs))) {
+            return;
+        }
+
+        YangNode aChild = aug.getChild();
+        YangNode tChild = tgt.getChild();
+        List<YangLeaf> aL = aug.getListOfLeaf();
+        List<YangLeafList> aLl = aug.getListOfLeafList();
+
+        List<YangLeaf> tL = null;
+        List<YangLeafList> tLl = null;
+
+        if (tgt instanceof YangLeavesHolder) {
+            tL = ((YangLeavesHolder) tgt).getListOfLeaf();
+            tLl = ((YangLeavesHolder) tgt).getListOfLeafList();
+        }
+
+        detectLeavesCollision(tL, tLl, aL, aLl);
+        while (aChild != null) {
+            detectNodeCollision(aChild, tChild, aL, aLl);
+            detectLeafCollision(aChild.getName(), aChild, tL);
+            detectLeafListCollision(aChild.getName(), aChild, tLl);
+            aChild = aChild.getNextSibling();
+        }
+    }
+
+    /**
+     * Detects collision between augment's leaves and leaf lists' identifier
+     * with target node leaves and leaf lists' identifier.
+     *
+     * @param tL  target leaves
+     * @param tLl target leaf lists
+     * @param aL  augment leaves
+     * @param aLl augment leaf lists
+     */
+    private static void detectLeavesCollision(List<YangLeaf> tL,
+                                              List<YangLeafList> tLl,
+                                              List<YangLeaf> aL,
+                                              List<YangLeafList> aLl) {
+        if (aL != null && !aL.isEmpty()) {
+            for (YangLeaf aLeaf : aL) {
+                detectLeafCollision(aLeaf.getName(), aLeaf, tL);
+                detectLeafListCollision(aLeaf.getName(), aLeaf, tLl);
+            }
+        }
+        if (aLl != null && !aLl.isEmpty()) {
+            for (YangLeafList aLeafList : aLl) {
+                detectLeafCollision(aLeafList.getName(), aLeafList, tL);
+                detectLeafListCollision(aLeafList.getName(), aLeafList, tLl);
             }
         }
     }
 
-    /*Detects collision between leaves/leaf-lists*/
-    private static void detectCollisionInLeaveHolders(YangNode targetNode, YangAugment augment) {
-        YangLeavesHolder targetNodesLeavesHolder = (YangLeavesHolder) targetNode;
-        if (augment.getListOfLeaf() != null && augment.getListOfLeaf().isEmpty() &&
-                targetNodesLeavesHolder.getListOfLeaf() != null) {
-            for (YangLeaf leaf : augment.getListOfLeaf()) {
-                for (YangLeaf targetLeaf : targetNodesLeavesHolder.getListOfLeaf()) {
-                    detectCollision(targetLeaf.getName(), leaf.getName(),
-                                    leaf.getLineNumber(),
-                                    leaf.getCharPosition(),
-                                    leaf.getFileName(), TARGET_NODE_LEAF_INFO);
-                }
-            }
-        }
-        if (augment.getListOfLeafList() != null &&
-                augment.getListOfLeafList().isEmpty() &&
-                targetNodesLeavesHolder.getListOfLeafList() != null) {
-            for (YangLeafList leafList : augment.getListOfLeafList()) {
-                for (YangLeafList targetLeafList : targetNodesLeavesHolder.getListOfLeafList()) {
-                    detectCollision(targetLeafList.getName(), leafList.getName(),
-                                    leafList.getLineNumber(),
-                                    leafList.getCharPosition(),
-                                    leafList.getFileName(), TARGET_NODE_LEAF_INFO);
-                }
+    /**
+     * Detects collision with list of leaf-list name and any comparable
+     * identifier.
+     *
+     * @param name       comparable identifier
+     * @param info       location info
+     * @param leavesList list of leaf-list
+     */
+    private static void detectLeafListCollision(String name, LocationInfo info,
+                                                List<YangLeafList> leavesList) {
+        if (leavesList != null && !leavesList.isEmpty()) {
+            for (YangLeafList ll : leavesList) {
+                detectCollision(ll.getName(), name, info, TGT_LEAF);
             }
         }
     }
 
+    /**
+     * Detects collision with list of leaf name and any comparable
+     * identifier.
+     *
+     * @param name   comparable identifier
+     * @param info   location info
+     * @param leaves list of leaf
+     */
+    private static void detectLeafCollision(String name, LocationInfo info,
+                                            List<YangLeaf> leaves) {
+        if (leaves != null && !leaves.isEmpty()) {
+            for (YangLeaf leaf : leaves) {
+                detectCollision(leaf.getName(), name, info, TGT_LEAF);
+            }
+        }
+    }
 
+    /**
+     * Detects node collision of augment children nodes, leaves and leaf-lists
+     * with target node's children nodes.
+     *
+     * @param aug YANG augment's child
+     * @param tgt target node's child
+     * @param aL  augment leaves
+     * @param aLl augment leaf lists
+     */
+    private static void detectNodeCollision(YangNode aug, YangNode tgt,
+                                            List<YangLeaf> aL,
+                                            List<YangLeafList> aLl) {
+        while (tgt != null) {
+            detectCollision(tgt.getName(), aug.getName(), aug, TARGET_NODE);
+            detectLeafCollision(tgt.getName(), tgt, aL);
+            detectLeafListCollision(tgt.getName(), tgt, aLl);
+            tgt = tgt.getNextSibling();
+        }
+    }
+
+    /**
+     * Returns module or sub-module node of any YANG node.
+     *
+     * @param node YANG node
+     * @return root node
+     */
+    private static YangNode getTgtRootNode(YangNode node) {
+        YangNode root = node;
+        while (!(root instanceof YangReferenceResolver)) {
+            root = root.getParent();
+            if (root == null) {
+                throw new LinkerException("Datamodel tree is not correct");
+            }
+        }
+        return root;
+    }
+
+    /**
+     * Detects collision for two strings and throws exception if collision
+     * occurs.
+     *
+     * @param first  first string
+     * @param second second string
+     * @param info   location info
+     * @param type   collision type
+     */
     private static void detectCollision(String first, String second,
-                                        int line, int position, String
-                                                fileName, String type) {
+                                        LocationInfo info, String type) {
         if (first.equals(second)) {
             throw new LinkerException(getErrorMsgCollision(
-                    COLLISION_DETECTION, second, line, position, type,
-                    fileName));
-        }
-    }
-
-    /*Detects collision for child nodes.*/
-    private static void detectCollisionInChildNodes(YangNode targetNodesChild,
-                                                    YangNode augmentsChild) {
-        while (augmentsChild != null) {
-            while (targetNodesChild != null) {
-                if (targetNodesChild.getName().equals(augmentsChild.getName())) {
-                    detectCollision(targetNodesChild.getName(), augmentsChild.getName(),
-                                    augmentsChild.getLineNumber(),
-                                    augmentsChild.getCharPosition(),
-                                    augmentsChild.getFileName(), TARGET_NODE);
-                }
-                targetNodesChild = targetNodesChild.getNextSibling();
-            }
-            augmentsChild = augmentsChild.getNextSibling();
+                    COLLISION_DETECTION, second, info.getLineNumber(),
+                    info.getCharPosition(), type, info.getFileName()));
         }
     }
 
@@ -358,19 +456,23 @@ public final class YangLinkerUtils {
     }
 
     /**
-     * Detects collision between target nodes and its all leaf/leaf-list or child
-     * node with augmented leaf/leaf-list or child node.
+     * Detects collision between augment nodes' children and target nodes'
+     * nodes children and also between augment nodes' children and other
+     * augmented nodes.
      *
-     * @param targetNode target node
-     * @param augment    augment node
+     * @param tgt     target node
+     * @param aug     YANG augment
+     * @param augRoot augment's root
      */
-    static void detectCollisionForAugmentedNode(YangNode targetNode, YangAugment augment) {
+    static void detectCollisionForAugment(YangNode tgt, YangAugment aug,
+                                          YangNode augRoot) {
         // Detect collision for target node and augment node.
-        detectCollision(targetNode, augment);
-        List<YangAugment> yangAugmentedInfo = ((YangAugmentableNode) targetNode).getAugmentedInfoList();
+        detectCollision(tgt, aug, augRoot);
+        List<YangAugment> infoList = ((YangAugmentableNode) tgt)
+                .getAugmentedInfoList();
         // Detect collision for target augment node and current augment node.
-        for (YangAugment info : yangAugmentedInfo) {
-            detectCollision(info, augment);
+        for (YangAugment info : infoList) {
+            detectCollision(info, aug, augRoot);
         }
     }
 

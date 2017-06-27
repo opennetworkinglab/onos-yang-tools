@@ -39,8 +39,8 @@ public final class ErrorMessages {
     public static final String INVALID_CASE_HOLDER
             = "\"Internal Data Model Tree Error: Invalid/Missing \"" +
             "                                   \"holder in case \"";
-    public static final String TARGET_NODE_LEAF_INFO = "target node leaf/leaf-list";
-    public static final String TARGET_NODE = "target node ";
+    public static final String TGT_LEAF = " target node leaf/leaf-list";
+    public static final String TARGET_NODE = " target node ";
     public static final String COLLISION_DETECTION = "YANG File Error: " +
             "Identifier collision detected in";
     public static final String FAILED_TO_ADD_CASE = "Failed to add child " +

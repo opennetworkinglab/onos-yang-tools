@@ -95,7 +95,7 @@ module ietf-inet {
     }           
   
     augment /get-port/input {
-       leaf port {
+       leaf port-n {
            type int32;
         }
     }      

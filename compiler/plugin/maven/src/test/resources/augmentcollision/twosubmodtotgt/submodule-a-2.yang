@@ -1,0 +1,18 @@
+submodule sub-module-a2 {
+
+    belongs-to "module-a" {
+        prefix "mod-a";
+    }
+
+    import module-b {
+        prefix mod-b;
+    }
+
+    augment "/mod-b:cont" {
+        container val {
+            leaf arg {
+                type string;
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+module module-b {
+
+    namespace "urn:ietf:params:xml:ns:yang:module:b";
+
+    prefix mod-b;
+
+    container cont{
+        container val {
+            leaf-list create {
+                type string;
+            }
+        }
+    }
+}

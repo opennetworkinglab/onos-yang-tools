@@ -1,0 +1,30 @@
+module module-a {
+
+    namespace "urn:ietf:params:xml:ns:yang:module:a";
+
+    prefix mod-a;
+
+    container cont{
+        container valid {
+            leaf-list create {
+                type string;
+            }
+        }
+    }
+
+    augment "/cont" {
+        container val {
+            leaf arg {
+                type string;
+            }
+        }
+    }
+
+    augment "/mod-a:cont" {
+        container val {
+            leaf arg {
+                type string;
+            }
+        }
+    }
+}

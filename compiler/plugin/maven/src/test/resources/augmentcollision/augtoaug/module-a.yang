@@ -1,0 +1,20 @@
+module module-a {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:a";
+
+    prefix mod-a;
+
+    import module-c {
+        prefix mod-c;
+    }
+
+    import module-b {
+        prefix mod-b;
+    }
+
+    augment "/mod-b:cont/mod-c:val" {
+        leaf arg {
+            type string;
+        }
+    }
+}
