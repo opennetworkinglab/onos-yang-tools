@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.model;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -27,9 +28,10 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 /**
  * Represents default YANG model implementation.
  */
-public class DefaultYangModel implements YangModel {
+public class DefaultYangModel implements YangModel, Serializable {
 
     private final Map<YangModuleId, YangModule> moduleMap;
+    private String modelId;
 
     /**
      * Creates an instance of YANG model.
@@ -37,6 +39,7 @@ public class DefaultYangModel implements YangModel {
      * @param b YANG model builder
      */
     private DefaultYangModel(Builder b) {
+        modelId = b.modelId;
         moduleMap = b.moduleMap;
     }
 
@@ -67,6 +70,11 @@ public class DefaultYangModel implements YangModel {
     }
 
     @Override
+    public String getYangModelId() {
+        return modelId;
+    }
+
+    @Override
     public YangModule getYangModule(YangModuleId id) {
         return moduleMap.get(id);
     }
@@ -79,7 +87,7 @@ public class DefaultYangModel implements YangModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(moduleMap);
+        return Objects.hash(moduleMap, modelId);
     }
 
     @Override
@@ -99,13 +107,14 @@ public class DefaultYangModel implements YangModel {
         } else {
             return false;
         }
-        return true;
+        return Objects.equals(modelId, that.modelId);
     }
 
     @Override
     public String toString() {
         return toStringHelper(getClass())
                 .add("model", moduleMap)
+                .add("modelId", modelId)
                 .toString();
     }
 
@@ -123,6 +132,7 @@ public class DefaultYangModel implements YangModel {
      */
     public static class Builder implements YangModel.Builder {
         private final Map<YangModuleId, YangModule> moduleMap;
+        private String modelId;
 
         /**
          * Creates an instance of YANG model builder.
@@ -134,6 +144,12 @@ public class DefaultYangModel implements YangModel {
         @Override
         public Builder addModule(YangModuleId id, YangModule module) {
             moduleMap.put(id, module);
+            return this;
+        }
+
+        @Override
+        public Builder addModelId(String id) {
+            modelId = id;
             return this;
         }
 

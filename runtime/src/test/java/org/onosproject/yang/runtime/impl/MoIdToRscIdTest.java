@@ -28,7 +28,6 @@ import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
-
 import org.onosproject.yang.gen.v1.check.check.Cont53;
 import org.onosproject.yang.gen.v1.check.check.DefaultCont53;
 import org.onosproject.yang.gen.v1.check.check.DefaultList56;
@@ -68,6 +67,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.INT32;
 import static org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.multiplexes.TypesEnum.SPACE_DIVISION;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.addMockNode;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -76,8 +78,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MoIdToRscIdTest {
 
     private final Logger log = getLogger(getClass());
-    private final TestYangSchemaNodeProvider provider = new
-            TestYangSchemaNodeProvider();
     ModIdToRscIdConverter builder;
     DefaultYangModelRegistry reg;
     private ResourceId rscId;
@@ -89,8 +89,8 @@ public class MoIdToRscIdTest {
      * Sets up all prerequisite.
      */
     private void setUp() {
-        provider.processSchemaRegistry();
-        reg = provider.registry();
+        processSchemaRegistry();
+        reg = registry();
         builder = new ModIdToRscIdConverter(reg);
     }
 
@@ -105,7 +105,7 @@ public class MoIdToRscIdTest {
         } catch (DataModelException e) {
             log.info("test error");
         }
-        provider.addMockNode(mod, getQualifiedName());
+        addMockNode(mod, getQualifiedName());
     }
 
     /**
@@ -119,7 +119,7 @@ public class MoIdToRscIdTest {
         } catch (DataModelException e) {
             log.info("test error");
         }
-        provider.addMockNode(mod, getQualifiedName());
+        addMockNode(mod, getQualifiedName());
     }
 
     /**

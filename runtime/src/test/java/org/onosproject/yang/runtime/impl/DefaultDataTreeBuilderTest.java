@@ -121,6 +121,8 @@ import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALU
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /*
  *
@@ -139,8 +141,6 @@ import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
  */
 public class DefaultDataTreeBuilderTest {
 
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
     private ResourceData rscData;
@@ -159,8 +159,8 @@ public class DefaultDataTreeBuilderTest {
      * Do the prior setup for each UT.
      */
     private void setUp() {
-        schemaProvider.processSchemaRegistry();
-        registry = schemaProvider.registry();
+        processSchemaRegistry();
+        registry = registry();
         treeBuilder = new DefaultDataTreeBuilder(registry);
     }
 

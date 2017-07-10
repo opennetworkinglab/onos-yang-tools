@@ -22,20 +22,18 @@ import org.onosproject.yang.runtime.YangSerializerContext;
 
 import java.util.List;
 
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
+
 /**
  * Tests the default schema context provider methods.
  */
 public class TestYangSerializerContext implements YangSerializerContext {
 
-    private static TestYangSchemaNodeProvider schemaProvider =
-            new TestYangSchemaNodeProvider();
-
-
     @Override
     public SchemaContext getContext() {
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
-        return registry;
+        processSchemaRegistry();
+        return registry();
     }
 
     @Override

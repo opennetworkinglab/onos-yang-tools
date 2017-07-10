@@ -27,30 +27,35 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
-import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafListSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Tests the default schema context methods.
  */
 public class LeafSchemaContextTest {
 
-    private static TestYangSchemaNodeProvider schemaProvider =
-            new TestYangSchemaNodeProvider();
+    private static final String FOODNS = "yrt:food";
+    private DefaultYangModelRegistry registry;
 
-    public static final String FOODNS = "yrt:food";
+    /**
+     * Do the prior setup for each UT.
+     */
+    private void setUp() {
+        processSchemaRegistry();
+        registry = registry();
+    }
 
     /**
      * Checks leaf, leaf-list, choice-case data node parent context.
      */
     @Test
     public void leafSchemaContTest() throws DataModelException {
-
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
+        setUp();
         SchemaId id = new SchemaId("food", FOODNS);
         YangNode child = (YangNode) registry.getChildContext(id);
         checkSchemaContext("food", FOODNS, "/", null,

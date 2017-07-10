@@ -33,26 +33,11 @@ public interface YangCompilationParam {
     Set<Path> getYangFiles();
 
     /**
-     * Adds YANG file path. This could be a directory in which YANG files are
-     * available.
-     *
-     * @param path YANG file path
-     */
-    void addYangFile(Path path);
-
-    /**
      * Returns set of dependent metadata paths.
      *
      * @return set of dependent metadata path
      */
     Set<Path> getDependentSchemas();
-
-    /**
-     * Adds dependent metadata path.
-     *
-     * @param path metadata path
-     */
-    void addDependentSchema(Path path);
 
     /**
      * Returns the desired path of generated code. If its not specified default
@@ -63,13 +48,6 @@ public interface YangCompilationParam {
     Path getCodeGenDir();
 
     /**
-     * Sets code generation directory.
-     *
-     * @param path expected code generation directory
-     */
-    void setCodeGenDir(Path path);
-
-    /**
      * Returns the desired path of metadata. If its not specified default
      * path will be taken.
      *
@@ -78,9 +56,9 @@ public interface YangCompilationParam {
     Path getMetadataGenDir();
 
     /**
-     * Sets metadata generation directory.
+     * Returns the model identifier.
      *
-     * @param path expected metadata generation directory
+     * @return model identifier
      */
-    void setMetadataGenDir(Path path);
+    String getModelId();
 }

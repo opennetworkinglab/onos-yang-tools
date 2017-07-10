@@ -57,6 +57,7 @@ public class IetfYangFileTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();

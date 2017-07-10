@@ -38,6 +38,13 @@ public interface YangModel {
     Set<YangModuleId> getYangModulesId();
 
     /**
+     * Returns model id for requested context.
+     *
+     * @return YANG model identifier
+     */
+    String getYangModelId();
+
+    /**
      * Returns YANG module information corresponding to a given module
      * identifier.
      *
@@ -68,6 +75,14 @@ public interface YangModel {
          * @return builder
          */
         Builder addModule(YangModuleId id, YangModule module);
+
+        /**
+         * Adds model identifier.
+         *
+         * @param modelId model identifier
+         * @return builder
+         */
+        Builder addModelId(String modelId);
 
         /**
          * Builds an instance of YANG model.

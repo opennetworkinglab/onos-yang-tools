@@ -17,22 +17,20 @@
 package org.onosproject.yang.runtime.helperutils;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.utils.DataModelUtils;
-import org.onosproject.yang.model.DefaultYangModel;
-import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.model.YangModuleId;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static java.nio.file.Paths.get;
-import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.parseJarFile;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.getYangNodes;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.parseJarFile;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.processYangModel;
 import static org.osgi.framework.FrameworkUtil.getBundle;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -66,51 +64,28 @@ public final class YangApacheUtils {
         BundleContext context = getBundle(modClass).getBundleContext();
         if (context != null) {
             Bundle bundle = context.getBundle();
-            List<YangNode> curNodes;
+            List<YangNode> curNodes = new ArrayList<>();
             String jarPath;
             String metaPath;
             jarPath = getJarPathFromBundleLocation(
                     bundle.getLocation(), context.getProperty(USER_DIRECTORY));
             metaPath = jarPath + SLASH + YANG_RESOURCES + SLASH + YANG_META_DATA;
-            curNodes = processJarParsingOperations(jarPath);
-            // process model creations.
-            if (curNodes != null && !curNodes.isEmpty()) {
-                return processYangModel(metaPath, curNodes);
+            YangModel model = processJarParsingOperations(jarPath);
+            if (model != null) {
+                curNodes.addAll(getYangNodes(model));
+                // process model creations.
+                if (!curNodes.isEmpty()) {
+                    try {
+                        return processYangModel(metaPath, curNodes,
+                                                model.getYangModelId(), false);
+                    } catch (IOException e) {
+                        log.error(" failed to create process YANG model " +
+                                          e.getMessage(), e);
+                    }
+                }
             }
         }
         return null;
-    }
-
-    /**
-     * Returns YANG model for application.
-     *
-     * @param path     path for metadata file
-     * @param curNodes curNodes YANG nodes
-     * @return YANG model
-     */
-    public static YangModel processYangModel(String path,
-                                             List<YangNode> curNodes) {
-        YangModel.Builder b = DefaultYangModel.builder();
-        YangModuleId id;
-        for (YangNode node : curNodes) {
-            id = processModuleId(node);
-            YangModuleExtendedInfo module =
-                    new YangModuleExtendedInfo(id, get(node.getFileName()), get(path));
-            module.setSchema(node);
-            b.addModule(id, module);
-        }
-        return b.build();
-    }
-
-    /**
-     * Returns YANG module id for a given YANG module node.
-     *
-     * @param module YANG module
-     * @return YANG module id for a given YANG module node
-     */
-    public static YangModuleId processModuleId(YangNode module) {
-        String rev = DataModelUtils.getDateInStringFormat(module);
-        return new DefaultYangModuleId(module.getName(), rev);
     }
 
     /**
@@ -148,12 +123,12 @@ public final class YangApacheUtils {
     }
 
     /**
-     * Process jar file for fetching YANG nodes.
+     * Process jar file for fetching YANG model.
      *
      * @param path jar file path
-     * @return YANG schema nodes
+     * @return YANG model
      */
-    private static List<YangNode> processJarParsingOperations(String path) {
+    private static YangModel processJarParsingOperations(String path) {
         //Deserialize data model and get the YANG node set.
         String jar = path + JAR;
         try {

@@ -48,15 +48,17 @@ public class YangStep extends AbstractExecutionStep {
     private final ProjectFilesystem filesystem;
     private final List<Path> srcs;
     private final Path output;
+    private final String modelId;
 
     YangStep(ProjectFilesystem filesystem,
              List<Path> srcs,
-             Path genSourcesDirectory, ImmutableSortedSet<BuildRule> deps) {
+             Path genSourcesDirectory, ImmutableSortedSet<BuildRule> deps, String id) {
         super(DESCRIPTION);
         this.filesystem = filesystem;
         this.srcs = srcs;
         this.deps = deps;
         this.output = genSourcesDirectory;
+        modelId = id;
     }
 
     @Override
@@ -67,8 +69,8 @@ public class YangStep extends AbstractExecutionStep {
             List<File> sourceFiles = srcs.stream().map(Path::toFile)
                     .collect(Collectors.toList());
             try {
-                new YangGenerator(sourceFiles, output.toString(), getJarPaths())
-                        .execute();
+                new YangGenerator(sourceFiles, output.toString(), getJarPaths(),
+                                  modelId).execute();
                 return StepExecutionResult.SUCCESS;
             } catch (YangParsingException e) {
                 executionContext.getConsole().printErrorText(e.getMessage());

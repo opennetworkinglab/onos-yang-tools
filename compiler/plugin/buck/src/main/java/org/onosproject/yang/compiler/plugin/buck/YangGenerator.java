@@ -16,7 +16,6 @@
 
 package org.onosproject.yang.compiler.plugin.buck;
 
-import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
 import org.onosproject.yang.compiler.api.YangCompilerService;
@@ -41,6 +40,7 @@ public class YangGenerator {
     private final List<String> depJar;
     private String outputDirectory;
     private YangCompiledOutput output;
+    private String modelId;
 
     /**
      * Creates an instance of YANG generator.
@@ -48,11 +48,13 @@ public class YangGenerator {
      * @param models          YANG models
      * @param outputDirectory output directory
      * @param depJar          dependent jar paths
+     * @param id              model id
      */
-    YangGenerator(List<File> models, String outputDirectory, List<String> depJar) {
+    YangGenerator(List<File> models, String outputDirectory, List<String> depJar, String id) {
         this.models = models;
         this.depJar = depJar;
         this.outputDirectory = outputDirectory + SLASH;
+        modelId = id;
     }
 
     /**
@@ -66,31 +68,34 @@ public class YangGenerator {
             YangCompilerService compiler = new YangCompilerManager();
 
             //Create compiler param.
-            YangCompilationParam param = new DefaultYangCompilationParam();
+            DefaultYangCompilationParam.Builder bldr =
+                    DefaultYangCompilationParam.builder();
 
             //Need to get dependent schema paths to give inter jar dependencies.
             for (String jar : depJar) {
                 try {
                     File path = parseDepSchemaPath(jar, outputDirectory);
                     if (path != null) {
-                        param.addDependentSchema(Paths.get(path.getAbsolutePath()));
+                        bldr.addDependentSchema(Paths.get(path.getAbsolutePath()));
                     }
                 } catch (IOException e) {
                     throw new YangCompilerException(
                             "Failed to parse dependent schema path");
                 }
             }
-            param.setCodeGenDir(Paths.get(outputDirectory));
-            param.setMetadataGenDir(Paths.get(outputDirectory + SLASH +
-                                                      YANG_RESOURCES + SLASH));
+            bldr.setCodeGenDir(Paths.get(outputDirectory));
+            bldr.setMetadataGenDir(Paths.get(outputDirectory + SLASH +
+                                                     YANG_RESOURCES + SLASH));
 
             for (File file : models) {
-                param.addYangFile(Paths.get(file.getAbsolutePath()));
+                bldr.addYangFile(Paths.get(file.getAbsolutePath()));
             }
+
+            bldr.setModelId(modelId);
 
             //Compile yang files and generate java code.
             try {
-                output = compiler.compileYangFiles(param);
+                output = compiler.compileYangFiles(bldr.build());
             } catch (IOException e) {
                 throw new YangParsingException(e);
             }

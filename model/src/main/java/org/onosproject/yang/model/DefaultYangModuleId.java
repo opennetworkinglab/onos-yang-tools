@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -24,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Represents default YANG module identifier.
  */
-public class DefaultYangModuleId implements YangModuleId {
+public class DefaultYangModuleId implements YangModuleId, Serializable {
 
     private String moduleName;
     private String revision;

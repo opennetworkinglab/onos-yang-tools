@@ -20,18 +20,18 @@ import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.runtime.Annotation;
 import org.onosproject.yang.runtime.DefaultAnnotation;
 import org.onosproject.yang.runtime.YangSerializerContext;
-import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Tests the default schema context provider methods.
  */
 public class MockYangSerializerContext implements YangSerializerContext {
 
-    private static MockYangSchemaNodeProvider schemaProvider =
-            new MockYangSchemaNodeProvider();
     private static final String NETCONF_NS =
             "urn:ietf:params:xml:ns:netconf:base:1.0";
     private static final String XMNLS_NC = "xml:xc";
@@ -39,9 +39,8 @@ public class MockYangSerializerContext implements YangSerializerContext {
 
     @Override
     public SchemaContext getContext() {
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
-        return registry;
+        processSchemaRegistry();
+        return registry();
     }
 
     @Override

@@ -64,6 +64,9 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     private static final String AT = "@";
     private final Logger log = getLogger(getClass());
     private static final String E_NEXIST = "node with {} namespace not found.";
+    private static final String E_MEXIST =
+            "Model with given modelId already exist";
+    private static final String E_NULL = "Model must not be null";
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -97,40 +100,37 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     private final ConcurrentMap<String, YangSchemaNode> nameSpaceSchemaStore;
 
     /**
-     * Set of YANG models.
+     * Map for storing YANG model with respect to model identifier. Will
+     * be used by other application to register and unregister the YANG
+     * models based on model identifier.
      */
-    private final Set<YangModel> models;
+    private final ConcurrentMap<String, YangModel> modelIdStore;
 
     /**
      * Creates an instance of default YANG schema registry.
      */
     public DefaultYangModelRegistry() {
-        models = new LinkedHashSet<>();
         yangSchemaStore = new ConcurrentHashMap<>();
         regClassNameKeyStore = new ConcurrentHashMap<>();
         registerClassStore = new ConcurrentHashMap<>();
         nameSpaceSchemaStore = new ConcurrentHashMap<>();
         qNameKeyStore = new ConcurrentHashMap<>();
+        modelIdStore = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void registerModel(ModelRegistrationParam param) {
-        YangModel model = checkNotNull(param.getYangModel(), "Model must not be null");
+    public void registerModel(ModelRegistrationParam param) throws
+            IllegalArgumentException {
+        YangModel model = checkNotNull(param.getYangModel(), E_NULL);
         Set<YangNode> curNodes = getNodes(model);
-        models.add(model);
-        String name;
-        Class<?> service;
-        AppModuleInfo info;
+
         //adding class info if added by application.
-        for (YangModuleId id : model.getYangModulesId()) {
-            info = param.getAppModuleInfo(id);
-            if (info != null) {
-                service = info.getModuleClass();
-                name = service.getName();
-                if (!registerClassStore.containsKey(name)) {
-                    registerClassStore.put(name, service);
-                }
-            }
+        updateRegClassStore(param);
+
+        if (modelIdStore.containsKey(model.getYangModelId())) {
+            throw new IllegalArgumentException(E_MEXIST);
+        } else {
+            modelIdStore.put(model.getYangModelId(), param.getYangModel());
         }
 
         //Register all the YANG nodes.
@@ -164,9 +164,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     @Override
     public void unregisterModel(ModelRegistrationParam param) {
         synchronized (DefaultYangModelRegistry.class) {
-            YangModel model = checkNotNull(param.getYangModel(),
-                                           "Model must not be null");
-            models.remove(model);
+            YangModel model = checkNotNull(param.getYangModel(), E_NULL);
+            modelIdStore.remove(model.getYangModelId());
             //Unregister all yang files
             Set<YangNode> curNodes = getNodes(model);
             for (YangNode node : curNodes) {
@@ -196,6 +195,10 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
     @Override
     public Set<YangModel> getModels() {
+        Set<YangModel> models = new LinkedHashSet<>();
+        for (Map.Entry<String, YangModel> entry : modelIdStore.entrySet()) {
+            models.add(entry.getValue());
+        }
         return unmodifiableSet(models);
     }
 
@@ -206,8 +209,26 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * @param schemaName schema name
      * @return YANG schema node
      */
-    YangSchemaNode getForSchemaName(String schemaName) {
+    public YangSchemaNode getForSchemaName(String schemaName) {
         return getForNameWithRev(schemaName);
+    }
+
+    @Override
+    public YangModel getModel(String id) {
+        return modelIdStore.get(id);
+    }
+
+    @Override
+    public org.onosproject.yang.model.YangModule getModule(YangModuleId id) {
+        for (Map.Entry<String, YangModel> entry : modelIdStore
+                .entrySet()) {
+            org.onosproject.yang.model.YangModule module = entry.getValue()
+                    .getYangModule(id);
+            if (module != null) {
+                return module;
+            }
+        }
+        return null;
     }
 
     /**
@@ -452,6 +473,36 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             log.error(E_NEXIST, ns);
         }
         return null;
+    }
+
+
+    /**
+     * Updates registered class store.
+     *
+     * @param param model registrations param
+     */
+    public void updateRegClassStore(ModelRegistrationParam param) {
+        Class<?> service;
+        AppModuleInfo info;
+        for (YangModuleId id : param.getYangModel().getYangModulesId()) {
+            info = param.getAppModuleInfo(id);
+            if (info != null) {
+                service = info.getModuleClass();
+                addRegClass(service.getName(), service);
+            }
+        }
+    }
+
+    /**
+     * Adds the registered class.
+     *
+     * @param name    qualified name of the class
+     * @param service generated class
+     */
+    public void addRegClass(String name, Class<?> service) {
+        if (!registerClassStore.containsKey(name)) {
+            registerClassStore.put(name, service);
+        }
     }
 
     /**

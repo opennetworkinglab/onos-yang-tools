@@ -54,6 +54,7 @@
                 <version>${project.version}</version>
                 <configuration>
                     <yangFilesDir>src/test/resources</yangFilesDir>
+                    <modelId>xml</modelId>
                 </configuration>
                 <executions>
                     <execution>

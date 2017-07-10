@@ -80,14 +80,17 @@ public class YangLibrary extends AbstractBuildRule {
     private final Path genSrcsDirectory;
     private final Path outputDirectory;
     private final Path output;
+    private final String modelId;
 
     public YangLibrary(
             BuildRuleParams params,
             SourcePathResolver resolver,
-            ImmutableSortedSet<SourcePath> srcs) {
+            ImmutableSortedSet<SourcePath> srcs,
+            String id) {
         super(params, resolver);
         this.srcs = srcs;
         this.params = params;
+        modelId = id;
         genSrcsDirectory = BuildTargets.getGenPath(getProjectFilesystem(),
                                                    params.getBuildTarget(),
                                                    "%s__yang-gen");
@@ -122,7 +125,7 @@ public class YangLibrary extends AbstractBuildRule {
                 .collect(Collectors.toList());
 
         steps.add(new YangStep(getProjectFilesystem(), sourcePaths, genSrcsDirectory,
-                               params.getDeps()));
+                               params.getDeps(), modelId));
 
         steps.add(new JarDirectoryStep(
                 getProjectFilesystem(),

@@ -99,7 +99,8 @@ public class YangLibraryDescription
                         unflavoredBuildTarget, SOURCES));
 
         BuildRule yangLib = resolver.getRuleOptional(yangParams.getBuildTarget())
-                .or(() -> resolver.addToIndex(new YangLibrary(yangParams, pathResolver, args.srcs)));
+                .or(() -> resolver.addToIndex(new YangLibrary(
+                        yangParams, pathResolver, args.srcs, args.modelId.get())));
 
         if (params.getBuildTarget().getFlavors().contains(SOURCES)) {
             return yangLib;
@@ -112,7 +113,6 @@ public class YangLibraryDescription
                 pathResolver,
                 args
         );
-
 
         // Create to main compile rule.
         BuildRuleParams javaParams = params.copyWithChanges(
@@ -179,6 +179,7 @@ public class YangLibraryDescription
     public static class Arg extends JvmLibraryArg {
         public ImmutableSortedSet<SourcePath> srcs;
         public Optional<ImmutableSortedSet<BuildTarget>> deps;
+        public Optional<String> modelId;
 
         //TODO other params here
     }

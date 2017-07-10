@@ -25,7 +25,6 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
-import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 
 import java.util.List;
 
@@ -33,23 +32,30 @@ import static org.onosproject.yang.runtime.impl.TestUtils.IETFNS;
 import static org.onosproject.yang.runtime.impl.TestUtils.TOPONS;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Tests the default schema context methods.
  */
 public class SchemaContextTest {
 
-    private static TestYangSchemaNodeProvider schemaProvider =
-            new TestYangSchemaNodeProvider();
+    private DefaultYangModelRegistry registry;
+
+    /**
+     * Do the prior setup for each UT.
+     */
+    private void setUp() {
+        processSchemaRegistry();
+        registry = registry();
+    }
 
     /**
      * Validates the getting schema context by schema Id scenario.
      */
     @Test
     public void schemaContextBySchemaIdTest() {
-
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
+        setUp();
         SchemaId id = new SchemaId("networks", IETFNS);
         YangNode child = (YangNode) registry.getChildContext(id);
         checkSchemaContext("networks", IETFNS, "/", null,

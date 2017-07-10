@@ -24,7 +24,7 @@ import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
-import org.onosproject.yang.runtime.helperutils.YangModuleExtendedInfo;
+import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public final class RuntimeHelper {
      * Returns YANG node for given YANG model.
      *
      * @param model YANG model
-     * @return YANG node for given model
+     * @return YANG nodes for given model
      */
     public static Set<YangNode> getNodes(YangModel model) {
         Set<YangNode> nodes = new HashSet<>();
@@ -82,6 +82,7 @@ public final class RuntimeHelper {
      * Adds linker and translator info for each data model tree.
      *
      * @param nodes YANG node
+     * @return YANG nodes for given model
      */
     public static Set<YangNode> addLinkerAndJavaInfo(Set<YangNode> nodes) {
         YangLinker yangLinker = new YangLinkerManager();

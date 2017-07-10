@@ -25,32 +25,37 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
-import org.onosproject.yang.runtime.impl.TestYangSchemaNodeProvider;
 
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafListSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkLeafSchemaContext;
 import static org.onosproject.yang.runtime.impl.TestUtils.checkSchemaContext;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Tests the default schema context methods.
  */
 public class CaseSchemaContextTest {
 
-    private static TestYangSchemaNodeProvider schemaProvider =
-            new TestYangSchemaNodeProvider();
+    private static final String CASENS = "yrt:choice-case";
+    private DefaultYangModelRegistry registry;
 
-    public static final String CASENS = "yrt:choice-case";
+    /**
+     * Do the prior setup for each UT.
+     */
+    private void setUp() {
+        processSchemaRegistry();
+        registry = registry();
+    }
 
     /**
      * Checks module level choice-case data node parent context.
      */
     @Test
     public void caseSchemaContTest() throws DataModelException {
-
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
+        setUp();
         SchemaId id = new SchemaId("pretzel", CASENS);
         YangLeaf leaf = (YangLeaf) registry.getChildContext(id);
         checkLeafSchemaContext("pretzel", CASENS, "/", null, leaf);

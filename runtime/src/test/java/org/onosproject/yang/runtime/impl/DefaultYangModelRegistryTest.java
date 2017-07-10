@@ -16,18 +16,31 @@
 
 package org.onosproject.yang.runtime.impl;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRevision;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.model.DefaultYangModuleId;
+import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.model.YangModuleId;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processModelTest;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.unRegister;
 
 /**
  * Unit test for model registry.
@@ -58,9 +71,16 @@ public class DefaultYangModelRegistryTest {
     private static final String DATE_NAMESPACE = "2015-12-08";
     private static final String NAMESPACE =
             "urn:ietf:params:xml:ns:yang:ietf-network4:check:namespace";
+    private static final String MODEL_ID = "onos-yang-runtime";
 
-    private final TestYangSchemaNodeProvider provider =
-            new TestYangSchemaNodeProvider();
+
+    /**
+     * Do the prior setup for each UT.
+     */
+    private DefaultYangModelRegistry setUp() {
+        processSchemaRegistry();
+        return registry();
+    }
 
     /**
      * Unit test case in which schema node should be present.
@@ -70,11 +90,21 @@ public class DefaultYangModelRegistryTest {
     @Test
     public void testForGetSchemaNode()
             throws IOException {
-
-        provider.processSchemaRegistry();
-
         List<YangNode> nodes = new ArrayList<>();
-        DefaultYangModelRegistry registry = provider.registry();
+        DefaultYangModelRegistry registry = setUp();
+
+        YangModel model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model != null));
+
+        Set<YangModule> modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() != 0));
+        assertThat(true, is(modules != null));
+
+        YangModuleId moduleId = new DefaultYangModuleId("ietf-network4",
+                                                        "2017-12-08");
+
+        YangModule module = registry.getModule(moduleId);
+        assertThat(true, is(moduleId.equals(module.getYangModuleId())));
 
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_3);
         assertThat(true, is(SCHEMA_NAME_3.equals(yangNode.getName())));
@@ -82,12 +112,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_3);
         assertThat(true, is(SCHEMA_NAME_3.equals(yangNode.getName())));
 
-        Class<?> cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_3.equals(cls.getName())));
-
         //Unregister service
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_3);
         assertThat(true, is(yangNode == null));
@@ -95,24 +122,56 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_3);
         assertThat(true, is(yangNode == null));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls == null));
+        module = registry.getModule(moduleId);
+        assertThat(true, is(module == null));
+
+        Set<YangModel> models = registry.getModels();
+        assertThat(true, is(models.size() == 0));
+
+        model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model == null));
+
+        modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() == 0));
     }
 
     /**
-     * Unit test case in which schema node should be present with multi
-     * revisions.
+     * Unit test case for getting the metadata for a particular module.
      *
      * @throws IOException when fails to do IO operation
      */
     @Test
-    public void testForGetSchemaNodeWhenNoRevision()
+    public void testForGetMetaData()
             throws IOException {
-
-        provider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = provider.registry();
-
+        DefaultYangModelRegistry registry = setUp();
+        YangNode node = null;
         List<YangNode> nodes = new ArrayList<>();
+
+        YangModel model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model != null));
+
+        Set<YangModule> modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() != 0));
+        assertThat(true, is(modules != null));
+        processModelTest();
+        YangModuleId moduleId = new DefaultYangModuleId("ietf-network4",
+                                                        "2017-12-08");
+
+        // TODO: fix this for yang model test
+        YangModule module = registry.getModule(moduleId);
+        assertThat(true, is(moduleId.equals(module.getYangModuleId())));
+
+        InputStream stream = module.getMetadata();
+        ObjectInputStream objectInputStream = new ObjectInputStream(stream);
+        try {
+            node = ((YangNode) objectInputStream.readObject());
+        } catch (ClassNotFoundException e) {
+            System.out.println(e);
+        }
+        objectInputStream.close();
+        assertThat(true, is(
+                node.getName().equals(moduleId.moduleName())));
+
         //Service with rev.
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_4_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
@@ -120,21 +179,15 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        Class<?> cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_REV_15.equals(cls.getName())));
-
         //unregister SERVICE_NAME_REV_15.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
 
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(yangNode == null));
-
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls == null));
 
         //Here the yangNode should be the node which does not have revision.
         // asset should pass with false.
@@ -149,12 +202,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_NO_REV.equals(cls.getName())));
-
         //unregister SERVICE_NAME_NO_REV.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         //Here the yangNode should be the node which have different revision.
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
@@ -164,8 +214,17 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(yangNode == null));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls == null));
+        module = registry.getModule(moduleId);
+        assertThat(true, is(module == null));
+
+        Set<YangModel> models = registry.getModels();
+        assertThat(true, is(models.size() == 0));
+
+        model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model == null));
+
+        modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() == 0));
     }
 
     /**
@@ -175,13 +234,27 @@ public class DefaultYangModelRegistryTest {
      * @throws IOException when fails to do IO operation
      */
     @Test
-    public void testForGetSchemaNodeWhenMultiRevision()
+    public void testForGetSchemaNodeWhenNoRevision()
             throws IOException {
 
-        provider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = provider.registry();
-
+        DefaultYangModelRegistry registry = setUp();
+        YangNode node = null;
         List<YangNode> nodes = new ArrayList<>();
+
+        YangModel model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model != null));
+
+        Set<YangModule> modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() != 0));
+        assertThat(true, is(modules != null));
+
+        YangModuleId moduleId = new DefaultYangModuleId("ietf-network4",
+                                                        "2017-12-08");
+
+        // TODO: fix this for yang model test
+        YangModule module = registry.getModule(moduleId);
+        assertThat(true, is(moduleId.equals(module.getYangModuleId())));
+
         //Service with rev.
         YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_4_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
@@ -189,12 +262,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        Class<?> cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_REV_15.equals(cls.getName())));
-
-        //Unregister SERVICE_NAME_REV_15.
+        //unregister SERVICE_NAME_REV_15.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
@@ -207,8 +277,96 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(((YangNode) yangNode).getRevision() == null));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls != null));
+        //---------------------------------------------------------------//
+
+        yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
+        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
+
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
+        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
+
+        //unregister SERVICE_NAME_NO_REV.
+        nodes.add((YangNode) yangNode);
+        unRegister(nodes);
+
+        //Here the yangNode should be the node which have different revision.
+        yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
+        assertThat(true, is(yangNode != null));
+        assertThat(true, is(((YangNode) yangNode).getRevision() != null));
+
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
+        assertThat(true, is(yangNode == null));
+
+        module = registry.getModule(moduleId);
+        assertThat(true, is(module == null));
+
+        Set<YangModel> models = registry.getModels();
+        assertThat(true, is(models.size() == 0));
+
+        model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model == null));
+
+        modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() == 0));
+    }
+
+    private Set<YangModule> getYangModules(YangModel model, String modelId) {
+        Set<org.onosproject.yang.model.YangModule> modules =
+                new LinkedHashSet<>();
+        if (model != null) {
+            modules.addAll(model.getYangModules());
+        }
+        return ImmutableSet.copyOf(modules);
+    }
+
+    /**
+     * Unit test case in which schema node should be present with multi
+     * revisions.
+     *
+     * @throws IOException when fails to do IO operation
+     */
+    @Test
+    public void testForGetSchemaNodeWhenMultiRevision()
+            throws IOException {
+
+        DefaultYangModelRegistry registry = setUp();
+
+        List<YangNode> nodes = new ArrayList<>();
+
+        YangModel model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model != null));
+
+        Set<YangModule> modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() != 0));
+        assertThat(true, is(modules != null));
+
+        YangModuleId moduleId = new DefaultYangModuleId("ietf-network4",
+                                                        "2017-12-08");
+
+        YangModule module = registry.getModule(moduleId);
+        assertThat(true, is(moduleId.equals(module.getYangModuleId())));
+
+        //Service with rev.
+        YangSchemaNode yangNode = registry.getForSchemaName(SCHEMA_NAME_4_15);
+        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
+
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
+        assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
+
+        //Unregister SERVICE_NAME_REV_15.
+        nodes.add((YangNode) yangNode);
+        unRegister(nodes);
+
+        yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
+        assertThat(true, is(yangNode != null));
+
+        yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_15);
+        assertThat(true, is(yangNode == null));
+
+        //Here the yangNode should be the node which does not have revision.
+        // asset should pass with false.
+        yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
+        assertThat(true, is(((YangNode) yangNode).getRevision() == null));
 
         //---------------------------------------------------------------//
 
@@ -223,12 +381,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_16);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_REV_16.equals(cls.getName())));
-
         //Unregister SERVICE_NAME_REV_16.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_16);
         assertThat(true, is(yangNode == null));
@@ -236,9 +391,6 @@ public class DefaultYangModelRegistryTest {
         //Here the yangNode should be the node which have different revision.
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(((YangNode) yangNode).getRevision() == null));
-
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls != null));
 
         //---------------------------------------------------------------//
 
@@ -250,12 +402,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_17);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_REV_17.equals(cls.getName())));
-
         //Unregister SERVICE_NAME_REV_17.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_17);
         assertThat(true, is(yangNode == null));
@@ -263,9 +412,6 @@ public class DefaultYangModelRegistryTest {
         //Here the yangNode should be the node which have different revision.
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(((YangNode) yangNode).getRevision() == null));
-
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls != null));
 
         //---------------------------------------------------------------//
 
@@ -277,12 +423,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_NO_REV.equals(cls.getName())));
-
         //Unregister SERVICE_NAME_NO_REV.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForRegClassName(INTERFACE_NAME_NO_REV);
         assertThat(true, is(yangNode == null));
@@ -291,9 +434,6 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode != null));
         assertThat(true, is(((YangNode) yangNode).getRevision() != null));
-
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls != null));
 
         //---------------------------------------------------------------//
 
@@ -305,12 +445,9 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_14);
         assertThat(true, is(SCHEMA_NAME_4.equals(yangNode.getName())));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(INTERFACE_NAME_REV_14.equals(cls.getName())));
-
         //Unregister SERVICE_NAME_REV_14.
         nodes.add((YangNode) yangNode);
-        provider.unRegister(nodes);
+        unRegister(nodes);
 
         yangNode = registry.getForSchemaName(SCHEMA_NAME_4);
         assertThat(true, is(yangNode == null));
@@ -318,8 +455,17 @@ public class DefaultYangModelRegistryTest {
         yangNode = registry.getForRegClassName(INTERFACE_NAME_REV_14);
         assertThat(true, is(yangNode == null));
 
-        cls = registry.getRegisteredClass(yangNode);
-        assertThat(true, is(cls == null));
+        module = registry.getModule(moduleId);
+        assertThat(true, is(module == null));
+
+        Set<YangModel> models = registry.getModels();
+        assertThat(true, is(models.size() == 0));
+
+        model = registry.getModel(MODEL_ID);
+        assertThat(true, is(model == null));
+
+        modules = getYangModules(model, MODEL_ID);
+        assertThat(true, is(modules.size() == 0));
     }
 
     /**
@@ -327,8 +473,7 @@ public class DefaultYangModelRegistryTest {
      */
     @Test
     public void testGetNodeWrtNamespace() {
-        provider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = provider.registry();
+        DefaultYangModelRegistry registry = setUp();
 
         YangSchemaNode yangNode = registry.getForNameSpace(NAMESPACE, false);
         assertThat(true, is(CHECK.equals(yangNode.getName())));

@@ -432,7 +432,7 @@ public abstract class YangModule
     /**
      * Adds a unique holder to a unique holder list.
      *
-     * @param uniqueHolder
+     * @param uniqueHolder unique holder
      */
     @Override
     public void addToUniqueHolderList(YangUniqueHolder uniqueHolder) {

@@ -64,14 +64,15 @@ import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelis
 import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Con1.LeafIdentifier.LL;
 import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Leaf6Enum.ENUM2;
 import static org.onosproject.yang.model.ModelObjectId.builder;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Unit test cases for resource id conversion from model object id.
  */
 public class YtbResourceIdTest {
 
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
     private ResourceData rscData;
@@ -81,14 +82,15 @@ public class YtbResourceIdTest {
     private SchemaId sid;
     private ModelObjectId mid;
     private Builder data;
+    DefaultYangModelRegistry reg;
 
     /**
      * Prior setup for each UT.
      */
     private void setUp() {
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
-        treeBuilder = new DefaultDataTreeBuilder(registry);
+        processSchemaRegistry();
+        reg = registry();
+        treeBuilder = new DefaultDataTreeBuilder(reg);
     }
 
     /**

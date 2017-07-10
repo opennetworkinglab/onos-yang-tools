@@ -740,6 +740,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
@@ -769,6 +770,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
@@ -795,6 +797,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
@@ -821,6 +824,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangPluginConfig yangPluginConfig = new YangPluginConfig();
@@ -849,6 +853,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangNode selfNode = null;
@@ -903,6 +908,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangNode selfNode = null;
@@ -965,6 +971,7 @@ public class InterFileLinkingTest {
 
         utilManager.createYangFileInfoSet(paths);
         utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
         utilManager.resolveDependenciesUsingLinker();
 
         YangNode selfNode = null;

@@ -81,6 +81,8 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Unit test cases for YANG tree builder for context switch for augment, RPC
@@ -91,8 +93,6 @@ public class DataTreeContextSwitchTest {
     private static final String CHOC = "choc";
     private static final String VAL = "val";
     private static final String IND = "ind";
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
     private ResourceData rscData;
     private DefaultDataTreeBuilder treeBuilder;
     private ResourceId id;
@@ -108,8 +108,8 @@ public class DataTreeContextSwitchTest {
      * Do the prior setup for each UT.
      */
     private void setUp() {
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
+        processSchemaRegistry();
+        DefaultYangModelRegistry registry = registry();
         treeBuilder = new DefaultDataTreeBuilder(registry);
     }
 
@@ -705,7 +705,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -748,8 +748,8 @@ public class DataTreeContextSwitchTest {
 
         data = new DefaultModelObjectData.Builder();
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class)
-                               .addChild(DefaultOnlyContainer.class).build());
+                                .addChild(DefaultFirstLevel.class)
+                                .addChild(DefaultOnlyContainer.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -798,7 +798,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -862,7 +862,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -942,7 +942,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -1050,8 +1050,8 @@ public class DataTreeContextSwitchTest {
         con.listLeaf(list);
 
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class)
-                               .addChild(DefaultContainerList.class).build());
+                                .addChild(DefaultFirstLevel.class)
+                                .addChild(DefaultContainerList.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -1128,9 +1128,9 @@ public class DataTreeContextSwitchTest {
         ListLeafKeys key = new ListLeafKeys();
         key.name("key leaf");
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class)
-                               .addChild(DefaultContainerList.class)
-                               .addChild(DefaultListLeaf.class, key).build());
+                                .addChild(DefaultFirstLevel.class)
+                                .addChild(DefaultContainerList.class)
+                                .addChild(DefaultListLeaf.class, key).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -1206,7 +1206,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -1273,7 +1273,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());
@@ -1331,7 +1331,7 @@ public class DataTreeContextSwitchTest {
         data = new DefaultModelObjectData.Builder();
         data.addModelObject(con);
         data.identifier(ModelObjectId.builder()
-                               .addChild(DefaultFirstLevel.class).build());
+                                .addChild(DefaultFirstLevel.class).build());
 
         // Builds YANG tree in YTB.
         rscData = treeBuilder.getResourceData(data.build());

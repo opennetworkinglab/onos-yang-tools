@@ -67,11 +67,9 @@ import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.SchemaId;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -395,30 +393,6 @@ public final class DataModelUtils {
          * choice/case/augment/grouping
          */
         return currentNode.getParent();
-    }
-
-    /**
-     * Returns de-serializes YANG data-model nodes.
-     *
-     * @param serializedFileInfo serialized File Info
-     * @return de-serializes YANG data-model nodes
-     * @throws IOException when fails do IO operations
-     */
-    public static Set<YangNode> deSerializeDataModel(String serializedFileInfo)
-            throws IOException {
-
-        Set<YangNode> nodes;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(serializedFileInfo);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            nodes = (Set<YangNode>) objectInputStream.readObject();
-            objectInputStream.close();
-            fileInputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new IOException(serializedFileInfo + " failed to fetch " +
-                                          "nodes due to " + e.getLocalizedMessage());
-        }
-        return nodes;
     }
 
     /**
@@ -854,57 +828,6 @@ public final class DataModelUtils {
                                              dataType.getLineNumber() + " at " +
                                              dataType.getCharPosition() +
                                              " in " + dataType.getFileName() + "\"");
-    }
-
-    /**
-     * Parses jar file and returns list of serialized file names.
-     *
-     * @param jarFile   jar file to be parsed
-     * @param directory directory where to search
-     * @return list of serialized files
-     * @throws IOException when fails to do IO operations
-     */
-    public static List<YangNode> parseJarFile(String jarFile, String directory)
-            throws IOException {
-
-        List<YangNode> nodes = new ArrayList<>();
-        JarFile jar = new JarFile(jarFile);
-        Enumeration<?> enumEntries = jar.entries();
-
-        while (enumEntries.hasMoreElements()) {
-            JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.getName().endsWith(".ser")) {
-
-                if (file.getName().contains(SLASH)) {
-                    String[] strArray = file.getName().split(SLASH);
-                    String tempPath = "";
-                    for (int i = 0; i < strArray.length - 1; i++) {
-                        tempPath = SLASH + tempPath + SLASH + strArray[i];
-                    }
-                    File dir = new File(directory + tempPath);
-                    dir.mkdirs();
-                }
-                File serializedFile = new File(directory + SLASH + file.getName());
-                if (file.isDirectory()) {
-                    serializedFile.mkdirs();
-                    continue;
-                }
-                InputStream inputStream = jar.getInputStream(file);
-
-                FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
-                while (inputStream.available() > 0) {
-                    fileOutputStream.write(inputStream.read());
-                }
-                fileOutputStream.close();
-                inputStream.close();
-                nodes.addAll(deSerializeDataModel(serializedFile.toString()));
-                //As of now only one metadata files will be there so if we
-                // found one then we should break the loop.
-                break;
-            }
-        }
-        jar.close();
-        return nodes;
     }
 
     /**

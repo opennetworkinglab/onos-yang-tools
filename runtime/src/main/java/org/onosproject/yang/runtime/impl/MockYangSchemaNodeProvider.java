@@ -19,9 +19,6 @@ package org.onosproject.yang.runtime.impl;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.YangModel;
-import org.onosproject.yang.runtime.AppModuleInfo;
-import org.onosproject.yang.runtime.DefaultAppModuleInfo;
-import org.onosproject.yang.runtime.DefaultModelRegistrationParam;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
 
 import java.io.File;
@@ -31,19 +28,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.deSerializeDataModel;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.deSerializeDataModel;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.getYangNodes;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.processYangModel;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
-import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processModuleId;
-import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.processYangModel;
-import static org.onosproject.yang.runtime.RuntimeHelper.addLinkerAndJavaInfo;
+import static org.onosproject.yang.runtime.DefaultModelRegistrationParam.builder;
 import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
 
 /**
- * Represents mock bundle context. provides bundle context for YSR to do unit
- * testing.
+ * Represents mock YANG schema node for unit test cases.
  */
-public class TestYangSchemaNodeProvider {
+public final class MockYangSchemaNodeProvider {
 
     private static final String FS = File.separator;
     private static final String PATH = System.getProperty("user.dir") +
@@ -52,27 +48,34 @@ public class TestYangSchemaNodeProvider {
             FS + "YangMetaData.ser";
     private static final String META_PATH = PATH + SER_FILE_PATH;
     private static final String TEMP_FOLDER_PATH = PATH + TEMP;
-    private DefaultYangModelRegistry reg = new DefaultYangModelRegistry();
-    private List<YangNode> nodes = new ArrayList<>();
+    private static DefaultYangModelRegistry reg;
+    private static List<YangNode> nodes = new ArrayList<>();
+    private static String id;
 
     /**
-     * Creates an instance of mock bundle context.
+     * Creates an instance of mock YANG schema for unit test cases.
      */
-    public TestYangSchemaNodeProvider() {
+    private MockYangSchemaNodeProvider() {
     }
 
     /**
      * Process YANG schema node for a application.
      */
-    public void processSchemaRegistry() {
+    public static void processSchemaRegistry() {
         try {
+            reg = new DefaultYangModelRegistry();
             //Need to deserialize generated meta data file for unit tests.
-            Set<YangNode> appNode = deSerializeDataModel(META_PATH);
-            addLinkerAndJavaInfo(appNode);
+            YangModel model = deSerializeDataModel(META_PATH);
+            Set<YangNode> appNode = getYangNodes(model);
             nodes.addAll(appNode);
-            reg.registerModel(prepareParam(nodes));
+            id = model.getYangModelId();
+            reg.registerModel(param(nodes));
+
+            //now we need to update the registered classes for YOB.
+            addClassInfo(nodes);
             deleteDirectory(TEMP_FOLDER_PATH);
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -81,8 +84,8 @@ public class TestYangSchemaNodeProvider {
      *
      * @param nodes list of nodes
      */
-    public void unRegister(List<YangNode> nodes) {
-        reg.unregisterModel(prepareParam(nodes));
+    public static void unRegister(List<YangNode> nodes) {
+        reg.unregisterModel(param(nodes));
     }
 
     /**
@@ -91,19 +94,46 @@ public class TestYangSchemaNodeProvider {
      * @param nodes list of nodes
      * @return model registration parameter
      */
-    private ModelRegistrationParam prepareParam(List<YangNode> nodes) {
-        //Process loading class file.
-        String appName;
-        ClassLoader classLoader = getClass().getClassLoader();
-
+    private static ModelRegistrationParam param(List<YangNode> nodes) {
         //Create model registration param.
-        ModelRegistrationParam.Builder b =
-                DefaultModelRegistrationParam.builder();
+        ModelRegistrationParam.Builder b = builder();
 
         //create a new YANG model
-        YangModel model = processYangModel(META_PATH, nodes);
+        YangModel model = null;
+        try {
+            model = processYangModel(META_PATH, nodes, id, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //set YANG model
         b.setYangModel(model);
+        return b.build();
+    }
+
+    static YangModel processModelTest() {
+        YangModel model = null;
+        try {
+            model = deSerializeDataModel(META_PATH);
+            Set<YangNode> appNode = getYangNodes(model);
+            List<YangNode> nodes = new ArrayList<>();
+            nodes.addAll(appNode);
+            return processYangModel(META_PATH, nodes, id, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return model;
+    }
+
+    /**
+     * Prepares model registration parameter.
+     *
+     * @param nodes list of nodes
+     */
+    private static void addClassInfo(List<YangNode> nodes) {
+        //Process loading class file.
+        String appName;
+        ClassLoader classLoader = MockYangSchemaNodeProvider.class.getClassLoader();
 
         Iterator<YangNode> it = nodes.iterator();
         while (it.hasNext()) {
@@ -119,11 +149,8 @@ public class TestYangSchemaNodeProvider {
                 continue;
             }
 
-            //generate app info.
-            AppModuleInfo info = new DefaultAppModuleInfo(cls, null);
-            b.addAppModuleInfo(processModuleId((YangNode) node), info);
+            reg.addRegClass(appName, cls);
         }
-        return b.build();
     }
 
     /**
@@ -131,7 +158,8 @@ public class TestYangSchemaNodeProvider {
      *
      * @return schema registry
      */
-    public DefaultYangModelRegistry registry() {
+
+    public static DefaultYangModelRegistry registry() {
         return reg;
     }
 
@@ -141,7 +169,7 @@ public class TestYangSchemaNodeProvider {
      * @param node schema node
      * @param name name of node
      */
-    public void addMockNode(YangSchemaNode node, String name) {
+    public static void addMockNode(YangSchemaNode node, String name) {
         reg.processApplicationContext(node, name);
     }
 }

@@ -25,7 +25,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
 import org.onosproject.yang.compiler.api.YangCompilerService;
@@ -83,6 +82,12 @@ public class YangUtilManager extends AbstractMojo {
     @Parameter(property = "classFileDir", defaultValue =
             "target/generated-sources/")
     private String classFileDir;
+
+    /**
+     * YANG Model id.
+     */
+    @Parameter(property = "modelId")
+    private String modelId;
 
     /**
      * Base directory for project.
@@ -163,20 +168,28 @@ public class YangUtilManager extends AbstractMojo {
                     project, localRepository, remoteRepository, outputDir);
 
             //Create compiler param.
-            YangCompilationParam param = new DefaultYangCompilationParam();
-            param.setCodeGenDir(Paths.get(codeGenDir));
-            param.setMetadataGenDir(Paths.get(metaDataGenDir));
+            DefaultYangCompilationParam.Builder bldr =
+                    DefaultYangCompilationParam.builder();
+
+            bldr.setCodeGenDir(Paths.get(codeGenDir));
+            bldr.setMetadataGenDir(Paths.get(metaDataGenDir));
 
             for (Path path : depSchemas) {
-                param.addDependentSchema(path);
+                bldr.addDependentSchema(path);
             }
 
             for (String file : getYangFiles(searchDir)) {
-                param.addYangFile(Paths.get(file));
+                bldr.addYangFile(Paths.get(file));
+            }
+
+            if (modelId != null) {
+                bldr.setModelId(modelId);
+            } else {
+                bldr.setModelId(project.getArtifactId());
             }
 
             //Compile yang files and generate java code.
-            output = compiler.compileYangFiles(param);
+            output = compiler.compileYangFiles(bldr.build());
 
             addToCompilationRoot(codeGenDir, project, context);
             addToProjectResource(outputDir + SLASH + TEMP + SLASH, project);

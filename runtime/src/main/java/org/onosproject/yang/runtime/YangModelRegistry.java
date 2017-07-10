@@ -17,6 +17,8 @@
 package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.model.YangModel;
+import org.onosproject.yang.model.YangModule;
+import org.onosproject.yang.model.YangModuleId;
 
 import java.util.Set;
 
@@ -29,15 +31,18 @@ public interface YangModelRegistry {
      * Registers a new model.
      *
      * @param param parameters having model to be registered with additional
-     *              informations provided by app
+     *              information provided by app
+     * @throws IllegalArgumentException when requested model with provided
+     *                                  identifier is already registered
      */
-    void registerModel(ModelRegistrationParam param);
+    void registerModel(ModelRegistrationParam param)
+            throws IllegalArgumentException;
 
     /**
      * Unregisters the specified model.
      *
      * @param param parameters having model to be registered with additional
-     *              informations provided by app
+     *              information provided by app
      */
     void unregisterModel(ModelRegistrationParam param);
 
@@ -47,4 +52,20 @@ public interface YangModelRegistry {
      * @return collection of models
      */
     Set<YangModel> getModels();
+
+    /**
+     * Returns YANG model for given model id.
+     *
+     * @param id model identifier
+     * @return YANG model
+     */
+    YangModel getModel(String id);
+
+    /**
+     * Returns YANG module for given YANG module id.
+     *
+     * @param id module identifier
+     * @return YANG module
+     */
+    YangModule getModule(YangModuleId id);
 }

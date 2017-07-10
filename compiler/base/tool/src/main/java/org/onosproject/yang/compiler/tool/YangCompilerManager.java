@@ -32,7 +32,6 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.DefaultYangModel;
-import org.onosproject.yang.model.DefaultYangModule;
 import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
@@ -40,17 +39,23 @@ import org.onosproject.yang.model.YangModuleId;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Paths.get;
@@ -58,13 +63,11 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.sort;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_DERIVED_DATA_TYPE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTITYREF;
-import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.deSerializeDataModel;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.resolveGroupingInDefinationScope;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.generateJavaCode;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translatorErrorHandler;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_META_DATA;
 import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getJavaFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.createDirectories;
@@ -84,41 +87,65 @@ public class YangCompilerManager implements YangCompilerService {
     private Set<YangFileInfo> yangFileInfoSet; //initialize in tool invocation;
     private YangFileInfo curYangFileInfo = new YangFileInfo();
     private Set<Path> genJavaPath = new LinkedHashSet<>();
+    private YangModel model;
+    private static final String SLASH = File.separator;
 
     @Override
     public YangCompiledOutput compileYangFiles(YangCompilationParam param)
             throws IOException, YangCompilerException {
         synchronized (YangCompilerManager.class) {
-
-            YangPluginConfig config = new YangPluginConfig();
-            config.setCodeGenDir(param.getCodeGenDir().toString() + SLASH);
-            config.resourceGenDir(param.getMetadataGenDir().toString() +
-                                          SLASH);
-
-            processYangFiles(createYangFileInfoSet(param.getYangFiles()),
-                             dependentSchema(param.getDependentSchemas()), config);
-
-            return new DefaultYangCompiledOutput(
-                    processYangModel(config.resourceGenDir()), genJavaPath);
+            processYangFiles(param);
+            return new DefaultYangCompiledOutput(model, genJavaPath);
         }
     }
 
     /**
      * Returns YANG model for application.
      *
-     * @param path path for metadata file
+     * @param path    path for metadata file
+     * @param list    list of YANG node
+     * @param modelId model id
+     * @param fromUt  if method is called from unit test
      * @return YANG model
+     * @throws IOException when fails to IO operations
      */
-    private YangModel processYangModel(String path) {
+    public static YangModel processYangModel(
+            String path, List<YangNode> list, String modelId, boolean fromUt)
+            throws IOException {
         YangModel.Builder b = DefaultYangModel.builder();
         YangModuleId id;
-        for (YangNode node : yangNodeSet) {
+        for (YangNode node : list) {
             id = processModuleId(node);
-            YangModule module =
-                    new DefaultYangModule(id, get(node.getFileName()), get(path));
+            String serFile = path + id.moduleName() + id.revision() + ".ser";
+            if (!fromUt) {
+                serializeModuleMetaData(serFile, node);
+            }
+            YangModule module = new YangModuleExtendedInfo(
+                    id, new File(node.getFileName()), new File(serFile));
+            ((YangModuleExtendedInfo) module).setSchema(node);
             b.addModule(id, module);
         }
-        return b.build();
+        return b.addModelId(modelId).build();
+    }
+
+    /**
+     * Serializes YANG Node.
+     *
+     * @param serFileName path of resource directory
+     * @param node        YangNode
+     * @throws IOException when fails to IO operations
+     */
+    private static void serializeModuleMetaData(String serFileName, YangNode node)
+            throws IOException {
+        try {
+            FileOutputStream outStream = new FileOutputStream(serFileName);
+            ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
+            objOutStream.writeObject(node);
+            objOutStream.close();
+            outStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -127,7 +154,7 @@ public class YangCompilerManager implements YangCompilerService {
      * @param module YANG module
      * @return YANG module id for a given YANG module node
      */
-    private YangModuleId processModuleId(YangNode module) {
+    public static YangModuleId processModuleId(YangNode module) {
         String rev = getDateInStringFormat(module);
         return new DefaultYangModuleId(module.getName(), rev);
     }
@@ -163,19 +190,18 @@ public class YangCompilerManager implements YangCompilerService {
      * Compile te YANG files and generate the corresponding Java files.
      * Update the generated bundle with the schema metadata.
      *
-     * @param yangFiles       Application YANG files
-     * @param dependentSchema inter jar linked schema nodes
-     * @param config          tool configurations
+     * @param param YANG compilation parameters
      * @throws IOException when fails to do IO operations
      */
-    private void processYangFiles(Set<YangFileInfo> yangFiles,
-                                  Set<YangNode> dependentSchema,
-                                  YangPluginConfig config) throws IOException {
-
+    private void processYangFiles(YangCompilationParam param) throws IOException {
+        YangPluginConfig config = new YangPluginConfig();
         synchronized (YangCompilerManager.class) {
             try {
-
-                yangFileInfoSet = yangFiles;
+                String codeGenDir = param.getCodeGenDir() + SLASH;
+                String resourceGenDir = param.getMetadataGenDir() + SLASH;
+                config.setCodeGenDir(codeGenDir);
+                config.resourceGenDir(resourceGenDir);
+                yangFileInfoSet = createYangFileInfoSet(param.getYangFiles());
 
                 // Check if there are any file to translate, if not return.
                 if (yangFileInfoSet.isEmpty()) {
@@ -184,16 +210,19 @@ public class YangCompilerManager implements YangCompilerService {
                 }
 
                 //Create resource directory.
-                createDirectories(config.resourceGenDir());
+                createDirectories(resourceGenDir);
 
                 // Resolve inter jar dependency.
-                addSchemaToFileSet(dependentSchema);
+                addSchemaToFileSet(dependentSchema(
+                        param.getDependentSchemas()));
 
                 // Carry out the parsing for all the YANG files.
                 parseYangFileInfoSet();
 
+                createYangNodeSet();
+
                 // Serialize data model.
-                processSerialization(config.resourceGenDir());
+                processSerialization(resourceGenDir, param.getModelId());
 
                 // Resolve dependencies using linker.
                 resolveDependenciesUsingLinker();
@@ -202,10 +231,10 @@ public class YangCompilerManager implements YangCompilerService {
                 translateToJava(config);
 
                 //add to generated java code map
-                processGeneratedCode(config.getCodeGenDir());
+                processGeneratedCode(codeGenDir);
 
                 //add YANG files to JAR
-                processCopyYangFile(config.resourceGenDir());
+                processCopyYangFile(resourceGenDir);
             } catch (IOException | ParserException e) {
                 //TODO: provide unified framework for exceptions
                 YangCompilerException exception =
@@ -251,7 +280,8 @@ public class YangCompilerManager implements YangCompilerService {
         Set<YangNode> depNodes = new LinkedHashSet<>();
         for (Path path : dependentSchemaPath) {
             try {
-                depNodes.addAll(deSerializeDataModel(path.toString()));
+                depNodes.addAll(getYangNodes(
+                        deSerializeDataModel(path.toString())));
             } catch (IOException e) {
                 throw new YangCompilerException(
                         "Failed to fetch dependent schema from given " +
@@ -289,7 +319,6 @@ public class YangCompilerManager implements YangCompilerService {
      * @throws YangCompilerException failed to link schema
      */
     public void resolveDependenciesUsingLinker() {
-        createYangNodeSet();
         try {
             yangLinker.resolveDependencies(yangNodeSet);
         } catch (LinkerException e) {
@@ -388,18 +417,18 @@ public class YangCompilerManager implements YangCompilerService {
      * Process serialization of datamodel.
      *
      * @param path path of resource directory
+     * @param id   model id
      * @throws IOException when fails to IO operations
      */
-    private void processSerialization(String path) throws IOException {
-        Set<YangNode> compiledSchemas = new HashSet<>();
-        for (YangFileInfo fileInfo : yangFileInfoSet) {
-            compiledSchemas.add(fileInfo.getRootNode());
-        }
-
+    public void processSerialization(String path, String id) throws
+            IOException {
+        List<YangNode> nodelist = new ArrayList<>();
+        nodelist.addAll(yangNodeSet);
+        model = processYangModel(path, nodelist, id, false);
         String serFileName = path + YANG_META_DATA;
         FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(compiledSchemas);
+        objectOutputStream.writeObject(model);
         objectOutputStream.close();
         fileOutputStream.close();
     }
@@ -462,5 +491,96 @@ public class YangCompilerManager implements YangCompilerService {
             }
         }
         return files;
+    }
+
+    /**
+     * Returns de-serializes YANG data-model.
+     *
+     * @param info serialized File Info
+     * @return de-serializes YANG data-model
+     * @throws IOException when fails do IO operations
+     */
+    public static YangModel deSerializeDataModel(String info)
+            throws IOException {
+        YangModel model;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(info);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            model = ((YangModel) objectInputStream.readObject());
+            objectInputStream.close();
+            fileInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new IOException(info + " failed to fetch nodes due to " + e
+                    .getLocalizedMessage(), e);
+        }
+        return model;
+    }
+
+    /**
+     * Returs the set of YANG nodes from a given YANG model.
+     *
+     * @param model YANG model
+     * @return set of YANG nodes
+     */
+    public static Set<YangNode> getYangNodes(YangModel model) {
+        Set<YangNode> yangNodes = new HashSet<>();
+        if (model != null) {
+            Set<YangModule> modules = model.getYangModules();
+            for (YangModule info : modules) {
+                yangNodes.add(((YangModuleExtendedInfo) info).getSchema());
+            }
+        }
+        return yangNodes;
+    }
+
+    /**
+     * Parses jar file and returns YANG model.
+     *
+     * @param jarFile   jar file to be parsed
+     * @param directory directory where to search
+     * @return YANG model
+     * @throws IOException when fails to do IO operations
+     */
+    public static YangModel parseJarFile(String jarFile, String directory)
+            throws IOException {
+
+        YangModel model = null;
+        JarFile jar = new JarFile(jarFile);
+        Enumeration<?> enumEntries = jar.entries();
+
+        while (enumEntries.hasMoreElements()) {
+            JarEntry file = (JarEntry) enumEntries.nextElement();
+            if (file.getName().endsWith(".ser")) {
+
+                if (file.getName().contains(SLASH)) {
+                    String[] strArray = file.getName().split(SLASH);
+                    String tempPath = "";
+                    for (int i = 0; i < strArray.length - 1; i++) {
+                        tempPath = SLASH + tempPath + SLASH + strArray[i];
+                    }
+                    File dir = new File(directory + tempPath);
+                    dir.mkdirs();
+                }
+                File serializedFile = new File(directory + SLASH + file.getName());
+                if (file.isDirectory()) {
+                    serializedFile.mkdirs();
+                    continue;
+                }
+                InputStream inputStream = jar.getInputStream(file);
+
+                FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
+                while (inputStream.available() > 0) {
+                    fileOutputStream.write(inputStream.read());
+                }
+                fileOutputStream.close();
+                inputStream.close();
+                model = deSerializeDataModel(serializedFile.toString());
+                //As of now only one metadata files will be there so if we
+                // found one then we should break the loop.
+                break;
+            }
+        }
+        jar.close();
+        return model;
     }
 }

@@ -16,10 +16,11 @@
 
 package org.onosproject.yang.model;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.file.Path;
+import java.io.Serializable;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -28,11 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Represents default YANG module.
  */
-public class DefaultYangModule implements YangModule {
+public class DefaultYangModule implements YangModule, Serializable {
 
     private YangModuleId id;
-    private Path yangSrc;
-    private Path metadata;
+    private File yangSrc;
+    private File metadata;
 
     /**
      * Creates an instance of default YANG module.
@@ -41,7 +42,7 @@ public class DefaultYangModule implements YangModule {
      * @param yangSrc  YANG source file path
      * @param metadata YANG metadata source file path
      */
-    public DefaultYangModule(YangModuleId id, Path yangSrc, Path metadata) {
+    public DefaultYangModule(YangModuleId id, File yangSrc, File metadata) {
         checkNotNull(yangSrc);
         checkNotNull(metadata);
         checkNotNull(id);
@@ -58,17 +59,16 @@ public class DefaultYangModule implements YangModule {
     @Override
     public InputStream getYangSource() {
         try {
-            return new FileInputStream(yangSrc.toString());
+            return new FileInputStream(yangSrc);
         } catch (FileNotFoundException e) {
-            throw new ModelException("Yang source file not found." +
-                                             yangSrc);
+            throw new ModelException("Yang source file not found." + yangSrc);
         }
     }
 
     @Override
     public InputStream getMetadata() {
         try {
-            return new FileInputStream(metadata.toString());
+            return new FileInputStream(metadata);
         } catch (FileNotFoundException e) {
             throw new ModelException("metadata source file not found." +
                                              metadata);

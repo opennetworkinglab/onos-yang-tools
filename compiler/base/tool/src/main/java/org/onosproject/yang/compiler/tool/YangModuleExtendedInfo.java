@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.helperutils;
+package org.onosproject.yang.compiler.tool;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.model.DefaultYangModule;
 import org.onosproject.yang.model.YangModuleId;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.Serializable;
 
 /**
  * Represents extended info for YANG module.
  */
-public class YangModuleExtendedInfo extends DefaultYangModule {
+public class YangModuleExtendedInfo extends DefaultYangModule implements Serializable {
 
     private YangNode schema;
 
@@ -36,7 +37,7 @@ public class YangModuleExtendedInfo extends DefaultYangModule {
      * @param yangSrc  YANG resource path
      * @param metadata meta data resource path
      */
-    YangModuleExtendedInfo(YangModuleId id, Path yangSrc, Path metadata) {
+    public YangModuleExtendedInfo(YangModuleId id, File yangSrc, File metadata) {
         super(id, yangSrc, metadata);
     }
 

@@ -17,7 +17,6 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.AddressAllocationType;
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.DefaultL3VpnSvc;
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.RoutingProtocolType;
@@ -70,6 +69,8 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
+import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 
 /**
  * Unit test for l3vpn app. test for conversion of model data to resource data.
@@ -84,8 +85,6 @@ public class L3vpnModelConverterTest {
     private List<DataNode> dataNodes;
     private DataNode node;
     private DefaultModelObjectData.Builder data;
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
     private static final String NAME_SPACE_SVC =
             "urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc";
     private static final String NAME_SPACE_EXT =
@@ -95,8 +94,8 @@ public class L3vpnModelConverterTest {
      * Do the prior setup for each UT.
      */
     private void setUp() {
-        schemaProvider.processSchemaRegistry();
-        DefaultYangModelRegistry registry = schemaProvider.registry();
+        processSchemaRegistry();
+        DefaultYangModelRegistry registry = registry();
         treeBuilder = new DefaultDataTreeBuilder(registry);
     }
 
