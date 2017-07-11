@@ -39,8 +39,10 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INPUT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OUTPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT_VAR_NAME;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
@@ -110,9 +112,21 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
             throws IOException {
 
         addResolvedAugmentedDataNodeImports(curNode);
+        JavaQualifiedTypeInfoTranslator typeInfo =
+                new JavaQualifiedTypeInfoTranslator();
+        typeInfo.setClassInfo(RPC_SERVICE);
+        typeInfo.setPkgInfo(MODEL_OBJECT_PKG);
+        typeInfo.setForInterface(true);
+        ((JavaCodeGeneratorInfo) curNode)
+                .getTempJavaCodeFragmentFiles().getServiceTempFiles()
+                .getJavaImportData().addImportInfo(typeInfo,
+                                                   getJavaClassName(SERVICE),
+                                                   getJavaFileInfo().getPackage());
+
         List<String> imports = ((JavaCodeGeneratorInfo) curNode)
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles()
                 .getJavaImportData().getImports(true);
+
         createPackage(curNode);
         /*boolean notification = false;
         if (curNode instanceof YangJavaModuleTranslator) {

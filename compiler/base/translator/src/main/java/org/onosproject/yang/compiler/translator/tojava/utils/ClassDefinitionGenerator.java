@@ -21,7 +21,6 @@ import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
@@ -88,6 +87,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.REGISTER_RPC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_EXTENDED_COMMAND;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_HANDLER;
+import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SUBJECT;
@@ -298,10 +298,12 @@ final class ClassDefinitionGenerator {
      * @return definition
      */
     private static String getRpcInterfaceDefinition(String yangName, YangNode curNode) {
-        JavaExtendsListHolder holder = ((TempJavaCodeFragmentFilesContainer) curNode)
+        /*JavaExtendsListHolder holder = ((TempJavaCodeFragmentFilesContainer)
+                curNode)
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles()
                 .getJavaExtendsListHolder();
-        if (holder.getExtendsList() != null && !holder.getExtendsList().isEmpty()) {
+        if (holder.getExtendsList() != null && !holder.getExtendsList()
+                .isEmpty()) {
             curNode = curNode.getChild();
             while (curNode != null) {
                 if (curNode instanceof YangNotification) {
@@ -309,9 +311,10 @@ final class ClassDefinitionGenerator {
                 }
                 curNode = curNode.getNextSibling();
             }
-        }
+        }*/
         if (yangName.matches(REGEX_FOR_ANY_STRING_ENDING_WITH_SERVICE)) {
-            return getDefaultDefinition(INTERFACE, yangName, PUBLIC);
+            return getDefaultDefinitionWithExtends(INTERFACE, yangName,
+                                                   PUBLIC, RPC_SERVICE);
         }
         String name = getSuffixedName(
                 yangName.substring(0, yangName.length() - 7), SERVICE);
