@@ -267,5 +267,9 @@ module simple-data-types {
     leaf lfenum1 {
         type tpdfun0;
     }
+
+    leaf inst-iden {
+        type instance-identifier;
+    }
   }
 }

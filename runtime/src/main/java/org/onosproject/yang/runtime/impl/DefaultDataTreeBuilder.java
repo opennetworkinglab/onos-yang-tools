@@ -33,6 +33,7 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
+import org.onosproject.yang.model.DefaultResourceData.Builder;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.LeafNode;
@@ -44,6 +45,7 @@ import org.onosproject.yang.model.ResourceId;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
@@ -53,11 +55,15 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getJavaName;
 import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
 import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
 import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.TRUE;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getJavaName;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getLeafListObject;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getLeafObject;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypeEmpty;
 
 /**
  * Representation of data tree builder which generates YANG data tree from the
@@ -106,7 +112,7 @@ class DefaultDataTreeBuilder {
         List<ModelObject> modelObjects = modelData.modelObjects();
         ModelObjectId id = modelData.identifier();
 
-        DefaultResourceData.Builder rscData = DefaultResourceData.builder();
+        Builder rscData = DefaultResourceData.builder();
 
         //Create resource identifier.
         ModIdToRscIdConverter converter = new ModIdToRscIdConverter(reg);
@@ -169,7 +175,7 @@ class DefaultDataTreeBuilder {
      */
     private void processDataNodeConversion(
             YangNode curNode, DataTreeBuilderHelper helper,
-            DefaultResourceData.Builder rscData, Object curObj) {
+            Builder rscData, Object curObj) {
         if (curNode == null) {
             return;
         }
@@ -209,7 +215,7 @@ class DefaultDataTreeBuilder {
      * @return input/output node
      */
     private YangSchemaNode handleRpcChild(
-            Object obj, YangNode parent, DefaultResourceData.Builder rscData) {
+            Object obj, YangNode parent, Builder rscData) {
         if (obj != null && parent != null) {
             //process all the node which are in data model tree.
             String name = obj.getClass().getName();
@@ -410,54 +416,110 @@ class DefaultDataTreeBuilder {
     /**
      * Process leaf and leaf list information.
      *
-     * @param rootNode root node
-     * @param rscData  resource data
+     * @param holder  holder node
+     * @param rscData resource data
+     * @param lObj    leaf model object
      */
-    private void processLeafObj(YangSchemaNode rootNode,
-                                DefaultResourceData.Builder rscData,
-                                LeafModelObject rootObj) {
+    private void processLeafObj(YangSchemaNode holder, Builder rscData,
+                                LeafModelObject lObj) {
         //handle leaf nodes.
-        YangLeavesHolder holder = (YangLeavesHolder) rootNode;
-        if (rootObj.leafIdentifier() != null) {
-            String name = rootObj.leafIdentifier().toString().toLowerCase();
-            List<Object> values = rootObj.values();
+        YangLeavesHolder lHolder = (YangLeavesHolder) holder;
+        if (lObj.leafIdentifier() != null) {
+            String name = lObj.leafIdentifier().toString().toLowerCase();
+            List<Object> values = lObj.values();
             // handle all leaf nodes and add their data nodes to resource data.
-            List<YangLeaf> leaves = holder.getListOfLeaf();
+            List<YangLeaf> leaves = lHolder.getListOfLeaf();
             if (nonEmpty(leaves)) {
-                for (YangLeaf leaf : leaves) {
-                    //Add node for leaf with value.
-                    if (name.equals(leaf.getJavaAttributeName().toLowerCase())) {
-                        DataNode node = LeafNode.builder(leaf.getName(), leaf
-                                .getNameSpace().getModuleNamespace())
-                                .value(values.get(0))
-                                .type(SINGLE_INSTANCE_LEAF_VALUE_NODE).build();
-                        rscData.addDataNode(node);
-                        break;
-                    }
-                }
+                updateLeafDataNode(name, leaves, values.get(0), rscData,
+                                   holder, lObj);
             }
-            // handle all leaf list nodes and add their data nodes to resource data.
-            List<YangLeafList> leafLists = holder.getListOfLeafList();
+            // handle all leaf-list nodes and add their data nodes to
+            // resource data.
+            List<YangLeafList> leafLists = lHolder.getListOfLeafList();
             if (nonEmpty(leafLists)) {
-                for (YangLeafList leafList : leafLists) {
-                    if (name.equals(leafList.getJavaAttributeName().toLowerCase())) {
-                        //for leaf list we need to add multi instance of leaf
-                        // node.
-                        for (Object o : values) {
-                            DataNode node = LeafNode
-                                    .builder(leafList.getName(),
-                                             leafList.getNameSpace().getModuleNamespace())
-                                    .value(o)
-                                    .type(MULTI_INSTANCE_LEAF_VALUE_NODE).build();
-                            rscData.addDataNode(node);
-                        }
-                        break;
-                    }
-                }
+                updateLeafListDataNode(name, leafLists, values, rscData,
+                                       holder, lObj);
             }
         }
     }
 
+    /**
+     * Updates the processed leaf-list objects from the leaf-list type to the
+     * data node.
+     *
+     * @param name      leaf-list name
+     * @param leafLists YANG leaf-lists
+     * @param values    leaf-list objects
+     * @param rscData   data node
+     * @param holder    leaf-list holder
+     * @param lObj      leaf model object
+     */
+    private void updateLeafListDataNode(String name, List<YangLeafList> leafLists,
+                                        List<Object> values, Builder rscData,
+                                        YangSchemaNode holder, LeafModelObject lObj) {
+        for (YangLeafList leafList : leafLists) {
+            if (name.equals(leafList.getJavaAttributeName().toLowerCase())) {
+                Set<Object> objects = getLeafListObject(holder, leafList,
+                                                        lObj, values);
+                if (!objects.isEmpty()) {
+                    Object o = objects.iterator().next();
+                    if (isTypeEmpty(leafList.getDataType())) {
+                        objects.clear();
+                        String empty = String.valueOf(o);
+                        if (!empty.equals(TRUE)) {
+                            break;
+                        }
+                        objects.add(null);
+                    }
+                    for (Object obj : objects) {
+                        DataNode node = LeafNode
+                                .builder(leafList.getName(), leafList
+                                        .getNameSpace().getModuleNamespace())
+                                .value(obj)
+                                .type(MULTI_INSTANCE_LEAF_VALUE_NODE).build();
+                        rscData.addDataNode(node);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Updates the processed leaf object from the leaf type to the data node.
+     *
+     * @param lName    leaf name
+     * @param leaves   YANG leaves
+     * @param val      leaf object
+     * @param rscData  data node
+     * @param rootNode holder node
+     * @param lObj     leaf model object
+     */
+    private void updateLeafDataNode(String lName, List<YangLeaf> leaves,
+                                    Object val, Builder rscData,
+                                    YangSchemaNode rootNode, LeafModelObject lObj) {
+        for (YangLeaf leaf : leaves) {
+            if (lName.equals(leaf.getJavaAttributeName().toLowerCase())) {
+                Object obj = getLeafObject(rootNode, leaf, lObj,
+                                           val, true);
+                if (obj != null) {
+                    if (isTypeEmpty(leaf.getDataType())) {
+                        String empty = String.valueOf(obj);
+                        if (!empty.equals(TRUE)) {
+                            break;
+                        }
+                        obj = null;
+                    }
+                    DataNode node = LeafNode.builder(leaf.getName(), leaf
+                            .getNameSpace().getModuleNamespace())
+                            .value(obj)
+                            .type(SINGLE_INSTANCE_LEAF_VALUE_NODE).build();
+                    rscData.addDataNode(node);
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * Process single instance/multi instance nodes and build there data nodes.
@@ -494,7 +556,7 @@ class DefaultDataTreeBuilder {
      * @param yangObj       object for node
      */
     private void processModelObjects(DataTreeBuilderHelper modYo, YangSchemaNode lastIndexNode,
-                                     DefaultResourceData.Builder rscData, Object
+                                     Builder rscData, Object
                                              yangObj) {
         //Process all the leaf nodes of root node.
         processRootLeafInfo(modYo, lastIndexNode, rscData, yangObj);
@@ -510,59 +572,114 @@ class DefaultDataTreeBuilder {
     /**
      * Process leaf and leaf list information.
      *
-     * @param modYo    module builder
-     * @param rootNode root node
-     * @param rscData  resource data
+     * @param modYo   module builder
+     * @param holder  root node
+     * @param rscData resource data
      */
-    private void processRootLeafInfo(
-            DataTreeBuilderHelper modYo, YangSchemaNode rootNode,
-            DefaultResourceData.Builder rscData, Object rootObj) {
+    private void processRootLeafInfo(DataTreeBuilderHelper modYo,
+                                     YangSchemaNode holder, Builder rscData,
+                                     Object hObj) {
         //handle leaf nodes.
-        YangLeavesHolder holder = (YangLeavesHolder) rootNode;
-        if (rootNode instanceof YangCase) {
-            if (((YangCase) rootNode).getParent().getParent() instanceof
+        YangLeavesHolder lHolder = (YangLeavesHolder) holder;
+        if (holder instanceof YangCase) {
+            if (((YangCase) holder).getParent().getParent() instanceof
                     RpcNotificationContainer) {
                 modYo.setExtBuilder(null);
             }
         }
         // handle all leaf nodes and add their data nodes to resource data.
-        List<YangLeaf> leaves = holder.getListOfLeaf();
-        DataNode.Builder builder;
+        List<YangLeaf> leaves = lHolder.getListOfLeaf();
         if (nonEmpty(leaves)) {
-            for (YangLeaf leaf : leaves) {
-                try {
-                    //Add node for leaf with value.
-                    builder = modYo.addLeafWithValue(
-                            rootNode, leaf, rootObj, getAttributeOfObject(
-                                    rootObj, leaf.getJavaAttributeName()));
-                    addDataNode(builder, rscData);
-                } catch (NoSuchMethodException e) {
-                    throw new ModelConvertorException("failed to create data node for " +
-                                                              "leaf " + leaf.getName());
-                }
-            }
+            updateLeaf(leaves, modYo, holder, hObj, rscData);
         }
         // handle all leaf list nodes and add their data nodes to resource data.
-        List<YangLeafList> leafLists = holder.getListOfLeafList();
-        List<DataNode.Builder> nodes;
+        List<YangLeafList> leafLists = lHolder.getListOfLeafList();
         if (nonEmpty(leafLists)) {
-            List<Object> obj;
-            for (YangLeafList leafList : leafLists) {
-                try {
-                    obj = (List<Object>) getAttributeOfObject(
-                            rootObj, getJavaName(leafList));
-                    if (obj != null) {
-                        nodes = modYo.addLeafListValue(rootNode, rootObj,
-                                                       leafList, obj);
+            updateLeafList(leafLists, modYo, holder, hObj, rscData);
+        }
+    }
+
+    /**
+     * Updates leaf values inside the holder node by taking the processed
+     * leaf object and checking for empty type.
+     *
+     * @param leafLists list of leaf-list
+     * @param modYo     data tree builder
+     * @param holder    leaf-list holder
+     * @param hObj      holder object
+     * @param rscData   resource data
+     */
+    private void updateLeafList(List<YangLeafList> leafLists,
+                                DataTreeBuilderHelper modYo, YangSchemaNode holder,
+                                Object hObj, Builder rscData) {
+        List<Object> obj;
+        List<DataNode.Builder> nodes;
+        for (YangLeafList leafList : leafLists) {
+            try {
+                obj = (List<Object>) getAttributeOfObject(
+                        hObj, getJavaName(leafList));
+                if (obj != null) {
+                    Set<Object> objects = getLeafListObject(holder, leafList,
+                                                            hObj, obj);
+                    if (!objects.isEmpty()) {
+                        Object o = objects.iterator().next();
+                        if (isTypeEmpty(leafList.getDataType())) {
+                            objects.clear();
+                            String empty = String.valueOf(o);
+                            if (!empty.equals(TRUE)) {
+                                continue;
+                            }
+                            objects.add(null);
+                        }
+                        nodes = modYo.addLeafList(objects, leafList);
                         if (nodes != null) {
                             for (DataNode.Builder node : nodes) {
                                 rscData.addDataNode(node.build());
                             }
                         }
                     }
-                } catch (NoSuchMethodException e) {
-                    throw new ModelConvertorException(e);
                 }
+            } catch (NoSuchMethodException e) {
+                throw new ModelConvertorException(e);
+            }
+        }
+    }
+
+    /**
+     * Updates leaf values inside the holder node by taking the processed
+     * leaf object and checking for empty type.
+     *
+     * @param leaves  list of leaf
+     * @param modYo   data tree builder
+     * @param holder  leaf holder
+     * @param hObj    holder object
+     * @param rscData resource data
+     */
+    private void updateLeaf(List<YangLeaf> leaves, DataTreeBuilderHelper modYo,
+                            YangSchemaNode holder, Object hObj, Builder rscData) {
+        DataNode.Builder builder;
+        for (YangLeaf leaf : leaves) {
+            try {
+                Object leafObj = getAttributeOfObject(
+                        hObj, leaf.getJavaAttributeName());
+                Object obj = getLeafObject(holder, leaf, hObj, leafObj,
+                                           false);
+
+                if (obj != null) {
+                    if (isTypeEmpty(leaf.getDataType())) {
+                        String empty = String.valueOf(obj);
+                        if (!empty.equals(TRUE)) {
+                            continue;
+                        }
+                        obj = null;
+                    }
+                    builder = modYo.createLeafNode(leaf, obj);
+                    addDataNode(builder, rscData);
+                }
+            } catch (NoSuchMethodException e) {
+                throw new ModelConvertorException(
+                        "Failed to create data node for leaf "
+                                + leaf.getName());
             }
         }
     }
@@ -578,7 +695,7 @@ class DefaultDataTreeBuilder {
      */
     private void processRootLevelListNode(
             DataTreeBuilderHelper helper, YangSchemaNode curRootNode,
-            DefaultResourceData.Builder rscData, Object curRootObj) {
+            Builder rscData, Object curRootObj) {
 
         YangNode curNode = ((YangNode) curRootNode).getChild();
         DataTreeNodeInfo parentInfo = new DataTreeNodeInfo();
@@ -646,7 +763,7 @@ class DefaultDataTreeBuilder {
      */
     private void processRootLevelSingleInNode(
             DataTreeBuilderHelper helper, YangSchemaNode rootNode,
-            DefaultResourceData.Builder rscData, Object rootObj) {
+            Builder rscData, Object rootObj) {
 
         YangNode curNode = ((YangNode) rootNode).getChild();
 
@@ -723,7 +840,7 @@ class DefaultDataTreeBuilder {
      * @return single instance node
      */
     private YangNode verifyAndDoNotGetList(YangNode curNode, DataTreeBuilderHelper
-            helper, DataTreeNodeInfo info, DefaultResourceData.Builder rscData) {
+            helper, DataTreeNodeInfo info, Builder rscData) {
         if (curNode == null) {
             return null;
         }
@@ -762,7 +879,7 @@ class DefaultDataTreeBuilder {
      */
     private YangNode processReCheckSibling(
             YangNode curNode, DataTreeBuilderHelper helper, DataTreeNodeInfo info,
-            DefaultResourceData.Builder rscData) {
+            Builder rscData) {
         curNode = curNode.getNextSibling();
         curNode = verifyAndDoNotGetList(curNode, helper, info, rscData);
         return curNode;
@@ -778,7 +895,7 @@ class DefaultDataTreeBuilder {
      */
     private void handleChoiceNode(
             YangNode curNode, DataTreeNodeInfo info, DataTreeBuilderHelper helper,
-            DefaultResourceData.Builder rscData) {
+            Builder rscData) {
         // get the choice object.
         Object childObj = helper.processChoiceNode(curNode, info);
         YangNode tempNode = curNode;
@@ -820,7 +937,7 @@ class DefaultDataTreeBuilder {
      */
     private void processCaseNode(
             YangNode curNode, DataTreeNodeInfo info, DataTreeBuilderHelper helper,
-            DefaultResourceData.Builder rscData) {
+            Builder rscData) {
         Object childObj = helper.processCaseNode(curNode, info);
         if (childObj != null) {
             processModelObjects(helper, curNode, rscData, childObj);
@@ -839,7 +956,7 @@ class DefaultDataTreeBuilder {
      */
     private void handleCaseNode(
             YangNode curNode, DataTreeNodeInfo info, DataTreeBuilderHelper yo,
-            DefaultResourceData.Builder rscData) {
+            Builder rscData) {
 
         Object obj = info.getYangObject();
         if (obj != null) {
@@ -854,7 +971,7 @@ class DefaultDataTreeBuilder {
      * @param builder resource data builder
      */
     private void addDataNode(DataNode.Builder node,
-                             DefaultResourceData.Builder builder) {
+                             Builder builder) {
         if (node != null) {
             builder.addDataNode(node.build());
         }

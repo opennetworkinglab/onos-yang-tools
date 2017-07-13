@@ -34,8 +34,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Represents implementation of interfaces to build and obtain JSON data tree.
  */
 public class DefaultJsonBuilder implements JsonBuilder {
-    private Logger log = LoggerFactory.getLogger(getClass());
-    private StringBuilder treeString;
     private static final String LEFT_BRACE = "{";
     private static final String RIGHT_BRACE = "}";
     private static final String LEFT_BRACKET = "[";
@@ -44,7 +42,8 @@ public class DefaultJsonBuilder implements JsonBuilder {
     private static final String COLON = ":";
     private static final String QUOTE = "\"";
     private static final String ROOT_MODULE_NAME = "ROOT";
-
+    private Logger log = LoggerFactory.getLogger(getClass());
+    private StringBuilder treeString;
     private Stack<String> moduleNameStack;
 
     public DefaultJsonBuilder(String rootName) {
@@ -81,9 +80,6 @@ public class DefaultJsonBuilder implements JsonBuilder {
             return;
         }
         appendField(nodeName);
-        if (value.isEmpty()) {
-            return;
-        }
         treeString.append(QUOTE);
         treeString.append(value);
         treeString.append(QUOTE);

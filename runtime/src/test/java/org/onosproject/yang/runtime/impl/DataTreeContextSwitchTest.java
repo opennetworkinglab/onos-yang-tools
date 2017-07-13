@@ -18,24 +18,6 @@ package org.onosproject.yang.runtime.impl;
 
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.ChoiceContainer;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.DefaultChoiceContainer;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.DefaultPredict;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.Predict;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.predict.DefaultReproduce;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.predict.Reproduce;
-import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.currentvalue.DefaultYtbAbsent;
-import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.DefaultCont1;
-import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.DefaultCont2;
-import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.DefaultAugmentedCont2;
-import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.augmentedcont2.Cont1s;
-import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.augmentedcont2.DefaultCont1s;
-import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoicecase.DefaultYtbFood;
-import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoicecase.ytbfood.ytbsnack.DefaultYtbLateNight;
-import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.DefaultModKey;
-import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.DefaultAugmentedSchModKey;
-import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.AugListModKey;
-import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.DefaultAugListModKey;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.BinaryTypedef;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.DefaultFirstLevel;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.UnionTypedef;
@@ -57,6 +39,24 @@ import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldata
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.group1.DefaultGroupContainer;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedatainterfile.rev20160826.modeldatatoresourcedatainterfile.firstlevel.containerchoice.choicecase.augmentedschchoicecase.DefaultLeafInterAug;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedatainterfile.rev20160826.modeldatatoresourcedatainterfile.firstlevel.containerchoice.choicecase.leafcase.DefaultAugmentedSchLeafCase;
+import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.DefaultModKey;
+import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.DefaultAugmentedSchModKey;
+import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.AugListModKey;
+import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.DefaultAugListModKey;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.ChoiceContainer;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.DefaultChoiceContainer;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.DefaultPredict;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.Predict;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.predict.DefaultReproduce;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.predict.Reproduce;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.currentvalue.DefaultYtbAbsent;
+import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.DefaultCont1;
+import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.DefaultCont2;
+import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.DefaultAugmentedCont2;
+import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.augmentedcont2.Cont1s;
+import org.onosproject.yang.gen.v1.ytbsimpleaugment.rev20160826.ytbsimpleaugment.cont1.cont2.augmentedcont2.DefaultCont1s;
+import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoicecase.DefaultYtbFood;
+import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoicecase.ytbfood.ytbsnack.DefaultYtbLateNight;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData;
 import org.onosproject.yang.model.InnerNode;
@@ -91,6 +91,8 @@ public class DataTreeContextSwitchTest {
     private static final String CHOC = "choc";
     private static final String VAL = "val";
     private static final String IND = "ind";
+    private final TestYangSchemaNodeProvider schemaProvider = new
+            TestYangSchemaNodeProvider();
     private ResourceData rscData;
     private DefaultDataTreeBuilder treeBuilder;
     private ResourceId id;
@@ -101,8 +103,6 @@ public class DataTreeContextSwitchTest {
     private DataNode node;
     private ModelObjectId mid;
     private DefaultModelObjectData.Builder data;
-    private final TestYangSchemaNodeProvider schemaProvider = new
-            TestYangSchemaNodeProvider();
 
     /**
      * Do the prior setup for each UT.
@@ -1191,7 +1191,7 @@ public class DataTreeContextSwitchTest {
         c1.leaf3(120);
 
         DefaultAugmentedLeafCase aug1 = new DefaultAugmentedLeafCase();
-        aug1.leafAug(BinaryTypedef.fromString("1011"));
+        aug1.leafAug(BinaryTypedef.fromString("MTAxMQ=="));
 
         c1.addAugmentation(aug1);
 

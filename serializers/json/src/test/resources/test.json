@@ -2,7 +2,7 @@
     "device": [
       {
         "deviceid": "string1-deviceid",
-        "Customs-supervisor": "string2",
+        "Customs-supervisor": "",
         "Merchandiser-supervisor": "string3",
         "Warehouse-supervisor": [
           "string41",

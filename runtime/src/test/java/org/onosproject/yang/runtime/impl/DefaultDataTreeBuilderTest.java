@@ -29,6 +29,18 @@ import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelp2pprop
 import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelsgrouping.DefaultTunnels;
 import org.onosproject.yang.gen.v1.yrtietfte.rev20170310.yrtietfte.tunnelsgrouping.tunnels.DefaultTunnel;
 import org.onosproject.yang.gen.v1.yrtietftetypes.rev20160320.yrtietftetypes.TunnelP2p;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Cont1;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Def1;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Def2;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Def3;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.DefaultCont1;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Physical;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Virtual;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.cont1.Cont2;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.cont1.DefaultCont2;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.cont1.cont2.AugmentedCont2;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.cont1.cont2.DefaultAugmentedCont2;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.def1.Def1Union;
 import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.YtbIetfSchedule;
 import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum1Enum;
 import org.onosproject.yang.gen.v1.ytbietfschedule.rev20160826.ytbietfschedule.Enum2Enum;
@@ -46,12 +58,15 @@ import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.y
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.multiplexes.DefaultApplicationAreas;
 import org.onosproject.yang.gen.v1.ytbtreebuilderforlisthavinglist.rev20160826.ytbtreebuilderforlisthavinglist.carrier.multiplexes.TypesEnum;
 import org.onosproject.yang.model.DataNode;
-import org.onosproject.yang.model.DefaultModelObjectData;
+import org.onosproject.yang.model.DefaultModelObjectData.Builder;
+import org.onosproject.yang.model.InnerModelObject;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
+import org.onosproject.yang.model.LeafIdentifier;
 import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.ListKey;
+import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceData;
@@ -64,6 +79,8 @@ import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestOutp
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,6 +90,31 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.Cont.LeafIdentifier.LFENUM1;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF1;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF10;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF11;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF12;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF2;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF3;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF4;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF5;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF6;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF7;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF8;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF9;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL1;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL10;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL11;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL12;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL2;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL3;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL4;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL5;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL6;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL7;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL8;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL9;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.def1.def1union.Def1UnionEnum1.of;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
@@ -111,7 +153,7 @@ public class DefaultDataTreeBuilderTest {
     private List<DataNode> dataNodes;
     private DataNode node;
     private ModelObjectId mid;
-    private DefaultModelObjectData.Builder data;
+    private Builder data;
 
     /**
      * Do the prior setup for each UT.
@@ -140,7 +182,7 @@ public class DefaultDataTreeBuilderTest {
         objects.add(9);
         modelObject.values(objects);
         // Builds YANG tree in YTB.
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(modelObject);
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -183,7 +225,7 @@ public class DefaultDataTreeBuilderTest {
         modelObject.values(objects);
 
         //Builds YANG tree in YTB.
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(modelObject);
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -226,7 +268,7 @@ public class DefaultDataTreeBuilderTest {
         DefaultModKey m1 = new DefaultModKey();
         m1.types(1);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
 
         data.addModelObject(m1);
         rscData = treeBuilder.getResourceData(data.build());
@@ -280,7 +322,7 @@ public class DefaultDataTreeBuilderTest {
         DefaultModKey m3 = new DefaultModKey();
         m3.types(3);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
 
         data.addModelObject(m1).addModelObject(m2).addModelObject(m3);
         rscData = treeBuilder.getResourceData(data.build());
@@ -358,7 +400,7 @@ public class DefaultDataTreeBuilderTest {
 
         setUp();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
 
         LeafModelObject object = new LeafModelObject();
         object.leafIdentifier(ModKey.LeafIdentifier.TYPES);
@@ -447,8 +489,7 @@ public class DefaultDataTreeBuilderTest {
 
         setUp();
 
-        data = new DefaultModelObjectData
-                .Builder();
+        data = new Builder();
         ModKeyKeys keyKeys = new ModKeyKeys();
         keyKeys.types(10);
         mid = ModelObjectId.builder()
@@ -502,7 +543,7 @@ public class DefaultDataTreeBuilderTest {
     public void processWithTypeEnum() {
         setUp();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         //As an application, creates the object.
         LeafModelObject object = new LeafModelObject();
         object.leafIdentifier(YtbIetfSchedule.LeafIdentifier.TIME);
@@ -582,7 +623,7 @@ public class DefaultDataTreeBuilderTest {
         sched.predict(dec);
 
         // Builds YANG tree in YTB.
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(sched);
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -625,7 +666,7 @@ public class DefaultDataTreeBuilderTest {
     public void processModuleWithContainerModId() {
 
         setUp();
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         //As an application, creates the object.
         LeafModelObject object = new LeafModelObject();
         object.leafIdentifier(DefaultSched.LeafIdentifier.PREDICT);
@@ -671,14 +712,14 @@ public class DefaultDataTreeBuilderTest {
         setUp();
         // Creates two binary leaf -lists for two list app areas.
         List<byte[]> destArea1 = new ArrayList<>();
-        byte[] arr = new byte[]{1, 6, 3};
-        byte[] arr1 = new byte[]{2, 7, 4};
+        byte[] arr = Base64.getDecoder().decode("QXdnRQ==");
+        byte[] arr1 = Base64.getDecoder().decode("QlFZQg==");
         destArea1.add(arr);
         destArea1.add(arr1);
 
         List<byte[]> destArea2 = new ArrayList<>();
-        byte[] arr2 = new byte[]{3, 8, 4};
-        byte[] arr3 = new byte[]{5, 6, 1};
+        byte[] arr2 = Base64.getDecoder().decode("QndjSA==");
+        byte[] arr3 = Base64.getDecoder().decode("QUFFPQ==");
         destArea2.add(arr2);
         destArea2.add(arr3);
 
@@ -699,14 +740,14 @@ public class DefaultDataTreeBuilderTest {
 
         //Creates two binary leaf -lists for two list app areas.
         List<byte[]> destArea3 = new ArrayList<>();
-        byte[] arrB = new byte[]{0, 0, 1};
-        byte[] arr1B = new byte[]{1, 0, 0};
+        byte[] arrB = Base64.getDecoder().decode("QUtqaA==");
+        byte[] arr1B = Base64.getDecoder().decode("TkJGag==");
         destArea3.add(arrB);
         destArea3.add(arr1B);
 
         List<byte[]> destArea4 = new ArrayList<>();
-        byte[] arr2B = new byte[]{7, 7, 7};
-        byte[] arr3B = new byte[]{0, 1};
+        byte[] arr2B = Base64.getDecoder().decode("SkhJOA==");
+        byte[] arr3B = Base64.getDecoder().decode("MTExMQ==");
         destArea4.add(arr2B);
         destArea4.add(arr3B);
 
@@ -733,7 +774,7 @@ public class DefaultDataTreeBuilderTest {
         DefaultCarrier carrier = new DefaultCarrier();
         carrier.multiplexes(multiplexList);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(carrier);
         rscData = treeBuilder.getResourceData(data.build());
         nameSpace = "yms:test:ytb:tree:builder:for:list:having:list";
@@ -793,7 +834,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         LeafListKey leafListKey = (LeafListKey) key;
-        assertThat("AwgE", is(leafListKey.value()));
+        assertThat("BwcH", is(leafListKey.value()));
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -804,7 +845,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("BQYB", is(leafListKey.value()));
+        assertThat("AAE=", is(leafListKey.value()));
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -846,7 +887,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("BwcH", is(leafListKey.value()));
+        assertThat("JHI8", is(leafListKey.value()));
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -857,7 +898,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("AAE=", is(leafListKey.value()));
+        assertThat("1111", is(leafListKey.value()));
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -876,7 +917,7 @@ public class DefaultDataTreeBuilderTest {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
         ut.addMockModWithNotification();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestNotification.class).build();
         data.identifier(mid);
@@ -913,7 +954,7 @@ public class DefaultDataTreeBuilderTest {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
         ut.addMockModWithNotification();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestNotification.class).build();
         data.identifier(mid);
@@ -957,7 +998,7 @@ public class DefaultDataTreeBuilderTest {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
         ut.addMockModWithRpc();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestInput.class).build();
         data.identifier(mid);
@@ -1000,7 +1041,7 @@ public class DefaultDataTreeBuilderTest {
 
         DefaultTestInput input = new DefaultTestInput();
         input.testContainer(new DefaultTestContainer());
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(input);
 
         registry = ut.reg;
@@ -1040,7 +1081,7 @@ public class DefaultDataTreeBuilderTest {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
         ut.addMockModWithRpc();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(new DefaultTestOutput());
 
         registry = ut.reg;
@@ -1080,7 +1121,7 @@ public class DefaultDataTreeBuilderTest {
         MoIdToRscIdTest ut = new MoIdToRscIdTest();
         ut.addMockModWithRpc();
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         mid = ModelObjectId.builder()
                 .addChild(DefaultTestInput.class).build();
         data.identifier(mid);
@@ -1124,7 +1165,7 @@ public class DefaultDataTreeBuilderTest {
     @Test
     public void processEnumeration() {
         setUp();
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         ModelObjectId.Builder moIdBdlr = ModelObjectId.builder()
                 .addChild(DefaultCont.class);
         LeafModelObject mo = new LeafModelObject();
@@ -1171,7 +1212,7 @@ public class DefaultDataTreeBuilderTest {
         DefaultTe te = new DefaultTe();
         te.tunnels(tunnels);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(te);
         DefaultDataTreeBuilder builder = new DefaultDataTreeBuilder(registry);
         rscData = builder.getResourceData(data.build());
@@ -1203,7 +1244,7 @@ public class DefaultDataTreeBuilderTest {
         con.conIn(typedef);
         input.in(con);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(input);
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -1232,7 +1273,7 @@ public class DefaultDataTreeBuilderTest {
         first.call(ll);
         output.outCh(first);
 
-        data = new DefaultModelObjectData.Builder();
+        data = new Builder();
         data.addModelObject(output);
         rscData = treeBuilder.getResourceData(data.build());
 
@@ -1251,5 +1292,395 @@ public class DefaultDataTreeBuilderTest {
 
         node = inDn.get(0);
         validateDataNode(node, "output", ns, SINGLE_INSTANCE_NODE, true, null);
+    }
+
+    /**
+     * Unit test for proper conversion of data types to data node.
+     */
+    @Test
+    public void processDataTypesToDataNode() {
+        setUp();
+        data = new Builder();
+        data = buildRootLeafAndLeafList(data);
+        data = buildContainer(data);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        List<DataNode> inDn = rscData.dataNodes();
+        String ns = "yms:test:ytb:data:types";
+        Iterator<DataNode> it = inDn.iterator();
+
+        it = validate(it, ns);
+
+        DataNode cont1 = it.next();
+        validateDataNode(cont1, "cont1", ns, SINGLE_INSTANCE_NODE, true, null);
+
+        Map<NodeKey, DataNode> c1 = ((InnerNode) cont1).childNodes();
+        List<DataNode> cont1DN = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : c1.entrySet()) {
+            cont1DN.add(c.getValue());
+        }
+        Iterator<DataNode> it1 = cont1DN.iterator();
+        it1 = validate(it1, ns);
+
+        DataNode cont2 = it1.next();
+        validateDataNode(cont2, "cont2", ns, SINGLE_INSTANCE_NODE, true, null);
+
+        Map<NodeKey, DataNode> c2 = ((InnerNode) cont2).childNodes();
+        List<DataNode> cont2DN = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : c2.entrySet()) {
+            cont2DN.add(c.getValue());
+        }
+        Iterator<DataNode> it2 = cont2DN.iterator();
+        validate(it2, ns);
+    }
+
+    /**
+     * Validates the leaf and leaf-list value under the specified node.
+     *
+     * @param it data node iterator
+     * @param ns name space
+     * @return data node iterator
+     */
+    private Iterator<DataNode> validate(Iterator<DataNode> it, String ns) {
+
+        validateDataNode(it.next(), "leaf1", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "leaf1");
+        validateDataNode(it.next(), "leaf2", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
+        validateDataNode(it.next(), "leaf3", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+        validateDataNode(it.next(), "leaf4", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
+        validateDataNode(it.next(), "leaf5", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "physical");
+        validateDataNode(it.next(), "leaf6", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "/cont1");
+        validateDataNode(it.next(), "leaf7", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2");
+        validateDataNode(it.next(), "leaf8", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, null);
+        validateDataNode(it.next(), "leaf9", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2");
+        validateDataNode(it.next(), "leaf11", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, null);
+        validateDataNode(it.next(), "leaf12", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+        validateDataNode(it.next(), "ll1", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "leaf-list1");
+        validateDataNode(it.next(), "ll1", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "leaf-list1-2");
+        validateDataNode(it.next(), "ll2", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
+        validateDataNode(it.next(), "ll2", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "ten");
+        validateDataNode(it.next(), "ll3", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+        validateDataNode(it.next(), "ll3", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110111");
+        validateDataNode(it.next(), "ll4", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
+        validateDataNode(it.next(), "ll4", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "ten");
+        validateDataNode(it.next(), "ll5", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "physical");
+        validateDataNode(it.next(), "ll5", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "virtual");
+        validateDataNode(it.next(), "ll6", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "/cont1");
+        validateDataNode(it.next(), "ll6", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "/cont1/cont2");
+        validateDataNode(it.next(), "ll7", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2");
+        validateDataNode(it.next(), "ll7", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2 b3");
+        validateDataNode(it.next(), "ll8", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, null);
+        validateDataNode(it.next(), "ll9", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2");
+        validateDataNode(it.next(), "ll9", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "b1 b2 b3");
+        validateDataNode(it.next(), "ll11", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, null);
+        validateDataNode(it.next(), "ll12", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+        validateDataNode(it.next(), "ll12", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110111");
+        return it;
+    }
+
+    /**
+     * Builds the container node with required value and returns the model
+     * object data.
+     *
+     * @param data model object data
+     * @return model object data builder
+     */
+    private Builder buildContainer(Builder data) {
+        Cont2 cont2 = buildAugmentForCont2();
+        Def1Union union = new Def1Union(of(1000));
+        Def1 def1 = new Def1(union);
+        Def1Union union2 = new Def1Union(of(10));
+        Def1 def12 = new Def1(union2);
+        byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
+        byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
+        BitSet bits = new BitSet();
+        bits.set(0, 2, true);
+        BitSet bits1 = new BitSet();
+        bits1.set(0, 3, true);
+        Def2 def2 = new Def2(bits);
+        Def2 def21 = new Def2(bits1);
+        Def3 def3 = new Def3(false);
+        Def3 def31 = new Def3(true);
+        Cont1 cont1 = new DefaultCont1();
+        cont1.leaf1("leaf1");
+        cont1.leaf2(def1);
+        cont1.leaf3(arr);
+        cont1.leaf4(def1);
+        cont1.leaf5(Physical.class);
+        cont1.leaf6("/cont1");
+        cont1.leaf7(bits);
+        cont1.leaf8(true);
+        cont1.leaf9(def2);
+        cont1.leaf10(def3);
+        cont1.leaf11(true);
+        cont1.leaf12(arr);
+        cont1.addToLl1("leaf-list1");
+        cont1.addToLl1("leaf-list1-2");
+        cont1.addToLl2(def1);
+        cont1.addToLl2(def12);
+        cont1.addToLl3(arr);
+        cont1.addToLl3(arr1);
+        cont1.addToLl4(def1);
+        cont1.addToLl4(def12);
+        cont1.addToLl5(Physical.class);
+        cont1.addToLl5(Virtual.class);
+        cont1.addToLl6("/cont1");
+        cont1.addToLl6("/cont1/cont2");
+        cont1.addToLl7(bits);
+        cont1.addToLl7(bits1);
+        cont1.addToLl8(true);
+        cont1.addToLl8(false);
+        cont1.addToLl9(def2);
+        cont1.addToLl9(def21);
+        cont1.addToLl10(def3);
+        cont1.addToLl10(def31);
+        cont1.addToLl11(true);
+        cont1.addToLl11(true);
+        cont1.addToLl12(arr);
+        cont1.addToLl12(arr1);
+        cont1.cont2(cont2);
+        data.addModelObject((ModelObject) cont1);
+        return data;
+    }
+
+    /**
+     * Builds the augment node with required value and updates it in the
+     * container cont2.
+     *
+     * @return cont2
+     */
+    private Cont2 buildAugmentForCont2() {
+        Cont2 cont2 = new DefaultCont2();
+        AugmentedCont2 augC = new DefaultAugmentedCont2();
+        Def1Union union = new Def1Union(of(1000));
+        Def1 def1 = new Def1(union);
+        Def1Union union2 = new Def1Union(of(10));
+        Def1 def12 = new Def1(union2);
+        byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
+        byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
+        BitSet bits = new BitSet();
+        bits.set(0, 2, true);
+        BitSet bits1 = new BitSet();
+        bits1.set(0, 3, true);
+        Def2 def2 = new Def2(bits);
+        Def2 def21 = new Def2(bits1);
+        Def3 def3 = new Def3(false);
+        Def3 def31 = new Def3(true);
+        augC.leaf1("leaf1");
+        augC.leaf2(def1);
+        augC.leaf3(arr);
+        augC.leaf4(def1);
+        augC.leaf5(Physical.class);
+        augC.leaf6("/cont1");
+        augC.leaf7(bits);
+        augC.leaf8(true);
+        augC.leaf9(def2);
+        augC.leaf10(def3);
+        augC.leaf11(true);
+        augC.leaf12(arr);
+        augC.addToLl1("leaf-list1");
+        augC.addToLl1("leaf-list1-2");
+        augC.addToLl2(def1);
+        augC.addToLl2(def12);
+        augC.addToLl3(arr);
+        augC.addToLl3(arr1);
+        augC.addToLl4(def1);
+        augC.addToLl4(def12);
+        augC.addToLl5(Physical.class);
+        augC.addToLl5(Virtual.class);
+        augC.addToLl6("/cont1");
+        augC.addToLl6("/cont1/cont2");
+        augC.addToLl7(bits);
+        augC.addToLl7(bits1);
+        augC.addToLl8(true);
+        augC.addToLl8(false);
+        augC.addToLl9(def2);
+        augC.addToLl9(def21);
+        augC.addToLl10(def3);
+        augC.addToLl10(def31);
+        augC.addToLl11(true);
+        augC.addToLl11(true);
+        augC.addToLl12(arr);
+        augC.addToLl12(arr1);
+        cont2.addAugmentation((InnerModelObject) augC);
+        return cont2;
+    }
+
+    /**
+     * Builds the root leaf and leaf-list and adds it in the model object
+     * data builder.
+     *
+     * @param data model object data
+     * @return model object data builder
+     */
+    private Builder buildRootLeafAndLeafList(Builder data) {
+
+        data = addLeafModelObject(LEAF1, "leaf1", data);
+
+        Def1Union union = new Def1Union(of("thousand"));
+        Def1 def1 = new Def1(union);
+        data = addLeafModelObject(LEAF2, def1, data);
+
+        byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
+        data = addLeafModelObject(LEAF3, arr, data);
+
+        data = addLeafModelObject(LEAF4, def1, data);
+
+        data = addLeafModelObject(LEAF5, Physical.class, data);
+
+        data = addLeafModelObject(LEAF6, "/cont1", data);
+
+        BitSet bits = new BitSet();
+        bits.set(0, 2, true);
+        data = addLeafModelObject(LEAF7, bits, data);
+
+        data = addLeafModelObject(LEAF8, true, data);
+
+        Def2 def2 = new Def2(bits);
+        data = addLeafModelObject(LEAF9, def2, data);
+
+        Def3 def3 = new Def3(false);
+        data = addLeafModelObject(LEAF10, def3, data);
+
+        data = addLeafModelObject(LEAF11, true, data);
+
+        data = addLeafModelObject(LEAF12, arr, data);
+
+        List<Object> objs = new LinkedList<>();
+        objs.add("leaf-list1");
+        objs.add("leaf-list1-2");
+        data = addLeafListModelObject(LL1, objs, data);
+
+        Def1Union union2 = new Def1Union(of("ten"));
+        Def1 def12 = new Def1(union2);
+        objs = new LinkedList<>();
+        objs.add(def1);
+        objs.add(def12);
+        data = addLeafListModelObject(LL2, objs, data);
+
+        byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
+        objs = new LinkedList<>();
+        objs.add(arr);
+        objs.add(arr1);
+        data = addLeafListModelObject(LL3, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(def1);
+        objs.add(def12);
+        data = addLeafListModelObject(LL4, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(Physical.class);
+        objs.add(Virtual.class);
+        data = addLeafListModelObject(LL5, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add("/cont1");
+        objs.add("/cont1/cont2");
+        data = addLeafListModelObject(LL6, objs, data);
+
+        BitSet bits2 = new BitSet();
+        bits2.set(0, 3, true);
+        objs = new LinkedList<>();
+        objs.add(bits);
+        objs.add(bits2);
+        data = addLeafListModelObject(LL7, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(true);
+        objs.add(false);
+        data = addLeafListModelObject(LL8, objs, data);
+
+        Def2 def21 = new Def2(bits2);
+        objs = new LinkedList<>();
+        objs.add(def2);
+        objs.add(def21);
+        data = addLeafListModelObject(LL9, objs, data);
+
+        Def3 def31 = new Def3(true);
+        objs = new LinkedList<>();
+        objs.add(def3);
+        objs.add(def31);
+        data = addLeafListModelObject(LL10, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(true);
+        objs.add(true);
+        data = addLeafListModelObject(LL11, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(arr);
+        objs.add(arr1);
+        data = addLeafListModelObject(LL12, objs, data);
+
+        return data;
+    }
+
+    /**
+     * Adds the leaf model object to the model object data builder with leaf
+     * value.
+     *
+     * @param lId    leaf identifier
+     * @param object leaf object
+     * @param data   model object data
+     * @return model object data builder
+     */
+    private Builder addLeafModelObject(LeafIdentifier lId, Object object,
+                                       Builder data) {
+        LeafModelObject obj = new LeafModelObject();
+        obj.leafIdentifier(lId);
+        obj.addValue(object);
+        data.addModelObject(obj);
+        return data;
+    }
+
+    /**
+     * Adds the leaf-list model objects to the model object data builder with
+     * leaf-list values.
+     *
+     * @param lId    leaf-list identifier
+     * @param object leaf-list object
+     * @param data   model object data
+     * @return model object data builder
+     */
+    private Builder addLeafListModelObject(LeafIdentifier lId,
+                                           List<Object> object, Builder data) {
+        LeafModelObject obj = new LeafModelObject();
+        obj.leafIdentifier(lId);
+        for (Object o : object) {
+            obj.addValue(o);
+        }
+        data.addModelObject(obj);
+        return data;
     }
 }

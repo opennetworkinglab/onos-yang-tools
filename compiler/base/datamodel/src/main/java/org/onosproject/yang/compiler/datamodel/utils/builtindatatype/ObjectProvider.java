@@ -73,9 +73,10 @@ public final class ObjectProvider {
                 return new BigInteger(leafValue);
             case EMPTY:
                 if (leafValue == null || leafValue.equals("")) {
-                    return true;
-                } else {
-                    throw new IllegalArgumentException(E_NONEMPTY);
+                    return null;
+                } else if (leafValue.equals("true") ||
+                        leafValue.equals("false")) {
+                    return Boolean.parseBoolean(leafValue);
                 }
             case BOOLEAN:
                 return Boolean.parseBoolean(leafValue);
@@ -87,6 +88,7 @@ public final class ObjectProvider {
             case IDENTITYREF:
             case ENUMERATION:
             case STRING:
+            case INSTANCE_IDENTIFIER:
                 return leafValue;
             case DECIMAL64:
                 return new BigDecimal(leafValue);

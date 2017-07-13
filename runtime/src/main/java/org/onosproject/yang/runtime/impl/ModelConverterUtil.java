@@ -20,8 +20,11 @@ package org.onosproject.yang.runtime.impl;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangCase;
+import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
+import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
@@ -31,6 +34,7 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.AtomicPath;
+import org.onosproject.yang.model.LeafSchemaContext;
 import org.onosproject.yang.model.MultiInstanceLeaf;
 import org.onosproject.yang.model.MultiInstanceNode;
 import org.onosproject.yang.model.SingleInstanceLeaf;
@@ -39,8 +43,8 @@ import org.onosproject.yang.model.SingleInstanceNode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -71,13 +75,15 @@ final class ModelConverterUtil {
      * Static attribute for string value having null.
      */
     static final String STR_NULL = "null";
-
+    static final String FALSE = "false";
+    static final String TRUE = "true";
     private static final int ONE = 1;
     private static final String ENUM_LEAF_IDENTIFIER = "$LeafIdentifier";
     private static final Set<YangDataTypes> PRIMITIVE_TYPES =
             new HashSet<>(Arrays.asList(INT8, INT16, INT32, INT64, UINT8,
                                         UINT16, UINT32, BOOLEAN, EMPTY));
     private static final String TO_STRING = "toString";
+    private static final String IS_VAL_SET = "isLeafValueSet";
 
     // No instantiation.
     private ModelConverterUtil() {
@@ -214,19 +220,15 @@ final class ModelConverterUtil {
     }
 
     /**
-     * Returns the string true, if the leaf data is actually set; false
-     * otherwise.
+     * Returns true, if the leaf data is actually set; false otherwise.
      *
-     * @param holder     leaf holder
-     * @param nodeObj    object if the node
-     * @param javaName   java name of the leaf
-     * @param methodName getter method name
-     * @return string value of the boolean method
-     * @throws NoSuchMethodException if the method is not present
+     * @param holder   leaf holder
+     * @param nodeObj  object if the node
+     * @param javaName java name of the leaf
+     * @return status of the value set flag
      */
-    static String isValueOrSelectLeafSet(YangSchemaNode holder, Object nodeObj,
-                                         String javaName, String methodName)
-            throws NoSuchMethodException {
+    static boolean isLeafValueSet(YangSchemaNode holder, Object nodeObj,
+                                  String javaName) {
 
         Class<?> nodeClass = nodeObj.getClass();
 
@@ -239,13 +241,13 @@ final class ModelConverterUtil {
         Class leafEnum;
         try {
             leafEnum = classLoader.loadClass(enumPackage);
-            Method getterMethod = nodeClass.getMethod(methodName, leafEnum);
+            Method getterMethod = nodeClass.getMethod(IS_VAL_SET, leafEnum);
             // Gets the value of the enum.
             Enum<?> value = Enum.valueOf(leafEnum, javaName.toUpperCase());
             // Invokes the method with the value of enum as param.
-            return String.valueOf(getterMethod.invoke(nodeObj, value));
+            return (boolean) getterMethod.invoke(nodeObj, value);
         } catch (IllegalAccessException | InvocationTargetException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new ModelConvertorException(e);
         }
     }
@@ -259,13 +261,15 @@ final class ModelConverterUtil {
      * @param name      leaf/leaf-list name
      * @param fieldObj  object of the leaf/leaf-list field
      * @param dataType  type of the leaf/leaf-list
-     * @return string value from the type
+     * @return finalized object
      */
-    static String getStringFromType(YangSchemaNode holder, Object holderObj,
-                                    String name, Object fieldObj, YangType dataType) {
+    static Object getObjFromType(YangSchemaNode holder, Object holderObj,
+                                 Object leaf, String name, Object fieldObj,
+                                 YangType dataType) {
 
         if (fieldObj == null) {
-            throw new ModelConvertorException("Value of " + holder.getName() + " is null");
+            throw new ModelConvertorException("Value of " + holder.getName()
+                                                      + " is null");
         }
 
         YangDataTypes type = dataType.getDataType();
@@ -278,39 +282,44 @@ final class ModelConverterUtil {
             case UINT16:
             case UINT32:
             case UINT64:
-            case EMPTY:
             case STRING:
-            case DECIMAL64:
-            case INSTANCE_IDENTIFIER:
-            case DERIVED:
-            case UNION:
-            case ENUMERATION:
             case BOOLEAN:
+            case DECIMAL64:
+            case EMPTY:
+                return fieldObj;
+
+            case INSTANCE_IDENTIFIER:
+            case ENUMERATION:
                 return String.valueOf(fieldObj).trim();
+
+            case BINARY:
+                return new String((byte[]) fieldObj);
 
             case BITS:
                 return getBitsValue(holder, holderObj, name, fieldObj).trim();
 
-            case BINARY:
-                return Base64.getEncoder().encodeToString((byte[]) fieldObj);
-
             case IDENTITYREF:
-                YangIdentityRef ir =
-                        (YangIdentityRef) dataType.getDataTypeExtendedInfo();
+                YangIdentityRef ir = (YangIdentityRef) dataType
+                        .getDataTypeExtendedInfo();
                 if (ir.isInGrouping()) {
                     return String.valueOf(fieldObj).trim();
                 }
                 return getIdentityRefValue(fieldObj, ir, holderObj);
 
             case LEAFREF:
-                YangLeafRef leafRef =
-                        (YangLeafRef) dataType.getDataTypeExtendedInfo();
-                return getStringFromType(holder, holderObj, name, fieldObj,
-                                         leafRef.getEffectiveDataType());
+                YangLeafRef leafRef = (YangLeafRef) dataType
+                        .getDataTypeExtendedInfo();
+                return getObjFromType(holder, holderObj, leaf, name, fieldObj,
+                                      leafRef.getEffectiveDataType());
+
+            case DERIVED:
+            case UNION:
+                String val = String.valueOf(fieldObj).trim();
+                return ((LeafSchemaContext) leaf).fromString(val);
 
             default:
-                throw new ModelConvertorException("Unsupported data type. Cannot be " +
-                                                          "processed.");
+                throw new ModelConvertorException(
+                        "Unsupported data type. Cannot be processed.");
         }
     }
 
@@ -531,5 +540,86 @@ final class ModelConverterUtil {
             builder.append(s);
         }
         return builder.toString();
+    }
+
+    /**
+     * Returns leaf object when value is present. For primitive types, in
+     * order to avoid default values, the value select is set or not is checked
+     * and then returned.
+     *
+     * @param holder    leaf holder
+     * @param leaf      YANG leaf
+     * @param parentObj leaf holder object
+     * @param leafObj   object of leaf type
+     * @param isRoot    if it is root leaf object
+     * @return processed leaf object
+     */
+    static Object getLeafObject(YangSchemaNode holder, YangLeaf leaf,
+                                Object parentObj, Object leafObj,
+                                boolean isRoot) {
+        String jLeaf = getJavaName(leaf);
+        YangType<?> type = leaf.getDataType();
+        if (!isRoot && isTypePrimitive(type)) {
+            if (!isLeafValueSet(holder, parentObj, jLeaf)) {
+                return null;
+            }
+        }
+
+        if (leafObj == null) {
+            return null;
+        }
+        return getObjFromType(holder, parentObj, leaf, jLeaf,
+                              leafObj, type);
+    }
+
+    /**
+     * Returns processed leaf-list objects from the data type.
+     *
+     * @param holder    leaf-list holder
+     * @param leafList  YANG leaf-list
+     * @param parentObj leaf-list holder object
+     * @param objects   leaf-list objects
+     * @return processed leaf-list objects
+     */
+    static Set<Object> getLeafListObject(YangSchemaNode holder,
+                                         YangLeafList leafList,
+                                         Object parentObj,
+                                         List<Object> objects) {
+        Set<Object> leafListVal = new LinkedHashSet<>();
+        YangType<?> type = leafList.getDataType();
+        for (Object object : objects) {
+            Object obj = getObjFromType(holder, parentObj, leafList,
+                                        getJavaName(leafList), object, type);
+            leafListVal.add(obj);
+        }
+        return leafListVal;
+    }
+
+
+    /**
+     * Returns the value as true if direct or referred type from leaf-ref or
+     * derived points to empty data type; false otherwise.
+     *
+     * @param dataType type of the leaf
+     * @return true if type is empty; false otherwise.
+     */
+    static boolean isTypeEmpty(YangType<?> dataType) {
+        switch (dataType.getDataType()) {
+            case EMPTY:
+                return true;
+
+            case LEAFREF:
+                YangLeafRef leafRef = (YangLeafRef) dataType
+                        .getDataTypeExtendedInfo();
+                return isTypeEmpty(leafRef.getEffectiveDataType());
+            case DERIVED:
+                YangDerivedInfo info = (YangDerivedInfo) dataType
+                        .getDataTypeExtendedInfo();
+                YangDataTypes type = info.getEffectiveBuiltInType();
+                return type == EMPTY;
+
+            default:
+                return false;
+        }
     }
 }

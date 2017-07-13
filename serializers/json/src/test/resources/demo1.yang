@@ -10,7 +10,7 @@ module demo1 {
                 type string;
             }
             leaf Customs-supervisor {
-                type string;
+                type empty;
                 description "name of the customs-supervisor.";
             }
 

@@ -17,8 +17,8 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.DefaultCont1;
 import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.DefaultCont;
+import org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.DefaultCont1;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
@@ -29,8 +29,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
+import static org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
@@ -40,10 +40,10 @@ import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
  */
 public class YobSimpleDataTypeTest {
 
-    TestYangSerializerContext context = new TestYangSerializerContext();
     private static final String DATA_TYPE_NAME_SPACE = "simple:data:types";
     private static final String DATA_TYPE_NAME_SPACE_LL =
             "simple:data:types:ll";
+    TestYangSerializerContext context = new TestYangSerializerContext();
     private DataNode.Builder dBlr;
     private String value;
 
@@ -219,6 +219,11 @@ public class YobSimpleDataTypeTest {
         value = "successful exit";
         dBlr = addDataNode(dBlr, "lfenum1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
+
+        value = "/cont";
+        dBlr = addDataNode(dBlr, "inst-iden", null, value, null);
+        dBlr = exitDataNode(dBlr);
+
         dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
@@ -469,6 +474,7 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfunion14().toString(), is("one"));
         assertThat(cont.identityref1().getSimpleName(), is("Iden"));
         assertThat(cont.lfenum1().enumeration(), is(SUCCESSFUL_EXIT));
+        assertThat(cont.instIden(), is("/cont"));
     }
 
 

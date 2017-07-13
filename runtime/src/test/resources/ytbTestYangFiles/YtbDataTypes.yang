@@ -1,0 +1,413 @@
+module YtbDataTypes {
+    yang-version 1;
+    namespace "yms:test:ytb:data:types";
+    prefix "data-types";
+    revision "2016-08-26";
+    // Enum with all combinations.
+
+    typedef def1 {
+        type union {
+            type uint64;
+            type enumeration {
+                enum ten {
+                    value "10";
+                }
+                enum hundred {
+                    value "100";
+                }
+                enum thousand {
+                    value "1000";
+                }
+            }
+        }
+    }
+
+    typedef def2 {
+        type bits {
+            bit b1;
+            bit b2;
+            bit b3;
+        }
+    }
+
+    typedef def3 {
+        type empty;
+    }
+
+    typedef def4 {
+        type empty;
+    }
+
+    typedef def5 {
+        type leafref {
+            path "/leaf3";
+        }
+    }
+
+    identity type {
+        description "type value";
+    }
+
+    identity physical {
+        base type;
+    }
+
+    identity virtual {
+        base type;
+    }
+
+    leaf leaf1 {
+        type string;
+    }
+
+    leaf leaf2 {
+        type def1;
+    }
+
+    leaf leaf3 {
+        type binary;
+    }
+
+    leaf leaf4 {
+        type leafref {
+            path "/leaf2";
+        }
+    }
+
+    leaf leaf5 {
+        type identityref {
+            base type;
+        }
+    }
+
+    leaf leaf6 {
+        type instance-identifier;
+    }
+
+    leaf leaf7 {
+        type bits {
+            bit b1;
+            bit b2;
+            bit b3;
+        }
+    }
+
+    leaf leaf8 {
+        type empty;
+    }
+
+    leaf leaf9 {
+        type def2;
+    }
+
+    leaf leaf10 {
+        type def3;
+    }
+
+    leaf leaf11 {
+        type leafref {
+            path "/leaf8";
+        }
+    }
+
+    leaf leaf12 {
+        type def5;
+    }
+
+    container cont1 {
+        leaf leaf1 {
+            type string;
+        }
+
+        leaf leaf2 {
+            type def1;
+        }
+
+        leaf leaf3 {
+            type binary;
+        }
+
+        leaf leaf4 {
+            type leafref {
+                path "/leaf2";
+            }
+        }
+
+        leaf leaf5 {
+            type identityref {
+                base type;
+            }
+        }
+
+        leaf leaf6 {
+            type instance-identifier;
+        }
+
+        leaf leaf7 {
+            type bits {
+                bit b1;
+                bit b2;
+                bit b3;
+            }
+        }
+
+        leaf leaf8 {
+            type empty;
+        }
+
+        leaf leaf9 {
+            type def2;
+        }
+
+        leaf leaf10 {
+            type def3;
+        }
+
+        leaf leaf11 {
+            type leafref {
+                path "/leaf8";
+            }
+        }
+
+        leaf leaf12 {
+            type def5;
+        }
+
+        leaf-list ll1 {
+            type string;
+        }
+
+        leaf-list ll2 {
+            type def1;
+        }
+
+        leaf-list ll3 {
+            type binary;
+        }
+
+        leaf-list ll4 {
+            type leafref {
+                path "/ll2";
+            }
+        }
+
+        leaf-list ll5 {
+            type identityref {
+                base type;
+            }
+        }
+
+        leaf-list ll6 {
+            type instance-identifier;
+        }
+
+        leaf-list ll7 {
+            type bits {
+                bit b1;
+                bit b2;
+                bit b3;
+            }
+        }
+
+        leaf-list ll8 {
+            type empty;
+        }
+
+        leaf-list ll9 {
+            type def2;
+        }
+
+        leaf-list ll10 {
+            type def3;
+        }
+
+        leaf-list ll11 {
+            type leafref {
+                path "/ll8";
+            }
+        }
+
+        leaf-list ll12 {
+            type def5;
+        }
+
+        container cont2 {
+        }
+    }
+
+    leaf-list ll1 {
+        type string;
+    }
+
+    leaf-list ll2 {
+        type def1;
+    }
+
+    leaf-list ll3 {
+        type binary;
+    }
+
+    leaf-list ll4 {
+        type leafref {
+            path "/ll2";
+        }
+    }
+
+    leaf-list ll5 {
+        type identityref {
+            base type;
+        }
+    }
+
+    leaf-list ll6 {
+        type instance-identifier;
+    }
+
+    leaf-list ll7 {
+        type bits {
+            bit b1;
+            bit b2;
+            bit b3;
+        }
+    }
+
+    leaf-list ll8 {
+        type empty;
+    }
+
+    leaf-list ll9 {
+        type def2;
+    }
+
+    leaf-list ll10 {
+        type def3;
+    }
+
+    leaf-list ll11 {
+        type leafref {
+            path "/ll8";
+        }
+    }
+
+    leaf-list ll12 {
+        type def5;
+    }
+
+    augment "/cont1/cont2" {
+        leaf leaf1 {
+            type string;
+        }
+
+        leaf leaf2 {
+            type def1;
+        }
+
+        leaf leaf3 {
+            type binary;
+        }
+
+        leaf leaf4 {
+            type leafref {
+                path "/leaf2";
+            }
+        }
+
+        leaf leaf5 {
+            type identityref {
+                base type;
+            }
+        }
+
+        leaf leaf6 {
+            type instance-identifier;
+        }
+
+        leaf leaf7 {
+            type bits {
+                bit b1;
+                bit b2;
+                bit b3;
+            }
+        }
+
+        leaf leaf8 {
+            type empty;
+        }
+
+        leaf leaf9 {
+            type def2;
+        }
+
+        leaf leaf10 {
+            type def3;
+        }
+
+        leaf leaf11 {
+            type leafref {
+                path "/leaf8";
+            }
+        }
+
+        leaf leaf12 {
+            type def5;
+        }
+
+        leaf-list ll1 {
+            type string;
+        }
+
+        leaf-list ll2 {
+            type def1;
+        }
+
+        leaf-list ll3 {
+            type binary;
+        }
+
+        leaf-list ll4 {
+            type leafref {
+                path "/ll2";
+            }
+        }
+
+        leaf-list ll5 {
+            type identityref {
+                base type;
+            }
+        }
+
+        leaf-list ll6 {
+            type instance-identifier;
+        }
+
+        leaf-list ll7 {
+            type bits {
+                bit b1;
+                bit b2;
+                bit b3;
+            }
+        }
+
+        leaf-list ll8 {
+            type empty;
+        }
+
+        leaf-list ll9 {
+            type def2;
+        }
+
+        leaf-list ll10 {
+            type def3;
+        }
+
+        leaf-list ll11 {
+            type leafref {
+                path "/ll8";
+            }
+        }
+
+        leaf-list ll12 {
+            type def5;
+        }
+    }
+}

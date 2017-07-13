@@ -66,6 +66,201 @@ public class XmlSerializerTest {
     }
 
     /**
+     * Validates and returns container data node.
+     *
+     * @param parent    data node holding container
+     * @param name      name of the container
+     * @param namespace namespace of the container
+     * @return container data node
+     */
+    private static DataNode validateContainerDataNode(DataNode parent,
+                                                      String name,
+                                                      String namespace) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        DataNode dataNode = childNodes.get(key);
+        SchemaId schemaId = dataNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        return dataNode;
+    }
+
+    /**
+     * Validates and returns list data node.
+     *
+     * @param parent    data node holding list
+     * @param name      name of the list
+     * @param namespace namespace of the list
+     * @param keynames  list of key leaf names
+     * @param keyNs     list of key leaf namespace
+     * @param keyVal    list of key leaf values
+     * @return list data node
+     */
+    private static DataNode validateListDataNode(DataNode parent,
+                                                 String name, String namespace,
+                                                 List<String> keynames,
+                                                 List<String> keyNs,
+                                                 List<Object> keyVal) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        DataNode dataNode;
+        if (keynames != null && !keynames.isEmpty()) {
+            ListKey.ListKeyBuilder listKeyBldr = new ListKey.ListKeyBuilder();
+            listKeyBldr.schemaId(key.schemaId());
+            for (int i = 0; i < keynames.size(); i++) {
+                listKeyBldr.addKeyLeaf(keynames.get(i), keyNs.get(i),
+                                       keyVal.get(i));
+            }
+            dataNode = childNodes.get(listKeyBldr.build());
+        } else {
+            dataNode = childNodes.get(key);
+        }
+        SchemaId schemaId = dataNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        return dataNode;
+    }
+
+    /**
+     * Validates leaf data node.
+     *
+     * @param parent    data node holding leaf
+     * @param name      name of the leaf
+     * @param namespace namespace of the leaf
+     * @param value     leaf value
+     */
+    private static void validateLeafDataNode(DataNode parent,
+                                             String name, String namespace,
+                                             Object value) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        LeafNode dataNode = ((LeafNode) childNodes.get(key));
+        SchemaId schemaId = dataNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        if (dataNode.value() != null) {
+            assertThat(dataNode.value().toString(), is(value));
+        }
+    }
+
+    /**
+     * Validates an empty leaf data node.
+     *
+     * @param parent    data node holding leaf
+     * @param name      name of the leaf
+     * @param namespace namespace of the leaf
+     * @param value     leaf value
+     */
+    private static void validateNullLeafDataNode(DataNode parent,
+                                                 String name, String namespace,
+                                                 Object value) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        LeafNode dataNode = ((LeafNode) childNodes.get(key));
+        SchemaId schemaId = dataNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        assertThat(dataNode.value(), is(value));
+    }
+
+    /**
+     * Validates leaf-list data node.
+     *
+     * @param parent    data node holding leaf-list
+     * @param name      name of the leaf-list
+     * @param namespace namespace of the leaf-list
+     * @param value     leaf-list value
+     */
+    private static void validateLeafListDataNode(DataNode parent,
+                                                 String name, String namespace,
+                                                 Object value) {
+        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
+        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
+        LeafListKey.LeafListKeyBuilder leafListBldr =
+                new LeafListKey.LeafListKeyBuilder();
+        leafListBldr.schemaId(key.schemaId());
+        leafListBldr.value(value);
+        DataNode leafListNode = childNodes.get(leafListBldr.build());
+        SchemaId schemaId = leafListNode.key().schemaId();
+        assertThat(schemaId.name(), is(name));
+        assertThat(schemaId.namespace(), is(namespace));
+        assertThat(((LeafNode) leafListNode).value().toString(), is(value));
+    }
+
+    /**
+     * Validates root data node.
+     *
+     * @param resourceData resource data which holds data node
+     * @return root data node
+     */
+    private static DataNode validateRootDataNode(ResourceData resourceData) {
+        List<DataNode> dataNodes = resourceData.dataNodes();
+        DataNode rootNode = dataNodes.get(0);
+        SchemaId rootSchemaId = rootNode.key().schemaId();
+        assertThat(rootSchemaId.name(), is("/"));
+        return rootNode;
+    }
+
+    /**
+     * Reads XML contents from file path and returns input stream.
+     *
+     * @param path path of XML file
+     * @return input stream
+     */
+    private static InputStream parseInput(String path) {
+        String temp;
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while ((temp = br.readLine()) != null) {
+                sb.append(temp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return IOUtils.toInputStream(sb);
+    }
+
+    /**
+     * Reads XML contents from file path and returns input stream.
+     *
+     * @param path path of XML file
+     * @return input stream
+     */
+    private static String parseXml(String path) {
+        String temp;
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while ((temp = br.readLine()) != null) {
+                sb.append(temp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Converts input stream to string format.
+     *
+     * @param inputStream input stream of xml
+     * @return XML string
+     */
+    private static String convertInputStreamToString(InputStream inputStream) {
+        BufferedReader br;
+        StringBuilder sb = new StringBuilder();
+        String xmlData;
+        br = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            while ((xmlData = br.readLine()) != null) {
+                sb.append(xmlData);
+            }
+        } catch (IOException e) {
+            throw new XmlSerializerException(e.getMessage());
+        }
+        return sb.toString();
+    }
+
+    /**
      * Validates data node in which XML element is of type YANG container.
      */
     @Test
@@ -280,199 +475,6 @@ public class XmlSerializerTest {
                 getNewCompositeData(compositeData), context);
         InputStream inputStream = compositeStream.resourceData();
         assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
-    }
-
-    /**
-     * Validates and returns container data node.
-     *
-     * @param parent    data node holding container
-     * @param name      name of the container
-     * @param namespace namespace of the container
-     * @return container data node
-     */
-    private static DataNode validateContainerDataNode(DataNode parent,
-                                                      String name,
-                                                      String namespace) {
-        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
-        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
-        DataNode dataNode = childNodes.get(key);
-        SchemaId schemaId = dataNode.key().schemaId();
-        assertThat(schemaId.name(), is(name));
-        assertThat(schemaId.namespace(), is(namespace));
-        return dataNode;
-    }
-
-    /**
-     * Validates and returns list data node.
-     *
-     * @param parent    data node holding list
-     * @param name      name of the list
-     * @param namespace namespace of the list
-     * @param keynames  list of key leaf names
-     * @param keyNs     list of key leaf namespace
-     * @param keyVal    list of key leaf values
-     * @return list data node
-     */
-    private static DataNode validateListDataNode(DataNode parent,
-                                                 String name, String namespace,
-                                                 List<String> keynames,
-                                                 List<String> keyNs,
-                                                 List<Object> keyVal) {
-        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
-        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
-        DataNode dataNode;
-        if (keynames != null && !keynames.isEmpty()) {
-            ListKey.ListKeyBuilder listKeyBldr = new ListKey.ListKeyBuilder();
-            listKeyBldr.schemaId(key.schemaId());
-            for (int i = 0; i < keynames.size(); i++) {
-                listKeyBldr.addKeyLeaf(keynames.get(i), keyNs.get(i),
-                                       keyVal.get(i));
-            }
-            dataNode = childNodes.get(listKeyBldr.build());
-        } else {
-            dataNode = childNodes.get(key);
-        }
-        SchemaId schemaId = dataNode.key().schemaId();
-        assertThat(schemaId.name(), is(name));
-        assertThat(schemaId.namespace(), is(namespace));
-        return dataNode;
-    }
-
-    /**
-     * Validates leaf data node.
-     *
-     * @param parent    data node holding leaf
-     * @param name      name of the leaf
-     * @param namespace namespace of the leaf
-     * @param value     leaf value
-     */
-    private static void validateLeafDataNode(DataNode parent,
-                                             String name, String namespace,
-                                             Object value) {
-        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
-        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
-        LeafNode dataNode = ((LeafNode) childNodes.get(key));
-        SchemaId schemaId = dataNode.key().schemaId();
-        assertThat(schemaId.name(), is(name));
-        assertThat(schemaId.namespace(), is(namespace));
-        assertThat(dataNode.value().toString(), is(value));
-    }
-
-    /**
-     * Validates an empty leaf data node.
-     *
-     * @param parent    data node holding leaf
-     * @param name      name of the leaf
-     * @param namespace namespace of the leaf
-     * @param value     leaf value
-     */
-    private static void validateNullLeafDataNode(DataNode parent,
-                                                 String name, String namespace,
-                                                 Object value) {
-        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
-        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
-        LeafNode dataNode = ((LeafNode) childNodes.get(key));
-        SchemaId schemaId = dataNode.key().schemaId();
-        assertThat(schemaId.name(), is(name));
-        assertThat(schemaId.namespace(), is(namespace));
-        assertThat(dataNode.value(), is(value));
-    }
-
-    /**
-     * Validates leaf-list data node.
-     *
-     * @param parent    data node holding leaf-list
-     * @param name      name of the leaf-list
-     * @param namespace namespace of the leaf-list
-     * @param value     leaf-list value
-     */
-    private static void validateLeafListDataNode(DataNode parent,
-                                                 String name, String namespace,
-                                                 Object value) {
-        Map<NodeKey, DataNode> childNodes = ((InnerNode) parent).childNodes();
-        NodeKey key = NodeKey.builder().schemaId(name, namespace).build();
-        LeafListKey.LeafListKeyBuilder leafListBldr =
-                new LeafListKey.LeafListKeyBuilder();
-        leafListBldr.schemaId(key.schemaId());
-        leafListBldr.value(value);
-        DataNode leafListNode = childNodes.get(leafListBldr.build());
-        SchemaId schemaId = leafListNode.key().schemaId();
-        assertThat(schemaId.name(), is(name));
-        assertThat(schemaId.namespace(), is(namespace));
-        assertThat(((LeafNode) leafListNode).value().toString(), is(value));
-    }
-
-    /**
-     * Validates root data node.
-     *
-     * @param resourceData resource data which holds data node
-     * @return root data node
-     */
-    private static DataNode validateRootDataNode(ResourceData resourceData) {
-        List<DataNode> dataNodes = resourceData.dataNodes();
-        DataNode rootNode = dataNodes.get(0);
-        SchemaId rootSchemaId = rootNode.key().schemaId();
-        assertThat(rootSchemaId.name(), is("/"));
-        return rootNode;
-    }
-
-    /**
-     * Reads XML contents from file path and returns input stream.
-     *
-     * @param path path of XML file
-     * @return input stream
-     */
-    private static InputStream parseInput(String path) {
-        String temp;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            while ((temp = br.readLine()) != null) {
-                sb.append(temp);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return IOUtils.toInputStream(sb);
-    }
-
-    /**
-     * Reads XML contents from file path and returns input stream.
-     *
-     * @param path path of XML file
-     * @return input stream
-     */
-    private static String parseXml(String path) {
-        String temp;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            while ((temp = br.readLine()) != null) {
-                sb.append(temp);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Converts input stream to string format.
-     *
-     * @param inputStream input stream of xml
-     * @return XML string
-     */
-    private static String convertInputStreamToString(InputStream inputStream) {
-        BufferedReader br;
-        StringBuilder sb = new StringBuilder();
-        String xmlData;
-        br = new BufferedReader(new InputStreamReader(inputStream));
-        try {
-            while ((xmlData = br.readLine()) != null) {
-                sb.append(xmlData);
-            }
-        } catch (IOException e) {
-            throw new XmlSerializerException(e.getMessage());
-        }
-        return sb.toString();
     }
 
     private CompositeData getNewCompositeData(CompositeData data) {

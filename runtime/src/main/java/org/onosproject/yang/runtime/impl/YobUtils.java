@@ -51,7 +51,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
@@ -80,8 +79,8 @@ import static org.onosproject.yang.runtime.impl.YobConstants.PERIOD;
  */
 final class YobUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(YobUtils.class);
     public static final String FORWARD_SLASH = "/";
+    private static final Logger log = LoggerFactory.getLogger(YobUtils.class);
     private static final String ENUM_LEAF_IDENTIFIER = "$LeafIdentifier";
 
     // no instantiation
@@ -120,19 +119,19 @@ final class YobUtils {
             case INT64:
             case UINT64:
             case BOOLEAN:
-            case EMPTY:
             case STRING:
+            case DECIMAL64:
+            case INSTANCE_IDENTIFIER:
                 parentSetter.invoke(parentObj, value);
                 break;
+
             case BINARY:
                 parentSetter.invoke(parentObj, ((String) value).getBytes());
                 break;
+
             case BITS:
                 parseBitSetTypeInfo(parentSetter, parentObj, value,
                                     schemaNode, parentSchema);
-                break;
-            case DECIMAL64:
-                parentSetter.invoke(parentObj, new BigDecimal(value.toString()));
                 break;
 
             case DERIVED:
@@ -158,6 +157,12 @@ final class YobUtils {
             case ENUMERATION:
                 parseDerivedTypeInfo(parentSetter, parentObj, value.toString(),
                                      true, schemaNode);
+                break;
+
+            case EMPTY:
+                if (value == null) {
+                    parentSetter.invoke(parentObj, true);
+                }
                 break;
 
             default:

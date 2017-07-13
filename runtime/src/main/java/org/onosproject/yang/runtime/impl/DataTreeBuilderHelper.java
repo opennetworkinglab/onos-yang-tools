@@ -22,16 +22,12 @@ import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangChoice;
-import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
-import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
-import org.onosproject.yang.compiler.datamodel.YangType;
-import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
@@ -39,7 +35,6 @@ import org.onosproject.yang.model.LeafNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,27 +44,26 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
-import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
+import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
+import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAugmentObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getClassLoaderForAugment;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getInterfaceClassFromImplClass;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getJavaName;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getLeafListObject;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getLeafObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getParentObjectOfNode;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getStringFromType;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isAugmentNode;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isMultiInstanceNode;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNodeProcessCompleted;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNonProcessableNode;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypePrimitive;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isValueOrSelectLeafSet;
-import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
-import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
-import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypeEmpty;
 
 
 /**
@@ -79,7 +73,6 @@ import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 public class DataTreeBuilderHelper {
 
     private static final String TRUE = "true";
-    private static final String IS_LEAF_VALUE_SET_METHOD = "isLeafValueSet";
     private static final String AUGMENTATIONS = "augmentations";
     private static final String FALSE = "false";
 
@@ -759,8 +752,18 @@ public class DataTreeBuilderHelper {
                     } catch (NoSuchMethodException e) {
                         throw new ModelConvertorException(e);
                     }
-
-                    addLeafWithValue(yangNode, yangLeaf, parentObj, leafType);
+                    Object obj = getLeafObject(yangNode, yangLeaf, parentObj,
+                                               leafType, false);
+                    if (obj != null) {
+                        if (isTypeEmpty(yangLeaf.getDataType())) {
+                            String empty = String.valueOf(obj);
+                            if (!empty.equals(TRUE)) {
+                                continue;
+                            }
+                            obj = null;
+                        }
+                        createLeafNode(yangLeaf, obj);
+                    }
                 }
             }
         }
@@ -815,43 +818,20 @@ public class DataTreeBuilderHelper {
             throw new ModelConvertorException(e);
         }
         if (obj != null) {
-            return addLeafListValue(yangNode, parentObj, leafList, obj);
-        }
-        return null;
-    }
-
-    /**
-     * Adds the leaf list value to the data tree builder by taking the string
-     * value from the data type.
-     *
-     * @param yangNode  YANG node
-     * @param parentObj parent object
-     * @param leafList  YANG leaf list
-     * @param obj       list of objects
-     */
-    List<DataNode.Builder> addLeafListValue(
-            YangSchemaNode yangNode, Object parentObj,
-            YangLeafList leafList, List<Object> obj) {
-
-        Set<String> leafListVal = new LinkedHashSet<>();
-        boolean isEmpty = false;
-        for (Object object : obj) {
-            String val = getStringFromType(yangNode, parentObj,
-                                           getJavaName(leafList), object,
-                                           leafList.getDataType());
-            isEmpty = isTypeEmpty(val, leafList.getDataType());
-            if (isEmpty) {
-                if (val.equals(TRUE)) {
-                    addLeafList(leafListVal, leafList);
+            Set<Object> objects = getLeafListObject(yangNode, leafList,
+                                                    parentObj, obj);
+            if (!objects.isEmpty()) {
+                Object o = objects.iterator().next();
+                if (isTypeEmpty(leafList.getDataType())) {
+                    objects.clear();
+                    String empty = String.valueOf(o);
+                    if (!empty.equals(TRUE)) {
+                        return null;
+                    }
+                    objects.add(null);
                 }
-                break;
+                return addLeafList(objects, leafList);
             }
-            if (!val.equals("")) {
-                leafListVal.add(val);
-            }
-        }
-        if (!isEmpty && !leafListVal.isEmpty()) {
-            return addLeafList(leafListVal, leafList);
         }
         return null;
     }
@@ -863,13 +843,13 @@ public class DataTreeBuilderHelper {
      * @param leafListVal set of values
      * @param leafList    YANG leaf list
      */
-    private List<DataNode.Builder> addLeafList(Set<String> leafListVal, YangLeafList
-            leafList) {
+    List<DataNode.Builder> addLeafList(Set<Object> leafListVal,
+                                       YangLeafList leafList) {
         if (extBuilder != null) {
-            for (String val : leafListVal) {
+            for (Object val : leafListVal) {
                 DataNode.Builder leaf = extBuilder.createChildBuilder(
-                        leafList.getName(), leafList.getNameSpace().getModuleNamespace(),
-                        val);
+                        leafList.getName(), leafList.getNameSpace()
+                                .getModuleNamespace(), val);
                 leaf.type(MULTI_INSTANCE_LEAF_VALUE_NODE);
                 leaf.addLeafListValue(val);
                 extBuilder = leaf.exitNode();
@@ -878,10 +858,10 @@ public class DataTreeBuilderHelper {
         }
         //In case of root node leaf lists.
         List<DataNode.Builder> builders = new ArrayList<>();
-        for (String val : leafListVal) {
+        for (Object val : leafListVal) {
             DataNode.Builder leaf = LeafNode.builder(
-                    leafList.getName(), leafList.getNameSpace().getModuleNamespace())
-                    .value(val);
+                    leafList.getName(), leafList.getNameSpace()
+                            .getModuleNamespace()).value(val);
             leaf.type(MULTI_INSTANCE_LEAF_VALUE_NODE);
             leaf.addLeafListValue(val);
             builders.add(leaf);
@@ -917,92 +897,17 @@ public class DataTreeBuilderHelper {
     }
 
     /**
-     * Adds leaf to data tree when value is present. For primitive types, in
-     * order to avoid default values, the value select is set or not is checked and
-     * then added.
-     *
-     * @param holder    leaf holder
-     * @param yangLeaf  YANG leaf node
-     * @param parentObj leaf holder object
-     * @param leafType  object of leaf type
-     */
-    DataNode.Builder addLeafWithValue(YangSchemaNode holder, YangLeaf yangLeaf,
-                                      Object parentObj, Object leafType) {
-        String fieldValue = null;
-        if (isTypePrimitive(yangLeaf.getDataType())) {
-            fieldValue = getLeafValueFromValueSetFlag(holder, parentObj,
-                                                      yangLeaf, leafType);
-            /*
-             * Checks the object is present or not, when type is
-             * non-primitive. And adds the value from the respective data type.
-             */
-        } else if (leafType != null) {
-            fieldValue = getStringFromType(holder, parentObj,
-                                           getJavaName(yangLeaf), leafType,
-                                           yangLeaf.getDataType());
-        }
-
-        if (ModelConverterUtil.nonEmpty(fieldValue)) {
-            boolean isEmpty = isTypeEmpty(fieldValue,
-                                          yangLeaf.getDataType());
-            if (isEmpty) {
-                if (!fieldValue.equals(TRUE)) {
-                    return null;
-                }
-                fieldValue = null;
-            }
-
-            //Create leaf node.
-            return createLeafNode(yangLeaf, fieldValue);
-        }
-        return null;
-    }
-
-    /**
-     * Returns the value as true if direct or referred type from leaf-ref or
-     * derived points to empty data type; false otherwise.
-     *
-     * @param fieldValue value of the leaf
-     * @param dataType   type of the leaf
-     * @return true if type is empty; false otherwise.
-     */
-    private boolean isTypeEmpty(String fieldValue, YangType<?> dataType) {
-        if (fieldValue.equals(TRUE) || fieldValue.equals(FALSE)) {
-            switch (dataType.getDataType()) {
-                case EMPTY:
-                    return true;
-
-                case LEAFREF:
-                    YangLeafRef leafRef =
-                            (YangLeafRef) dataType.getDataTypeExtendedInfo();
-                    return isTypeEmpty(fieldValue,
-                                       leafRef.getEffectiveDataType());
-                case DERIVED:
-                    YangDerivedInfo info =
-                            (YangDerivedInfo) dataType
-                                    .getDataTypeExtendedInfo();
-                    YangDataTypes type = info.getEffectiveBuiltInType();
-                    return type == EMPTY;
-
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Creates data leaf node.
      *
      * @param yangLeaf YANG leaf
      * @param val      value for the leaf
      */
-    private DataNode.Builder createLeafNode(YangLeaf yangLeaf, Object val) {
+    DataNode.Builder createLeafNode(YangLeaf yangLeaf, Object val) {
         if (extBuilder != null) {
             //Add leaf to key leaves.
             if (yangLeaf.isKeyLeaf()) {
-                extBuilder.addKeyLeaf(yangLeaf.getName(), yangLeaf.getNameSpace()
-                        .getModuleNamespace(), val);
+                extBuilder.addKeyLeaf(yangLeaf.getName(), yangLeaf
+                        .getNameSpace().getModuleNamespace(), val);
             }
             //build leaf node and add to parent node.
             DataNode.Builder leaf = extBuilder.createChildBuilder(
@@ -1017,35 +922,6 @@ public class DataTreeBuilderHelper {
                 .getModuleNamespace())
                 .type(SINGLE_INSTANCE_LEAF_VALUE_NODE)
                 .value(val);
-    }
-
-    /**
-     * Returns the value of type, after checking the value leaf flag. If the
-     * flag is set, then it takes the value else returns null.
-     *
-     * @param holder    leaf holder
-     * @param parentObj parent object
-     * @param yangLeaf  YANG leaf node
-     * @param leafType  object of leaf type
-     * @return value of type
-     */
-    private String getLeafValueFromValueSetFlag(YangSchemaNode holder, Object parentObj,
-                                                YangLeaf yangLeaf, Object leafType) {
-
-        String valueOfLeaf;
-        try {
-            valueOfLeaf = isValueOrSelectLeafSet(holder, parentObj,
-                                                 getJavaName(yangLeaf),
-                                                 IS_LEAF_VALUE_SET_METHOD);
-        } catch (NoSuchMethodException e) {
-            throw new ModelConvertorException(e);
-        }
-        if (valueOfLeaf.equals(TRUE)) {
-            return getStringFromType(holder, parentObj,
-                                     getJavaName(yangLeaf), leafType,
-                                     yangLeaf.getDataType());
-        }
-        return null;
     }
 
     /**

@@ -44,7 +44,7 @@ module food {
            }
        }
        leaf p1 {
-           type string;
+           type empty;
        }
        leaf-list p2 {
            type string;
