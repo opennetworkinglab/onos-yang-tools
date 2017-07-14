@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.model;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,12 +32,12 @@ import static org.onosproject.yang.model.ModelConstants.NON_KEY_LEAF;
  * hierarchy to reach a resource in the instance tree.
  */
 
-public class ResourceId {
+public final class ResourceId {
 
     /**
      * List of node keys.
      */
-    private List<NodeKey> nodeKeyList;
+    private final List<NodeKey> nodeKeyList;
 
     /**
      * Create object from builder.
@@ -43,7 +45,7 @@ public class ResourceId {
      * @param builder initialized builder
      */
     public ResourceId(Builder builder) {
-        nodeKeyList = builder.nodeKeyList;
+        nodeKeyList = ImmutableList.copyOf(builder.nodeKeyList);
     }
 
     /**
