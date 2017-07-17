@@ -17,24 +17,24 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-
 import org.onosproject.yang.gen.v1.ymsiptopology.rev20140101.ymsiptopology.node.DefaultAugmentedTopoNode;
 import org.onosproject.yang.gen.v1.ymstopology.rev20140101.ymstopology.DefaultNode;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.Network;
+import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.TeTemplateName;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.networks.network.link.DefaultAugmentedNtLink;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkaugment.te.Config;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.Bundle;
 import org.onosproject.yang.gen.v1.yrtietftetopology.rev20160317.yrtietftetopology.telinkconfig.bundlestacklevel.bundle.bundledlinks.BundledLink;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.TpId;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.DefaultAugmentedNdNetwork;
-import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
-import org.onosproject.yang.model.DefaultResourceData;
 
 import java.util.List;
 
@@ -210,17 +210,19 @@ public class YobAugmentTest {
         DefaultNetworks networks = ((DefaultNetworks) modelObject);
         Network network = networks.network().get(0);
         assertThat(network.networkId().toString(), is("network-id"));
-        DefaultAugmentedNdNetwork augNw = ((DefaultNetwork) network)
-                .augmentation(DefaultAugmentedNdNetwork.class);
+        DefaultAugmentedNdNetwork augNw = network.augmentation(
+                DefaultAugmentedNdNetwork.class);
         Link link = augNw.link().get(0);
         assertThat(link.linkId().toString(), is("link-id"));
-        DefaultAugmentedNtLink augLink = ((DefaultLink) link)
-                .augmentation(DefaultAugmentedNtLink.class);
+        DefaultAugmentedNtLink augLink = link.augmentation(
+                DefaultAugmentedNtLink.class);
         Config config = augLink.te().config();
-        assertThat(config.teLinkTemplate().get(0), is("abc"));
+        TeTemplateName tName = (TeTemplateName) config.teLinkTemplate().get(0);
+        assertThat(tName.string(), is("abc"));
         BundledLink bundledLink = ((Bundle) config.bundleStackLevel())
                 .bundledLinks().bundledLink().get(0);
-        assertThat(bundledLink.srcTpRef(), is("101"));
+        TpId id = (TpId) bundledLink.srcTpRef();
+        assertThat(id.uri().string(), is("101"));
         assertThat(bundledLink.sequence(), is(100L));
     }
 }

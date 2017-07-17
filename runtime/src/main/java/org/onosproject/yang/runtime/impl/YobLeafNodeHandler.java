@@ -18,6 +18,7 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.LeafNode;
@@ -29,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypeEmpty;
 import static org.onosproject.yang.runtime.impl.YobConstants.E_FAIL_TO_INVOKE_METHOD;
 import static org.onosproject.yang.runtime.impl.YobConstants.L_FAIL_TO_INVOKE_METHOD;
 import static org.onosproject.yang.runtime.impl.YobUtils.getChildSchemaNode;
@@ -76,16 +78,13 @@ class YobLeafNodeHandler extends YobHandler {
             String setterInParent = referredSchema.getJavaAttributeName();
             Object parentObj = curWb.getParentObject(registry, schemaNode);
             parentClass = parentObj.getClass();
-            YangDataTypes dataType = ((YangLeaf) referredSchema).getDataType()
-                    .getDataType();
-            if (((LeafNode) leafNode).value() != null ||
-                    dataType == YangDataTypes.EMPTY) {
+            YangType<?> type = ((YangLeaf) referredSchema).getDataType();
+            YangDataTypes dataType = type.getDataType();
+            if (((LeafNode) leafNode).value() != null || isTypeEmpty(type)) {
                 Field leafName = parentClass.getDeclaredField(setterInParent);
-                Method setterMethod = parentClass.getDeclaredMethod(setterInParent,
-                                                                    leafName.getType());
-
-                setDataFromStringValue(dataType,
-                                       ((LeafNode) leafNode).value(),
+                Method setterMethod = parentClass.getDeclaredMethod(
+                        setterInParent, leafName.getType());
+                setDataFromStringValue(dataType, ((LeafNode) leafNode).value(),
                                        setterMethod, parentObj, referredSchema,
                                        curWb.schemaNode());
             }

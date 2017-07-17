@@ -17,8 +17,8 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
-
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.DefaultL3VpnSvc;
+import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.SvcId;
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.accessvpnpolicy.vpnattachment.attachmentflavor.VpnId;
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.l3vpnsvc.DefaultSites;
 import org.onosproject.yang.gen.v1.ietfl3vpnsvc.rev20160730.ietfl3vpnsvc.l3vpnsvc.DefaultVpnServices;
@@ -304,8 +304,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        SvcId sId = (SvcId) ((VpnId) sna.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
     }
@@ -410,8 +411,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        SvcId sId = (SvcId) ((VpnId) sna.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
         DefaultSite site2 = ((DefaultSite) modelObjectList.get(1));
@@ -432,8 +434,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        sId = (SvcId) ((VpnId) sna.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
     }
@@ -513,8 +516,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna1.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna1.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        SvcId sId = (SvcId) ((VpnId) sna1.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna1.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
 
@@ -525,8 +529,8 @@ public class YobL3VpnSvcTest {
         bearerAttach = bearer.augmentation(DefaultAugmentedL3VpnBearer.class);
         assertThat(bearerAttach.bearerAttachment().peMgmtIp().string(), is("192.1.1.1"));
         assertThat(bearerAttach.bearerAttachment().peName(), is("pe-name"));
-        reqType = ((DefaultRequestedType) bearer.requestedType())
-                .augmentation(DefaultAugmentedL3VpnRequestedType.class);
+        reqType = bearer.requestedType().augmentation(
+                DefaultAugmentedL3VpnRequestedType.class);
         py = ((PhysicalCase) reqType.requestedTypeProfile()
                 .requestedTypeChoice()).physical();
         assertThat(py.physicalIf(), is("eth0/0/0"));
@@ -542,8 +546,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna2.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna2.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        sId = (SvcId) ((VpnId) sna2.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna2.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
     }
@@ -608,8 +613,9 @@ public class YobL3VpnSvcTest {
         assertThat(ipConnection.ipv6().addresses().mask(), is(mask));
         assertThat(sna.routingProtocols().routingProtocol().get(0).type()
                            .getSimpleName(), is("Ospf"));
-        assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).vpnId(),
-                   is("10"));
+        SvcId sId = (SvcId) ((VpnId) sna.vpnAttachment().attachmentFlavor())
+                .vpnId();
+        assertThat(sId.string(), is("10"));
         assertThat(((VpnId) sna.vpnAttachment().attachmentFlavor()).siteRole()
                            .getSimpleName(), is("HubRole"));
     }

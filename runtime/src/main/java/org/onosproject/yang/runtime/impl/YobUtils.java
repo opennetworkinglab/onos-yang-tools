@@ -17,12 +17,12 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
-import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
+import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
@@ -135,7 +135,7 @@ final class YobUtils {
                 break;
 
             case DERIVED:
-                parseDerivedTypeInfo(parentSetter, parentObj, value.toString(),
+                parseDerivedTypeInfo(parentSetter, parentObj, value,
                                      false, schemaNode);
                 break;
 
@@ -145,13 +145,13 @@ final class YobUtils {
                 break;
 
             case UNION:
-                parseDerivedTypeInfo(parentSetter, parentObj, value.toString(),
+                parseDerivedTypeInfo(parentSetter, parentObj, value,
                                      false, schemaNode);
                 break;
 
             case LEAFREF:
                 parseLeafRefTypeInfo(parentSetter, parentObj, value,
-                                     schemaNode, parentSchema);
+                                     schemaNode);
                 break;
 
             case ENUMERATION:
@@ -185,11 +185,17 @@ final class YobUtils {
      */
     static void parseDerivedTypeInfo(Method parentSetter,
                                      Object parentObj,
-                                     String value,
+                                     Object value,
                                      boolean isEnum,
                                      YangSchemaNode leaf)
             throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException {
+        String val;
+        if (value == null) {
+            val = "true";
+        } else {
+            val = value.toString();
+        }
         Class<?> childSetClass = null;
         Constructor<?> childConstructor = null;
         Object childValue = null;
@@ -201,6 +207,7 @@ final class YobUtils {
 
         String qualifiedClassName = leaf.getJavaPackage() + PERIOD +
                 getCapitalCase(leaf.getJavaClassNameOrBuiltInType());
+
         ClassLoader classLoader = parentObj.getClass().getClassLoader();
         try {
             childSetClass = classLoader.loadClass(qualifiedClassName);
@@ -234,7 +241,7 @@ final class YobUtils {
             }
         }
         if (childMethod != null) {
-            childValue = childMethod.invoke(childObject, value);
+            childValue = childMethod.invoke(childObject, val);
         }
         parentSetter.invoke(parentObj, childValue);
     }
@@ -268,9 +275,11 @@ final class YobUtils {
             leaf = leaf.getReferredSchema();
         }
 
+        String pName = parentSchema.getJavaClassNameOrBuiltInType()
+                .toLowerCase() + PERIOD;
+
         String qualifiedClassName = parentSchema.getJavaPackage() + PERIOD +
-                parentSchema.getJavaAttributeName().toLowerCase() +
-                PERIOD + getCapitalCase(leaf.getJavaAttributeName());
+                pName + getCapitalCase(leaf.getJavaAttributeName());
 
         ClassLoader classLoader = parentObject.getClass().getClassLoader();
 
@@ -294,21 +303,18 @@ final class YobUtils {
     /**
      * To set data into parent setter method from string value for leafref type.
      *
-     * @param parentSetterMethod the parent setter method to be invoked
-     * @param parentObject       the parent build object on which to invoke
-     *                           the method
-     * @param leafValue          leaf value to be set
-     * @param schemaNode         schema information
-     * @param parentSchema       schema information of parent
+     * @param parentSetter the parent setter method to be invoked
+     * @param parentObject the parent build object on which to invoke
+     *                     the method
+     * @param leafValue    leaf value to be set
+     * @param schemaNode   schema information
      * @throws InvocationTargetException if method could not be invoked
      * @throws IllegalAccessException    if method could not be accessed
      * @throws NoSuchMethodException     if method does not exist
      */
-    static void parseLeafRefTypeInfo(Method parentSetterMethod,
-                                     Object parentObject,
+    static void parseLeafRefTypeInfo(Method parentSetter, Object parentObject,
                                      Object leafValue,
-                                     YangSchemaNode schemaNode,
-                                     YangSchemaNode parentSchema)
+                                     YangSchemaNode schemaNode)
             throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException {
         while (schemaNode.getReferredSchema() != null) {
@@ -325,25 +331,16 @@ final class YobUtils {
         }
 
         YangType type = leafRef.getEffectiveDataType();
-        if (type.getDataType() == YangDataTypes.DERIVED &&
-                schemaNode.getJavaPackage().equals(YobConstants.JAVA_LANG)) {
-            /*
-             * If leaf is inside grouping, then its return type will be of type
-             * Object and if its actual type is derived type then get the
-             * effective built-in type and set the value.
-             */
-            YangDerivedInfo derivedInfo = (YangDerivedInfo) leafRef
-                    .getEffectiveDataType()
-                    .getDataTypeExtendedInfo();
-            YobUtils.setDataFromStringValue(derivedInfo.getEffectiveBuiltInType(),
-                                            leafValue, parentSetterMethod,
-                                            parentObject, schemaNode, parentSchema);
+        Object refLeaf = leafRef.getReferredLeafOrLeafList();
+        YangLeavesHolder parent;
+        if (refLeaf instanceof YangLeaf) {
+            parent = ((YangLeaf) refLeaf).getContainedIn();
         } else {
-            YobUtils.setDataFromStringValue(type.getDataType(),
-                                            leafValue, parentSetterMethod,
-                                            parentObject,
-                                            schemaNode, parentSchema);
+            parent = ((YangLeafList) refLeaf).getContainedIn();
         }
+        setDataFromStringValue(type.getDataType(), leafValue, parentSetter,
+                               parentObject, (YangSchemaNode) refLeaf,
+                               (YangSchemaNode) parent);
 
     }
 

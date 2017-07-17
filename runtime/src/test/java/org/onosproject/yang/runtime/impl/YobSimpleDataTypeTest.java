@@ -18,13 +18,18 @@ package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
 import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.DefaultCont;
+import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.gr.Cont3;
 import org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.DefaultCont1;
+import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Leaf7;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.DataNode.Builder;
 import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
 
+import java.util.Base64;
+import java.util.BitSet;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,10 +49,10 @@ public class YobSimpleDataTypeTest {
     private static final String DATA_TYPE_NAME_SPACE_LL =
             "simple:data:types:ll";
     TestYangSerializerContext context = new TestYangSerializerContext();
-    private DataNode.Builder dBlr;
+    private Builder dBlr;
     private String value;
 
-    public DataNode buildDataNodeForSimpleDataTypes() {
+    private DataNode buildDataNodeForSimpleDataTypes() {
         dBlr = initializeDataNode(context);
         value = null;
         dBlr = addDataNode(dBlr, "cont", DATA_TYPE_NAME_SPACE, value, null);
@@ -221,15 +226,215 @@ public class YobSimpleDataTypeTest {
         dBlr = exitDataNode(dBlr);
 
         value = "/cont";
-        dBlr = addDataNode(dBlr, "inst-iden", null, value, null);
+        dBlr = addDataNode(dBlr, "inst-iden", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
+        dBlr = getLeafRefData(dBlr);
         dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
 
+    private Builder getLeafRefData(Builder dBlr) {
+        value = "8";
+        dBlr = addDataNode(dBlr, "lref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
 
-    public DataNode buildDnForLeafListSimpleDataTypes() {
+        value = "val";
+        dBlr = addDataNode(dBlr, "lref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "zero";
+        dBlr = addDataNode(dBlr, "lref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b2 b3";
+        dBlr = addDataNode(dBlr, "lref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "-92233720368547758.08";
+        dBlr = addDataNode(dBlr, "lref5", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "10";
+        dBlr = addDataNode(dBlr, "lref6", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "enum4";
+        dBlr = addDataNode(dBlr, "lref7", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "-9223372036854.775808";
+        dBlr = addDataNode(dBlr, "lref8", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "MTAxMDEwMTAx";
+        dBlr = addDataNode(dBlr, "lref9", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "";
+        dBlr = addDataNode(dBlr, "lref10", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "";
+        dBlr = addDataNode(dBlr, "lref11", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b3";
+        dBlr = addDataNode(dBlr, "lref12", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "";
+        dBlr = addDataNode(dBlr, "lref13", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b1 b2 b3";
+        dBlr = addDataNode(dBlr, "lref14", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "/cont";
+        dBlr = addDataNode(dBlr, "lref15", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "physical";
+        dBlr = addDataNode(dBlr, "lref16", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "784985";
+        dBlr = addDataNode(dBlr, "lref17", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "MTExMTExMTE=";
+        dBlr = addDataNode(dBlr, "lref18", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "hundred";
+        dBlr = addDataNode(dBlr, "lref19", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "leafref";
+        dBlr = addDataNode(dBlr, "lref20", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "val";
+        dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "pro";
+        dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "physical";
+        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "virtual";
+        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        dBlr = addDataNode(dBlr, "cont3", DATA_TYPE_NAME_SPACE, null, null);
+
+        value = "108";
+        dBlr = addDataNode(dBlr, "llref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "val";
+        dBlr = addDataNode(dBlr, "llref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "one";
+        dBlr = addDataNode(dBlr, "llref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b1 b3";
+        dBlr = addDataNode(dBlr, "llref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "-922337203685470058.08";
+        dBlr = addDataNode(dBlr, "llref5", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "121";
+        dBlr = addDataNode(dBlr, "llref6", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "enum1";
+        dBlr = addDataNode(dBlr, "llref7", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "-9223372036000.775808";
+        dBlr = addDataNode(dBlr, "llref8", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "MTExMTExMTE=";
+        dBlr = addDataNode(dBlr, "llref9", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "";
+        dBlr = addDataNode(dBlr, "llref11", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b2";
+        dBlr = addDataNode(dBlr, "llref12", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "";
+        dBlr = addDataNode(dBlr, "llref13", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "b1";
+        dBlr = addDataNode(dBlr, "llref14", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "/cont/con2";
+        dBlr = addDataNode(dBlr, "llref15", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "virtual";
+        dBlr = addDataNode(dBlr, "llref16", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "78498522";
+        dBlr = addDataNode(dBlr, "llref17", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "MDEwMTAxMDEw";
+        dBlr = addDataNode(dBlr, "llref18", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "ten";
+        dBlr = addDataNode(dBlr, "llref19", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "leaflistref";
+        dBlr = addDataNode(dBlr, "llref20", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "check";
+        dBlr = addDataNode(dBlr, "lref21", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "val";
+        dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "pro";
+        dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "physical";
+        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "virtual";
+        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        dBlr = exitDataNode(dBlr);
+        return dBlr;
+    }
+
+
+    private DataNode buildDnForLeafListSimpleDataTypes() {
         dBlr = initializeDataNode(context);
         value = null;
         dBlr = addDataNode(dBlr, "cont1", DATA_TYPE_NAME_SPACE_LL, value, null);
@@ -402,6 +607,7 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "lfenum1", null, value, null);
         dBlr = exitDataNode(dBlr);
         dBlr = exitDataNode(dBlr);
+
         return dBlr.build();
     }
 
@@ -475,6 +681,89 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.identityref1().getSimpleName(), is("Iden"));
         assertThat(cont.lfenum1().enumeration(), is(SUCCESSFUL_EXIT));
         assertThat(cont.instIden(), is("/cont"));
+        value = 8;
+        assertThat(cont.lref1(), is(value));
+        assertThat(cont.lref2().toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes" +
+                        ".rev20131112.simpledatatypes.Val"));
+        assertThat(cont.lref3().toString(), is("zero"));
+        assertThat(cont.lref4().toString(), is("b2 b3 "));
+        assertThat(cont.lref5().toString(), is("-92233720368547758.08"));
+        value = 10;
+        assertThat(cont.lref6(), is(value));
+        assertThat(cont.lref7().toString(), is("enum4"));
+        assertThat(cont.lref8().toString(), is("-9223372036854.775808"));
+        byte[] arr = Base64.getDecoder().decode("MTAxMDEwMTAx");
+        assertThat(cont.lref9(), is(arr));
+        assertThat(cont.lref10(), is(true));
+        assertThat(cont.lref11().toString(), is("true"));
+        assertThat(cont.lref12().toString(), is("b3 "));
+        assertThat(cont.lref13(), is(true));
+        String bit = Leaf7.toString(cont.lref14());
+        assertThat(bit, is("b1 b2 b3 "));
+        assertThat(cont.lref15(), is("/cont"));
+        assertThat(cont.lref16().toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Physical"));
+        assertThat(cont.lref17().toString(), is("784985"));
+        arr = Base64.getDecoder().decode("MTExMTExMTE=");
+        assertThat(cont.lref18(), is(arr));
+        assertThat(cont.lref19().toString(), is("hundred"));
+        assertThat(cont.lref20(), is("leafref"));
+        assertThat(cont.iref1().toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes.rev201311" +
+                        "12.simpledatatypes.Val"));
+        assertThat(cont.iref2().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes.rev201311" +
+                        "12.simpledatatypes.Pro"));
+        assertThat(cont.iref3().toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Physical"));
+        assertThat(cont.iref4().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Virtual"));
+        Cont3 cont3 = cont.cont3();
+        value = 108;
+        assertThat(cont3.llref1().get(0), is(value));
+        assertThat(cont3.llref2().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes" +
+                        ".rev20131112.simpledatatypes.Val"));
+        assertThat(cont3.llref3().get(0).toString(), is("one"));
+        assertThat(cont3.llref4().get(0).toString(), is("b1 b3 "));
+        assertThat(cont3.llref5().get(0).toString(), is("-922337203685470058.08"));
+        value = 121;
+        assertThat(cont3.llref6().get(0), is(value));
+        assertThat(cont3.llref7().get(0).toString(), is("enum1"));
+        assertThat(cont3.llref8().get(0).toString(), is("-9223372036000.775808"));
+        arr = Base64.getDecoder().decode("MTExMTExMTE=");
+        assertThat(cont3.llref9().get(0), is(arr));
+        assertThat(cont3.llref11().get(0).toString(), is("true"));
+        assertThat(cont3.llref12().get(0).toString(), is("b2 "));
+        assertThat(cont3.llref13().get(0), is(true));
+        bit = Leaf7.toString((BitSet) cont3.llref14().get(0));
+        assertThat(bit, is("b1 "));
+        assertThat(cont3.llref15().get(0), is("/cont/con2"));
+        assertThat(cont3.llref16().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Virtual"));
+        assertThat(cont3.llref17().get(0).toString(), is("78498522"));
+        arr = Base64.getDecoder().decode("MDEwMTAxMDEw");
+        assertThat(cont3.llref18().get(0), is(arr));
+        assertThat(cont3.llref19().get(0).toString(), is("ten"));
+        assertThat(cont3.llref20().get(0), is("leaflistref"));
+        assertThat(cont3.lref21(), is("check"));
+        assertThat(cont3.iref1().toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes.rev201311" +
+                        "12.simpledatatypes.Val"));
+        assertThat(cont3.iref2().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.simpledatatypes.rev201311" +
+                        "12.simpledatatypes.Pro"));
+        assertThat(cont3.iref3().toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Physical"));
+        assertThat(cont3.iref4().get(0).toString(), is(
+                "class org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826." +
+                        "ytbdatatypes.Virtual"));
     }
 
 
