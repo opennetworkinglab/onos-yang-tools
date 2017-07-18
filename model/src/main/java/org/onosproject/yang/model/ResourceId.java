@@ -86,7 +86,10 @@ public final class ResourceId {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof ResourceId)) {
             return false;
         }
         ResourceId that = (ResourceId) obj;

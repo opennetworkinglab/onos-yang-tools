@@ -8,7 +8,9 @@
 
 package org.onosproject.yang.model;
 
+import org.junit.Before;
 import org.junit.Test;
+import com.google.common.testing.EqualsTester;
 
 import java.util.List;
 
@@ -19,6 +21,27 @@ import static org.junit.Assert.assertEquals;
  */
 
 public class ResourceIdTest {
+
+    ResourceId ridA;
+    ResourceId ridAcopy;
+
+    @Before
+    public void setUp() throws Exception {
+        ridA = ResourceId.builder()
+                .addBranchPointSchema("/", "")
+                .addBranchPointSchema("devices", "onos")
+                .addBranchPointSchema("device", "onos")
+                .addKeyLeaf("device-id", "onos", "test:A")
+                .build();
+        ridAcopy = ridA.copyBuilder().build();
+    }
+
+    @Test
+    public void random() {
+        new EqualsTester()
+        .addEqualityGroup(ridA, ridAcopy)
+        .testEquals();
+    }
 
     @Test
     public void resourceIdConstruction() {
