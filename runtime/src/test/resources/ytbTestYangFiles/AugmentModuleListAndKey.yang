@@ -15,4 +15,16 @@ module ModuleListAndKeyAugment {
             }
         }
     }
+
+    augment "/sch:type" {
+        leaf leaf10 {
+            type int32;
+        }
+    }
+
+    augment "/sch:val" {
+        leaf-list ll {
+            type sch:bitdef;
+        }
+    }
 }

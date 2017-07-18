@@ -626,11 +626,8 @@ public class L3vpnModelConverterTest {
         assertThat("site-id", is(sid.name()));
         assertThat(NAME_SPACE_SVC, is(sid.namespace()));
 
-        assertThat(true, is(keyLeaf.leafValue() instanceof SvcId));
-        assertThat("site-keys", is(keyLeaf.leafValAsString()));
-
-        SvcId id = (SvcId) keyLeaf.leafValue();
-        assertThat("site-keys", is(id.string()));
+        assertThat(false, is(keyLeaf.leafValue() instanceof SvcId));
+        assertThat("site-keys", is(keyLeaf.leafValue()));
 
         dataNodes = rscData.dataNodes();
         assertThat(1, is(dataNodes.size()));
@@ -760,11 +757,8 @@ public class L3vpnModelConverterTest {
         assertThat("site-id", is(sid.name()));
         assertThat(NAME_SPACE_SVC, is(sid.namespace()));
 
-        assertThat(true, is(keyLeaf.leafValue() instanceof SvcId));
-        assertThat("site-keys", is(keyLeaf.leafValAsString()));
-
-        SvcId id = (SvcId) keyLeaf.leafValue();
-        assertThat("site-keys", is(id.string()));
+        assertThat(false, is(keyLeaf.leafValue() instanceof SvcId));
+        assertThat("site-keys", is(keyLeaf.leafValue()));
 
         sid = keys.get(4).schemaId();
         assertThat("site-network-accesses", is(sid.name()));

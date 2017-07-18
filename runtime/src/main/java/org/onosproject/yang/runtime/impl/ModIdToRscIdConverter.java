@@ -25,6 +25,7 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeType;
+import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.MultiInstanceLeaf;
@@ -41,11 +42,12 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_AU
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_NON_DATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.fetchPackage;
-import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
 import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
 import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
 import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.fetchPackage;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
+import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getObjFromType;
 
 /**
  * Converts model object identifier to resource identifier.
@@ -53,32 +55,28 @@ import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
 class ModIdToRscIdConverter {
 
     /**
+     * Model registry.
+     */
+    private final DefaultYangModelRegistry reg;
+    /**
      * Schema node with respect to the last atomic path in model object
      * identifier. in case of leaf node as last atomic path last index node
      * will be leaf's parent node.
      */
     private YangSchemaNode lastIndexNode;
-
     /**
      * Flag to know if model object identifier contains leaf identifier.
      */
     private boolean isMoIdWithLeaf;
-
     /**
      * Flag is true if rpc is added in branch point schema of resource
      * identifier.
      */
     private boolean isRpcAdded = true;
-
     /**
      * Flag is true if we have found module node using input/output packages.
      */
     private boolean isInputOrOutput;
-
-    /**
-     * Model registry.
-     */
-    private final DefaultYangModelRegistry reg;
 
     /**
      * Creates an instance of converter.
@@ -240,11 +238,12 @@ class ModIdToRscIdConverter {
                 if (curNode instanceof YangList) {
                     YangList list = (YangList) curNode;
                     MultiInstanceNode mil = (MultiInstanceNode) path;
-                    Object keyObj = mil.key();
+                    Object keysObj = mil.key();
                     Set<String> keys = list.getKeyLeaf();
                     for (String key : keys) {
+                        Object obj = getKeyObject(keysObj, key, list);
                         builder.addKeyLeaf(key, list.getNameSpace()
-                                .getModuleNamespace(), getKeyValue(keyObj, key));
+                                .getModuleNamespace(), obj);
                     }
                 }
             } else {
@@ -264,13 +263,13 @@ class ModIdToRscIdConverter {
                                  ResourceId.Builder builder, AtomicPath path) {
         //check leaf nodes in previous nodes.
         String pkg = fetchPackage(path);
-        YangSchemaNode curNode = fetchLeaf(preNode, pkg);
+        YangSchemaNode curNode = fetchLeaf(preNode, pkg, false);
         if (curNode == null) {
             if (preNode instanceof YangAugmentableNode) {
                 List<YangAugment> augments = ((YangAugmentableNode) preNode)
                         .getAugmentedInfoList();
                 for (YangAugment augment : augments) {
-                    curNode = fetchLeaf(augment, pkg);
+                    curNode = fetchLeaf(augment, pkg, false);
                     if (curNode != null) {
                         break;
                     }
@@ -288,7 +287,9 @@ class ModIdToRscIdConverter {
         } else {
             // leaf list should be added as leaf list branch point
             // schema with its value added to it.
+            YangType<?> type = ((YangLeafList) curNode).getDataType();
             Object val = ((MultiInstanceLeaf) path).value();
+            val = getObjFromType(preNode, path, curNode, "value", val, type);
             builder.addLeafListBranchPoint(curNode.getName(), curNode
                     .getNameSpace().getModuleNamespace(), val);
         }
@@ -384,24 +385,32 @@ class ModIdToRscIdConverter {
         return null;
     }
 
-    private YangSchemaNode fetchLeaf(YangSchemaNode node, String name) {
+    private YangSchemaNode fetchLeaf(YangSchemaNode node, String name,
+                                     boolean isSchemaName) {
         YangLeavesHolder holder = (YangLeavesHolder) node;
         List<YangLeaf> leaves = holder.getListOfLeaf();
+        String lName;
         // check if the names is equal to any of the leaf/leaf-list nodes.
         if (nonEmpty(leaves)) {
             for (YangLeaf leaf : leaves) {
-                if (leaf.getJavaAttributeName().toLowerCase()
-                        .equals(name)) {
+                lName = leaf.getName();
+                if (!isSchemaName) {
+                    lName = leaf.getJavaAttributeName().toLowerCase();
+                }
+                if (lName.equals(name)) {
                     return leaf;
                 }
             }
         }
         List<YangLeafList> leafLists = holder.getListOfLeafList();
         if (nonEmpty(leafLists)) {
-            for (YangLeafList leaf : leafLists) {
-                if (leaf.getJavaAttributeName().toLowerCase()
-                        .equals(name)) {
-                    return leaf;
+            for (YangLeafList ll : leafLists) {
+                lName = ll.getName();
+                if (!isSchemaName) {
+                    lName = ll.getJavaAttributeName().toLowerCase();
+                }
+                if (lName.equals(name)) {
+                    return ll;
                 }
             }
         }
@@ -434,5 +443,40 @@ class ModIdToRscIdConverter {
      */
     boolean isInputOrOutput() {
         return isInputOrOutput;
+    }
+
+    /**
+     * Returns the key leaf's processed object to be present in the resource id.
+     *
+     * @param keysObj list of keys object
+     * @param key     leaf key object
+     * @param list    YANG list
+     * @return processed object
+     */
+    private Object getKeyObject(Object keysObj, String key, YangList list) {
+        Object keyObj = getKeyValue(keysObj, key);
+        YangSchemaNode leaf = fetchLeaf(list, key, true);
+
+        if (leaf == null) {
+            List<YangAugment> augment = list.getAugmentedInfoList();
+            for (YangAugment a : augment) {
+                leaf = fetchLeaf(a, key, true);
+                if (leaf != null) {
+                    break;
+                }
+            }
+        }
+        if (leaf == null) {
+            throw new ModelConvertorException(
+                    "The specified key " + key + " is not present in the " +
+                            "YANG schema node.");
+        }
+        YangType<?> type;
+        if (leaf instanceof YangLeaf) {
+            type = ((YangLeaf) leaf).getDataType();
+        } else {
+            type = ((YangLeafList) leaf).getDataType();
+        }
+        return getObjFromType(list, keysObj, leaf, key, keyObj, type);
     }
 }
