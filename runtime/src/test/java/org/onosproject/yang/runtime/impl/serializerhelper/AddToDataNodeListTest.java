@@ -167,14 +167,14 @@ public class AddToDataNodeListTest {
         dBlr = exitDataNode(dBlr);
 
         //Tree validation
-        nA = new String[]{"/", "l1", "k1", "k2", "k3", "c1", "leaf_c1"};
-        nsA = new String[]{null, LNS, LNS, LNS, LNS, LNS, LNS};
-        valA = new String[]{"1", "2", "3", "0"};
+        nA = new String[]{"/", "l1", "k1", "k2", "c1", "leaf_c1"};
+        nsA = new String[]{null, LNS, LNS, LNS, LNS, LNS};
+        valA = new String[]{"1", "2", null, "0"};
         validateResourceId(nA, nsA, valA, id);
 
-        nA = new String[]{"/", "l1", "k1", "k2", "k3", "c1"};
-        nsA = new String[]{null, LNS, LNS, LNS, LNS, LNS};
-        valA = new String[]{"1", "2", "3"};
+        nA = new String[]{"/", "l1", "k1", "k2", "c1"};
+        nsA = new String[]{null, LNS, LNS, LNS, LNS};
+        valA = new String[]{"1", "2", null};
         validateResourceId(nA, nsA, valA, id1);
 
         nA = new String[]{"/", "l1", "k1", "k2", "k3"};

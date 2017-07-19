@@ -30,6 +30,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  */
 public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKey> {
 
+    // effectively final, but not possible due to clone()
     private List<KeyLeaf> keyLeafs;
 
     /**
@@ -39,7 +40,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
      */
     private ListKey(ListKeyBuilder builder) {
         super(builder);
-        keyLeafs = builder.keyLeafs;
+        keyLeafs = ImmutableList.copyOf(builder.keyLeafs);
     }
 
     /**
@@ -50,7 +51,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
      * @return List of key leaf nodes
      */
     public List<KeyLeaf> keyLeafs() {
-        return ImmutableList.copyOf(keyLeafs);
+        return keyLeafs;
     }
 
     /**
@@ -60,19 +61,21 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
      * @throws CloneNotSupportedException if the object's class does not
      *                                    support the {@code Cloneable} interface
      */
+    @Override
     public ListKey clone() throws CloneNotSupportedException {
         ListKey clonedListKey = (ListKey) super.clone();
-        List<KeyLeaf> clonedKeyLeafs = new LinkedList<>();
+        ImmutableList.Builder<KeyLeaf> clonedKeyLeafs = ImmutableList.builder();
         for (KeyLeaf leaf : keyLeafs) {
             clonedKeyLeafs.add(leaf.clone());
         }
-        clonedListKey.keyLeafs = clonedKeyLeafs;
+        clonedListKey.keyLeafs = clonedKeyLeafs.build();
         return clonedListKey;
     }
 
+    @Override
     public int compareTo(ListKey o) {
         //TODO: implement me
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -129,7 +132,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
          * Adds the key leaf for the list resource.
          *
          * @param name      key leaf name
-         * @param nameSpace key laef namespace
+         * @param nameSpace key leaf namespace
          * @param val       value of key
          */
         public void addKeyLeaf(String name, String nameSpace, Object val) {
@@ -142,6 +145,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
          *
          * @return list key
          */
+        @Override
         public ListKey build() {
             return new ListKey(this);
         }
