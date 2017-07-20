@@ -33,4 +33,16 @@ public interface SchemaContextProvider {
      *                                  resource identifier is invalid
      */
     SchemaContext getSchemaContext(ResourceId id);
+
+    /**
+     * Returns rpc context corresponding to a given resource identifier.
+     * It returns null if module is not registered.
+     *
+     * @param id absolute resource identifier
+     * @return rpc context
+     * @throws IllegalArgumentException when module as per resource
+     *                                  identifier is registered, but given
+     *                                  rpc is invalid
+     */
+    RpcContext getRpcContext(ResourceId id);
 }
