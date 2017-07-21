@@ -64,11 +64,11 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
     @Override
     public ListKey clone() throws CloneNotSupportedException {
         ListKey clonedListKey = (ListKey) super.clone();
-        ImmutableList.Builder<KeyLeaf> clonedKeyLeafs = ImmutableList.builder();
+        List<KeyLeaf> clonedKeyLeafs = new LinkedList<>();
         for (KeyLeaf leaf : keyLeafs) {
             clonedKeyLeafs.add(leaf.clone());
         }
-        clonedListKey.keyLeafs = clonedKeyLeafs.build();
+        clonedListKey.keyLeafs = clonedKeyLeafs;
         return clonedListKey;
     }
 
