@@ -20,6 +20,7 @@ import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangNodeType;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
@@ -36,7 +37,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGene
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.addResolvedAugmentedDataNodeImports;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRpcServiceMethod;
-import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT_PKG;
@@ -44,7 +44,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.OUTPUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_INPUT_VAR_NAME;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RPC_SERVICE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SERVICE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.generateJavaDocForRpc;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
@@ -72,6 +71,9 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      * Java file handle for rpc interface file.
      */
     private File serviceJavaFileHandle;
+
+    private static final String RPC_INPUT = "RpcInput";
+    private static final String RPC_OUTPUT = "RpcOutput";
 
     /**
      * Creates an instance of temporary java code fragment.
@@ -122,6 +124,49 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
                 .getJavaImportData().addImportInfo(typeInfo,
                                                    getJavaClassName(SERVICE),
                                                    getJavaFileInfo().getPackage());
+        boolean rpcInput = false;
+        boolean rpcOutput = false;
+
+        YangNode subNode = curNode.getChild();
+        while (subNode != null) {
+            if (subNode.getNodeType() == YangNodeType.RPC_NODE) {
+                YangNode childNode1 = subNode.getChild();
+                while (childNode1 != null) {
+                    if (childNode1.getNodeType() == YangNodeType.INPUT_NODE) {
+                        rpcInput = true;
+                    } else {
+                        rpcOutput = true;
+                    }
+                    childNode1 = childNode1.getNextSibling();
+                }
+            }
+            subNode = subNode.getNextSibling();
+            if (rpcInput & rpcOutput) {
+                break;
+            }
+        }
+
+        JavaQualifiedTypeInfoTranslator typeInfo1 =
+                new JavaQualifiedTypeInfoTranslator();
+        typeInfo1.setClassInfo(RPC_INPUT);
+        typeInfo1.setPkgInfo(MODEL_OBJECT_PKG);
+        typeInfo1.setForInterface(true);
+        ((JavaCodeGeneratorInfo) curNode)
+                .getTempJavaCodeFragmentFiles().getServiceTempFiles()
+                .getJavaImportData().addImportInfo(typeInfo1,
+                                                   getJavaClassName(SERVICE),
+                                                   getJavaFileInfo().getPackage());
+
+        JavaQualifiedTypeInfoTranslator typeInfo2 =
+                new JavaQualifiedTypeInfoTranslator();
+        typeInfo2.setClassInfo(RPC_OUTPUT);
+        typeInfo2.setPkgInfo(MODEL_OBJECT_PKG);
+        typeInfo2.setForInterface(true);
+        ((JavaCodeGeneratorInfo) curNode)
+                .getTempJavaCodeFragmentFiles().getServiceTempFiles()
+                .getJavaImportData().addImportInfo(typeInfo2,
+                                                   getJavaClassName(SERVICE),
+                                                   getJavaFileInfo().getPackage());
 
         List<String> imports = ((JavaCodeGeneratorInfo) curNode)
                 .getTempJavaCodeFragmentFiles().getServiceTempFiles()
@@ -162,21 +207,13 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
      */
     private void addRpcString(JavaAttributeInfo inAttr, JavaAttributeInfo outAttr,
                               String rpcName) throws IOException {
-        String rpcInput = null;
-        String rpcOutput = VOID;
-        String rpcIn = EMPTY_STRING;
-        if (inAttr != null) {
-            rpcInput = getCapitalCase(inAttr.getAttributeName());
-        }
-        if (outAttr != null) {
-            rpcOutput = getCapitalCase(outAttr.getAttributeName());
-        }
-        if (rpcInput != null) {
-            rpcIn = RPC_INPUT_VAR_NAME;
-        }
+        String rpcInput = RPC_INPUT;
+        String rpcOutput = RPC_OUTPUT;
+        String rpcIn = RPC_INPUT_VAR_NAME;
         appendToFile(rpcInterfaceTempFileHandle,
                      generateJavaDocForRpc(rpcName, rpcIn, rpcOutput) +
-                             getRpcServiceMethod(rpcName, rpcInput, rpcOutput));
+                             getRpcServiceMethod(rpcName, rpcInput,
+                                                 rpcOutput));
     }
 
     /**
