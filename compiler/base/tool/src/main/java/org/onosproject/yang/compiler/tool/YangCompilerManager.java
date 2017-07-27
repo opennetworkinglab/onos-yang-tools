@@ -550,7 +550,7 @@ public class YangCompilerManager implements YangCompilerService {
 
         while (enumEntries.hasMoreElements()) {
             JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.getName().endsWith(".ser")) {
+            if (file.getName().endsWith(YANG_META_DATA)) {
 
                 if (file.getName().contains(SLASH)) {
                     String[] strArray = file.getName().split(SLASH);
