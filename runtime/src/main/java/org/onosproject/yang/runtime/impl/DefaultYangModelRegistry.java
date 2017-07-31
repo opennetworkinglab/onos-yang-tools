@@ -125,12 +125,22 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         Set<YangNode> curNodes = getNodes(model);
 
         //adding class info if added by application.
-        updateRegClassStore(param);
+        AppModuleInfo info = null;
+        for (YangModuleId id : param.getYangModel().getYangModulesId()) {
+            info = param.getAppModuleInfo(id);
+            if (info != null) {
+                break;
+            }
+        }
 
-        if (modelIdStore.containsKey(model.getYangModelId())) {
-            throw new IllegalArgumentException(E_MEXIST);
+        if (!modelIdStore.containsKey(model.getYangModelId())) {
+            updateRegClassStore(param);
+            modelIdStore.put(model.getYangModelId(), model);
+        } else if ((info != null) && (!registerClassStore
+                .containsKey(info.getModuleClass()))) {
+            updateRegClassStore(param);
         } else {
-            modelIdStore.put(model.getYangModelId(), param.getYangModel());
+            throw new IllegalArgumentException(E_MEXIST);
         }
 
         //Register all the YANG nodes.
