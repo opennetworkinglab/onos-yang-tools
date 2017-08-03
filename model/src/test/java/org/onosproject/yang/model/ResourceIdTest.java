@@ -22,6 +22,8 @@ import static org.junit.Assert.assertEquals;
 
 public class ResourceIdTest {
 
+    private static final ResourceId ROOT =
+            ResourceId.builder().addBranchPointSchema("/", "").build();
     ResourceId ridA;
     ResourceId ridAcopy;
 
@@ -37,10 +39,21 @@ public class ResourceIdTest {
     }
 
     @Test
-    public void random() {
+    public void equality() {
         new EqualsTester()
         .addEqualityGroup(ridA, ridAcopy)
+        .addEqualityGroup(ROOT)
         .testEquals();
+    }
+
+    public void appendNodeKeys() throws CloneNotSupportedException {
+        ResourceId devices = ResourceId.builder()
+            .append(ridA.nodeKeys().subList(1, 2))
+            .build();
+
+        assertEquals(1, devices.nodeKeys().size());
+        assertEquals("devices", devices.nodeKeys().get(0).schemaId().name());
+        assertEquals("onos", devices.nodeKeys().get(0).schemaId().namespace());
     }
 
     @Test

@@ -157,6 +157,19 @@ public final class ResourceId {
         }
 
         /**
+         * Appends a given list of NodeKey to current builder.
+         *
+         * @param nodeKeys list of NodeKey to be appended
+         * @return builder
+         */
+        public Builder append(List<NodeKey> nodeKeys) {
+            processCurKey();
+            curKeyBuilder = null;
+            nodeKeyList.addAll(nodeKeys);
+            return this;
+        }
+
+        /**
          * Validates, build and add current key.
          */
         protected void processCurKey() {
