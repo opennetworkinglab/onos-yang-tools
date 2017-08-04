@@ -42,7 +42,6 @@ public final class YangApacheUtils {
     private static final String SLASH = File.separator;
     private static final String HYPHEN = "-";
     private static final String PERIOD = ".";
-    private static final String YANG_META_DATA = "YangMetaData.ser";
     private static final String YANG_RESOURCES = "yang/resources";
     private static final String SYSTEM = SLASH + "system" + SLASH;
     private static final String MAVEN = "mvn:";
@@ -69,7 +68,7 @@ public final class YangApacheUtils {
             String metaPath;
             jarPath = getJarPathFromBundleLocation(
                     bundle.getLocation(), context.getProperty(USER_DIRECTORY));
-            metaPath = jarPath + SLASH + YANG_RESOURCES + SLASH + YANG_META_DATA;
+            metaPath = jarPath + SLASH + YANG_RESOURCES + SLASH;
             YangModel model = processJarParsingOperations(jarPath);
             if (model != null) {
                 curNodes.addAll(getYangNodes(model));

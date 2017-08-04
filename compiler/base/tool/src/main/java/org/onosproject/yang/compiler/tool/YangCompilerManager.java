@@ -69,6 +69,7 @@ import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorU
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translatorErrorHandler;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_META_DATA;
+import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RESOURCES;
 import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getJavaFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.createDirectories;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -120,12 +121,25 @@ public class YangCompilerManager implements YangCompilerService {
             if (!fromUt) {
                 serializeModuleMetaData(serFile, node);
             }
-            YangModule module = new YangModuleExtendedInfo(
-                    id, new File(node.getFileName()), new File(serFile));
-            ((YangModuleExtendedInfo) module).setSchema(node);
+            //take the absolute jar path and make a new path for our yang files.
+            String fileName = getFileName(node.getFileName());
+            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
+                    id, new File(path + fileName), new File(serFile));
+            module.setSchema(node);
             b.addModule(id, module);
         }
         return b.addModelId(modelId).build();
+    }
+
+    /**
+     * Returns the file name from provided absolute path.
+     *
+     * @param absPath absolute path
+     * @return file name
+     */
+    private static String getFileName(String absPath) {
+        String[] file = absPath.split(SLASH);
+        return file[file.length - 1];
     }
 
     /**
@@ -517,7 +531,7 @@ public class YangCompilerManager implements YangCompilerService {
     }
 
     /**
-     * Returs the set of YANG nodes from a given YANG model.
+     * Returns the set of YANG nodes from a given YANG model.
      *
      * @param model YANG model
      * @return set of YANG nodes
@@ -548,20 +562,18 @@ public class YangCompilerManager implements YangCompilerService {
         JarFile jar = new JarFile(jarFile);
         Enumeration<?> enumEntries = jar.entries();
 
+        File dir = new File(directory + SLASH + YANG_RESOURCES);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
         while (enumEntries.hasMoreElements()) {
             JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.getName().endsWith(YANG_META_DATA)) {
-
-                if (file.getName().contains(SLASH)) {
-                    String[] strArray = file.getName().split(SLASH);
-                    String tempPath = "";
-                    for (int i = 0; i < strArray.length - 1; i++) {
-                        tempPath = SLASH + tempPath + SLASH + strArray[i];
-                    }
-                    File dir = new File(directory + tempPath);
-                    dir.mkdirs();
-                }
-                File serializedFile = new File(directory + SLASH + file.getName());
+            if (file.getName().endsWith(YANG_META_DATA) ||
+                    file.getName().endsWith(".yang")) {
+                String name = getFileName(file.getName());
+                File serializedFile = new File(directory + SLASH +
+                                                       YANG_RESOURCES + SLASH + name);
                 if (file.isDirectory()) {
                     serializedFile.mkdirs();
                     continue;
@@ -574,10 +586,9 @@ public class YangCompilerManager implements YangCompilerService {
                 }
                 fileOutputStream.close();
                 inputStream.close();
-                model = deSerializeDataModel(serializedFile.toString());
-                //As of now only one metadata files will be there so if we
-                // found one then we should break the loop.
-                break;
+                if (serializedFile.getName().endsWith(YANG_META_DATA)) {
+                    model = deSerializeDataModel(serializedFile.toString());
+                }
             }
         }
         jar.close();
