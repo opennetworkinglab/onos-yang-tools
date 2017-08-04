@@ -37,7 +37,7 @@ import static org.junit.Assert.assertThat;
 public final class CopyrightHeaderTest {
 
     private static final String COPYRIGHTS_FIRST_LINE = "/*\n * Copyright " + Calendar.getInstance().get(Calendar.YEAR)
-            + "-present Open Networking Laboratory\n";
+            + "-present Open Networking Foundation\n";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 

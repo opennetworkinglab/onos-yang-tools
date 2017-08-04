@@ -37,7 +37,7 @@ public final class CopyrightHeader {
     private static final int EOF = -1;
     private static final String COPYRIGHT_HEADER_FILE = "CopyrightHeader.txt";
     private static final String COPYRIGHTS_FIRST_LINE = "/*\n * Copyright " + getInstance().get(YEAR)
-            + "-present Open Networking Laboratory\n";
+            + "-present Open Networking Foundation\n";
     private static final String TEMP_FILE = "temp.txt";
 
     /**
