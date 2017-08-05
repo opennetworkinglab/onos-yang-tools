@@ -100,7 +100,9 @@ public final class YangApacheUtils {
         builder.append(currentDirectory).append(SYSTEM);
         StringBuilder ver = new StringBuilder();
         if (mvnLocationPath.contains(MAVEN)) {
-            String[] strArray = mvnLocationPath.split(MAVEN);
+            String[] strArray = mvnLocationPath
+                    .replaceFirst("\\$Bundle-.*$", "")
+                    .split(MAVEN);
             if (strArray[1].contains(File.separator)) {
                 String[] split = strArray[1].split(File.separator);
                 if (split[0].contains(PERIOD)) {
