@@ -30,6 +30,8 @@ import org.onosproject.yang.compiler.translator.exception.InvalidNodeForTranslat
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
+import com.google.common.base.Throwables;
+
 import java.io.IOException;
 
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
@@ -136,7 +138,8 @@ public final class JavaCodeGeneratorUtil {
                 } catch (Exception e) {
                     e.printStackTrace();
                     close(codeGenNode, yangPlugin, rootNode);
-                    throw new TranslatorException(e.getMessage());
+                    Throwables.propagateIfInstanceOf(e, TranslatorException.class);
+                    throw new TranslatorException(e);
                 }
                 curTraversal = SIBLING;
                 codeGenNode = codeGenNode.getNextSibling();
@@ -148,7 +151,8 @@ public final class JavaCodeGeneratorUtil {
                 } catch (Exception e) {
                     e.printStackTrace();
                     close(codeGenNode, yangPlugin, rootNode);
-                    throw new TranslatorException(e.getMessage());
+                    Throwables.propagateIfInstanceOf(e, TranslatorException.class);
+                    throw new TranslatorException(e);
                 }
                 curTraversal = PARENT;
                 codeGenNode = codeGenNode.getParent();

@@ -138,8 +138,9 @@ public class YangJavaTypeDefTranslator
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code entry for typedef node " + getName()
-                            + "in " + getLineNumber() + " at " + getCharPosition() + " in " + getFileName()
-                            + " " + e.getLocalizedMessage());
+                            + " in " + getLineNumber() +
+                            " at " + getCharPosition() +
+                            " in " + getFileName(), e);
         }
     }
 
@@ -155,8 +156,9 @@ public class YangJavaTypeDefTranslator
         } catch (IOException e) {
             throw new TranslatorException(
                     "Failed to prepare generate code for typedef node " + getName()
-                            + "in " + getLineNumber() + " at " + getCharPosition() + " in " + getFileName()
-                            + " " + e.getLocalizedMessage());
+                            + " in " + getLineNumber() +
+                            " at " + getCharPosition() +
+                            " in " + getFileName(), e);
         }
     }
 }

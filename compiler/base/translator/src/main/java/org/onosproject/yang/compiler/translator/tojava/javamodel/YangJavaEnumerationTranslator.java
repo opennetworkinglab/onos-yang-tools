@@ -119,7 +119,7 @@ public class YangJavaEnumerationTranslator
             tempFileHandle.getEnumTempFiles().setEnumClass(true);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
-                                                      e.getLocalizedMessage()));
+                                                      e.getLocalizedMessage()), e);
         }
     }
 
@@ -134,7 +134,7 @@ public class YangJavaEnumerationTranslator
             generateJava(GENERATE_ENUM_CLASS, this);
         } catch (IOException e) {
             throw new TranslatorException(getErrorMsg(FAIL_AT_EXIT, this,
-                                                      e.getLocalizedMessage()));
+                                                      e.getLocalizedMessage()), e);
         }
     }
 }

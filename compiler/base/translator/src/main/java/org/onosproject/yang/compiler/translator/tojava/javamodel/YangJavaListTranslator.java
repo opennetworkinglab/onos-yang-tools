@@ -116,8 +116,8 @@ public class YangJavaListTranslator
                     "Failed to prepare generate code entry for list node " +
                             getName() + " in " +
                             getLineNumber() + " at " +
-                            getCharPosition()
-                            + " in " + getFileName() + " " + e.getLocalizedMessage());
+                            getCharPosition() +
+                            " in " + getFileName(), e);
         }
     }
 
@@ -134,8 +134,8 @@ public class YangJavaListTranslator
             throw new TranslatorException("Failed to generate code for list node " +
                                                   getName() + " in " +
                                                   getLineNumber() + " at " +
-                                                  getCharPosition()
-                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+                                                  getCharPosition() +
+                                                  " in " + getFileName(), e);
         }
     }
 }

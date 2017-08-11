@@ -352,7 +352,8 @@ public final class JavaFileGeneratorUtils {
             throws IOException {
 
         if (file.exists()) {
-            throw new IOException(" file " + file.getName() + " is already generated." +
+            throw new IOException(" file " + file.getName() + " is already generated for "
+                    + className + " @ " + pkg + "\n" +
                                           ERROR_MSG_FOR_GEN_CODE);
         }
 
@@ -366,7 +367,7 @@ public final class JavaFileGeneratorUtils {
             appendContents(file, className, genType, imports, pkg);
         } catch (IOException e) {
             throw new IOException("Failed to append contents in " + file.getName() +
-                                          " class file.");
+                                          " class file.", e);
         }
     }
 
@@ -386,7 +387,8 @@ public final class JavaFileGeneratorUtils {
             throws IOException {
 
         if (file.exists()) {
-            throw new IOException(" file " + file.getName() + " is already generated." +
+            throw new IOException(" file " + file.getName() +
+                                  " is already generated for: " + name + "\n" +
                                           ERROR_MSG_FOR_GEN_CODE);
         }
         boolean isFileCreated;
@@ -399,7 +401,7 @@ public final class JavaFileGeneratorUtils {
             appendContents(file, genType, imports, curNode, name);
         } catch (IOException e) {
             throw new IOException("Failed to append contents in " + file.getName() +
-                                          " class file.");
+                                          " class file.", e);
         }
     }
 

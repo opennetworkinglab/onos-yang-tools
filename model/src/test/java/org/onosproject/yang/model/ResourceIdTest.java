@@ -22,6 +22,8 @@ import static org.junit.Assert.assertEquals;
 
 public class ResourceIdTest {
 
+    private static final ResourceId EMPTY =
+            ResourceId.builder().build();
     private static final ResourceId ROOT =
             ResourceId.builder().addBranchPointSchema("/", "").build();
     ResourceId ridA;
@@ -43,6 +45,7 @@ public class ResourceIdTest {
         new EqualsTester()
         .addEqualityGroup(ridA, ridAcopy)
         .addEqualityGroup(ROOT)
+        .addEqualityGroup(EMPTY)
         .testEquals();
     }
 
