@@ -19,7 +19,8 @@ package org.onosproject.yang.compiler.utils;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents utilities constants which are used while generating java files.
@@ -1130,20 +1131,35 @@ public final class UtilConstants {
      * List of keywords in java, this is used for checking if the input does not
      * contain these keywords.
      */
-    public static final List<String> JAVA_KEY_WORDS = Collections
-            .unmodifiableList(Arrays.asList("abstract", "assert", "boolean", "break", "byte",
-                                            "case", "catch", "char", "class", "const", "continue",
-                                            "default", "do", "double", "else", "extends", "false",
-                                            "final", "finally", "float", "for", "goto", "if",
-                                            "implements", "import", "instanceof", "enum", "int",
-                                            "interface", "long", "native", "new", "null",
-                                            "package", "private", "protected", "public", "return",
-                                            "short", "static", "strictfp", "super", "switch",
-                                            "synchronized", "this", "throw", "throws", "transient",
-                                            "true", "try", "void", "volatile", "while", "list",
-                                            "map", "arrayList", "hashMap", "linkedList", "notify",
-                                            "notifyAll", "Method",
-                                            "collections"));
+    public static final Set<String> JAVA_KEY_WORDS =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                 "abstract", "assert", "boolean", "break", "byte",
+                 "case", "catch", "char", "class", "const", "continue",
+                 "default", "do", "double", "else", "extends", "false",
+                 "final", "finally", "float", "for", "goto", "if",
+                 "implements", "import", "instanceof", "enum", "int",
+                 "interface", "long", "native", "new", "null",
+                 "package", "private", "protected", "public", "return",
+                 "short", "static", "strictfp", "super", "switch",
+                 "synchronized", "this", "throw", "throws", "transient",
+                 "true", "try", "void", "volatile", "while",
+                 "list", // Not a Java keyword
+                 "map", // Not a Java keyword
+                 "arrayList", // Not a Java keyword
+                 "hashMap", // Not a Java keyword
+                 "linkedList", // Not a Java keyword
+                 "notify", // method on Object
+                 "notifyAll", // method on Object
+                 "wait", // method on Object
+                 "getClass", // method on Object
+                 "hashCode", // method on Object
+                 "equals", // method on Object
+                 "toString", // method on Object
+                 "clone", // method on Object
+                 "finalize", // method on Object
+                 "Method", // Not a Java keyword
+                 "collections") // Not a Java keyword
+            ));
 
     /**
      * Static attribute for regex for all the special characters.
