@@ -185,7 +185,7 @@ public final class JavaIdentifierSyntax {
                                    false);
                 }
             } catch (IOException e) {
-                throw new IOException("failed to create package-info file");
+                throw new IOException("failed to create package-info file for " + pkg, e);
             }
         }
     }

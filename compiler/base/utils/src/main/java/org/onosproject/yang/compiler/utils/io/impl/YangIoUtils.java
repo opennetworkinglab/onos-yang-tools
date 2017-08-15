@@ -139,7 +139,7 @@ public final class YangIoUtils {
             fileWriter.close();
         } catch (IOException e) {
             throw new IOException("Exception occurred while creating package info" +
-                                          " file.");
+                                          " file.", e);
         }
     }
 
@@ -184,7 +184,7 @@ public final class YangIoUtils {
             } catch (IOException e) {
                 throw new IOException(
                         "Failed to delete the generated files in " +
-                                generatedDirectory + " directory");
+                                generatedDirectory + " directory", e);
             }
         }
     }
@@ -333,7 +333,7 @@ public final class YangIoUtils {
         try {
             FileSystemUtil.updateFileHandle(file, data, false);
         } catch (IOException e) {
-            throw new IOException("Failed to insert in " + file + "file");
+            throw new IOException("Failed to insert in " + file + "file", e);
         }
     }
 

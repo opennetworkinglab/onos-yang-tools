@@ -1692,8 +1692,8 @@ public final class UtilConstants {
      * Static attribute for error msg.
      */
     public static final String ERROR_MSG_FOR_GEN_CODE = "please check whether " +
-            "multiple yang" + " files has same module/submodule" +
-            " \"name\" and \"namespace\"" + "or You may have generated code of" +
+            "multiple yang files has same module/submodule" +
+            " \"name\" and \"namespace\" or You may have generated code of" +
             " previous build present in your directory.";
 
     /**
