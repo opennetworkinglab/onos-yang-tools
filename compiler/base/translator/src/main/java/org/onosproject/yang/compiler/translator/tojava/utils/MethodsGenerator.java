@@ -117,7 +117,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARE_TO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DECODE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
@@ -1263,7 +1262,7 @@ public final class MethodsGenerator {
                 return null;
         }
 
-        String method = TWELVE_SPACE_INDENTATION + DEFAULT + SPACE + COLON +
+        String method = TWELVE_SPACE_INDENTATION + "default" + SPACE + COLON +
                 NEW_LINE;
         builder.append(method)
                 .append(getExceptionThrowString(SIXTEEN_SPACE_INDENTATION))
