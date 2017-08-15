@@ -138,7 +138,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMAND;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_CAPS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_RPC_HANDLER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
@@ -447,7 +446,7 @@ public final class JavaFileGenerator {
             insertDataIntoJavaFile(file, NEW_LINE);
         }
 
-        methods.add(addDefaultConstructor(curNode, PUBLIC, DEFAULT));
+        methods.add(addDefaultConstructor(curNode, PUBLIC, DEFAULT_CAPS));
 
         if (leavesPresent) {
             methods.add(getIsValueLeafSet());

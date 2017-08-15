@@ -386,7 +386,7 @@ final class ClassDefinitionGenerator {
                     break;
                 case DEFAULT_CLASS_MASK:
 
-                    // class defination
+                    // class definition
                     if (curNode instanceof RpcNotificationContainer) {
                         def.append(CLASS).append(SPACE).append(yangName)
                                 .append(OP_PARAM).append(SPACE).append(EXTEND)

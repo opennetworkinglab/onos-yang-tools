@@ -80,6 +80,8 @@ public class YangLibrary extends AbstractBuildRule {
     private final Path genSrcsDirectory;
     private final Path outputDirectory;
     private final Path output;
+
+    @AddToRuleKey
     private final String modelId;
 
     public YangLibrary(
