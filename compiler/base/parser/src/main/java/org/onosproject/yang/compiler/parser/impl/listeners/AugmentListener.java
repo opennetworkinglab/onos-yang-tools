@@ -51,6 +51,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getPrefixRemovedName;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidAbsoluteSchemaNodeId;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.parseUsesAugment;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.validateCardinalityEitherOne;
@@ -106,23 +107,22 @@ public final class AugmentListener {
 
         Parsable curData = listener.getParsedDataStack().peek();
 
-        if (curData instanceof YangUses) {
-            throw new ParserException(constructListenerErrorMessage(
-                    UNHANDLED_PARSED_DATA, AUGMENT_DATA,
-                    ctx.augment().getText(), ENTRY));
-        }
-
         if (!(curData instanceof YangModule) &&
-                !(curData instanceof YangSubModule)) {
+                !(curData instanceof YangSubModule) &&
+                !(curData instanceof YangUses)) {
             throw new ParserException(constructListenerErrorMessage(
                     INVALID_HOLDER, AUGMENT_DATA,
                     ctx.augment().getText(), ENTRY));
         }
+        List<YangAtomicPath> atomics;
 
-        // Validates augment argument string
-        List<YangAtomicPath> atomics =
-                getValidAbsoluteSchemaNodeId(ctx.augment().getText(),
-                                             AUGMENT_DATA, ctx);
+        if (curData instanceof YangUses) {
+            atomics = parseUsesAugment((YangNode) curData, ctx);
+        } else {
+            atomics = getValidAbsoluteSchemaNodeId(ctx.augment().getText(),
+                                                   AUGMENT_DATA, ctx);
+        }
+
         valSubStatCardinality(ctx);
 
         int line = ctx.getStart().getLine();

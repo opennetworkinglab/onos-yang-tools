@@ -375,13 +375,15 @@ final class YobUtils {
                                             YangSchemaNodeContextInfo context,
                                             DefaultYangModelRegistry
                                                     reg) {
-        YangSchemaNode augmentSchemaNode = context.getContextSwitchedNode();
-        if (augmentSchemaNode.getYangSchemaNodeType() == YANG_AUGMENT_NODE) {
-            YangSchemaNode moduleNode = ((YangNode) augmentSchemaNode).getParent();
-
-            Class<?> moduleClass = reg.getRegisteredClass(moduleNode);
+        YangSchemaNode augment = context.getContextSwitchedNode();
+        if (augment.getYangSchemaNodeType() == YANG_AUGMENT_NODE) {
+            YangSchemaNode parent = ((YangNode) augment).getParent();
+            while (((YangNode) parent).getParent() != null) {
+                parent = ((YangNode) parent).getParent();
+            }
+            Class<?> moduleClass = reg.getRegisteredClass(parent);
             if (moduleClass == null) {
-                throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS + moduleNode
+                throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS + parent
                         .getJavaClassNameOrBuiltInType());
             }
             return moduleClass.getClassLoader();

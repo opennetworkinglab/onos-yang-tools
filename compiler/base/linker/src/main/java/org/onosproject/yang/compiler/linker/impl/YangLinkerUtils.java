@@ -481,10 +481,11 @@ public final class YangLinkerUtils {
      *
      * @param augment            instance of YANG augment
      * @param remainingAncestors ancestor count to move in augment path
-     * @return list of path names needed in leafref
+     * @return list of path names needed in leafref or YANG node
      */
-    static List<String> getPathWithAugment(YangAugment augment, int remainingAncestors) {
+    static Object getPathWithAugment(YangAugment augment, int remainingAncestors) {
         List<String> listOfPathName = new ArrayList<>();
+        YangNode node = augment.getAugmentedNode();
         for (YangAtomicPath atomicPath : augment.getTargetNode()) {
             if (atomicPath.getNodeIdentifier().getPrefix() != null &&
                     !atomicPath.getNodeIdentifier().getPrefix().equals(EMPTY_STRING)) {
@@ -493,11 +494,34 @@ public final class YangLinkerUtils {
             } else {
                 listOfPathName.add(atomicPath.getNodeIdentifier().getName());
             }
+            if (node != null) {
+                node = node.getParent();
+            }
         }
         for (int countOfAncestor = 0; countOfAncestor < remainingAncestors; countOfAncestor++) {
+            if (listOfPathName.isEmpty()) {
+                return getNodeFromUsesAug(node, remainingAncestors - countOfAncestor);
+            }
             listOfPathName.remove(listOfPathName.size() - 1);
         }
+        if (listOfPathName.isEmpty()) {
+            return getNodeFromUsesAug(node, 0);
+        }
         return listOfPathName;
+    }
+
+    /**
+     * Returns the YANG node from uses augment.
+     *
+     * @param node  YANG node
+     * @param count number of ancestors
+     * @return YANG node.
+     */
+    private static YangNode getNodeFromUsesAug(YangNode node, int count) {
+        for (int val = 0; val < count; val++) {
+            node = node.getParent();
+        }
+        return node;
     }
 
     /**

@@ -1054,8 +1054,9 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
             throws DataModelException {
 
         YangXpathLinker<T> xPathLinker = new YangXpathLinker<T>();
-
-        if (entityToResolve instanceof YangAugment) {
+        YangNode node = entityToResolveInfo.getHolderOfEntityToResolve();
+        if (entityToResolve instanceof YangAugment &&
+                !(node instanceof YangUses)) {
             YangNode targetNode;
             YangAugment augment = (YangAugment) entityToResolve;
             targetNode = xPathLinker
@@ -1166,6 +1167,33 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
 
             Resolvable resolvable = (Resolvable) entityToResolve;
             resolvable.setResolvableStatus(RESOLVED);
+        } else if (entityToResolve instanceof YangAugment) {
+            resolveUsesAugment(entityToResolve, node);
+        }
+    }
+
+    private void resolveUsesAugment(T entity, YangNode node) {
+        YangXpathLinker<T> linker = new YangXpathLinker<T>();
+        YangAugment aug = (YangAugment) entity;
+        YangNode tgt = linker.processUsesAugLinking(aug.getTargetNode(),
+                                                    (YangUses) node);
+        if (tgt != null) {
+            if (tgt instanceof YangAugmentableNode) {
+                //TODO: collision detection
+                ((YangAugmentableNode) tgt).addAugmentation(aug);
+                aug.setAugmentedNode(tgt);
+                setAugmentedFlagInAncestors(tgt);
+                Resolvable resolvable = (Resolvable) entity;
+                resolvable.setResolvableStatus(RESOLVED);
+                if (tgt instanceof YangInput) {
+                    linker.addInModuleIfInput(aug, node);
+                }
+            } else {
+                throw new LinkerException(getErrorMsg(
+                        INVALID_TARGET + tgt.getNodeType(),
+                        aug.getName(), aug.getLineNumber(),
+                        aug.getCharPosition(), aug.getFileName()));
+            }
         }
     }
 
@@ -1618,8 +1646,8 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         curParent = skipInvalidDataNodes(curParent, leafref);
         if (curParent instanceof YangAugment) {
             YangAugment augment = (YangAugment) curParent;
-            List<String> valueInAugment = getPathWithAugment(augment,
-                                                             ancestorCount - curParentCount);
+            Object valueInAugment = getPathWithAugment(augment,
+                                                       ancestorCount - curParentCount);
             return (T) valueInAugment;
         } else {
             while (curParentCount < ancestorCount) {
@@ -1636,7 +1664,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
                 curParentCount = curParentCount + 1;
                 if (curParent instanceof YangAugment) {
                     YangAugment augment = (YangAugment) curParent;
-                    List<String> valueInAugment = getPathWithAugment(
+                    Object valueInAugment = getPathWithAugment(
                             augment, ancestorCount - curParentCount);
                     return (T) valueInAugment;
                 }

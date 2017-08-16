@@ -170,25 +170,30 @@ public abstract class YangAugment
     }
 
     @Override
-    public void addToChildSchemaMap(
-            YangSchemaNodeIdentifier schemaNodeIdentifier,
-            YangSchemaNodeContextInfo yangSchemaNodeContextInfo)
-            throws DataModelException {
-        getYsnContextInfoMap()
-                .put(schemaNodeIdentifier, yangSchemaNodeContextInfo);
-        YangSchemaNodeContextInfo yangSchemaNodeContextInfo1 =
-                new YangSchemaNodeContextInfo();
-        yangSchemaNodeContextInfo1
-                .setSchemaNode(yangSchemaNodeContextInfo.getSchemaNode());
-        yangSchemaNodeContextInfo1.setContextSwitchedNode(this);
-        getAugmentedNode().addToChildSchemaMap(schemaNodeIdentifier,
-                                               yangSchemaNodeContextInfo1);
+    public void addToChildSchemaMap(YangSchemaNodeIdentifier schemaNodeIdentifier,
+            YangSchemaNodeContextInfo ctxInfo) throws DataModelException {
+        getYsnContextInfoMap().put(schemaNodeIdentifier, ctxInfo);
+        YangSchemaNodeContextInfo ctxInfo1 = new YangSchemaNodeContextInfo();
+        ctxInfo1.setSchemaNode(ctxInfo.getSchemaNode());
+        ctxInfo1.setContextSwitchedNode(this);
+        if (getAugmentedNode() != null) {
+            if (getAugmentedNode() instanceof YangChoice) {
+                ctxInfo1.setContextSwitchedNode(
+                        ctxInfo.getContextSwitchedNode());
+            }
+            getAugmentedNode().addToChildSchemaMap(schemaNodeIdentifier,
+                                                   ctxInfo1);
+        }
     }
 
     @Override
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace and set namespace for self node.
-        setNameSpace(getParent().getNameSpace());
+        YangNode parent = getParent();
+        if (parent instanceof YangUses) {
+            parent = parent.getParent();
+        }
+        setNameSpace(parent.getNameSpace());
         /*
          * Check if node contains leaf/leaf-list, if yes add namespace for leaf
          * and leaf list.

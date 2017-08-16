@@ -40,6 +40,7 @@ import org.onosproject.yang.compiler.linker.exceptions.LinkerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -51,6 +52,7 @@ import static org.onosproject.yang.compiler.linker.impl.PrefixResolverType.INTRA
 import static org.onosproject.yang.compiler.linker.impl.PrefixResolverType.NO_PREFIX_CHANGE_FOR_INTER;
 import static org.onosproject.yang.compiler.linker.impl.PrefixResolverType.NO_PREFIX_CHANGE_FOR_INTRA;
 import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.AUGMENT_LINKING;
+import static org.onosproject.yang.compiler.linker.impl.XpathLinkingTypes.USES_AUGMENT_LINKING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ERROR_MSG_FOR_AUGMENT_LINKING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FAILED_TO_FIND_LEAD_INFO_HOLDER;
@@ -218,6 +220,21 @@ public class YangXpathLinker<T> {
     }
 
     /**
+     * Processes uses augment linking.
+     *
+     * @param paths YANG atomic path list
+     * @param uses  YANG uses
+     * @return augmented node
+     */
+    public YangNode processUsesAugLinking(List<YangAtomicPath> paths,
+                                          YangUses uses) {
+        absPaths = paths;
+        rootNode = uses;
+        linkingType = USES_AUGMENT_LINKING;
+        return parseUsesAugData(uses.getParent());
+    }
+
+    /**
      * Searches for the referred leaf in target node.
      *
      * @param targetNode target node
@@ -338,6 +355,121 @@ public class YangXpathLinker<T> {
     }
 
     /**
+     * Parses uses-augment data to finding the augmented node.
+     *
+     * @param node YANG uses parent
+     * @return augmented node
+     */
+    private YangNode parseUsesAugData(YangNode node) {
+        YangNode temp = node;
+        YangNode tgt;
+        Iterator<YangAtomicPath> it = absPaths.iterator();
+        YangAtomicPath path;
+        YangNodeIdentifier id;
+        StringBuilder builder = new StringBuilder();
+        while (it.hasNext()) {
+            path = it.next();
+            id = path.getNodeIdentifier();
+            tgt = searchTargetNode(temp, id);
+            if (tgt == null) {
+                temp = getAugmentNode(temp, builder.toString());
+                if (temp != null) {
+                    tgt = searchTargetNode(temp, id);
+                }
+            }
+            temp = tgt;
+            builder.append(id.getName());
+            builder.append("/");
+        }
+        return temp;
+    }
+
+    /**
+     * Returns the augment node, that contains the node to be searched.
+     *
+     * @param temp parent YANG node
+     * @param id   node id to be searched
+     * @return YANG augment node
+     */
+    private YangAugment getAugmentNode(YangNode temp, String id) {
+        String augId = getAugNodeId(id);
+        YangNode parent = temp.getParent();
+        List<YangUses> usesList = getUsesNode(parent);
+        for (YangUses uses : usesList) {
+            List<YangAugment> augList = getAugList(uses);
+            if (!augList.isEmpty()) {
+                for (YangAugment aug : augList) {
+                    if (aug.getPrefixRemovedName().equals(augId)) {
+                        return aug;
+                    }
+                }
+            }
+        }
+        // TODO: Has to be more specific error message.
+        throw new LinkerException("Invalid augment path");
+    }
+
+    /**
+     * Gets the list of augments from the uses.
+     *
+     * @param uses YANG uses
+     * @return list of YANG augment
+     */
+    private List<YangAugment> getAugList(YangUses uses) {
+        List<YangAugment> augList = new LinkedList<>();
+        YangNode child = uses.getChild();
+        while (child != null) {
+            if (child instanceof YangAugment) {
+                augList.add((YangAugment) child);
+            }
+            child = child.getNextSibling();
+        }
+        return augList;
+    }
+
+    /**
+     * Returns a proper YANG augment id to be searched.
+     *
+     * @param id YANG augment id
+     * @return formatted id
+     */
+    private String getAugNodeId(String id) {
+        int ind = id.indexOf(SLASH_FOR_STRING);
+        try {
+            id = id.substring(ind + 1, id.length() - 1);
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new LinkerException("Invalid augment path");
+        }
+        StringBuilder str = new StringBuilder();
+        String[] arr;
+
+        arr = id.split(SLASH_FOR_STRING);
+        for (String a : arr) {
+            str.append(SLASH_FOR_STRING);
+            str.append(a);
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns the YANG uses node list.
+     *
+     * @param node parent node
+     * @return YANG uses list
+     */
+    private List<YangUses> getUsesNode(YangNode node) {
+        YangNode curNode = node.getChild();
+        List<YangUses> usesList = new LinkedList<>();
+        while (curNode != null) {
+            if (curNode instanceof YangUses) {
+                usesList.add((YangUses) curNode);
+            }
+            curNode = curNode.getNextSibling();
+        }
+        return usesList;
+    }
+
+    /**
      * Validates temp path nodes for augment linking.
      *
      * @param node temp path node
@@ -396,8 +528,8 @@ public class YangXpathLinker<T> {
      * Resolves inter file augment linking.
      *
      * @param tempPath temporary absolute path
-     * @param root root node
-     * @param size node size
+     * @param root     root node
+     * @param size     node size
      * @return linked target node
      */
     private YangNode resolveInterFileAugment(YangAtomicPath tempPath,

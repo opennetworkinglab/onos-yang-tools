@@ -646,6 +646,7 @@ public class DataTreeBuilderHelper {
              * Gets the registered module class. Loads the class and gets the
              * augment class.
              */
+                curNode = getRootNode(curNode);
                 Class moduleClass = getClassLoaderForAugment(curNode, reg);
                 if (moduleClass == null) {
                     return null;
@@ -660,6 +661,19 @@ public class DataTreeBuilderHelper {
             throw new ModelConvertorException(e);
         }
         return null;
+    }
+
+    /**
+     * Returns the root node from the current node.
+     *
+     * @param curNode current YANG node
+     * @return root node
+     */
+    private YangNode getRootNode(YangNode curNode) {
+        while (curNode.getParent() != null) {
+            curNode = curNode.getParent();
+        }
+        return curNode;
     }
 
     /**

@@ -1,0 +1,71 @@
+module multiusesaug {
+    yang-version 1;
+
+    namespace
+        "http://org/ns/multiusesaug";
+
+    prefix mug;
+
+    container cont1 {
+        uses group {
+            augment "cont2/cont3/cont4/cont5/cont6" {
+                list listl1 {
+                    key "l2";
+                    leaf l2 {
+                        type boolean;
+                    }
+                }
+            }
+        }
+    }
+
+    grouping group {
+        leaf l1 {
+            type int8;
+        }
+
+        container cont2 {
+            leaf-list ll1 {
+                type decimal64 {
+                    fraction-digits 1;
+                }
+            }
+            uses group2 {
+                augment "cont3" {
+                    container cont4 {
+                        container cont5 {
+                            uses group3 {
+                                augment "cont6" {
+                                    leaf ll5 {
+                                        type uint64;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping group2 {
+        container cont3 {
+            list listl2 {
+                key "key";
+
+                leaf key {
+                    type leafref {
+                        path "../../../ll1";
+                    }
+                }
+            }
+        }
+    }
+
+    grouping group3 {
+        container cont6 {
+            container cont7 {
+            }
+        }
+    }
+}

@@ -30,5 +30,8 @@ public enum XpathLinkingTypes {
     COMPILER_ANNOTATION_LINKING,
 
     // Deviation linking.
-    DEVIATION_LINKING
+    DEVIATION_LINKING,
+
+    // Uses augment linking
+    USES_AUGMENT_LINKING
 }

@@ -1,0 +1,321 @@
+module subscription {
+    yang-version 1;
+
+    namespace
+        "http://org/ns/subscription";
+
+    prefix sub;
+
+    import ietf-yang-types {
+        prefix yang;
+    }
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    rpc establish-subscription {
+        input {
+            uses subscription-policy;
+        }
+        output {
+            uses subscription-response-with-hints {
+                augment "result" {
+                    case success {
+                        leaf identifier {
+                            type subscription-id;
+                        }
+                    }
+                }
+
+                augment "result/no-success" {
+                    leaf replay-start-time-hint {
+                        type yang:date-and-time;
+                    }
+                }
+            }
+        }
+    }
+
+    container subscriptions {
+        config false;
+        list subscription {
+            key "identifier";
+            config false;
+
+            leaf identifier {
+                type subscription-id;
+            }
+            leaf configured-subscription {
+                if-feature "configured-subscriptions";
+                type empty;
+            }
+
+            uses subscription-policy;
+            uses notification-origin-info {
+                if-feature "configured-subscriptions";
+            }
+
+            uses receiver-info {
+                refine receivers/receiver {
+                    min-elements "1";
+                }
+                augment receivers/receiver {
+                    leaf pushed-notifications {
+                        type yang:counter64;
+                    }
+                    leaf excluded-notifications {
+                        type yang:counter64;
+                    }
+                    leaf status {
+                        type subscription-status-type;
+                        mandatory true;
+                    }
+                }
+            }
+        }
+    }
+
+    grouping subscription-policy {
+        uses subscription-policy-non-modifiable {
+            augment target/event-stream {
+                leaf replay-start-time {
+                    if-feature "replay";
+                    type yang:date-and-time;
+                }
+            }
+        }
+    }
+
+    grouping subscription-policy-non-modifiable {
+        leaf encoding {
+            type encoding;
+        }
+
+        choice target {
+            mandatory true;
+            case event-stream {
+                leaf stream {
+                    type stream-type;
+                    mandatory true;
+                }
+            }
+        }
+    }
+
+    grouping subscription-response-with-hints {
+        leaf subscription-result {
+            type subscription-result-type;
+            mandatory true;
+        }
+        choice result {
+            case no-success {
+                uses error-hints;
+            }
+        }
+    }
+
+    grouping error-hints {
+        leaf filter-failure {
+            type string;
+        }
+    }
+
+    grouping receiver-info {
+        container receivers {
+            list receiver {
+                key "address port";
+                min-elements 1;
+                leaf address {
+                    type inet:host;
+                    mandatory true;
+                }
+                leaf port {
+                    type inet:port-number;
+                    mandatory true;
+                }
+                leaf protocol {
+                    type transport-protocol;
+                    default "netconf-notif";
+                }
+            }
+        }
+    }
+
+    grouping notification-origin-info {
+        choice notification-origin {
+            case interface-originated {
+                leaf source-interface {
+                    type string;
+                }
+            }
+            case address-originated {
+                leaf source-vrf {
+                    type string;
+                }
+                leaf source-address {
+                    type inet:ip-address-no-zone;
+                    mandatory true;
+                }
+            }
+        }
+    }
+
+    grouping update-policy-modifiable {
+        choice update-trigger {
+            case periodic {
+                leaf period {
+                    type yang:timeticks;
+                    mandatory true;
+                }
+                leaf anchor-time {
+                    type yang:date-and-time;
+                }
+            }
+            case on-change {
+                if-feature "on-change";
+                leaf dampening-period {
+                    type yang:timeticks;
+                    mandatory true;
+                }
+            }
+        }
+    }
+
+    grouping update-policy {
+        uses update-policy-modifiable {
+            augment "update-trigger/on-change" {
+                leaf no-synch-on-start {
+                    type empty;
+                }
+                leaf-list excluded-change {
+                    type change-type;
+                }
+            }
+        }
+    }
+
+    typedef transport-protocol {
+        type identityref {
+            base transport;
+        }
+    }
+
+    typedef encoding {
+        type identityref {
+            base encodings;
+        }
+    }
+
+    typedef stream-type {
+        type identityref {
+            base stream;
+        }
+    }
+
+    typedef subscription-result-type {
+        type identityref {
+            base subscription-result;
+        }
+    }
+
+    typedef subscription-id {
+        type uint32;
+    }
+
+    typedef subscription-status-type {
+        type identityref {
+            base subscription-status;
+        }
+    }
+
+    typedef change-type {
+        type enumeration {
+            enum "create";
+            enum "delete";
+            enum "insert";
+            enum "merge";
+            enum "move";
+            enum "replace";
+            enum "remove";
+        }
+    }
+
+    identity encodings {
+    }
+
+    identity encode-xml {
+        base encodings;
+    }
+
+    identity encode-json {
+        base encodings;
+    }
+
+    identity stream {
+    }
+
+    identity NETCONF {
+        base stream;
+    }
+
+    identity SYSLOG {
+        base stream;
+    }
+
+    identity subscription-result {
+    }
+
+    identity ok {
+        base subscription-result;
+    }
+
+    identity error {
+        base subscription-result;
+    }
+
+    identity transport {
+    }
+
+    identity netconf-notif {
+        base transport;
+    }
+
+    identity http2 {
+        base transport;
+    }
+
+    identity subscription-status {
+    }
+
+    identity active {
+        base subscription-status;
+    }
+
+    identity inactive {
+        base subscription-status;
+    }
+
+    identity suspended {
+        base subscription-status;
+    }
+
+    identity in-error {
+        base subscription-status;
+    }
+
+    feature replay {
+        description "This feature indicates that historical event display is
+        supported.";
+    }
+
+    feature configured-subscriptions {
+        description "This feature indicates that management plane configuration
+        of subscription is supported.";
+    }
+
+    feature on-change {
+        description "This feature indicates that on-change updates are
+        supported.";
+    }
+}

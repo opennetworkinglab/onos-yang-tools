@@ -1,0 +1,81 @@
+module ietf-inet-types {
+
+    namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
+
+    prefix "inet";
+
+    revision 2010-09-24 {
+        description "Initial revision.";
+    }
+
+    typedef port-number {
+        type uint16 {
+            range "0..65535";
+        }
+    }
+
+    typedef ip-address {
+        type union {
+            type inet:ipv4-address;
+            type inet:ipv6-address;
+        }
+    }
+
+    typedef ipv4-address {
+        type string {
+            pattern
+                '(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}'
+                +  '([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])'
+                + '(%[\p{N}\p{L}]+)?';
+        }
+    }
+
+    typedef ipv6-address {
+        type string {
+            pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
+                + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
+                + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
+                + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
+                + '(%[\p{N}\p{L}]+)?';
+            pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
+                + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
+                + '(%.+)?';
+        }
+    }
+
+    typedef ip-address-no-zone {
+        type union {
+            type inet:ipv4-address-no-zone;
+            type inet:ipv6-address-no-zone;
+        }
+    }
+
+    typedef ipv4-address-no-zone {
+        type inet:ipv4-address {
+            pattern '[0-9\.]*';
+        }
+    }
+
+    typedef ipv6-address-no-zone {
+        type inet:ipv6-address {
+            pattern '[0-9a-fA-F:\.]*';
+        }
+    }
+
+    typedef domain-name {
+        type string {
+            pattern
+                '((([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.)*'
+                + '([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.?)'
+                + '|\.';
+                length "1..253";
+        }
+    }
+
+    typedef host {
+        type union {
+            type inet:ip-address;
+            type inet:domain-name;
+        }
+    }
+}

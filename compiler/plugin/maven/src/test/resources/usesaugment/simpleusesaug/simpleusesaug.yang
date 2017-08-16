@@ -1,0 +1,35 @@
+module simpleusesaug {
+    yang-version 1;
+
+    namespace
+        "http://org/ns/simpleusesaug";
+
+    prefix ua;
+
+    container cont1 {
+        uses group {
+            augment "cont2" {
+                list listl1 {
+                    key "l2";
+                    leaf l2 {
+                        type boolean;
+                    }
+                }
+            }
+        }
+    }
+
+    grouping group {
+        leaf l1 {
+            type int8;
+        }
+
+        container cont2 {
+            leaf-list ll1 {
+                type decimal64 {
+                    fraction-digits 1;
+                }
+            }
+        }
+    }
+}

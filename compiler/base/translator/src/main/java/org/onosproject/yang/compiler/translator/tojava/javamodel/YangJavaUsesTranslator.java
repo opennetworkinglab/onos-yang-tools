@@ -16,7 +16,6 @@
 package org.onosproject.yang.compiler.translator.tojava.javamodel;
 
 import org.onosproject.yang.compiler.datamodel.javadatamodel.YangJavaUses;
-import org.onosproject.yang.compiler.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGenerator;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorInfo;
@@ -96,11 +95,9 @@ public class YangJavaUsesTranslator
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin)
             throws TranslatorException {
-        InvalidNodeForTranslatorException exception = new InvalidNodeForTranslatorException();
-        exception.setFileName(this.getFileName());
-        exception.setCharPosition(this.getCharPosition());
-        exception.setLine(this.getLineNumber());
-        throw exception;
+        /*
+         * Do nothing.
+         */
     }
 
     @Override

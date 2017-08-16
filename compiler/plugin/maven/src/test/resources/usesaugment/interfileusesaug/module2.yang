@@ -1,0 +1,39 @@
+module module2 {
+    yang-version 1;
+
+    namespace
+        "http://org/ns/module2";
+
+    prefix m2;
+
+    grouping group2 {
+        container cont3 {
+            list listl2 {
+                key "key";
+
+                leaf key {
+                    type string;
+                }
+            }
+        }
+
+        choice interface {
+            case physical {
+                container phy {
+                }
+            }
+
+            case virtual {
+                container vir {
+                }
+            }
+        }
+    }
+
+    grouping group3 {
+        container cont6 {
+            container cont7 {
+            }
+        }
+    }
+}

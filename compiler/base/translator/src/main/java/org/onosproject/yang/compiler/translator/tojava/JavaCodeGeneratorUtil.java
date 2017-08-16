@@ -19,6 +19,7 @@ package org.onosproject.yang.compiler.translator.tojava;
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
+import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -78,12 +79,11 @@ public final class JavaCodeGeneratorUtil {
                                                           codeGenNode.getFileName());
                 }
                 try {
-                    if (codeGen) {
-                        generateCodeEntry(codeGenNode, yangPlugin, rootNode);
-                    } else {
-                        //for uses java info is not required so need to skip
-                        // it and go to its sibling or parent node.
-                        if (!(codeGenNode instanceof YangUses)) {
+                    if (!(codeGenNode instanceof YangUses) ||
+                            !((YangUses) codeGenNode).isCloned()) {
+                        if (codeGen) {
+                            generateCodeEntry(codeGenNode, yangPlugin, rootNode);
+                        } else {
                             //this will update java file info for the target
                             // node.
                             updateJavaInfo(codeGenNode, yangPlugin);
@@ -95,22 +95,27 @@ public final class JavaCodeGeneratorUtil {
                                 ((RpcNotificationContainer) codeGenNode.getParent())
                                         .addToNotificationEnumMap(enumName, codeGenNode);
                             }
-                        } else {
-                            //handle uses ,its java info is not required.
-                            if (codeGenNode.getNextSibling() != null) {
-                                curTraversal = SIBLING;
-                                codeGenNode = codeGenNode.getNextSibling();
-                            } else {
-                                curTraversal = PARENT;
-                                codeGenNode = codeGenNode.getParent();
-                            }
-                            continue;
                         }
-                    }
-                    codeGenNode.setNameSpaceAndAddToParentSchemaMap();
-                    if (codeGenNode instanceof YangLeavesHolder ||
-                            codeGenNode instanceof SchemaDataNode) {
-                        codeGenNode.setParentContext();
+                        if (!(codeGenNode instanceof YangUses)) {
+                            codeGenNode.setNameSpaceAndAddToParentSchemaMap();
+                            if (codeGenNode instanceof YangLeavesHolder ||
+                                    codeGenNode instanceof SchemaDataNode) {
+                                codeGenNode.setParentContext();
+                            }
+                        }
+                    } else {
+                        if (((YangUses) codeGenNode).isCloned()) {
+                            setUsesAugNsAddToParent((YangUses) codeGenNode);
+                        }
+                        //handle uses ,its java info is not required.
+                        if (codeGenNode.getNextSibling() != null) {
+                            curTraversal = SIBLING;
+                            codeGenNode = codeGenNode.getNextSibling();
+                        } else {
+                            curTraversal = PARENT;
+                            codeGenNode = codeGenNode.getParent();
+                        }
+                        continue;
                     }
                 } catch (InvalidNodeForTranslatorException e) {
                     if (codeGenNode.getNextSibling() != null) {
@@ -375,5 +380,53 @@ public final class JavaCodeGeneratorUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Sets the uses augment and its child's namespace and adds it to the
+     * parent.
+     *
+     * @param uses YANG uses
+     */
+    public static void setUsesAugNsAddToParent(YangUses uses) {
+        YangNode node = uses.getChild();
+        while (node != null) {
+            if (node instanceof YangAugment) {
+                node.setNameSpaceAndAddToParentSchemaMap();
+                node.setParentContext();
+                processAugNode((YangAugment) node);
+            }
+            node = node.getNextSibling();
+        }
+    }
+
+    /**
+     * Processes the YANG augment node and its complete tree.
+     *
+     * @param aug YANG augment
+     */
+    private static void processAugNode(YangAugment aug) {
+        YangNode child = aug.getChild();
+        TraversalType curTraversal = ROOT;
+
+        while (child != aug && child != null) {
+            if (curTraversal != PARENT) {
+                child.setNameSpaceAndAddToParentSchemaMap();
+                if (child instanceof YangLeavesHolder ||
+                        child instanceof SchemaDataNode) {
+                    child.setParentContext();
+                }
+            }
+            if (curTraversal != PARENT && child.getChild() != null) {
+                curTraversal = CHILD;
+                child = child.getChild();
+            } else if (child.getNextSibling() != null) {
+                curTraversal = SIBLING;
+                child = child.getNextSibling();
+            } else {
+                curTraversal = PARENT;
+                child = child.getParent();
+            }
+        }
     }
 }

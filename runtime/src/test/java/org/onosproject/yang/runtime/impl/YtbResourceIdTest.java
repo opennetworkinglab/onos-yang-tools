@@ -32,11 +32,46 @@ import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.DefaultCon1;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Leaf1Union;
 import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.val.AugmentedSchVal;
+import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.DomainName;
+import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.Host;
+import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.PortNumber;
+import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.host.HostUnion;
+import org.onosproject.yang.gen.v1.yrtietfyangtypes.rev20130715.yrtietfyangtypes.Counter64;
+import org.onosproject.yang.gen.v1.yrtietfyangtypes.rev20130715.yrtietfyangtypes.DateAndTime;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.Active;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.DefaultSubscriptions;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.Netconf;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.StreamType;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.SubscriptionId;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.SubscriptionStatusType;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.Subscriptions;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.DefaultEstablishSubscriptionInput;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.DefaultEstablishSubscriptionOutput;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.EstablishSubscriptionInput;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.EstablishSubscriptionOutput;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.establishsubscriptionoutput.result.augmentedresult.DefaultSuccess;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.establishsubscription.establishsubscriptionoutput.result.augmentedresult.Success;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.receiverinfo.DefaultReceivers;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.receiverinfo.Receivers;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.receiverinfo.receivers.DefaultReceiver;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.receiverinfo.receivers.Receiver;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptionpolicy.target.eventstream.AugmentedEventStream;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptionpolicy.target.eventstream.DefaultAugmentedEventStream;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptionpolicynonmodifiable.target.DefaultEventStream;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptionpolicynonmodifiable.target.EventStream;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.DefaultSubscription;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.Subscription;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.subscription.receivers.receiver.AugmentedReceiver;
+import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.subscription.receivers.receiver.DefaultAugmentedReceiver;
+import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData.Builder;
+import org.onosproject.yang.model.InnerModelObject;
+import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafIdentifier;
 import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.ListKey;
+import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceData;
@@ -46,7 +81,9 @@ import org.onosproject.yang.model.SchemaId;
 import java.math.BigInteger;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -63,15 +100,18 @@ import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelis
 import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.Ll6Enum.ENUM1;
 import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Con1.LeafIdentifier.LL;
 import static org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Leaf6Enum.ENUM2;
+import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.model.ModelObjectId.builder;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 
 /**
  * Unit test cases for resource id conversion from model object id.
  */
 public class YtbResourceIdTest {
-
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -284,5 +324,163 @@ public class YtbResourceIdTest {
         assertThat(lName, is(sid.name()));
         assertThat(nameSpace, is(sid.namespace()));
         assertThat(value, is(keyLeaf.leafValue()));
+    }
+
+    /**
+     * Processes rpc input with uses augment.
+     */
+    @Test
+    public void processRpcInputForUsesAug() {
+        setUp();
+        EstablishSubscriptionInput input = new
+                DefaultEstablishSubscriptionInput();
+        EventStream tgt = new DefaultEventStream();
+        tgt.stream(new StreamType(Netconf.class));
+        AugmentedEventStream es = new DefaultAugmentedEventStream();
+        es.replayStartTime(DateAndTime.fromString("2000-06-12T06:23:21"));
+        tgt.addAugmentation((InnerModelObject) es);
+        input.target(tgt);
+        data = new Builder();
+        data.addModelObject((ModelObject) input);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        List<DataNode> inDn = rscData.dataNodes();
+        String ns = "http://org/ns/yrt/subscription";
+        Iterator<DataNode> it = inDn.iterator();
+
+        DataNode in = it.next();
+        validateDataNode(in, "input", ns, SINGLE_INSTANCE_NODE, true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) in).childNodes();
+        List<DataNode> inputDN = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            inputDN.add(c.getValue());
+        }
+
+        Iterator<DataNode> it1 = inputDN.iterator();
+        validateDataNode(it1.next(), "stream", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "stream");
+        validateDataNode(it1.next(), "replay-start-time", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
+                         "2000-06-12T06:23:21");
+    }
+
+    /**
+     * Processes rpc output with uses augment.
+     */
+    @Test
+    public void processRpcOutputForUsesAug() {
+        setUp();
+        EstablishSubscriptionOutput output = new
+                DefaultEstablishSubscriptionOutput();
+        Success result = new DefaultSuccess();
+        result.identifier(new SubscriptionId(876L));
+        output.result(result);
+        data = new Builder();
+        data.addModelObject((ModelObject) output);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        List<DataNode> inDn = rscData.dataNodes();
+        String ns = "http://org/ns/yrt/subscription";
+        Iterator<DataNode> it = inDn.iterator();
+
+        DataNode in = it.next();
+        validateDataNode(in, "output", ns, SINGLE_INSTANCE_NODE, true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) in).childNodes();
+        List<DataNode> inputDN = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            inputDN.add(c.getValue());
+        }
+
+        Iterator<DataNode> it1 = inputDN.iterator();
+        validateDataNode(it1.next(), "identifier", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "876");
+    }
+
+    /**
+     * Processes container with uses augment.
+     */
+    @Test
+    public void processContainerForUsesAug() {
+        setUp();
+        Subscriptions subs = new DefaultSubscriptions();
+        Subscription sub = new DefaultSubscription();
+        sub.identifier(new SubscriptionId(1112L));
+        AugmentedReceiver aug = new DefaultAugmentedReceiver();
+        aug.pushedNotifications(new Counter64(new BigInteger("1113")));
+        aug.excludedNotifications(new Counter64(new BigInteger("456")));
+        aug.status(new SubscriptionStatusType(Active.class));
+        Receivers rcs = new DefaultReceivers();
+        Receiver rc = new DefaultReceiver();
+        rc.address(new Host(new HostUnion(new DomainName("dom1"))));
+        rc.port(new PortNumber(111));
+        rc.addAugmentation((InnerModelObject) aug);
+        rcs.addToReceiver(rc);
+        sub.receivers(rcs);
+        subs.addToSubscription(sub);
+        data = new Builder();
+        data.addModelObject((ModelObject) subs);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        List<DataNode> subsDn = rscData.dataNodes();
+        String ns = "http://org/ns/yrt/subscription";
+        Iterator<DataNode> it = subsDn.iterator();
+
+        DataNode subsNode = it.next();
+        validateDataNode(subsNode, "subscriptions", ns, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) subsNode).childNodes();
+        List<DataNode> list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+
+        it = list.iterator();
+        DataNode subscription = it.next();
+        validateDataNode(subscription, "subscription", ns, MULTI_INSTANCE_NODE,
+                         true, null);
+
+        child = ((InnerNode) subscription).childNodes();
+        list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+
+        it = list.iterator();
+        validateDataNode(it.next(), "identifier", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "1112");
+        DataNode receivers = it.next();
+        validateDataNode(receivers, "receivers", ns, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        child = ((InnerNode) receivers).childNodes();
+        list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+        it = list.iterator();
+        DataNode receiver = it.next();
+        validateDataNode(receiver, "receiver", ns, MULTI_INSTANCE_NODE, true,
+                         null);
+
+        child = ((InnerNode) receiver).childNodes();
+        list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+        it = list.iterator();
+        validateDataNode(it.next(), "address", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "dom1");
+        validateDataNode(it.next(), "port", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "111");
+        validateDataNode(it.next(), "pushed-notifications", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "1113");
+        validateDataNode(it.next(), "excluded-notifications", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "456");
+        validateDataNode(it.next(), "status", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
+                         "subscription-status");
     }
 }

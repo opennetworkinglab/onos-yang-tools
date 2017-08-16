@@ -216,7 +216,7 @@ final class ModelConverterUtil {
      */
     static Class<?> getClassLoaderForAugment(
             YangNode curNode, DefaultYangModelRegistry registry) {
-        return registry.getRegisteredClass(curNode.getParent());
+        return registry.getRegisteredClass(curNode);
     }
 
     /**

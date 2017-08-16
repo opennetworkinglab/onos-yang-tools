@@ -64,5 +64,10 @@ public enum ResolvableType {
     /**
      * Identifies the deviation.
      */
-    YANG_DEVIATION
+    YANG_DEVIATION,
+
+    /**
+     * Identifies augment inside uses.
+     */
+    YANG_USES_AUGMENT
 }

@@ -93,7 +93,9 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTI
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES_AUGMENT;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_AUGMENT_NODE;
+import static org.onosproject.yang.compiler.datamodel.utils.ResolvableStatus.UNRESOLVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.DERIVED;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.ENUMERATION;
@@ -126,6 +128,8 @@ public final class DataModelUtils {
             "cannot be mentioned more than one time in the unique statement";
     private static final String E_TARGET_NODE = "YANG file error: The target" +
             " node in unique reference path is invalid";
+    private static final String E_DATATREE = "Internal datamodel error: Datam" +
+            "odel tree is not correct";
 
     /**
      * Creates a new data model tree utility.
@@ -237,52 +241,48 @@ public final class DataModelUtils {
     /**
      * Add a resolution information.
      *
-     * @param resolutionInfo information about the YANG construct which has to be resolved
+     * @param resInfo resolvable YANG info
      * @throws DataModelException a violation of data model rules
      */
-    public static void addResolutionInfo(YangResolutionInfo resolutionInfo)
+    public static void addResolutionInfo(YangResolutionInfo resInfo)
             throws DataModelException {
 
         /* get the module node to add maintain the list of nested reference */
-        YangNode curNode = resolutionInfo.getEntityToResolveInfo()
+        YangNode curNode = resInfo.getEntityToResolveInfo()
                 .getHolderOfEntityToResolve();
         while (!(curNode instanceof YangReferenceResolver)) {
             curNode = curNode.getParent();
             if (curNode == null) {
-                throw new DataModelException("Internal datamodel error: Datamodel tree is not correct");
+                throw new DataModelException(E_DATATREE);
             }
         }
-        YangReferenceResolver resolutionNode = (YangReferenceResolver) curNode;
-        YangEntityToResolveInfo entityToResolveInfo = resolutionInfo.getEntityToResolveInfo();
-        if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangType) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               YANG_DERIVED_DATA_TYPE);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangUses) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_USES);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangAugment) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_AUGMENT);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangIfFeature) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_IF_FEATURE);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangLeafRef) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_LEAFREF);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangBase) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_BASE);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangIdentityRef) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_IDENTITYREF);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangCompilerAnnotation) {
-            resolutionNode.addToResolutionList(resolutionInfo,
-                                               YANG_COMPILER_ANNOTATION);
-        } else if (entityToResolveInfo.getEntityToResolve()
-                instanceof YangDeviation) {
-            resolutionNode.addToResolutionList(resolutionInfo, YANG_DEVIATION);
+
+        YangReferenceResolver root = (YangReferenceResolver) curNode;
+        YangEntityToResolveInfo entity = resInfo.getEntityToResolveInfo();
+        Object en = entity.getEntityToResolve();
+
+        if (en instanceof YangType) {
+            root.addToResolutionList(resInfo, YANG_DERIVED_DATA_TYPE);
+        } else if (en instanceof YangUses) {
+            root.addToResolutionList(resInfo, YANG_USES);
+        } else if (en instanceof YangAugment) {
+            if (entity.getHolderOfEntityToResolve() instanceof YangUses) {
+                root.addToResolutionList(resInfo, YANG_USES_AUGMENT);
+            } else {
+                root.addToResolutionList(resInfo, YANG_AUGMENT);
+            }
+        } else if (en instanceof YangIfFeature) {
+            root.addToResolutionList(resInfo, YANG_IF_FEATURE);
+        } else if (en instanceof YangLeafRef) {
+            root.addToResolutionList(resInfo, YANG_LEAFREF);
+        } else if (en instanceof YangBase) {
+            root.addToResolutionList(resInfo, YANG_BASE);
+        } else if (en instanceof YangIdentityRef) {
+            root.addToResolutionList(resInfo, YANG_IDENTITYREF);
+        } else if (en instanceof YangCompilerAnnotation) {
+            root.addToResolutionList(resInfo, YANG_COMPILER_ANNOTATION);
+        } else if (en instanceof YangDeviation) {
+            root.addToResolutionList(resInfo, YANG_DEVIATION);
         }
     }
 
@@ -382,17 +382,21 @@ public final class DataModelUtils {
     /**
      * Returns the contained data model parent node.
      *
-     * @param currentNode current node which parent contained node is required
+     * @param curNode current node
      * @return parent node in which the current node is an attribute
      */
-    public static YangNode getParentNodeInGenCode(YangNode currentNode) {
+    public static YangNode getParentNodeInGenCode(YangNode curNode) {
 
         /*
          * TODO: recursive parent lookup to support choice/augment/uses. TODO:
          * need to check if this needs to be updated for
          * choice/case/augment/grouping
          */
-        return currentNode.getParent();
+        YangNode parent = curNode.getParent();
+        if (curNode instanceof YangAugment && parent instanceof YangUses) {
+            parent = parent.getParent();
+        }
+        return parent;
     }
 
     /**
@@ -452,6 +456,29 @@ public final class DataModelUtils {
             if (nonEmpty(infoList)) {
                 yangUses.addEntityToResolve(infoList);
             }
+        }
+    }
+
+    /**
+     * Adds the resolved augment from the cloned uses.
+     *
+     * @param uses YANG uses
+     * @param aug  cloned augment
+     * @throws DataModelException data model error
+     */
+    public static void addUnresolvedAugment(YangUses uses, YangAugment aug)
+            throws DataModelException {
+        if (uses.getCurrentGroupingDepth() == 0) {
+            List<YangEntityToResolveInfoImpl> infoList = new LinkedList<>();
+            YangEntityToResolveInfoImpl info =
+                    new YangEntityToResolveInfoImpl<>();
+            aug.setResolvableStatus(UNRESOLVED);
+            info.setEntityToResolve(aug);
+            info = setInformationInEntity(info, aug.getParent(),
+                                          aug.getCharPosition(),
+                                          aug.getLineNumber());
+            infoList.add(info);
+            uses.addEntityToResolve(infoList);
         }
     }
 

@@ -35,6 +35,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTI
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES_AUGMENT;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
@@ -242,6 +243,11 @@ public abstract class YangModule
     private List<YangResolutionInfo> compilerAnnotationList;
 
     /**
+     * Uses-augment resolution list.
+     */
+    private List<YangResolutionInfo> usesAugmentList;
+
+    /**
      * Deviation list.
      */
     private List<YangResolutionInfo> deviationList;
@@ -317,6 +323,7 @@ public abstract class YangModule
         notificationEnumMap = new HashMap<>();
         augments = new LinkedList<>();
         uniqueHolderList = new LinkedList<>();
+        usesAugmentList = new LinkedList<>();
     }
 
     @Override
@@ -755,8 +762,10 @@ public abstract class YangModule
             return unmodifiableList(identityRefResolutionList);
         } else if (type == YANG_COMPILER_ANNOTATION) {
             return unmodifiableList(compilerAnnotationList);
-        } else {
+        } else if (type == YANG_DEVIATION) {
             return unmodifiableList(deviationList);
+        } else {
+            return unmodifiableList(usesAugmentList);
         }
     }
 
@@ -781,6 +790,8 @@ public abstract class YangModule
             compilerAnnotationList.add(info);
         } else if (type == YANG_DEVIATION) {
             deviationList.add(info);
+        } else if (type == YANG_USES_AUGMENT) {
+            usesAugmentList.add(info);
         }
     }
 
@@ -805,6 +816,8 @@ public abstract class YangModule
             compilerAnnotationList = resolutionList;
         } else if (type == YANG_DEVIATION) {
             deviationList = resolutionList;
+        } else if (type == YANG_USES_AUGMENT) {
+            usesAugmentList = resolutionList;
         }
     }
 

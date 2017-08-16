@@ -30,6 +30,7 @@ import org.onosproject.yang.compiler.datamodel.YangRelativePath;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AugmentStatementContext;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.slf4j.Logger;
 
@@ -45,6 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.onosproject.yang.compiler.datamodel.YangPathOperator.EQUALTO;
+import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.AUGMENT_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.UNIQUE_DATA;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.PathStatementContext;
@@ -75,8 +77,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Represents an utility for listener.
  */
 public final class ListenerUtil {
+    public static final String SPACE = " ";
+    public static final String LINE_NUMBER = "line number ";
+    public static final String CHARACTER_POSITION = "character position ";
+    public static final String FILE = "file ";
     private static final Logger log = getLogger(ListenerUtil.class);
-
     private static final Pattern IDENTIFIER_PATTERN =
             Pattern.compile("[a-zA-Z_][a-zA-Z0-9_.-]*");
     private static final String DATE_PATTERN =
@@ -92,12 +97,11 @@ public final class ListenerUtil {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String REGEX_EQUAL = "[=]";
     private static final String REGEX_OPEN_BRACE = "[(]";
-    public static final String SPACE = " ";
-    public static final String LINE_NUMBER = "line number ";
-    public static final String CHARACTER_POSITION = "character position ";
-    public static final String FILE = "file ";
-    private static final String E_LEAF_REF = "YANG file error : A leaf " +
-            "reference, in unique, must refer to a leaf in the list";
+    private static final String E_DES_NODE = "YANG file error : The " +
+            "reference path of descendant schema is not pointing to node " +
+            "inside itself";
+    private static final String E_DES_FORMAT = "YANG file error : The " +
+            "descendant path must not start with a slash(/)";
 
     // No instantiation.
     private ListenerUtil() {
@@ -432,27 +436,50 @@ public final class ListenerUtil {
     }
 
     /**
-     * Validates the unique syntax from the reference path.
+     * Parses the uses augment statement, validates the statement and creates
+     * a list of YANG atomic path.
      *
-     * @param val    path of unique
-     * @param prefix current file's prefix
-     * @param ctx    yang construct's context to get the line number and character position
-     * @return list of absolute path
+     * @param uses YANG uses
+     * @param ctx  YANG construct
+     * @return YANG atomic path list
      */
-    private static List<YangAtomicPath> validateUniqueValues(String val,
-                                                             String prefix,
-                                                             ParserRuleContext ctx) {
+    public static List<YangAtomicPath> parseUsesAugment(YangNode uses,
+                                                        AugmentStatementContext ctx) {
+        String val = removeQuotesAndHandleConcat(ctx.augment().getText());
+        String rootPre = getRootPrefix(uses);
+        return validateDesSchemaNode(val, rootPre, ctx, AUGMENT_DATA);
+    }
+
+    /**
+     * Validates the descendant schema node id, after parsing, by converting
+     * it to YANG atomic path.
+     *
+     * @param val    descendant schema
+     * @param prefix current file's prefix
+     * @param ctx    yang construct
+     * @param type   YANG construct type
+     * @return list of YANG atomic path
+     */
+    private static List<YangAtomicPath> validateDesSchemaNode(String val,
+                                                              String prefix,
+                                                              ParserRuleContext ctx,
+                                                              YangConstructType type) {
+        if (val.startsWith(SLASH_FOR_STRING)) {
+            ParserException exc = new ParserException(E_DES_FORMAT);
+            exc.setLine(ctx.getStart().getLine());
+            exc.setCharPosition(ctx.getStart().getCharPositionInLine());
+            throw exc;
+        }
         List<YangAtomicPath> pathList = new LinkedList<>();
         String[] path = val.split(SLASH_FOR_STRING);
         for (String uniVal : path) {
             YangAtomicPath atomicPath = new YangAtomicPath();
-            YangNodeIdentifier nodeId = getValidNodeIdentifier(
-                    uniVal, UNIQUE_DATA, ctx);
-            atomicPath.setNodeIdentifier(nodeId);
+            YangNodeIdentifier id = getValidNodeIdentifier(uniVal, type, ctx);
+            atomicPath.setNodeIdentifier(id);
             pathList.add(atomicPath);
-            if (nodeId.getPrefix() != null &&
-                    !nodeId.getPrefix().equals(prefix)) {
-                ParserException exc = new ParserException(E_LEAF_REF);
+            if (id.getPrefix() != null &&
+                    !id.getPrefix().equals(prefix)) {
+                ParserException exc = new ParserException(E_DES_NODE);
                 exc.setLine(ctx.getStart().getLine());
                 exc.setCharPosition(ctx.getStart().getCharPositionInLine());
                 throw exc;
@@ -461,6 +488,11 @@ public final class ListenerUtil {
         return pathList;
     }
 
+    /**
+     * Adds the unique holder to the module or sub-module node.
+     *
+     * @param holder unique holder
+     */
     public static void addUniqueHolderToRoot(YangUniqueHolder holder) {
         List<List<YangAtomicPath>> uniques = holder.getPathList();
         if (uniques != null && !uniques.isEmpty()) {
@@ -483,7 +515,7 @@ public final class ListenerUtil {
                                                             ParserRuleContext ctx) {
         YangNode node = (YangNode) holder;
         String rootPre = getRootPrefix(node);
-        return validateUniqueValues(val, rootPre, ctx);
+        return validateDesSchemaNode(val, rootPre, ctx, UNIQUE_DATA);
     }
 
     /**

@@ -27,6 +27,7 @@ import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
+import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.datamodel.javadatamodel.JavaFileInfo;
 import org.onosproject.yang.compiler.datamodel.javadatamodel.JavaQualifiedTypeInfo;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
@@ -1675,6 +1676,9 @@ public class TempJavaFragmentFiles {
     //Removes case's parent import.
     private void removeCaseParentImport(YangNode node, List<String> imports) {
         YangNode parent = node.getParent();
+        if (parent instanceof YangUses) {
+            parent = parent.getParent();
+        }
         JavaFileInfo info = ((JavaFileInfoContainer) parent).getJavaFileInfo();
         String impt = getImportString(info.getPackage(),
                                       getCapitalCase(info.getJavaName()));

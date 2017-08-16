@@ -156,8 +156,8 @@ public class UniqueListenerTest {
     public void processParsingUniqueDescendent() throws IOException,
             ParserException {
         thrown.expect(ParserException.class);
-        thrown.expectMessage("YANG file error : unique name  is" +
-                                     " not valid.");
+        thrown.expectMessage("YANG file error : The descendant path must not" +
+                                     " start with a slash(/)");
         YangNode node = manager.getDataModel(
                 "src/test/resources/UniqueDescendent.yang");
     }

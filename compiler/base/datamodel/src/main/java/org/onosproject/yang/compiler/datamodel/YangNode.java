@@ -29,6 +29,7 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.RPC_NODE;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.addUnresolvedAugment;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeaf;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeafList;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentSchemaContext;
@@ -519,8 +520,12 @@ public abstract class YangNode
                                                          " at " + nextNodeToClone.getCharPosition() +
                                                          " in " + nextNodeToClone.getFileName() + "\"");
                 }
+
                 if (curTraversal != PARENT) {
                     newNode = nextNodeToClone.clone(yangUses, isDeviation);
+                    if (newNode instanceof YangUses) {
+                        ((YangUses) newNode).setCloned(true);
+                    }
                     detectCollisionWhileCloning(clonedTreeCurNode, newNode,
                                                 curTraversal);
                 }
@@ -546,6 +551,13 @@ public abstract class YangNode
                         updateClonedLeavesUnionEnumRef((YangLeavesHolder) clonedTreeCurNode);
                     }
                     clonedTreeCurNode = clonedTreeCurNode.getParent();
+                }
+
+                if (curTraversal != PARENT &&
+                        clonedTreeCurNode instanceof YangAugment &&
+                        (clonedTreeCurNode.getParent() instanceof YangUses)) {
+                    YangAugment augment = (YangAugment) clonedTreeCurNode;
+                    addUnresolvedAugment(yangUses, augment);
                 }
 
                 if (curTraversal != PARENT && nextNodeToClone.getChild() != null) {

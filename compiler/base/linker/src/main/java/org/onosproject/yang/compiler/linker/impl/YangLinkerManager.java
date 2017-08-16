@@ -38,6 +38,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IDENTI
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_IF_FEATURE;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_LEAFREF;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
+import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES_AUGMENT;
 import static org.onosproject.yang.compiler.linker.impl.YangLinkerUtils.updateFilePriority;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 
@@ -186,6 +187,7 @@ public class YangLinkerManager
                         yangNode);
                 resolver.resolveInterFileLinking(YANG_IF_FEATURE);
                 resolver.resolveInterFileLinking(YANG_USES);
+                resolver.resolveInterFileLinking(YANG_USES_AUGMENT);
                 resolver.resolveInterFileLinking(YANG_AUGMENT);
                 resolver.resolveInterFileLinking(YANG_DERIVED_DATA_TYPE);
                 resolver.resolveInterFileLinking(YANG_BASE);

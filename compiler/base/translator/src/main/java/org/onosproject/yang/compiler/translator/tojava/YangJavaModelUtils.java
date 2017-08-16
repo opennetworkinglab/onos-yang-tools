@@ -603,6 +603,9 @@ public final class YangJavaModelUtils {
                                          YangPluginConfig config) {
 
         List<String> clsInfo = new ArrayList<>();
+        if (node.getReferredSchema() != null) {
+            node = (YangNode) node.getReferredSchema();
+        }
         while (node.getParent() != null) {
             if (node instanceof YangJavaAugmentTranslator) {
                 YangJavaAugmentTranslator augment =

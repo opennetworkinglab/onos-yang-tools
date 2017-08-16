@@ -1,0 +1,32 @@
+module module1 {
+    yang-version 1;
+
+    namespace
+        "http://org/ns/module1";
+
+    prefix m1;
+
+    import module3 {
+        prefix m3;
+    }
+
+    notification not1 {
+        uses m3:group {
+            augment "m1:cont2/m1:cont3/m1:cont4/cont5/cont6" {
+                list listl1 {
+                    key "l2";
+                    leaf l2 {
+                        type string;
+                    }
+                }
+            }
+        }
+
+        leaf-list ref {
+            type enumeration {
+                enum ten;
+                enum thousand;
+            }
+        }
+    }
+}

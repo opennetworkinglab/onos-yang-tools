@@ -151,6 +151,11 @@ public abstract class YangUses
     private boolean defaultDenyAll;
 
     /**
+     * Status of cloning of YANG uses.
+     */
+    private boolean isCloned;
+
+    /**
      * Creates an YANG uses node.
      */
     public YangUses() {
@@ -597,5 +602,23 @@ public abstract class YangUses
     @Override
     public void setDefaultDenyAll(boolean defaultDenyAll) {
         this.defaultDenyAll = defaultDenyAll;
+    }
+
+    /**
+     * Returns true if YANG uses is cloned; false otherwise.
+     *
+     * @return true if cloned; false otherwise
+     */
+    public boolean isCloned() {
+        return isCloned;
+    }
+
+    /**
+     * Sets the YANG uses cloned status.
+     *
+     * @param cloned cloned status
+     */
+    public void setCloned(boolean cloned) {
+        isCloned = cloned;
     }
 }
