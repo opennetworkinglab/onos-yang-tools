@@ -47,6 +47,14 @@ public final class LeafNode extends DataNode {
         return String.valueOf(value);
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                    "key=" + key() + ", " +
+                    "value=" + asString() +
+               "}";
+    }
+
     /**
      * Creates an instance of leaf node.
      *

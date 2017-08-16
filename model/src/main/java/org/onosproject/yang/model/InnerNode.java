@@ -52,6 +52,14 @@ public final class InnerNode extends DataNode {
         childNodes = builder.childNodes;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                    "key=" + key() + ", " +
+                    "childNodes=" + childNodes().values() +
+               "}";
+    }
+
     /**
      * Returns inner node builder instance.
      *
