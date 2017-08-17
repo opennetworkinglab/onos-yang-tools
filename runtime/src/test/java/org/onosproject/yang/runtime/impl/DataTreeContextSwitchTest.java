@@ -18,6 +18,15 @@ package org.onosproject.yang.runtime.impl;
 
 
 import org.junit.Test;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.PrivateIp;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.AugmentedSchValid;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.DefaultAugmentedSchValid;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.AugCaseModKey;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.DefaultAugCaseModKey;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.DefaultTestedCont;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.DefaultUnlistedVal;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.TestedCont;
+import org.onosproject.yang.gen.v1.augmentchoice.rev20160826.augmentchoice.contenttest.valid.augmentedschvalid.UnlistedVal;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.BinaryTypedef;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.DefaultFirstLevel;
 import org.onosproject.yang.gen.v1.modeldatatoresourcedata.rev20160826.modeldatatoresourcedata.UnionTypedef;
@@ -43,6 +52,8 @@ import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey
 import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.DefaultAugmentedSchModKey;
 import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.AugListModKey;
 import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.modkey.augmentedschmodkey.DefaultAugListModKey;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.DefaultValid;
+import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.Valid;
 import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.ChoiceContainer;
 import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.DefaultChoiceContainer;
 import org.onosproject.yang.gen.v1.ytbchoicewithcontainerandleaflist.rev20160826.ytbchoicewithcontainerandleaflist.contenttest.choicecontainer.choicecontainer.DefaultPredict;
@@ -59,6 +70,7 @@ import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoi
 import org.onosproject.yang.gen.v1.ytbsimplechoicecase.rev20160826.ytbsimplechoicecase.ytbfood.ytbsnack.DefaultYtbLateNight;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData;
+import org.onosproject.yang.model.InnerModelObject;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.ListKey;
@@ -80,9 +92,9 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 
 /**
  * Unit test cases for YANG tree builder for context switch for augment, RPC
@@ -1379,6 +1391,97 @@ public class DataTreeContextSwitchTest {
                          true, "namespace");
     }
 
+    /**
+     * Unit test case for multi augments with the same augment name.
+     */
+    @Test
+    public void processMultiAugWithSameName() {
+        setUp();
+
+        AugmentedSchValid valid = new DefaultAugmentedSchValid();
+        valid.chTest(PrivateIp.class);
+        byte b1 = 8;
+        byte b2 = 110;
+        valid.addToTest(b1);
+        valid.addToTest(b2);
+        TestedCont cont = new DefaultTestedCont();
+        cont.presence("true");
+        valid.testedCont(cont);
+        UnlistedVal val = new DefaultUnlistedVal();
+        val.presence("false");
+        valid.addToUnlistedVal(val);
+        AugCaseModKey modKey = new DefaultAugCaseModKey();
+        modKey.types(12);
+        valid.addToAugCaseModKey(modKey);
+        Valid valid1 = new DefaultValid();
+        valid1.addAugmentation((InnerModelObject) valid);
+
+        data = new DefaultModelObjectData.Builder();
+        data.addModelObject((InnerModelObject) valid1);
+
+        rscData = treeBuilder.getResourceData(data.build());
+
+        nameSpace = "yms:test:ytb:choice:with:container:and:leaf:list";
+
+        id = rscData.resourceId();
+        keys = id.nodeKeys();
+        assertThat(1, is(keys.size()));
+
+        sid = keys.get(0).schemaId();
+        assertThat("/", is(sid.name()));
+        assertThat(null, is(sid.namespace()));
+
+        dataNodes = rscData.dataNodes();
+        assertThat(6, is(dataNodes.size()));
+
+        node = dataNodes.get(0);
+        validateDataNode(node, "ch-test", nameSpace,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "private-ip");
+
+        node = dataNodes.get(1);
+        validateDataNode(node, "test", nameSpace,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "8");
+
+        node = dataNodes.get(2);
+        validateDataNode(node, "test", nameSpace,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110");
+
+        node = dataNodes.get(3);
+        validateDataNode(node, "unlisted-val", nameSpace, MULTI_INSTANCE_NODE,
+                         true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) node).childNodes();
+        assertThat(1, is(child.size()));
+
+        Iterator<Map.Entry<NodeKey, DataNode>> it = child.entrySet().iterator();
+        Map.Entry<NodeKey, DataNode> n = it.next();
+        validateDataNode(n.getValue(), "presence", nameSpace,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "false");
+
+        node = dataNodes.get(4);
+        validateDataNode(node, "aug-case-modKey", nameSpace,
+                         MULTI_INSTANCE_NODE, true, null);
+
+        child = ((InnerNode) node).childNodes();
+        assertThat(1, is(child.size()));
+
+        it = child.entrySet().iterator();
+        n = it.next();
+        validateDataNode(n.getValue(), "types", nameSpace,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "12");
+
+        node = dataNodes.get(5);
+        validateDataNode(node, "tested-cont", nameSpace, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        child = ((InnerNode) node).childNodes();
+        assertThat(1, is(child.size()));
+
+        it = child.entrySet().iterator();
+        n = it.next();
+        validateDataNode(n.getValue(), "presence", nameSpace,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "true");
+    }
 
     /**
      * Unit test for inter file augment. Model object is null so resource id

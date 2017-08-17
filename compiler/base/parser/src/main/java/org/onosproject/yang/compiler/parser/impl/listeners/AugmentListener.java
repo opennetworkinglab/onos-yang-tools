@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.parser.impl.listeners;
 
+import org.antlr.v4.runtime.Token;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangModule;
@@ -49,9 +50,12 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErro
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_CURRENT_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.MISSING_HOLDER;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.checkAugNameCollision;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getPrefixRemovedName;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.getValidAbsoluteSchemaNodeId;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.isDuplicateNode;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.parseUsesAugment;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.removeAugment;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil.removeQuotesAndHandleConcat;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.validateCardinalityEitherOne;
@@ -141,6 +145,7 @@ public final class AugmentListener {
         augment.setName(removeQuotesAndHandleConcat(ctx.augment().getText()));
         augment.setPrefixRemovedName(name);
 
+        checkAugNameCollision(root, augment);
         try {
             root.addChild(augment);
         } catch (DataModelException e) {
@@ -149,11 +154,6 @@ public final class AugmentListener {
                     ctx.augment().getText(), ENTRY, e.getMessage()));
         }
         listener.getParsedDataStack().push(augment);
-
-        // Adds resolution info to the list
-        YangResolutionInfoImpl<YangAugment> info =
-                new YangResolutionInfoImpl<>(augment, root, line, pos);
-        addToResolution(info, ctx);
     }
 
     /**
@@ -175,7 +175,19 @@ public final class AugmentListener {
                     MISSING_CURRENT_HOLDER, AUGMENT_DATA,
                     ctx.augment().getText(), EXIT));
         }
-        listener.getParsedDataStack().pop();
+        YangAugment augment = (YangAugment) listener.getParsedDataStack().pop();
+
+        boolean isDup = isDuplicateNode(augment);
+        if (isDup) {
+            removeAugment(augment);
+        } else {
+            Token txt = ctx.getStart();
+            YangResolutionInfoImpl<YangAugment> info =
+                    new YangResolutionInfoImpl<>(augment, augment.getParent(),
+                                                 txt.getLine(),
+                                                 txt.getCharPositionInLine());
+            addToResolution(info, ctx);
+        }
     }
 
     /**

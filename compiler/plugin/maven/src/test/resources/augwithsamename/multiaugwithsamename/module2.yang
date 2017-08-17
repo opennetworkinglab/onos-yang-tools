@@ -1,0 +1,39 @@
+module module2 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:2";
+
+    prefix mod-b;
+
+    import module1 {
+        prefix mod-a;
+    }
+
+    augment "/mod-a:cont/mod-a:val" {
+        leaf arg {
+            type string;
+        }
+    }
+
+    augment "/mod-a:cont/mod-a:val" {
+        leaf-list arg-lis {
+            type string;
+        }
+    }
+
+    augment "/mod-a:cont/mod-a:val" {
+        container cont {
+            leaf ll {
+                type binary;
+            }
+        }
+    }
+
+    augment "/mod-a:cont/mod-a:val" {
+        list contlist {
+            key true;
+            leaf true {
+                type boolean;
+            }
+        }
+    }
+}

@@ -2,16 +2,53 @@ module Augment-choice {
     yang-version 1;
     namespace yms:test:ytb:choice:with:container:and:leaf:list";
     prefix "sch1";
-        import YtbChoiceWithContainerAndLeafList {
-            prefix sch;
-        }
+
+    import YtbChoiceWithContainerAndLeafList {
+        prefix sch;
+    }
     revision "2016-08-26";
+
+    identity ip {
+    }
+
+    identity private-ip {
+        base ip;
+    }
+
+    identity public-ip {
+        base ip;
+    }
 
     augment /sch:content-test/ {
         list aug-choice-modKey {
-        key "types";
+            key "types";
             leaf types {
                 type int32;
+            }
+        }
+    }
+
+    augment /sch:content-test/sch:valid {
+        leaf ch-test {
+            type identityref {
+                base ip;
+            }
+        }
+
+        leaf-list test {
+            type int8;
+        }
+
+        container tested-cont {
+            leaf presence {
+                type string;
+            }
+        }
+
+        list unlisted-val {
+            key "presence";
+            leaf presence {
+                type string;
             }
         }
     }
@@ -23,5 +60,5 @@ module Augment-choice {
                 type int32;
             }
         }
-     }
+    }
 }

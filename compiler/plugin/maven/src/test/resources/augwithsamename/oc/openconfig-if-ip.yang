@@ -1,0 +1,69 @@
+module openconfig-if-ip {
+
+  yang-version "1";
+
+  namespace "http://openconfig.net/yang/interfaces/ip";
+
+  prefix "oc-ip";
+
+  import openconfig-interfaces {
+   prefix oc-if;
+  }
+
+  grouping ip-vrrp-top {
+    container vrrp {
+      list vrrp-group {
+        key "virtual-router-id";
+        leaf virtual-router-id {
+          type string;
+        }
+      }
+    }
+  }
+
+  grouping ipv4-top {
+    container ipv4 {
+      container addresses {
+        list address {
+          key "ip";
+          leaf ip {
+            type string;
+          }
+        }
+      }
+    }
+  }
+
+  grouping ipv6-top {
+    container ipv6 {
+      container addresses {
+        list address {
+          key "ip";
+          leaf ip {
+            type string;
+          }
+        }
+      }
+    }
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+    "oc-if:subinterface" {
+    uses ipv4-top;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+    "oc-if:subinterface" {
+    uses ipv6-top;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+    "oc-if:subinterface/oc-ip:ipv4/oc-ip:addresses/oc-ip:address" {
+    uses ip-vrrp-top;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+    "oc-if:subinterface/oc-ip:ipv6/oc-ip:addresses/oc-ip:address" {
+    uses ip-vrrp-top;
+  }
+}

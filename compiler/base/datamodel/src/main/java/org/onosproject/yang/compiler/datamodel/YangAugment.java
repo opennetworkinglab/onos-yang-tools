@@ -158,6 +158,11 @@ public abstract class YangAugment
     private String setterMethodName;
 
     /**
+     * Logical node of YANG augment.
+     */
+    private YangAugment logicalNode;
+
+    /**
      * Create a YANG augment node.
      */
     public YangAugment() {
@@ -568,5 +573,23 @@ public abstract class YangAugment
      */
     public void setSetterMethodName(String name) {
         setterMethodName = name;
+    }
+
+    /**
+     * Returns the logical YANG augment node.
+     *
+     * @return logical YANG augment
+     */
+    public YangAugment getLogicalNode() {
+        return logicalNode;
+    }
+
+    /**
+     * Sets the logical YANG augment node.
+     *
+     * @param logicalNode logical YANG augment
+     */
+    public void setLogicalNode(YangAugment logicalNode) {
+        this.logicalNode = logicalNode;
     }
 }

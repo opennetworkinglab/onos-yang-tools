@@ -97,6 +97,35 @@ public class YobAugmentTest {
         value = "str2";
         dBlr = addDataNode(dBlr, "router-ip", IP_TOPO_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
+
+        value = "r1tor2";
+        dBlr = addDataNode(dBlr, "router-path", IP_TOPO_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = null;
+        dBlr = addDataNode(dBlr, "aug-route", IP_TOPO_NAME_SPACE, value, null);
+        value = "r2tor1";
+        dBlr = addDataNode(dBlr, "router-path", IP_TOPO_NAME_SPACE, value, null);
+
+        dBlr = exitDataNode(dBlr);
+        dBlr = exitDataNode(dBlr);
+
+        value = "17";
+        dBlr = addDataNode(dBlr, "value", IP_TOPO_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "18";
+        dBlr = addDataNode(dBlr, "value", IP_TOPO_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = null;
+        dBlr = addDataNode(dBlr, "aug-route-c", IP_TOPO_NAME_SPACE, value, null);
+
+        value = "valid";
+        dBlr = addDataNode(dBlr, "val", IP_TOPO_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
 
@@ -197,6 +226,11 @@ public class YobAugmentTest {
                 .augmentation(DefaultAugmentedTopoNode.class);
         assertThat(obj.routerId(), is("str1"));
         assertThat(obj.routerIp(), is("str2"));
+        assertThat(obj.routerPath(), is("r1tor2"));
+        assertThat(obj.augRoute().routerPath(), is("r2tor1"));
+        assertThat(obj.value().get(0).toString(), is("17"));
+        assertThat(obj.value().get(1).toString(), is("18"));
+        assertThat(obj.augRoutec().get(0).val(), is("valid"));
     }
 
     @Test

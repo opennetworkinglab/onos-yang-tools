@@ -1,0 +1,42 @@
+module openconfig-interfaces {
+
+  yang-version "1";
+
+  namespace "http://openconfig.net/yang/interfaces";
+
+  prefix "oc-if";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  grouping subinterfaces-top {
+    container subinterfaces {
+      list subinterface {
+        key "index";
+        leaf index {
+          type int8;
+        }
+      }
+    }
+  }
+
+  grouping interfaces-top {
+    description
+      "Top-level grouping for interface configuration and
+      operational state data";
+
+    container interfaces {
+      list interface {
+        key "name";
+
+        leaf name {
+          type string;
+        }
+        uses subinterfaces-top;
+      }
+    }
+  }
+
+  uses interfaces-top;
+}

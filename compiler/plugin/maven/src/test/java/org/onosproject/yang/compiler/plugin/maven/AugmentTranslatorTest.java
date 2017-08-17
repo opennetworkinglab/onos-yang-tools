@@ -435,4 +435,67 @@ public class AugmentTranslatorTest {
         YangPluginConfig.compileCode(COMP);
         deleteDirectory(DIR);
     }
+
+    /**
+     * Checks multiple augment handling which has the same name for open
+     * config YANG files.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processOpenConfigAugment() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augwithsamename/oc/";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
+     * Checks multiple augment handling which has the same name.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fail
+     */
+    @Test
+    public void processSameAugName() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/augwithsamename/multiaugwithsamename/";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
 }

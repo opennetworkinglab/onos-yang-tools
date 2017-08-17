@@ -18,7 +18,10 @@ package org.onosproject.yang.compiler.parser.impl.parserutils;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
+import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangImport;
+import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -29,9 +32,11 @@ import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangRelativePath;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
+import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AugmentStatementContext;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
+import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.slf4j.Logger;
 
 import java.text.ParseException;
@@ -51,6 +56,9 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.UN
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.getYangConstructType;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.PathStatementContext;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YangVersionStatementContext;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorLocation.ENTRY;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorMessageConstruction.constructExtendedListenerErrorMessage;
+import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerErrorType.UNHANDLED_PARSED_DATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ANCESTOR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
@@ -1029,5 +1037,146 @@ public final class ListenerUtil {
             builder.append(id);
         }
         return builder.toString();
+    }
+
+    /**
+     * Checks if the augment node is a duplicate node. If the augment is
+     * duplicate, then it adds all its children to the logical node.
+     *
+     * @param augment YANG augment
+     * @return true if it is a duplicate node; false otherwise
+     */
+    public static boolean isDuplicateNode(YangAugment augment) {
+        YangAugment logical = augment.getLogicalNode();
+        if (logical == null) {
+            return false;
+        }
+        YangNode lastChild = logical;
+
+        YangNode child = logical.getChild();
+        while (child != null) {
+            lastChild = child;
+            child = child.getNextSibling();
+        }
+        addChildToLogicalNode(logical, augment, lastChild);
+        addLeafAndLeafList(logical, augment);
+        return true;
+    }
+
+    /**
+     * Adds the child and its sibling in duplicate augment to the logical
+     * augment node.
+     *
+     * @param logical   logical augment node
+     * @param augment   YANG augment
+     * @param lastChild logical node's last node
+     */
+    private static void addChildToLogicalNode(YangAugment logical,
+                                              YangAugment augment,
+                                              YangNode lastChild) {
+        YangNode augChild = augment.getChild();
+        while (augChild != null) {
+            if (lastChild == logical) {
+                augChild.setParent(lastChild);
+                try {
+                    lastChild.addChild(augChild);
+                } catch (DataModelException e) {
+                    throw new ParserException(
+                            constructExtendedListenerErrorMessage(
+                                    UNHANDLED_PARSED_DATA, AUGMENT_DATA,
+                                    augment.getName(), ENTRY, e.getMessage()));
+                }
+            } else {
+                augChild.setParent(lastChild.getParent());
+                augChild.setPreviousSibling(lastChild);
+                lastChild.setNextSibling(augChild);
+            }
+            lastChild = augChild;
+            augChild = augChild.getNextSibling();
+        }
+    }
+
+    /**
+     * Adds leaf and leaf-list from the YANG augment to the logical augment
+     * node.
+     *
+     * @param logical logical YANG augment
+     * @param augment duplicate YANG augment
+     */
+    private static void addLeafAndLeafList(YangAugment logical,
+                                           YangAugment augment) {
+
+        List<YangLeaf> logLeaves = logical.getListOfLeaf();
+        List<YangLeafList> logLl = logical.getListOfLeafList();
+        List<YangLeaf> augLeaves = augment.getListOfLeaf();
+        List<YangLeafList> augLl = augment.getListOfLeafList();
+
+        if (augLeaves != null && !augLeaves.isEmpty()) {
+            for (YangLeaf leaf : augLeaves) {
+                leaf.setContainedIn(logical);
+                if (logLeaves == null) {
+                    logLeaves = new LinkedList<>();
+                }
+                logLeaves.add(leaf);
+            }
+        }
+        if (augLl != null && !augLl.isEmpty()) {
+            for (YangLeafList ll : augLl) {
+                ll.setContainedIn(logical);
+                if (logLl == null) {
+                    logLl = new LinkedList<>();
+                }
+                logLl.add(ll);
+            }
+        }
+    }
+
+    /**
+     * Checks for the augment name name collision. If there are augments with
+     * the same name present, then the new augment will be set with a logical
+     * node.
+     *
+     * @param root augment parent node
+     * @param aug  YANG augment node
+     */
+    public static void checkAugNameCollision(YangNode root, YangAugment aug) {
+        YangNode child = root.getChild();
+        while (child != null) {
+            if (child instanceof YangAugment) {
+                if (child.getName().equals(aug.getName())) {
+                    aug.setLogicalNode((YangAugment) child);
+                }
+            }
+            child = child.getNextSibling();
+        }
+    }
+
+    /**
+     * Removes the duplicate YANG augment from the data tree by detaching it
+     * from its parent and from its sibling.
+     *
+     * @param augment duplicate YANG augment
+     */
+    public static void removeAugment(YangAugment augment) {
+        YangNode root = augment.getParent();
+        YangNode child = root.getChild();
+        YangNode pSib = null;
+        if (child == null) {
+            throw new ParserException("The root node of augment " + augment
+                    .getName() + " must have atleast one child");
+        }
+        while (child != null) {
+            if (child == augment) {
+                if (pSib == null) {
+                    root.setChild(null);
+                } else {
+                    pSib.setNextSibling(null);
+                }
+            }
+            pSib = child;
+            child = child.getNextSibling();
+        }
+        augment = new YangJavaAugmentTranslator();
+        augment = null;
     }
 }
