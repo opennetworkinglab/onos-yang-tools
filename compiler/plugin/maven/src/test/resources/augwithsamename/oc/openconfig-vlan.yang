@@ -1,0 +1,46 @@
+module openconfig-vlan {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://openconfig.net/yang/vlan";
+
+  prefix "oc-vlan";
+
+  // import some basic types
+  import openconfig-interfaces { prefix oc-if; }
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  description
+    "This module defines configuration and state variables for VLANs,
+    in addition to VLAN parameters associated with interfaces";
+
+  //oc-ext:openconfig-version "1.0.2";
+
+  revision "2016-05-26" {
+    description
+      "OpenConfig public release";
+    reference "1.0.2";
+  }
+
+
+  grouping vlan-routed-top {
+    container routed-vlan {
+    }
+  }
+  augment "/oc-if:interfaces/oc-if:interface" {
+    uses vlan-routed-top;
+  }
+
+
+  // rpc statements
+
+  // notification statements
+
+}

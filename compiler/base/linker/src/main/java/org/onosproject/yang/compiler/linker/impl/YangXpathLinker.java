@@ -920,11 +920,12 @@ public class YangXpathLinker<T> {
         YangAtomicPath absPath;
         String prePrefix;
         String curPrefix = null;
+        String rootPrefix = getRootsPrefix(rootNode);
         while (pathIterator.hasNext()) {
             prePrefix = curPrefix;
             absPath = pathIterator.next();
             curPrefix = absPath.getNodeIdentifier().getPrefix();
-            if (curPrefix != null) {
+            if (curPrefix != null && !(curPrefix.equals(rootPrefix))) {
                 if (!curPrefix.equals(prePrefix)) {
                     if (prePrefix != null) {
                         prefixResolverTypes.put(absPath, INTER_TO_INTER);

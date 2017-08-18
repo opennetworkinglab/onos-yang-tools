@@ -10,12 +10,21 @@ module openconfig-if-ip {
    prefix oc-if;
   }
 
+  import openconfig-vlan {
+   prefix oc-vlan;
+  }
+
   grouping ip-vrrp-top {
     container vrrp {
       list vrrp-group {
         key "virtual-router-id";
         leaf virtual-router-id {
           type string;
+        }
+        container config {
+        }
+
+        container state {
         }
       }
     }
@@ -47,6 +56,26 @@ module openconfig-if-ip {
     }
   }
 
+  grouping ip-vrrp-ipv6-config {
+    description
+      "IPv6-specific configuration data for VRRP on IPv6
+      interfaces";
+
+      leaf virtual-link-local {
+        type string;
+        description
+          "For VRRP on IPv6 interfaces, sets the virtual link local
+          address";
+      }
+  }
+
+  grouping ip-vrrp-ipv6-state {
+    description
+      "IPv6-specific operational state for VRRP on IPv6 interfaces";
+
+    uses ip-vrrp-ipv6-config;
+  }
+
   augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
     "oc-if:subinterface" {
     uses ipv4-top;
@@ -65,5 +94,77 @@ module openconfig-if-ip {
   augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
     "oc-if:subinterface/oc-ip:ipv6/oc-ip:addresses/oc-ip:address" {
     uses ip-vrrp-top;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+    "oc-if:subinterface/oc-ip:ipv6/oc-ip:addresses/oc-ip:address/" +
+    "vrrp/vrrp-group/config" {
+    description
+      "Additional VRRP data for IPv6 interfaces";
+
+    uses ip-vrrp-ipv6-config;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:subinterfaces/" +
+  "oc-if:subinterface/oc-ip:ipv6/oc-ip:addresses/oc-ip:address/vrrp/" +
+    "vrrp-group/state" {
+    description
+      "Additional VRRP data for IPv6 interfaces";
+
+    uses ip-vrrp-ipv6-state;
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan" {
+    description
+      "IPv4 addr family configuration for
+      interfaces";
+
+    uses ipv4-top;
+
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan" {
+    description
+      "IPv6 addr family configuration for
+      interfaces";
+
+    uses ipv6-top;
+
+  }
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan/" +
+    "oc-ip:ipv4/oc-ip:addresses/oc-ip:address" {
+    description
+      "Additional IP addr family configuration for
+      interfaces";
+
+    uses ip-vrrp-top;
+
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan/" +
+    "oc-ip:ipv6/oc-ip:addresses/oc-ip:address" {
+    description
+      "Additional IP addr family configuration for
+      interfaces";
+
+    uses ip-vrrp-top;
+
+  }
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan/" +
+    "oc-ip:ipv6/oc-ip:addresses/oc-ip:address/vrrp/vrrp-group/config" {
+    description
+      "Additional VRRP data for IPv6 interfaces";
+
+    uses ip-vrrp-ipv6-config;
+  }
+
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-vlan:routed-vlan/" +
+    "oc-ip:ipv6/oc-ip:addresses/oc-ip:address/vrrp/vrrp-group/state" {
+    description
+      "Additional VRRP data for IPv6 interfaces";
+
+    uses ip-vrrp-ipv6-state;
   }
 }
