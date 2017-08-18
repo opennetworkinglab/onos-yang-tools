@@ -62,6 +62,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getBitSetAttr;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getCatchSubString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getCompareToString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getElseIfConditionBegin;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getExceptionThrowString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getForLoopString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getGreaterThanCondition;
@@ -1535,7 +1536,6 @@ public final class MethodsGenerator {
                 .append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();
-
     }
 
     // Returns if condition for add to list method.
@@ -1860,10 +1860,12 @@ public final class MethodsGenerator {
      *
      * @param name       name of identity
      * @param schemaName schema name
+     * @param idList     list of derived identities
      * @return from string method
      */
     public static String getFromStringMethodForIdentity(String name,
-                                                        String schemaName) {
+                                                        String schemaName,
+                                                        List<YangIdentity> idList) {
         StringBuilder builder = new StringBuilder(NEW_LINE);
         builder.append(getJavaDoc(FROM_METHOD, name, false, null));
         String caps = getCapitalCase(name);
@@ -1876,7 +1878,21 @@ public final class MethodsGenerator {
                                        STRING_DATA_TYPE, CLASS_TYPE))
                 .append(getIfConditionBegin(EIGHT_SPACE_INDENTATION, cond))
                 .append(getReturnString(returnVal, TWELVE_SPACE_INDENTATION))
-                .append(signatureClose()).append(methodClose(EIGHT_SPACE))
+                .append(signatureClose());
+        if (idList != null) {
+            for (YangIdentity id : idList) {
+                cond = getTwoParaEqualsString(FROM_STRING_PARAM_NAME,
+                                              getQuotedString(id.getName()));
+                name = getCamelCase(id.getName(), null);
+                caps = getCapitalCase(name);
+                returnVal = caps + PERIOD + CLASS;
+                builder.append(getElseIfConditionBegin(
+                        EIGHT_SPACE_INDENTATION, cond))
+                        .append(getReturnString(returnVal, TWELVE_SPACE_INDENTATION))
+                        .append(signatureClose());
+            }
+        }
+        builder.append(methodClose(EIGHT_SPACE))
                 .append(getExceptionThrowString(EIGHT_SPACE_INDENTATION))
                 .append(methodClose(FOUR_SPACE));
         return builder.toString();

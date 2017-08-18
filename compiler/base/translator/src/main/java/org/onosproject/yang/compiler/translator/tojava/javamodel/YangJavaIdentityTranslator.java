@@ -15,6 +15,11 @@
  */
 package org.onosproject.yang.compiler.translator.tojava.javamodel;
 
+import org.onosproject.yang.compiler.datamodel.YangIdentity;
+import org.onosproject.yang.compiler.datamodel.YangModule;
+import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangRevision;
+import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.javadatamodel.YangJavaIdentity;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGenerator;
@@ -35,6 +40,7 @@ import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethodForIdentity;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodForIdentity;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
@@ -43,8 +49,10 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUt
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_FILE_EXTENSION;
+import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
+import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 
@@ -137,7 +145,7 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             createPackage(this);
             List<String> imports = null;
             boolean isQualified;
-
+            List<YangIdentity> idList = getExtendList();
             if (getBaseNode() != null && getBaseNode().getReferredIdentity() != null) {
                 if (!(getBaseNode().getReferredIdentity() instanceof YangJavaIdentityTranslator)) {
                     throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
@@ -156,12 +164,13 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
                     imports = importData.getImports(true);
                 }
             }
+            imports = getImportOfDerId(idList, imports, className);
 
             File file = getFileObject(path, className, JAVA_FILE_EXTENSION, itsInfo);
 
             initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
             //Add to string and from string method to class
-            addStringMethodsToClass(file, name);
+            addStringMethodsToClass(file, name, idList);
             insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
             formatFile(file);
             closeFile(file, false);
@@ -171,10 +180,77 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
         }
     }
 
-    private void addStringMethodsToClass(File file, String className) throws IOException {
+    /**
+     * Gets the import statements of derived identities.
+     *
+     * @param idList    derived identities list.
+     * @param imports   import statements.
+     * @param className base type class name.
+     * @return list of import statements.
+     */
+    private List<String> getImportOfDerId(List<YangIdentity> idList,
+                                          List<String> imports, String className) {
+        if (idList != null) {
+            for (YangIdentity id : idList) {
+                String derClassName = getCapitalCase(
+                        getCamelCase(id.getName(), null));
+                JavaFileInfoTranslator info = ((
+                        YangJavaIdentityTranslator) id).getJavaFileInfo();
+                String derPkg = info.getPackage();
+                if (derPkg == null) {
+                    derPkg = getDerivedPackage(id);
+                }
+                JavaQualifiedTypeInfoTranslator derPkgInfo =
+                        new JavaQualifiedTypeInfoTranslator();
+                derPkgInfo.setClassInfo(derClassName);
+                derPkgInfo.setPkgInfo(derPkg);
+                importData.addImportInfo(derPkgInfo, className,
+                                         javaFileInfo.getPackage());
+            }
+            imports = importData.getImports(true);
+        }
+        return imports;
+    }
+
+    /**
+     * Gets the derived package of YangIdentity.
+     *
+     * @param id YANG Identity.
+     * @return package of identity.
+     */
+    private String getDerivedPackage(YangIdentity id) {
+        String derPkg = null;
+        byte version;
+        String moduleName;
+        YangRevision revision;
+        String nodeName;
+
+        YangNode node = id.getParent();
+        if (node instanceof YangModule) {
+            YangModule module = (YangModule) node;
+            version = module.getVersion();
+            moduleName = module.getModuleName();
+            revision = module.getRevision();
+            nodeName = module.getName();
+        } else {
+            YangSubModule subModule = (YangSubModule) node;
+            version = subModule.getVersion();
+            moduleName = subModule.getModuleName();
+            revision = subModule.getRevision();
+            nodeName = subModule.getName();
+        }
+        String modulePkg = getRootPackage(version, moduleName, revision, null);
+        String modJava = getCamelCase(nodeName, null);
+        derPkg = modulePkg + PERIOD + modJava.toLowerCase();
+        return derPkg;
+    }
+
+    private void addStringMethodsToClass(File file, String className,
+                                         List<YangIdentity> idList)
+            throws IOException {
         insertDataIntoJavaFile(file, getToStringMethodForIdentity(getName()));
         insertDataIntoJavaFile(file, getFromStringMethodForIdentity(
-                className, getName()));
+                className, getName(), idList));
     }
 
     /**

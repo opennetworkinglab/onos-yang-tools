@@ -295,6 +295,12 @@ module simple-data-types {
             }
         }
 
+        leaf identityref2 {
+            type identityref {
+                base iden;
+            }
+        }
+
         leaf lfenum1 {
             type tpdfun0;
         }

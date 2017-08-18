@@ -193,6 +193,38 @@ public class AugmentTranslatorTest {
     }
 
     /**
+     * Checks the derived identities with referred base types in inter modules.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fails
+     */
+    @Test
+    public void processIdentityRefTranslator() throws IOException,
+            ParserException,
+            MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String searchDir = "src/test/resources/DerivedIdentity";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
+
+    /**
      * Checks collision detection of an augment linked to a target having
      * same node in the same level.
      *

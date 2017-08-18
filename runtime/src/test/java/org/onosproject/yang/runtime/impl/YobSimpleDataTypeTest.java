@@ -221,6 +221,10 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "identityref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
+        value = "pro";
+        dBlr = addDataNode(dBlr, "identityref2", null, value, null);
+        dBlr = exitDataNode(dBlr);
+
         value = "successful exit";
         dBlr = addDataNode(dBlr, "lfenum1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
@@ -679,6 +683,7 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfunion13().toString(), is("b2 "));
         assertThat(cont.lfunion14().toString(), is("one"));
         assertThat(cont.identityref1().getSimpleName(), is("Iden"));
+        assertThat(cont.identityref2().getSimpleName(), is("Pro"));
         assertThat(cont.lfenum1().enumeration(), is(SUCCESSFUL_EXIT));
         assertThat(cont.instIden(), is("/cont"));
         value = 8;
