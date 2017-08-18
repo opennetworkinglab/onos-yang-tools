@@ -1,0 +1,14 @@
+module module1 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:1";
+
+    prefix mod-a;
+
+    container cont{
+        container val {
+            leaf-list create {
+                type string;
+            }
+        }
+    }
+}

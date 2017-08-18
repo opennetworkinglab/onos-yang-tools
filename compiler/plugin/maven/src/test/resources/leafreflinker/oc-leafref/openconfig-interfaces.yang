@@ -1,0 +1,23 @@
+module openconfig-interfaces {
+
+  yang-version "1";
+
+  namespace "http://openconfig.net/yang/interfaces";
+
+  prefix "oc-if";
+
+  grouping interfaces-top {
+    container interfaces {
+      list interface {
+        key "name";
+        leaf name {
+          type string;
+        }
+        container state {
+        }
+      }
+    }
+  }
+
+  uses interfaces-top;
+}

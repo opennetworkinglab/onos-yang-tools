@@ -1,0 +1,18 @@
+module module4 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:4";
+
+    prefix mod-d;
+
+    import module2 {
+        prefix mod-b;
+    }
+
+    augment "/mod-b:cont1" {
+        container validate {
+            leaf referred {
+                type uint8;
+            }
+        }
+    }
+}

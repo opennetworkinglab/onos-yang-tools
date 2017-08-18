@@ -1,0 +1,39 @@
+module module3 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:3";
+
+    prefix mod-c;
+
+    import module1 {
+        prefix mod-a;
+    }
+
+    import module2 {
+        prefix mod-b;
+    }
+
+    import module4 {
+        prefix mod-d;
+    }
+
+    augment "/mod-a:cont/mod-a:val" {
+        leaf per {
+            type leafref {
+                 path "/mod-b:cont1/mod-b:cont2[mod-b:name=current()/"+
+                 "../mod-b:arg]/mod-b:ll";
+            }
+        }
+
+        leaf val {
+            type leafref {
+                 path "/mod-b:cont1/mod-d:validate/mod-d:referred";
+            }
+        }
+    }
+
+    augment "/mod-b:cont1/mod-b:cont2" {
+        leaf name {
+            type string;
+        }
+    }
+}

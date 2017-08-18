@@ -873,15 +873,25 @@ public final class YangLinkerUtils {
             throws DataModelException {
 
         YangLeaf leaf = getLeaf(leftAxisName, (YangLeavesHolder) node);
-        if (leaf != null) {
-            return leaf;
-        }
         YangLeafList leafList = getLeafList(leftAxisName,
                                             (YangLeavesHolder) node);
-        if (leafList == null) {
+        if (leaf == null && leafList == null) {
+            if (node instanceof YangAugmentableNode) {
+                List<YangAugment> augList = ((YangAugmentableNode) node)
+                        .getAugmentedInfoList();
+                for (YangAugment aug : augList) {
+                    leaf = getLeaf(leftAxisName, aug);
+                    leafList = getLeafList(leftAxisName, aug);
+                    if (leaf != null || leafList != null) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (leaf == null && leafList == null) {
             throw getDataModelExc(TGT_LEAF_ERR, leafRef);
         }
-        return leafList;
+        return (leaf != null) ? leaf : leafList;
     }
 
     /**

@@ -1,0 +1,35 @@
+module openconfig-platform {
+
+  yang-version "1";
+
+  namespace "http://openconfig.net/yang/platform";
+
+  prefix "oc-platform";
+import openconfig-interfaces { prefix oc-if; }
+
+  revision 2016-12-22;
+
+
+
+  grouping platform-component-top {
+    container components {
+      list component {
+        key "name";
+        leaf name {
+          type string;
+        }
+      }
+    }
+  }
+
+  uses platform-component-top;
+
+  augment "/oc-if:interfaces/oc-if:interface/oc-if:state" {
+    leaf hardware-port {
+      type leafref {
+        path "/oc-platform:components/oc-platform:component/" +
+          "oc-platform:name";
+      }
+    }
+  }
+}
