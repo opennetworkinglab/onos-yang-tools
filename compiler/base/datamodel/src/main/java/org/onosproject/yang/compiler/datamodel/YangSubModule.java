@@ -20,6 +20,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SI
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.updateMap;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateUniqueInList;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.SUB_MODULE_DATA;
 
@@ -304,6 +306,12 @@ public abstract class YangSubModule
     private boolean isRpcPresent;
 
     /**
+     * Map of typedef or identity with the list of corresponding schema
+     * node to find the name conflict.
+     */
+    private final Map<String, LinkedList<YangNode>> identityTypedefMap;
+
+    /**
      * Creates a sub module node.
      */
     public YangSubModule() {
@@ -327,6 +335,7 @@ public abstract class YangSubModule
         augments = new LinkedList<>();
         uniqueHolderList = new LinkedList<>();
         usesAugmentList = new LinkedList<>();
+        identityTypedefMap = new LinkedHashMap<>();
     }
 
     @Override
@@ -952,6 +961,14 @@ public abstract class YangSubModule
     public void resolveUniqueLinking() throws DataModelException {
         for (YangUniqueHolder holder : uniqueHolderList) {
             validateUniqueInList(holder);
+        }
+    }
+
+    @Override
+    public void addToIdentityTypedefMap(String name, YangNode node)
+            throws DataModelException {
+        if (node instanceof ConflictResolveNode) {
+            updateMap(name, node, identityTypedefMap);
         }
     }
 

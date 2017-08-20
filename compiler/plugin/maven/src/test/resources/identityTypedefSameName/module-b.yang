@@ -1,0 +1,32 @@
+module module-b {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:b";
+
+    prefix mod-a;
+
+    import module-c {
+        prefix c;
+    }
+
+    identity BASE;
+
+    identity DER1 {
+        base c:BASE;
+    }
+
+    identity DER2 {
+        base c:BASE;
+    }
+
+    typedef base {
+        type identityref {
+            base BASE;
+        }
+    }
+
+    typedef der1 {
+        type identityref {
+            base c:BASE;
+        }
+    }
+}

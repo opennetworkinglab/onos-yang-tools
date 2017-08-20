@@ -94,6 +94,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.valueAssign;
+import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getIdentityRefName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_AUGMENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
@@ -140,6 +141,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.GET_ENCODER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET_METHOD_PREFIX;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HASH_CODE_STRING;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IMPLEMENTS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INSTANCE_OF;
@@ -1728,8 +1730,9 @@ public final class MethodsGenerator {
                 YangIdentityRef ir = (YangIdentityRef) type
                         .getDataTypeExtendedInfo();
                 YangIdentity identity = ir.getReferredIdentity();
-                String idName = getCamelCase(identity.getName(), null);
-                return getCapitalCase(idName) + PERIOD + idName + TO_CAPS +
+                String idName = getCamelCase(getIdentityRefName(type), null);
+                return getCapitalCase(idName) + PERIOD +
+                        getCamelCase(identity.getName(), null) + TO_CAPS +
                         STRING_DATA_TYPE + OPEN_CLOSE_BRACKET_STRING;
             case ENUMERATION:
             case INSTANCE_IDENTIFIER:
@@ -1883,7 +1886,11 @@ public final class MethodsGenerator {
             for (YangIdentity id : idList) {
                 cond = getTwoParaEqualsString(FROM_STRING_PARAM_NAME,
                                               getQuotedString(id.getName()));
-                name = getCamelCase(id.getName(), null);
+                if (id.isNameConflict()) {
+                    name = getCamelCase(id.getName() + IDENTITY, null);
+                } else {
+                    name = getCamelCase(id.getName(), null);
+                }
                 caps = getCapitalCase(name);
                 returnVal = caps + PERIOD + CLASS;
                 builder.append(getElseIfConditionBegin(
@@ -1947,7 +1954,7 @@ public final class MethodsGenerator {
      *
      * @param name         class name
      * @param modifierType modifier type
-     * @param params       parameters for constrcutor
+     * @param params       parameters for constructor
      * @param space        indentation for constructor
      * @return parameterisied constructor method string
      */

@@ -48,6 +48,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorEr
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_FILE_EXTENSION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
@@ -190,10 +191,16 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
      */
     private List<String> getImportOfDerId(List<YangIdentity> idList,
                                           List<String> imports, String className) {
+        String derClassName;
         if (idList != null) {
             for (YangIdentity id : idList) {
-                String derClassName = getCapitalCase(
-                        getCamelCase(id.getName(), null));
+                if (id.isNameConflict()) {
+                    derClassName = getCapitalCase(
+                            getCamelCase(id.getName() + IDENTITY, null));
+                } else {
+                    derClassName = getCapitalCase(
+                            getCamelCase(id.getName(), null));
+                }
                 JavaFileInfoTranslator info = ((
                         YangJavaIdentityTranslator) id).getJavaFileInfo();
                 String derPkg = info.getPackage();

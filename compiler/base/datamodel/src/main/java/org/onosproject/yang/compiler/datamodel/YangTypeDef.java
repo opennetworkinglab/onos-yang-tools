@@ -18,6 +18,7 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.compiler.utils.UtilConstants;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -67,7 +68,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.TY
 public abstract class YangTypeDef
         extends YangNode
         implements YangCommonInfo, Parsable, YangTypeHolder, CollisionDetector,
-        YangTranslatorOperatorNode, YangUnits, YangDefault {
+        YangTranslatorOperatorNode, YangUnits, YangDefault, ConflictResolveNode {
 
     private static final long serialVersionUID = 806201615L;
 
@@ -102,6 +103,11 @@ public abstract class YangTypeDef
      * This is done to unify the code with union.
      */
     private final List<YangType<?>> typeList;
+
+    /**
+     * Flag to distinguish name conflict between typedef and identity.
+     */
+    private boolean nameConflict = false;
 
     /**
      * Creates a typedef node.
@@ -313,5 +319,20 @@ public abstract class YangTypeDef
                                          getLineNumber(), getCharPosition(),
                                          TYPEDEF, getFileName()));
         }
+    }
+
+    @Override
+    public String getSuffix() {
+        return UtilConstants.TYPEDEF;
+    }
+
+    @Override
+    public boolean isNameConflict() {
+        return nameConflict;
+    }
+
+    @Override
+    public void setConflictFlag() {
+        nameConflict = true;
     }
 }

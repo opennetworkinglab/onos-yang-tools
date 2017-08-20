@@ -1,0 +1,36 @@
+module module-a {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:a";
+
+    prefix mod-a;
+
+    import module-b {
+      prefix b;
+    }
+
+    import module-c {
+      prefix c;
+    }
+
+    container abc {
+        leaf arg {
+            type "b:base";
+        }
+        leaf arg2 {
+            type identityref {
+                base b:BASE;
+            }
+        }
+        leaf arg3 {
+            type "c:base";
+        }
+        leaf arg4 {
+            type identityref {
+                base c:BASE;
+            }
+        }
+        leaf arg5 {
+            type c:base1;
+        }
+    }
+}

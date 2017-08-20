@@ -23,12 +23,15 @@ import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
+import org.onosproject.yang.compiler.datamodel.YangTypeDef;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
+import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
+import org.onosproject.yang.compiler.utils.UtilConstants;
 import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
 
 import java.util.Stack;
@@ -181,8 +184,7 @@ public final class AttributesJavaDataType {
                 case INSTANCE_IDENTIFIER:
                     return STRING_DATA_TYPE;
                 case DERIVED:
-                    return getCapitalCase(
-                            getCamelCase(yangType.getDataTypeName(), pluginConfig));
+                    return getDerivedImplClass(yangType, pluginConfig);
                 default:
                     throw new TranslatorException("given data type is not supported ." +
                                                           yangType.getDataTypeName() + " in " +
@@ -216,12 +218,30 @@ public final class AttributesJavaDataType {
                 case INSTANCE_IDENTIFIER:
                     return STRING_DATA_TYPE;
                 case DERIVED:
-                    return getCapitalCase(
-                            getCamelCase(yangType.getDataTypeName(), pluginConfig));
+                    return getDerivedImplClass(yangType, pluginConfig);
                 default:
                     return null;
             }
         }
+    }
+
+    /**
+     * Returns the derived type import class.
+     *
+     * @param yangType     yang type
+     * @param pluginConfig YANG to java naming conflict util
+     * @return import class
+     */
+    private static String getDerivedImplClass(
+            YangType<?> yangType, YangToJavaNamingConflictUtil pluginConfig) {
+        String name = yangType.getDataTypeName();
+        YangDerivedInfo derivedInfo = (YangDerivedInfo) yangType
+                .getDataTypeExtendedInfo();
+        YangTypeDef typeDef = derivedInfo.getReferredTypeDef();
+        if (typeDef.isNameConflict()) {
+            name = name + UtilConstants.TYPEDEF;
+        }
+        return getCapitalCase(getCamelCase(name, pluginConfig));
     }
 
     /**
@@ -451,11 +471,11 @@ public final class AttributesJavaDataType {
      * Update the referred data model nodes java file info, this will be called,
      * when the linked node is yet to translate. Then resolve until the parent hierarchy.
      *
-     * @param yangNode         node whose java info needs to be updated
-     * @param conflictResolver yang plugin config
+     * @param yangNode node whose java info needs to be updated
+     * @param conf     yang plugin config
      */
     public static void updateJavaFileInfo(YangNode yangNode,
-                                          YangToJavaNamingConflictUtil conflictResolver) {
+                                          YangToJavaNamingConflictUtil conf) {
         Stack<YangNode> nodesToUpdatePackage = new Stack<>();
 
         /*
@@ -478,12 +498,12 @@ public final class AttributesJavaDataType {
             if (yangNode instanceof YangJavaModuleTranslator) {
                 YangJavaModuleTranslator module = (YangJavaModuleTranslator) yangNode;
                 pkg = getRootPackage(module.getVersion(), module.getModuleName(),
-                                     module.getRevision(), conflictResolver);
+                                     module.getRevision(), conf);
             } else if (yangNode instanceof YangJavaSubModuleTranslator) {
                 YangJavaSubModuleTranslator submodule = (YangJavaSubModuleTranslator) yangNode;
                 pkg = getRootPackage(submodule.getVersion(),
                                      submodule.getModuleName(),
-                                     submodule.getRevision(), conflictResolver);
+                                     submodule.getRevision(), conf);
             } else {
                 throw new TranslatorException("Invalid root node of data model tree " +
                                                       yangNode.getName() + " in " +
@@ -491,15 +511,7 @@ public final class AttributesJavaDataType {
                                                       yangNode.getCharPosition()
                                                       + " in " + yangNode.getFileName());
             }
-
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setJavaName(getCamelCase(yangNode.getName(), conflictResolver));
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setPackage(pkg);
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setPackageFilePath(getPackageDirPathFromJavaJPackage(
-                            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                                    .getPackage()));
+            setJavaCodeGenInfo(yangNode, conf, pkg);
         }
 
         /*
@@ -508,15 +520,29 @@ public final class AttributesJavaDataType {
          */
         while (nodesToUpdatePackage.size() != 0) {
             yangNode = nodesToUpdatePackage.pop();
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setJavaName(getCamelCase(yangNode.getName(), conflictResolver));
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setPackage(getCurNodePackage(yangNode));
-            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                    .setPackageFilePath(getPackageDirPathFromJavaJPackage(
-                            ((JavaCodeGeneratorInfo) yangNode).getJavaFileInfo()
-                                    .getPackage()));
+            setJavaCodeGenInfo(yangNode, conf, getCurNodePackage(yangNode));
         }
+    }
+
+    /**
+     * Sets the java code generator info for given YANG node.
+     *
+     * @param node YANG node
+     * @param conf conflict util
+     * @param pkg  current node package
+     */
+    private static void setJavaCodeGenInfo(
+            YangNode node, YangToJavaNamingConflictUtil conf, String pkg) {
+        String name = node.getName();
+        JavaFileInfoTranslator info = ((JavaCodeGeneratorInfo) node)
+                .getJavaFileInfo();
+        if (node instanceof ConflictResolveNode && (
+                (ConflictResolveNode) node).isNameConflict()) {
+            name = name + ((ConflictResolveNode) node).getSuffix();
+        }
+        info.setJavaName(getCamelCase(name, conf));
+        info.setPackage(pkg);
+        info.setPackageFilePath(getPackageDirPathFromJavaJPackage(pkg));
     }
 
     /**
@@ -559,7 +585,11 @@ public final class AttributesJavaDataType {
             return OBJECT_STRING;
         }
         YangIdentity identity = ir.getReferredIdentity();
-        return getCapitalCase(getCamelCase(identity.getName(), cnfg));
+        String name = identity.getName();
+        if (identity.isNameConflict()) {
+            name = name + UtilConstants.IDENTITY;
+        }
+        return getCapitalCase(getCamelCase(name, cnfg));
     }
 
     /**

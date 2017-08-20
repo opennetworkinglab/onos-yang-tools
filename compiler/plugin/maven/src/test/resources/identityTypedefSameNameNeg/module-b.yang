@@ -1,0 +1,16 @@
+module module-b {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:b";
+
+    prefix mod-a;
+
+    identity BASE;
+
+    typedef base {
+        type identityref {
+            base BASE;
+        }
+    }
+    identity BAsE;
+
+}

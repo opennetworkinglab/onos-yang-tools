@@ -17,12 +17,16 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.LocationInfo;
+import org.onosproject.yang.compiler.datamodel.YangIdentity;
+import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaBeanFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaCodeFragmentFilesContainer;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaTypeFragmentFiles;
+import org.onosproject.yang.compiler.utils.UtilConstants;
 
 import java.io.IOException;
 
@@ -142,5 +146,22 @@ public final class TranslatorUtils {
          * TODO update addDefaultConstructor, it doesn't need YANG node as an
          * input.
          */
+    }
+
+    /**
+     * Returns the identity ref name with name conflict checking.
+     *
+     * @param yangType YANG type
+     * @return identity ref name
+     */
+    static String getIdentityRefName(YangType<?> yangType) {
+        YangIdentityRef ir = (YangIdentityRef) yangType
+                .getDataTypeExtendedInfo();
+        YangIdentity identity = ir.getReferredIdentity();
+        String name = identity.getName();
+        if (identity.isNameConflict()) {
+            name = name + UtilConstants.IDENTITY;
+        }
+        return name;
     }
 }

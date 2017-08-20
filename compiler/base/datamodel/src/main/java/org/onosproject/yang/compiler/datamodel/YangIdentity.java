@@ -23,6 +23,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
+
 /*-
  * Reference RFC 6020.
  *
@@ -51,7 +53,8 @@ import java.util.List;
  */
 public abstract class YangIdentity
         extends YangNode
-        implements YangCommonInfo, Parsable, Serializable, YangTranslatorOperatorNode {
+        implements YangCommonInfo, Parsable, Serializable,
+        YangTranslatorOperatorNode, ConflictResolveNode {
 
     private static final long serialVersionUID = 806201691L;
 
@@ -72,6 +75,11 @@ public abstract class YangIdentity
      * identities.
      */
     private List<YangIdentity> extendList;
+
+    /**
+     * Flag to distinguish name conflict between typedef and identity.
+     */
+    private boolean nameConflict;
 
     //Creates a identity type of node.
     public YangIdentity() {
@@ -189,5 +197,20 @@ public abstract class YangIdentity
      */
     public void addToExtendList(YangIdentity identity) {
         extendList.add(identity);
+    }
+
+    @Override
+    public String getSuffix() {
+        return IDENTITY;
+    }
+
+    @Override
+    public boolean isNameConflict() {
+        return nameConflict;
+    }
+
+    @Override
+    public void setConflictFlag() {
+        nameConflict = true;
     }
 }

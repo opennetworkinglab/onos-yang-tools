@@ -1,0 +1,30 @@
+module module-c {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:c";
+
+    prefix mod-a;
+
+    identity BASE;
+
+    typedef ip-address {
+       type string;
+    }
+
+    typedef base {
+        type union {
+            type ip-address;
+            type identityref {
+                base BASE;
+            }
+        }
+    }
+
+    typedef base1 {
+        type union {
+            type base;
+            type identityref {
+                base BASE;
+            }
+        }
+    }
+}

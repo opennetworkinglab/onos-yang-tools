@@ -18,8 +18,6 @@ package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.YangCompilerAnnotation;
 import org.onosproject.yang.compiler.datamodel.YangDataStructure;
-import org.onosproject.yang.compiler.datamodel.YangIdentity;
-import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
@@ -47,6 +45,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getIdentityRefName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
@@ -752,10 +751,8 @@ public final class StringGenerator {
                 return targetDataType + PERIOD + OF;
 
             case IDENTITYREF:
-                YangIdentityRef ir = (YangIdentityRef) yangType
-                        .getDataTypeExtendedInfo();
-                YangIdentity identity = ir.getReferredIdentity();
-                return getCapitalCase(getCamelCase(identity.getName(), null))
+                return getCapitalCase(getCamelCase(
+                        getIdentityRefName(yangType), null))
                         + PERIOD + FROM_STRING_METHOD_NAME;
             case DERIVED:
             case UNION:
@@ -1051,7 +1048,6 @@ public final class StringGenerator {
                     classDef = classDef + COMMA + SPACE;
                 }
             }
-
         }
         return classDef + defCloseString();
     }

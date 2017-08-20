@@ -17,6 +17,7 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
+import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
@@ -317,6 +318,10 @@ public abstract class YangNode
 
         if (newChild.getParent() == null) {
             newChild.setParent(this);
+            if (this instanceof RpcNotificationContainer) {
+                ((RpcNotificationContainer) this).addToIdentityTypedefMap(
+                        YangIoUtils.getCamelCase(newChild.getName(), null), newChild);
+            }
         } else if (newChild.getParent() != this) {
             throw new DataModelException("Node is already part of a tree " +
                                                  getName() + " in " +

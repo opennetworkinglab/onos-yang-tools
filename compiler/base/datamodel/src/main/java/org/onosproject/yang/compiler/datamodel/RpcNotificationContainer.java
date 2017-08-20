@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
+import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+
 import java.util.List;
 
 /**
@@ -72,4 +74,15 @@ public interface RpcNotificationContainer {
      * @return list of notification nodes
      */
     List<YangNode> getNotificationNodes();
+
+    /**
+     * Adds typedef or identity nodes in module/sub-module.
+     *
+     * @param name node name
+     * @param node YANG node
+     * @throws DataModelException if name conflict occurs for typedef or
+     *                            identity node.
+     */
+    void addToIdentityTypedefMap(String name, YangNode node)
+            throws DataModelException;
 }

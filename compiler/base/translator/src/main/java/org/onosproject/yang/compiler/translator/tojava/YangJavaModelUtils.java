@@ -38,6 +38,7 @@ import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeHolder;
+import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.JavaLeafInfoContainer;
@@ -137,6 +138,10 @@ public final class YangJavaModelUtils {
         } else {
             javaGenName = ((YangNode) info).getName();
         }
+        if (info instanceof ConflictResolveNode && ((ConflictResolveNode)
+                info).isNameConflict()) {
+            javaGenName = javaGenName + ((ConflictResolveNode) info).getSuffix();
+        }
         info.getJavaFileInfo().setJavaName(getCamelCase(
                 javaGenName, config.getConflictResolver()));
     }
@@ -190,9 +195,13 @@ public final class YangJavaModelUtils {
     private static void updatePackageInfo(JavaCodeGeneratorInfo info,
                                           YangPluginConfig config,
                                           String pkg) {
-
+        String name = ((YangNode) info).getName();
         JavaFileInfoTranslator translator = info.getJavaFileInfo();
-        translator.setJavaName(getCamelCase(((YangNode) info).getName(),
+        if (info instanceof ConflictResolveNode && ((ConflictResolveNode)
+                info).isNameConflict()) {
+            name = name + ((ConflictResolveNode) info).getSuffix();
+        }
+        translator.setJavaName(getCamelCase(name,
                                             config.getConflictResolver()));
         translator.setPackage(pkg);
         updateCommonPackageInfo(translator, info, config);

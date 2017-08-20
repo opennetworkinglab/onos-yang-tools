@@ -40,6 +40,7 @@ import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SI
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.updateMap;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateUniqueInList;
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.MODULE_DATA;
 
@@ -278,6 +279,12 @@ public abstract class YangModule
     private final List<YangAugment> augments;
 
     /**
+     * Map of typedef or identity with the list of corresponding schema
+     * node to find the name conflict.
+     */
+    private final Map<String, LinkedList<YangNode>> identityTypedefMap;
+
+    /**
      * List of unique identifiers List.
      */
     private List<YangUniqueHolder> uniqueHolderList;
@@ -324,6 +331,7 @@ public abstract class YangModule
         augments = new LinkedList<>();
         uniqueHolderList = new LinkedList<>();
         usesAugmentList = new LinkedList<>();
+        identityTypedefMap = new HashMap<>();
     }
 
     @Override
@@ -947,6 +955,14 @@ public abstract class YangModule
     @Override
     public void setModuleForDeviation(boolean moduleForDeviation) {
         isModuleForDeviation = moduleForDeviation;
+    }
+
+    @Override
+    public void addToIdentityTypedefMap(String name, YangNode node)
+            throws DataModelException {
+        if (node instanceof ConflictResolveNode) {
+            updateMap(name, node, identityTypedefMap);
+        }
     }
 
     /**

@@ -168,6 +168,7 @@ public class AttributesJavaDataTypeTest {
     @SuppressWarnings("unchecked")
     private YangType<?> getStubExtendedInfo(YangType<?> type) throws DataModelException {
         YangJavaTypeDefTranslator typedef = new YangJavaTypeDefTranslator();
+        typedef.setName("xyz");
         getStubParent().addChild(typedef);
         YangDerivedInfo<?> derInfo = new YangDerivedInfo<>();
         derInfo.setReferredTypeDef(typedef);

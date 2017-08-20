@@ -17,6 +17,7 @@
 package org.onosproject.yang.compiler.datamodel.utils;
 
 import org.onosproject.yang.compiler.datamodel.CollisionDetector;
+import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.DefaultYangNamespace;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
@@ -116,6 +117,8 @@ import static org.onosproject.yang.model.LeafType.STRING;
 public final class DataModelUtils {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
+    public static final String TYPEDEF = "Typedef";
+    public static final String IDENTITY = "Identity";
     private static final String SLASH = File.separator;
     public static final String FMT_NOT_EXIST =
             "Requested %s is not child in %s.";
@@ -130,6 +133,9 @@ public final class DataModelUtils {
             " node in unique reference path is invalid";
     private static final String E_DATATREE = "Internal datamodel error: Datam" +
             "odel tree is not correct";
+    public static final String E_NOT_ALLOWED =
+            "%s with the name %s in file %s at line %s is not allowed. Please" +
+                    " avoid the %s extension in the name.";
 
     /**
      * Creates a new data model tree utility.
@@ -1461,5 +1467,53 @@ public final class DataModelUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Updates the identity and typedef info in module/sub-module map.
+     *
+     * @param name java name of the node
+     * @param node YANG node
+     * @param map  typedef and identity map
+     * @throws DataModelException exception when two identity or
+     *                            typedef present with same name
+     */
+    public static void updateMap(String name, YangNode node, Map<String,
+            LinkedList<YangNode>> map) throws DataModelException {
+        YangNode oldNode;
+        if (!map.containsKey(name)) {
+            LinkedList<YangNode> list = new LinkedList<>();
+            list.push(node);
+            map.put(name, list);
+        } else {
+            LinkedList<YangNode> value = map.get(name);
+            oldNode = value.get(0);
+            if (value.size() >= 2) {
+                if (!node.getNodeType().equals(oldNode.getNodeType())) {
+                    oldNode = value.get(1);
+                }
+                throw new DataModelException(composeErrorMsg(node, oldNode));
+            }
+            if (oldNode.getNodeType().equals(node.getNodeType())) {
+                throw new DataModelException(composeErrorMsg(node, oldNode));
+            }
+            ((ConflictResolveNode) oldNode).setConflictFlag();
+            ((ConflictResolveNode) node).setConflictFlag();
+            value.push(node);
+        }
+    }
+
+    /**
+     * Composes the error message for given new and existing YANG node
+     * name conflict.
+     *
+     * @param node    newly added YANG node
+     * @param oldNode existing YANG node.
+     */
+    private static String composeErrorMsg(YangNode node, YangNode oldNode) {
+        return "Node with name " + node.getName() + " in file " +
+                node.getFileName() + " at line " + node.getLineNumber() +
+                " is already present " + "in file " + oldNode.getFileName() +
+                " at " + "line " + oldNode.getLineNumber() + "" + ".";
     }
 }
