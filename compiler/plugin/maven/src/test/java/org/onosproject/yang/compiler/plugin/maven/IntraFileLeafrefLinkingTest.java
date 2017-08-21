@@ -1280,7 +1280,7 @@ public class IntraFileLeafrefLinkingTest {
                 module2 = node;
             } else if (node.getName().equals("module3")) {
                 module3 = node;
-            } else {
+            } else if (node.getName().equals("module4")) {
                 module4 = node;
             }
         }
