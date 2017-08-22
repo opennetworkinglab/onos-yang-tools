@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeDef;
@@ -285,6 +286,7 @@ public class TempJavaTypeFragmentFiles
         if (yangTypeHolder instanceof YangUnion) {
             verifyUnionTypes(typeList, yangTypeHolder);
         }
+        addIdentityToImport(typeList, config);
         if (typeList != null) {
             List<YangType<?>> types = validateTypes(typeList);
             for (YangType<?> type : types) {
@@ -322,6 +324,17 @@ public class TempJavaTypeFragmentFiles
             addMethodsInConflictCase(config);
             for (JavaAttributeInfo attr : attrs) {
                 super.addJavaSnippetInfoToApplicableTempFiles(attr, config);
+            }
+        }
+    }
+
+    //TODO: Union with two identities code generation has to be changed.
+    private void addIdentityToImport(List<YangType<?>> types,
+                                     YangPluginConfig config) {
+        for (YangType<?> type :types) {
+            Object ex = type.getDataTypeExtendedInfo();
+            if (ex != null && ex instanceof YangIdentityRef) {
+                getAttributeForType(type, config);
             }
         }
     }

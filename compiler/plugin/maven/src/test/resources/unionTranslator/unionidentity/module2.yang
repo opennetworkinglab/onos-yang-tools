@@ -1,0 +1,39 @@
+module module2 {
+    yang-version 1;
+    namespace "http://huawei.com1:mod2";
+
+    prefix mod2;
+
+    identity axis {
+    }
+
+    identity left {
+        base axis;
+    }
+
+    identity right {
+        base axis;
+    }
+
+    identity represent {
+    }
+
+    identity horizontal {
+        base represent;
+    }
+
+    identity vertical {
+        base represent;
+    }
+
+    identity area {
+    }
+
+    identity square {
+        base area;
+    }
+
+    identity rectangle {
+        base area;
+    }
+}

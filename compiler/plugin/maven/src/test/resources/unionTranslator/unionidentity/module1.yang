@@ -1,0 +1,29 @@
+module module1 {
+    yang-version 1;
+    namespace "http://huawei.com:mod1";
+    prefix Ant;
+
+    import module2 {
+        prefix mod2;
+    }
+
+    typedef def6 {
+        type binary;
+    }
+
+    leaf icon {
+        type union {
+            type identityref {
+                base mod2:axis;
+            }
+            type identityref {
+                base mod2:represent;
+            }
+            type identityref {
+                base mod2:area;
+            }
+            type uint8;
+            type def6;
+        }
+    }
+}
