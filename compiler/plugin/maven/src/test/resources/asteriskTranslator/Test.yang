@@ -1,0 +1,15 @@
+module Test {
+    yang-version 1;
+    namespace "http://huawei.com";
+    prefix Ant;
+
+     leaf myenum {
+         type enumeration {
+             enum *;
+             enum one;
+             enum seven {
+                 value 7;
+             }
+         }
+     }
+}

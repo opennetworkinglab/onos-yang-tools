@@ -91,4 +91,27 @@ public final class ChoiceCaseTranslatorTest {
         YangPluginConfig.compileCode(COMP);
         YangIoUtils.deleteDirectory(DIR);
     }
+
+    @Test
+    public void processEnumwithNameAstrick() throws IOException,
+            ParserException, MojoExecutionException {
+        YangIoUtils.deleteDirectory(DIR);
+        String searchDir = "src/test/resources/asteriskTranslator";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(searchDir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        YangIoUtils.deleteDirectory(DIR);
+    }
 }

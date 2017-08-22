@@ -67,6 +67,9 @@ module simple-data-types {
             enum "grace period expired" {
                 value 2;
             }
+            enum "*" {
+                value 3;
+            }
         }
     }
 
@@ -302,6 +305,10 @@ module simple-data-types {
         }
 
         leaf lfenum1 {
+            type tpdfun0;
+        }
+
+        leaf lfenum2 {
             type tpdfun0;
         }
 

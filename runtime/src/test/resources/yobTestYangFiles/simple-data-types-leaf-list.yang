@@ -263,5 +263,15 @@ module simple-data-types-ll {
             }
         }
     }
+    leaf-list lfenum2 {
+        type enumeration {
+            enum "successful exit" {
+                value 1;
+            }
+            enum "*" {
+                value 3;
+            }
+        }
+    }
   }
 }

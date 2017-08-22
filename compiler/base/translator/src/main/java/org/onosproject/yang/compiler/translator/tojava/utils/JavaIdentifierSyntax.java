@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ASTERISK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
@@ -132,7 +133,12 @@ public final class JavaIdentifierSyntax {
      */
     public static String getEnumJavaAttribute(String name) {
 
-        name = name.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+        if (name.equals("*")) {
+            name = ASTERISK;
+        } else {
+            name = name.replaceAll(REGEX_WITH_ALL_SPECIAL_CHAR, COLON);
+        }
+
         String[] strArray = name.split(COLON);
         StringBuilder output = new StringBuilder();
         if (strArray[0].isEmpty()) {

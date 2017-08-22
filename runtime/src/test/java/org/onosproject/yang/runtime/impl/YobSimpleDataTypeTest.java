@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.DefaultCont;
 import org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.gr.Cont3;
 import org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.DefaultCont1;
+import org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.cont1.Lfenum2Enum;
 import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Leaf7;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DataNode.Builder;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.ASTERISK;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
 import static org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
@@ -227,6 +229,10 @@ public class YobSimpleDataTypeTest {
 
         value = "successful exit";
         dBlr = addDataNode(dBlr, "lfenum1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = exitDataNode(dBlr);
+
+        value = "*";
+        dBlr = addDataNode(dBlr, "lfenum2", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "/cont";
@@ -610,6 +616,11 @@ public class YobSimpleDataTypeTest {
         value = "grace period expired";
         dBlr = addDataNode(dBlr, "lfenum1", null, value, null);
         dBlr = exitDataNode(dBlr);
+
+        value = "*";
+        dBlr = addDataNode(dBlr, "lfenum2", null, value, null);
+        dBlr = exitDataNode(dBlr);
+
         dBlr = exitDataNode(dBlr);
 
         return dBlr.build();
@@ -685,6 +696,7 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.identityref1().getSimpleName(), is("Iden"));
         assertThat(cont.identityref2().getSimpleName(), is("Pro"));
         assertThat(cont.lfenum1().enumeration(), is(SUCCESSFUL_EXIT));
+        assertThat(cont.lfenum2().enumeration(), is(ASTERISK));
         assertThat(cont.instIden(), is("/cont"));
         value = 8;
         assertThat(cont.lref1(), is(value));
@@ -842,5 +854,6 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.identityref1().get(0).getSimpleName().toString(),
                    is("Iden"));
         assertThat(cont.lfenum1().get(0), is(GRACE_PERIOD_EXPIRED));
+        assertThat(cont.lfenum2().get(0), is(Lfenum2Enum.ASTERISK));
     }
 }

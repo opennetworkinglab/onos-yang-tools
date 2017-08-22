@@ -94,6 +94,7 @@ import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF10;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF11;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF12;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF13;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF2;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF3;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF4;
@@ -106,6 +107,7 @@ import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL10;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL11;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL12;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL13;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL2;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL3;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL4;
@@ -119,10 +121,10 @@ import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
-import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
-import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNode;
 
 /*
  *
@@ -1365,6 +1367,8 @@ public class DefaultDataTreeBuilderTest {
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, null);
         validateDataNode(it.next(), "leaf12", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+        validateDataNode(it.next(), "leaf13", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "*");
         validateDataNode(it.next(), "ll1", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "leaf-list1");
         validateDataNode(it.next(), "ll1", ns,
@@ -1405,6 +1409,8 @@ public class DefaultDataTreeBuilderTest {
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "11011");
         validateDataNode(it.next(), "ll12", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110111");
+        validateDataNode(it.next(), "ll13", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "*");
         return it;
     }
 
@@ -1420,6 +1426,8 @@ public class DefaultDataTreeBuilderTest {
         Def1Union union = new Def1Union(of(1000));
         Def1 def1 = new Def1(union);
         Def1Union union2 = new Def1Union(of(10));
+        Def1Union union22 = new Def1Union(of(10000));
+        Def1 def11 = new Def1(union22);
         Def1 def12 = new Def1(union2);
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
         byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
@@ -1444,6 +1452,7 @@ public class DefaultDataTreeBuilderTest {
         cont1.leaf10(def3);
         cont1.leaf11(true);
         cont1.leaf12(arr);
+        cont1.leaf13(def11);
         cont1.addToLl1("leaf-list1");
         cont1.addToLl1("leaf-list1-2");
         cont1.addToLl2(def1);
@@ -1468,6 +1477,7 @@ public class DefaultDataTreeBuilderTest {
         cont1.addToLl11(true);
         cont1.addToLl12(arr);
         cont1.addToLl12(arr1);
+        cont1.addToLl13(def11);
         cont1.cont2(cont2);
         data.addModelObject((ModelObject) cont1);
         return data;
@@ -1485,6 +1495,8 @@ public class DefaultDataTreeBuilderTest {
         Def1Union union = new Def1Union(of(1000));
         Def1 def1 = new Def1(union);
         Def1Union union2 = new Def1Union(of(10));
+        Def1Union union22 = new Def1Union(of(10000));
+        Def1 def11 = new Def1(union22);
         Def1 def12 = new Def1(union2);
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
         byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
@@ -1508,6 +1520,7 @@ public class DefaultDataTreeBuilderTest {
         augC.leaf10(def3);
         augC.leaf11(true);
         augC.leaf12(arr);
+        augC.leaf13(def11);
         augC.addToLl1("leaf-list1");
         augC.addToLl1("leaf-list1-2");
         augC.addToLl2(def1);
@@ -1532,6 +1545,7 @@ public class DefaultDataTreeBuilderTest {
         augC.addToLl11(true);
         augC.addToLl12(arr);
         augC.addToLl12(arr1);
+        augC.addToLl13(def11);
         cont2.addAugmentation((InnerModelObject) augC);
         return cont2;
     }
@@ -1549,6 +1563,8 @@ public class DefaultDataTreeBuilderTest {
 
         Def1Union union = new Def1Union(of("thousand"));
         Def1 def1 = new Def1(union);
+        Def1Union union22 = new Def1Union(of("*"));
+        Def1 def11 = new Def1(union22);
         data = addLeafModelObject(LEAF2, def1, data);
 
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
@@ -1575,6 +1591,8 @@ public class DefaultDataTreeBuilderTest {
         data = addLeafModelObject(LEAF11, true, data);
 
         data = addLeafModelObject(LEAF12, arr, data);
+
+        data = addLeafModelObject(LEAF13, def11, data);
 
         List<Object> objs = new LinkedList<>();
         objs.add("leaf-list1");
@@ -1643,6 +1661,9 @@ public class DefaultDataTreeBuilderTest {
         objs.add(arr1);
         data = addLeafListModelObject(LL12, objs, data);
 
+        objs = new LinkedList<>();
+        objs.add(def11);
+        data = addLeafListModelObject(LL13, objs, data);
         return data;
     }
 
