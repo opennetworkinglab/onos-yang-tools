@@ -20,4 +20,18 @@ module hello {
             }
         }
     }
+
+    rpc hello-second {
+        input {
+            leaf x {
+                type string;
+            }
+        }
+
+        output {
+            leaf greeting {
+                type string;
+            }
+        }
+    }
 }

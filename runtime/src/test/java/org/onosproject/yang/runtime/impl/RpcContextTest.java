@@ -15,12 +15,22 @@
  */
 package org.onosproject.yang.runtime.impl;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.gen.v1.hello.rev20150105.hello.hellosecond.DefaultHelloSecondInput;
+import org.onosproject.yang.gen.v1.hello.rev20150105.hello.hellosecond.HelloSecondInput;
+import org.onosproject.yang.gen.v1.hello.rev20150105.hello.helloworld.DefaultHelloWorldInput;
+import org.onosproject.yang.gen.v1.hello.rev20150105.hello.helloworld.HelloWorldInput;
+import org.onosproject.yang.model.DefaultModelObjectData;
+import org.onosproject.yang.model.ModelConverter;
+import org.onosproject.yang.model.ModelObject;
+import org.onosproject.yang.model.ModelObjectData;
+import org.onosproject.yang.model.ResourceData;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.RpcContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.onosproject.yang.runtime.SerializerHelper.addToResourceId;
 import static org.onosproject.yang.runtime.SerializerHelper.initializeResourceId;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
@@ -35,12 +45,12 @@ public class RpcContextTest {
     public static final String NS = "urn:params:xml:ns:yang:hello";
     String value = null;
     TestYangSerializerContext context = new TestYangSerializerContext();
-    DataNode.Builder dBlr;
 
     /**
      * Sets up all prerequisite.
      */
-    private void setUp() {
+    @Before
+    public void setUp() {
         processSchemaRegistry();
         reg = registry();
         builder = new ModIdToRscIdConverter(reg);
@@ -51,7 +61,6 @@ public class RpcContextTest {
      */
     @Test
     public void checkRpcContext() {
-        setUp();
         ResourceId.Builder rIdBlr = initializeResourceId(context);
         rIdBlr = addToResourceId(rIdBlr, "hello-world", NS, value);
 
@@ -62,5 +71,31 @@ public class RpcContextTest {
         assertEquals(context.rpcName(), "helloWorld");
         assertEquals(context.serviceIntf().toString(), "interface org.onosproject" +
                 ".yang.gen.v1.hello.rev20150105.HelloService");
+    }
+
+    /*
+     * Test the file rpc_test.yang.
+     * This specifically tests that when 2 RPC's are specified in a single
+     * YANG file that both RPC inputs can be handled through the ModelConverter
+     */
+    @Test
+    public void checkRpcConverter() {
+        ModelConverter mc = new DefaultModelConverter(reg);
+        HelloWorldInput hwInput = new DefaultHelloWorldInput();
+        hwInput.x("input-sample");
+        ModelObjectData hwInputMod = DefaultModelObjectData.builder().
+                            addModelObject((ModelObject) hwInput).build();
+        assertNotNull(hwInputMod);
+        ResourceData rd = mc.createDataNode(hwInputMod);
+        assertNotNull(rd);
+
+        //Now test converting to a second RPC in the same YANG
+        HelloSecondInput hsInput = new DefaultHelloSecondInput();
+        hsInput.x("second-input");
+        ModelObjectData hsInputMod = DefaultModelObjectData.builder().
+                addModelObject((ModelObject) hsInput).build();
+        assertNotNull(hsInputMod);
+        ResourceData rdSecond = mc.createDataNode(hsInputMod);
+        assertNotNull(rdSecond);
     }
 }

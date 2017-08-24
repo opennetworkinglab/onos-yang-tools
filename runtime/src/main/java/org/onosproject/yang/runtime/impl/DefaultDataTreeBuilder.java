@@ -223,6 +223,11 @@ class DefaultDataTreeBuilder {
             while (child != null && !(child instanceof YangRpc)) {
                 child = child.getNextSibling();
             }
+            while (child != null && child instanceof YangRpc &&
+                    !name.contains(child.getJavaPackage() + "."
+                    + child.getJavaClassNameOrBuiltInType().toLowerCase())) {
+                child = child.getNextSibling();
+            }
             if (child != null) {
                 //Rpc should be part of resource identifier for input/output
                 // nodes.

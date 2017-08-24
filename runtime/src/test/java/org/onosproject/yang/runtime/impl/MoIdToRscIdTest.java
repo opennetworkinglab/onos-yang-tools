@@ -782,7 +782,7 @@ public class MoIdToRscIdTest {
         YangRpc rpc = new YangRpc() {
             @Override
             public String getJavaPackage() {
-                return null;
+                return "org.onosproject.yang.runtime.mockclass.testmodule";
             }
 
             @Override
