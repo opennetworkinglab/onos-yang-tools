@@ -593,4 +593,35 @@ public class AugmentTranslatorTest {
         YangPluginConfig.compileCode(COMP);
         deleteDirectory(DIR);
     }
+
+    /**
+     * Checks identity linked in sub-module of imported module.
+     *
+     * @throws IOException            if any error occurs during IO on files
+     * @throws ParserException        if any error occurs during parsing
+     * @throws MojoExecutionException if any mojo operation fail
+     */
+    @Test
+    public void processSubmoduleId() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/identityinsubmod";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
 }

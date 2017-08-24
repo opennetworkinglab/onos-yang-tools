@@ -1,0 +1,8 @@
+module module2 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:2";
+
+    prefix mod-b;
+
+    include submodule2;
+}

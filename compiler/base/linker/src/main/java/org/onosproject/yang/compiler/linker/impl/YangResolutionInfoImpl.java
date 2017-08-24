@@ -1685,7 +1685,11 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
          * typedef/grouping at the root level.
          */
         for (YangInclude yangInclude : curRefResolver.getIncludeList()) {
-            YangNode linkedNode = getLinkedNode(yangInclude.getIncludedNode());
+            YangNode inc = yangInclude.getIncludedNode();
+            YangNode linkedNode = getLinkedNode(inc);
+            if (linkedNode == null) {
+                linkedNode = getFromIncludeList(inc);
+            }
             if (linkedNode != null) {
                 return addUnResolvedRefToStack(linkedNode);
             }
@@ -1710,7 +1714,11 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
              * for the referred typedef/grouping at the root level.
              */
             if (yangImport.getPrefixId().contentEquals(getRefPrefix())) {
-                YangNode linkedNode = getLinkedNode(yangImport.getImportedNode());
+                YangNode inc = yangImport.getImportedNode();
+                YangNode linkedNode = getLinkedNode(inc);
+                if (linkedNode == null) {
+                    linkedNode = getFromIncludeList(inc);
+                }
                 if (linkedNode != null) {
                     return addUnResolvedRefToStack(linkedNode);
                 }
@@ -1723,6 +1731,28 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         }
         // If referred node can't be found return false.
         return false;
+    }
+
+    /**
+     * Returns the referred node, by finding in the list of included nodes,
+     * inside the given node.
+     *
+     * @param node YANG node
+     * @return referred node inside included node
+     */
+    private YangNode getFromIncludeList(YangNode node) {
+        List<YangInclude> incList = ((YangReferenceResolver) node)
+                .getIncludeList();
+        YangNode refNode = null;
+        if (incList != null && !incList.isEmpty()) {
+            for (YangInclude inc : incList) {
+                refNode = getLinkedNode(inc.getIncludedNode());
+                if (refNode != null) {
+                    break;
+                }
+            }
+        }
+        return refNode;
     }
 
     //Add unresolved constructs to stack.

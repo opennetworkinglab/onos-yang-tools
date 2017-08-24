@@ -1,0 +1,9 @@
+submodule submodule2 {
+
+    belongs-to module2 {
+        prefix mod2;
+    }
+
+    identity BGP_ERROR_CODE {
+    }
+}

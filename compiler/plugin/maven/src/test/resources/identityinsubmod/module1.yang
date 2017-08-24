@@ -1,0 +1,16 @@
+module module1 {
+
+    namespace "urn:ietf:params:xml:ns:aug:module:1";
+
+    prefix mod-a;
+
+    import module2 {
+        prefix mod2;
+    }
+
+    leaf name {
+        type identityref {
+            base mod2:BGP_ERROR_CODE;
+        }
+    }
+}
