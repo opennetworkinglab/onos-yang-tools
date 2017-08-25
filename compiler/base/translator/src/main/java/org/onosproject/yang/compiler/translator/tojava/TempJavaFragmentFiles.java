@@ -79,7 +79,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGene
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddToListMethodImpl;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddToListMethodInterface;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getAddToListMethodInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getDefaultConstructorString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethod;
@@ -89,7 +89,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethod;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_LEAF_HOLDER;

@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
@@ -50,6 +51,7 @@ import static org.onosproject.yang.compiler.translator.tojava.JavaAttributeInfo.
 import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedInfoOfFromString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateTypeDefClassFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateUnionClassFile;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getDerivedPkfInfo;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getOfMethodStringAndJavaDoc;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getTypeConstructorStringAndJavaDoc;
@@ -331,10 +333,17 @@ public class TempJavaTypeFragmentFiles
     //TODO: Union with two identities code generation has to be changed.
     private void addIdentityToImport(List<YangType<?>> types,
                                      YangPluginConfig config) {
-        for (YangType<?> type :types) {
+        for (YangType<?> type : types) {
             Object ex = type.getDataTypeExtendedInfo();
             if (ex != null && ex instanceof YangIdentityRef) {
+                YangIdentity base = ((YangIdentityRef) ex).getReferredIdentity();
                 getAttributeForType(type, config);
+                List<YangIdentity> idList = base.getExtendList();
+                for (YangIdentity id : idList) {
+                    JavaQualifiedTypeInfoTranslator derPkgInfo =
+                            getDerivedPkfInfo(id);
+                    getIsQualifiedAccessOrAddToImportList(derPkgInfo);
+                }
             }
         }
     }

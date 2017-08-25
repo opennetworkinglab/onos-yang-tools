@@ -47,6 +47,23 @@ module YtbDataTypes {
         }
     }
 
+    typedef def6 {
+        type identityref {
+            base type;
+        }
+    }
+
+    typedef def7 {
+        type union {
+            type identityref {
+                base physical ;
+            }
+            type identityref {
+                base virtual;
+            }
+        }
+    }
+
     identity type {
         description "type value";
     }
@@ -121,6 +138,14 @@ module YtbDataTypes {
         type def1;
     }
 
+    leaf leaf14 {
+        type def6;
+    }
+
+    leaf leaf15 {
+        type def7;
+    }
+
     container cont1 {
         leaf leaf1 {
             type string;
@@ -182,6 +207,14 @@ module YtbDataTypes {
 
         leaf leaf13 {
             type def1;
+        }
+
+        leaf leaf14 {
+            type def6;
+        }
+
+        leaf leaf15 {
+            type def7;
         }
 
         leaf-list ll1 {
@@ -246,6 +279,13 @@ module YtbDataTypes {
             type def1;
         }
 
+        leaf-list ll14 {
+            type def6;
+        }
+
+        leaf-list ll15 {
+            type def7;
+        }
         container cont2 {
         }
     }
@@ -312,6 +352,13 @@ module YtbDataTypes {
         type def1;
     }
 
+    leaf-list ll14 {
+        type def6;
+    }
+
+    leaf-list ll15 {
+        type def7;
+    }
     augment "/cont1/cont2" {
         leaf leaf1 {
             type string;
@@ -375,6 +422,14 @@ module YtbDataTypes {
             type def1;
         }
 
+        leaf leaf14 {
+            type def6;
+        }
+
+        leaf leaf15 {
+            type def7;
+        }
+
         leaf-list ll1 {
             type string;
         }
@@ -435,6 +490,14 @@ module YtbDataTypes {
 
         leaf-list ll13 {
             type def1;
+        }
+
+        leaf-list ll14 {
+            type def6;
+        }
+
+        leaf-list ll15 {
+            type def7;
         }
     }
 }

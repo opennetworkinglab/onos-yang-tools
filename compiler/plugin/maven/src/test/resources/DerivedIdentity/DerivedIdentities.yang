@@ -15,6 +15,32 @@ module IdentityTypedef {
         base ref-address-family;
     }
 
+    typedef type2 {
+        type identityref {
+             base ipv4-address-family;
+        }
+    }
+
+    typedef type3 {
+        type union {
+            type type2;
+            type identityref {
+                 base ipv4-address-family;
+            }
+        }
+    }
+
+    typedef type4 {
+        type union {
+            type identityref {
+                base ipv4-address-family;
+            }
+            type identityref {
+                base ipv6-address-family;
+            }
+        }
+    }
+
     leaf tunnel {
         type type15;
     }

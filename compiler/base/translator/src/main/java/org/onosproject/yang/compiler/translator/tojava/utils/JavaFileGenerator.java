@@ -123,7 +123,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodOpen;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getUnionToStringMethod;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.isLeafValueSetInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getInterfaceLeafIdEnumMethods;

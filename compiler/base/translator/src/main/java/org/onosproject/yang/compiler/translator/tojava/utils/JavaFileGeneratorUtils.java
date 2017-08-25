@@ -17,14 +17,19 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.InvalidOpTypeHolder;
+import org.onosproject.yang.compiler.datamodel.YangAppDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
+import org.onosproject.yang.compiler.datamodel.YangCompilerAnnotation;
+import org.onosproject.yang.compiler.datamodel.YangDataStructure;
+import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
+import org.onosproject.yang.compiler.translator.tojava.JavaAttributeInfo;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
@@ -37,14 +42,18 @@ import org.onosproject.yang.compiler.translator.tojava.TempJavaEventFragmentFile
 import org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaTypeFragmentFiles;
+import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaIdentityTranslator;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.IDENTITYREF;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.DEFAULT_CLASS_MASK;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_ENUM_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_EVENT_CLASS;
@@ -86,17 +95,48 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.ClassDefinitionGenerator.generateClassDefinition;
+import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.FOUR_SPACE;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.INTERFACE_TYPE;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getIfConditionBegin;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getReturnString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getTwoParaEqualsString;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.methodClose;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.methodSignature;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AUGMENTED;
+import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
+import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARE_TO;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ERROR_MSG_FOR_GEN_CODE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.EXTEND;
+import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
+import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
+import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LEAFREF;
+import static org.onosproject.yang.compiler.utils.UtilConstants.NEG_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PACKAGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
+import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
+import static org.onosproject.yang.compiler.utils.UtilConstants.QUESTION_MARK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET_METHOD_PREFIX;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.TO_CAPS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_CAPS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ZERO;
 import static org.onosproject.yang.compiler.utils.io.impl.CopyrightHeader.parseCopyrightHeader;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CLASS;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.ENUM_CLASS;
@@ -845,5 +885,166 @@ public final class JavaFileGeneratorUtils {
             }
         }
         return attributeType;
+    }
+
+    /**
+     * Returns package info of derived identity.
+     *
+     * @param id YANG identity.
+     * @return derived package info.
+     */
+    public static JavaQualifiedTypeInfoTranslator getDerivedPkfInfo(YangIdentity id) {
+        String pkg = YangJavaIdentityTranslator.getDerivedPackage(id);
+        String name;
+        if (id.isNameConflict()) {
+            name = getCapitalCase(
+                    getCamelCase(id.getName() + IDENTITY, null));
+        } else {
+            name = getCapitalCase(
+                    getCamelCase(id.getName(), null));
+        }
+        JavaQualifiedTypeInfoTranslator derPkgInfo =
+                new JavaQualifiedTypeInfoTranslator();
+        derPkgInfo.setClassInfo(name);
+        derPkgInfo.setPkgInfo(pkg);
+        return derPkgInfo;
+    }
+
+    /**
+     * Returns Identity name of the Identity.
+     *
+     * @param id YANG identity.
+     * @return YANG identity name.
+     */
+    public static String getIdName(YangIdentity id) {
+        String idName;
+        if (id.isNameConflict()) {
+            idName = getCapitalCase(
+                    getCamelCase(id.getName() + IDENTITY, null));
+        } else {
+            idName = getCapitalCase(
+                    getCamelCase(id.getName(), null));
+        }
+        return idName;
+    }
+
+    /**
+     * Returns add to list method interface.
+     *
+     * @param attr      java attribute
+     * @param className name of the class
+     * @return add to list method interface
+     */
+    public static String getAddToListMethodInterface(JavaAttributeInfo attr,
+                                                     String className) {
+
+        String methodName = ADD_STRING + TO_CAPS + getCapitalCase(
+                attr.getAttributeName());
+        String retType = getReturnType(attr);
+        YangDataStructure struct = getYangDataStructure(attr.getCompilerAnnotation());
+        if (struct != null) {
+            switch (struct) {
+                case MAP:
+                    Map<String, String> param = new LinkedHashMap<>();
+                    param.put(attr.getAttributeName() + KEYS, retType + KEYS);
+                    param.put(attr.getAttributeName() + VALUE_CAPS, retType);
+                    return multiAttrMethodSignature(methodName, null, null,
+                                                    VOID, param,
+                                                    INTERFACE_TYPE,
+                                                    FOUR_SPACE_INDENTATION);
+                default:
+                    return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
+                                           VOID, retType,
+                                           INTERFACE_TYPE);
+            }
+        }
+        return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
+                               VOID, getReturnType(attr),
+                               INTERFACE_TYPE);
+    }
+
+    /**
+     * Returns YANG data structure from java attribute.
+     *
+     * @param annotation compiler annotation
+     * @return YANG data structure from java attribute
+     */
+    public static YangDataStructure getYangDataStructure(
+            YangCompilerAnnotation annotation) {
+        if (annotation != null) {
+            YangAppDataStructure data = annotation.getYangAppDataStructure();
+            if (data != null) {
+                return data.getDataStructure();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns return type for attribute.
+     *
+     * @param attr attribute info
+     * @return return type
+     */
+    static String getReturnType(JavaAttributeInfo attr) {
+        StringBuilder builder = new StringBuilder();
+
+        if (attr.isQualifiedName() &&
+                attr.getImportInfo().getPkgInfo() != null) {
+            builder.append(attr.getImportInfo().getPkgInfo()).append(PERIOD);
+        }
+        builder.append(attr.getImportInfo().getClassInfo());
+
+        if (attr.getAttributeType() != null &&
+                attr.getAttributeType().getDataType() == IDENTITYREF) {
+            return CLASS_STRING + DIAMOND_OPEN_BRACKET +
+                    QUESTION_MARK + SPACE + EXTEND + SPACE +
+                    builder.toString() + DIAMOND_CLOSE_BRACKET;
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Returns compare to method for key class.
+     *
+     * @param attrs     attribute list
+     * @param className class name
+     * @return compare to method
+     */
+    public static String getCompareToForKeyClass(
+            List<JavaAttributeInfo> attrs, String className) {
+
+        StringBuilder builder = new StringBuilder(getOverRideString());
+        builder.append(methodSignature(COMPARE_TO, null, PUBLIC, VALUE, INT,
+                                       className, CLASS_TYPE));
+        String cond;
+        String attrName;
+        String para;
+        StringBuilder space = new StringBuilder();
+        List<String> spaces = new ArrayList<>();
+        int count = 1;
+        for (JavaAttributeInfo attr : attrs) {
+            attrName = attr.getAttributeName();
+            para = VALUE + PERIOD + attrName;
+            cond = getTwoParaEqualsString(attrName, para);
+            if (count == 1) {
+                space.append(EIGHT_SPACE_INDENTATION);
+            } else {
+                space.append(FOUR_SPACE_INDENTATION);
+            }
+            spaces.add(space.toString());
+            count++;
+            builder.append(getIfConditionBegin(space.toString(), cond));
+        }
+        space.append(FOUR_SPACE_INDENTATION);
+        builder.append(getReturnString(ZERO, space.toString()))
+                .append(signatureClose());
+        for (int i = spaces.size() - 1; i >= 0; i--) {
+            builder.append(spaces.get(i)).append(CLOSE_CURLY_BRACKET)
+                    .append(NEW_LINE);
+        }
+        builder.append(getReturnString(NEG_ONE, EIGHT_SPACE_INDENTATION))
+                .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        return builder.toString();
     }
 }

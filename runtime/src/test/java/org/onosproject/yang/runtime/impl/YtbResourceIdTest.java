@@ -359,7 +359,7 @@ public class YtbResourceIdTest {
 
         Iterator<DataNode> it1 = inputDN.iterator();
         validateDataNode(it1.next(), "stream", ns,
-                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "stream");
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "NETCONF");
         validateDataNode(it1.next(), "replay-start-time", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
                          "2000-06-12T06:23:21");
@@ -481,6 +481,6 @@ public class YtbResourceIdTest {
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "456");
         validateDataNode(it.next(), "status", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
-                         "subscription-status");
+                         "active");
     }
 }

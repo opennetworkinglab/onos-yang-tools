@@ -17,7 +17,6 @@
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
 import org.onosproject.yang.compiler.datamodel.InvalidOpTypeHolder;
-import org.onosproject.yang.compiler.datamodel.YangAppDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangCompilerAnnotation;
 import org.onosproject.yang.compiler.datamodel.YangDataStructure;
@@ -34,7 +33,6 @@ import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +48,10 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationT
 import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.TWELVE_SPACE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getAugmentedClassNameForDataMethods;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getCurNodeName;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getIdName;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getReturnType;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getSetOfNodeIdentifiers;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.GETTER;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodBodyTypes.MANAGER_METHODS;
@@ -80,6 +81,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getReturnOfSubString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getReturnString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getSetValueParaCondition;
+import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getSetterInterfaceString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getStringBuilderAttr;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getToStringCall;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getTrySubString;
@@ -117,10 +119,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRAC
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_PARENTHESIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
-import static org.onosproject.yang.compiler.utils.UtilConstants.COMPARE_TO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DECODE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
-import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_OPEN_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ELSE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
@@ -159,7 +158,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.MAX_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MIN_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_LEAF_IDENTIFIER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.MODEL_OBJECT;
-import static org.onosproject.yang.compiler.utils.UtilConstants.NEG_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_STRING_JOINER_OBJECT;
@@ -215,7 +213,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE_LEAF_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VARIABLE_C;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
-import static org.onosproject.yang.compiler.utils.UtilConstants.ZERO;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.CONSTRUCTOR;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.DEFAULT_CONSTRUCTOR;
 import static org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType.FROM_METHOD;
@@ -253,7 +250,6 @@ public final class MethodsGenerator {
      * @return getter string
      */
     public static String getGetterString(JavaAttributeInfo attr, int genType) {
-
         String returnType = getReturnType(attr);
         String attributeName = attr.getAttributeName();
         String appDataStructure = null;
@@ -611,51 +607,6 @@ public final class MethodsGenerator {
 
         String listAttr = getListAttribute(attrType, annotation);
         return getSetterInterfaceString(className, attrName, listAttr, genType);
-    }
-
-    /**
-     * Returns setter string for interface.
-     *
-     * @param name     class name
-     * @param attrName attribute name
-     * @param attrType attribute type
-     * @return setter string
-     */
-    private static String getSetterInterfaceString(String name,
-                                                   String attrName,
-                                                   String attrType,
-                                                   int genType) {
-        if (genType == GENERATE_SERVICE_AND_MANAGER) {
-            return methodSignature(getCapitalCase(attrName), SET_METHOD_PREFIX,
-                                   null, attrName, VOID, attrType + OP_PARAM,
-                                   INTERFACE_TYPE);
-        }
-        return methodSignature(attrName, EMPTY_STRING, null,
-                               attrName, VOID, attrType, INTERFACE_TYPE);
-    }
-
-    /**
-     * Returns return type for attribute.
-     *
-     * @param attr attribute info
-     * @return return type
-     */
-    private static String getReturnType(JavaAttributeInfo attr) {
-        StringBuilder builder = new StringBuilder();
-
-        if (attr.isQualifiedName() &&
-                attr.getImportInfo().getPkgInfo() != null) {
-            builder.append(attr.getImportInfo().getPkgInfo()).append(PERIOD);
-        }
-        builder.append(attr.getImportInfo().getClassInfo());
-
-        if (attr.getAttributeType() != null &&
-                attr.getAttributeType().getDataType() == IDENTITYREF) {
-            return CLASS_STRING + DIAMOND_OPEN_BRACKET +
-                    QUESTION_MARK + SPACE + EXTEND + SPACE +
-                    builder.toString() + DIAMOND_CLOSE_BRACKET;
-        }
-        return builder.toString();
     }
 
     /**
@@ -1431,58 +1382,6 @@ public final class MethodsGenerator {
     }
 
     /**
-     * Returns add to list method interface.
-     *
-     * @param attr      java attribute
-     * @param className name of the class
-     * @return add to list method interface
-     */
-    public static String getAddToListMethodInterface(JavaAttributeInfo attr,
-                                                     String className) {
-
-        String methodName = ADD_STRING + TO_CAPS + getCapitalCase(
-                attr.getAttributeName());
-        String retType = getReturnType(attr);
-        YangDataStructure struct = getYangDataStructure(attr.getCompilerAnnotation());
-        if (struct != null) {
-            switch (struct) {
-                case MAP:
-                    Map<String, String> param = new LinkedHashMap<>();
-                    param.put(attr.getAttributeName() + KEYS, retType + KEYS);
-                    param.put(attr.getAttributeName() + VALUE_CAPS, retType);
-                    return multiAttrMethodSignature(methodName, null, null,
-                                                    VOID, param,
-                                                    INTERFACE_TYPE,
-                                                    FOUR_SPACE_INDENTATION);
-                default:
-                    return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                                           VOID, retType,
-                                           INTERFACE_TYPE);
-            }
-        }
-        return methodSignature(methodName, null, null, ADD_STRING + TO_CAPS,
-                               VOID, getReturnType(attr),
-                               INTERFACE_TYPE);
-    }
-
-    /**
-     * Returns YANG data structure from java attribute.
-     *
-     * @param annotation compiler annotation
-     * @return YANG data structure from java attribute
-     */
-    public static YangDataStructure getYangDataStructure(
-            YangCompilerAnnotation annotation) {
-        if (annotation != null) {
-            YangAppDataStructure data = annotation.getYangAppDataStructure();
-            if (data != null) {
-                return data.getDataStructure();
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns add to list method impl.
      *
      * @param attr java attribute
@@ -1683,9 +1582,16 @@ public final class MethodsGenerator {
         StringBuilder builder = new StringBuilder(getOverRideString())
                 .append(methodSignature(TO_STRING_METHOD, null, PUBLIC, null,
                                         STRING_DATA_TYPE, null, CLASS_TYPE));
-        builder.append(getReturnString(
-                getToStringForSpecialType(type, attr), EIGHT_SPACE_INDENTATION))
-                .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        if (type.getDataType() == IDENTITYREF) {
+            builder.append(getToStringForSpecialType(type, attr))
+                    .append(getReturnString(null, EIGHT_SPACE_INDENTATION))
+                    .append(signatureClose())
+                    .append(methodClose(FOUR_SPACE));
+        } else {
+            builder.append(getReturnString(
+                    getToStringForSpecialType(type, attr), EIGHT_SPACE_INDENTATION))
+                    .append(signatureClose()).append(methodClose(FOUR_SPACE));
+        }
         return builder.toString();
     }
 
@@ -1727,13 +1633,7 @@ public final class MethodsGenerator {
                         getToStringForSpecialType(rt, name);
 
             case IDENTITYREF:
-                YangIdentityRef ir = (YangIdentityRef) type
-                        .getDataTypeExtendedInfo();
-                YangIdentity identity = ir.getReferredIdentity();
-                String idName = getCamelCase(getIdentityRefName(type), null);
-                return getCapitalCase(idName) + PERIOD +
-                        getCamelCase(identity.getName(), null) + TO_CAPS +
-                        STRING_DATA_TYPE + OPEN_CLOSE_BRACKET_STRING;
+                return getIdRefToString(type, name, "");
             case ENUMERATION:
             case INSTANCE_IDENTIFIER:
             case UINT64:
@@ -1748,24 +1648,83 @@ public final class MethodsGenerator {
     }
 
     /**
+     * Returns indented toString method of identiref.
+     *
+     * @param type   type of attribute.
+     * @param name   @return to string method body for typedef class
+     * @param indent number of indent spaces.
+     * @return returns tostring method.
+     */
+    private static String getIdRefToString(YangType type, String name, String
+            indent) {
+        YangIdentityRef ir = (YangIdentityRef) type
+                .getDataTypeExtendedInfo();
+        StringBuilder builder = new StringBuilder();
+        String idName = getCamelCase(getIdentityRefName(type), null);
+        YangIdentity identity = ir.getReferredIdentity();
+        //condition for comparision
+        String cond = getTwoParaEqualsString(name, getCapitalCase(idName) + PERIOD + CLASS);
+        //return value in toString method
+        String returnVal = getCapitalCase(idName) + PERIOD + getCamelCase(
+                identity.getName(), null) + TO_CAPS +
+                STRING_DATA_TYPE + OPEN_CLOSE_BRACKET_STRING;
+        List<YangIdentity> idList = identity.getExtendList();
+        //adding present identity's tostring method
+        builder.append(getIfConditionBegin(EIGHT_SPACE_INDENTATION + indent,
+                                           cond))
+                .append(getReturnString(returnVal, TWELVE_SPACE_INDENTATION +
+                        indent))
+                .append(signatureClose());
+        //adding derived identities tostring method
+        for (YangIdentity id : idList) {
+            idName = getIdName(id);
+            cond = getTwoParaEqualsString(name, getCapitalCase(idName) +
+                    PERIOD + CLASS);
+
+            returnVal = getCapitalCase(idName) + PERIOD + getCamelCase(id.getName(), null) + TO_CAPS +
+                    STRING_DATA_TYPE + OPEN_CLOSE_BRACKET_STRING;
+
+            builder.append(getElseIfConditionBegin(
+                    EIGHT_SPACE_INDENTATION + indent, cond))
+                    .append(getReturnString(returnVal,
+                                            TWELVE_SPACE_INDENTATION + indent))
+                    .append(signatureClose());
+        }
+        //passing indents for if-else statements in toString methods
+        if (indent.equals(FOUR_SPACE_INDENTATION)) {
+            builder.append(methodClose(TWELVE_SPACE));
+        } else {
+            builder.append(methodClose(EIGHT_SPACE));
+        }
+        return builder.toString();
+    }
+
+    /**
      * Returns union class's to string method.
      *
      * @param types list of types
      * @return union class's to string method
      */
     static String getUnionToStringMethod(List<YangType<?>> types) {
-
         StringBuilder builder = new StringBuilder(getOverRideString());
         builder.append(methodSignature(TO_STRING_METHOD, null, PUBLIC, null,
                                        STRING_DATA_TYPE, null, CLASS_TYPE));
         for (YangType type : types) {
             builder.append(getIfConditionBegin(
                     EIGHT_SPACE_INDENTATION, getSetValueParaCondition(
-                            types.indexOf(type)))).append(getReturnString(
-                    getToStringForSpecialType(type,
-                                              getCamelCase(type.getDataTypeName(), null)),
-                    TWELVE_SPACE_INDENTATION))
-                    .append(signatureClose()).append(methodClose(EIGHT_SPACE));
+                            types.indexOf(type))));
+            String retVal = getToStringForSpecialType(
+                    type, getCamelCase(type.getDataTypeName(), null));
+            if (type.getDataType() != IDENTITYREF) {
+                builder.append(getReturnString(retVal, TWELVE_SPACE_INDENTATION))
+                        .append(signatureClose());
+            } else {
+                retVal = getIdRefToString(type,
+                                          getCamelCase(type.getDataTypeName(), null),
+                                          FOUR_SPACE_INDENTATION);
+                builder.append(retVal);
+            }
+            builder.append(methodClose(EIGHT_SPACE));
         }
         builder.append(getReturnString(NULL, EIGHT_SPACE_INDENTATION)).append(signatureClose())
                 .append(methodClose(FOUR_SPACE));
@@ -1902,50 +1861,6 @@ public final class MethodsGenerator {
         builder.append(methodClose(EIGHT_SPACE))
                 .append(getExceptionThrowString(EIGHT_SPACE_INDENTATION))
                 .append(methodClose(FOUR_SPACE));
-        return builder.toString();
-    }
-
-    /**
-     * Returns compare to method for key class.
-     *
-     * @param attrs     attribute list
-     * @param className class name
-     * @return compare to method
-     */
-    public static String getCompareToForKeyClass(
-            List<JavaAttributeInfo> attrs, String className) {
-
-        StringBuilder builder = new StringBuilder(getOverRideString());
-        builder.append(methodSignature(COMPARE_TO, null, PUBLIC, VALUE, INT,
-                                       className, CLASS_TYPE));
-        String cond;
-        String attrName;
-        String para;
-        StringBuilder space = new StringBuilder();
-        List<String> spaces = new ArrayList<>();
-        int count = 1;
-        for (JavaAttributeInfo attr : attrs) {
-            attrName = attr.getAttributeName();
-            para = VALUE + PERIOD + attrName;
-            cond = getTwoParaEqualsString(attrName, para);
-            if (count == 1) {
-                space.append(EIGHT_SPACE_INDENTATION);
-            } else {
-                space.append(FOUR_SPACE_INDENTATION);
-            }
-            spaces.add(space.toString());
-            count++;
-            builder.append(getIfConditionBegin(space.toString(), cond));
-        }
-        space.append(FOUR_SPACE_INDENTATION);
-        builder.append(getReturnString(ZERO, space.toString()))
-                .append(signatureClose());
-        for (int i = spaces.size() - 1; i >= 0; i--) {
-            builder.append(spaces.get(i)).append(CLOSE_CURLY_BRACKET)
-                    .append(NEW_LINE);
-        }
-        builder.append(getReturnString(NEG_ONE, EIGHT_SPACE_INDENTATION))
-                .append(signatureClose()).append(methodClose(FOUR_SPACE));
         return builder.toString();
     }
 

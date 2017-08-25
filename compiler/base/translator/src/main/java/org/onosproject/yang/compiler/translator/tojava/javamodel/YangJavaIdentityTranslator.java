@@ -37,6 +37,7 @@ import java.util.List;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.updatePackageInfo;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getDerivedPkfInfo;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
@@ -48,7 +49,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorEr
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
-import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_FILE_EXTENSION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
@@ -191,26 +191,10 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
      */
     private List<String> getImportOfDerId(List<YangIdentity> idList,
                                           List<String> imports, String className) {
-        String derClassName;
         if (idList != null) {
             for (YangIdentity id : idList) {
-                if (id.isNameConflict()) {
-                    derClassName = getCapitalCase(
-                            getCamelCase(id.getName() + IDENTITY, null));
-                } else {
-                    derClassName = getCapitalCase(
-                            getCamelCase(id.getName(), null));
-                }
-                JavaFileInfoTranslator info = ((
-                        YangJavaIdentityTranslator) id).getJavaFileInfo();
-                String derPkg = info.getPackage();
-                if (derPkg == null) {
-                    derPkg = getDerivedPackage(id);
-                }
                 JavaQualifiedTypeInfoTranslator derPkgInfo =
-                        new JavaQualifiedTypeInfoTranslator();
-                derPkgInfo.setClassInfo(derClassName);
-                derPkgInfo.setPkgInfo(derPkg);
+                        getDerivedPkfInfo(id);
                 importData.addImportInfo(derPkgInfo, className,
                                          javaFileInfo.getPackage());
             }
@@ -225,8 +209,8 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
      * @param id YANG Identity.
      * @return package of identity.
      */
-    private String getDerivedPackage(YangIdentity id) {
-        String derPkg = null;
+    public static String getDerivedPackage(YangIdentity id) {
+        String derPkg;
         byte version;
         String moduleName;
         YangRevision revision;

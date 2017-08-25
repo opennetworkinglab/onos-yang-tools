@@ -40,11 +40,13 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT32;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT64;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UINT8;
+import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_SERVICE_AND_MANAGER;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.BracketType.OPEN_CLOSE_BRACKET_WITH_VALUE_AND_RETURN_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
-import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.INTERFACE_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getIdentityRefName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ABSTRACT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
@@ -108,6 +110,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.OMIT_NULL_VALUE_
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CLOSE_BRACKET_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_PARENTHESIS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OVERRIDE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PARSE_BOOLEAN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PARSE_BYTE;
@@ -122,6 +125,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTE_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.RETURN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET;
+import static org.onosproject.yang.compiler.utils.UtilConstants.SET_METHOD_PREFIX;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET_VALUE_PARA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT_MAX_RANGE;
@@ -147,6 +151,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MAX_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ULONG_MIN_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALIDATE_RANGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_UTILS_TODO;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ZERO;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
@@ -1364,5 +1369,26 @@ public final class StringGenerator {
                 .append(IMPORT).append(STATIC).append(SPACE)
                 .append(pkg).append(PERIOD).append(cls).append(signatureClose());
         return builder.toString();
+    }
+
+    /**
+     * Returns setter string for interface.
+     *
+     * @param name     class name
+     * @param attrName attribute name
+     * @param attrType attribute type
+     * @return setter string
+     */
+    static String getSetterInterfaceString(String name,
+                                           String attrName,
+                                           String attrType,
+                                           int genType) {
+        if (genType == GENERATE_SERVICE_AND_MANAGER) {
+            return methodSignature(getCapitalCase(attrName), SET_METHOD_PREFIX,
+                                   null, attrName, VOID, attrType + OP_PARAM,
+                                   INTERFACE_TYPE);
+        }
+        return methodSignature(attrName, EMPTY_STRING, null,
+                               attrName, VOID, attrType, INTERFACE_TYPE);
     }
 }
