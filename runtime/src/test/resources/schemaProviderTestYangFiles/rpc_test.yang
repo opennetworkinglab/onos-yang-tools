@@ -24,13 +24,13 @@ module hello {
     rpc hello-second {
         input {
             leaf x {
-                type string;
+                type binary;
             }
         }
 
         output {
             leaf greeting {
-                type string;
+                type binary;
             }
         }
     }

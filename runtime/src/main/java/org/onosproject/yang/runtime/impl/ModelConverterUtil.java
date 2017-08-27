@@ -43,6 +43,7 @@ import org.onosproject.yang.model.SingleInstanceNode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -84,6 +85,7 @@ final class ModelConverterUtil {
                                         UINT16, UINT32, BOOLEAN, EMPTY));
     private static final String TO_STRING = "toString";
     private static final String IS_VAL_SET = "isLeafValueSet";
+    private static final Base64.Encoder BASE64_BASIC_ENCODER = Base64.getEncoder();
 
     // No instantiation.
     private ModelConverterUtil() {
@@ -293,7 +295,7 @@ final class ModelConverterUtil {
                 return String.valueOf(fieldObj).trim();
 
             case BINARY:
-                return new String((byte[]) fieldObj);
+                return BASE64_BASIC_ENCODER.encodeToString((byte[]) fieldObj);
 
             case BITS:
                 return getBitsValue(holder, holderObj, name, fieldObj).trim();

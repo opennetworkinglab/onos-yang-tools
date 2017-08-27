@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.runtime.impl;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -91,6 +92,8 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.Cont.LeafIdentifier.LFENUM1;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LEAF1;
@@ -167,7 +170,8 @@ public class DefaultDataTreeBuilderTest {
     /**
      * Do the prior setup for each UT.
      */
-    private void setUp() {
+    @Before
+    public void setUp() {
         processSchemaRegistry();
         registry = registry();
         treeBuilder = new DefaultDataTreeBuilder(registry);
@@ -181,8 +185,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleAndLeaf() {
-        setUp();
-
         //  As an application, creates the object.
 
         LeafModelObject modelObject = new LeafModelObject();
@@ -221,8 +223,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleAndLeafList() {
-
-        setUp();
         //As an application, creates the object.
 
         LeafModelObject modelObject = new LeafModelObject();
@@ -271,8 +271,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleListAndKeyOneIn() {
-        setUp();
-
         //As an application, creates the object.
         DefaultModKey m1 = new DefaultModKey();
         m1.types(1);
@@ -319,8 +317,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleListAndKey() {
-        setUp();
-
         //As an application, creates the object.
         DefaultModKey m1 = new DefaultModKey();
         m1.types(1);
@@ -406,9 +402,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleListAndKeyListModId() {
-
-        setUp();
-
         data = new Builder();
 
         LeafModelObject object = new LeafModelObject();
@@ -495,9 +488,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleListAndKeyLeafModId() {
-
-        setUp();
-
         data = new Builder();
         ModKeyKeys keyKeys = new ModKeyKeys();
         keyKeys.types(10);
@@ -550,8 +540,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processWithTypeEnum() {
-        setUp();
-
         data = new Builder();
         //As an application, creates the object.
         LeafModelObject object = new LeafModelObject();
@@ -622,8 +610,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleWithContainer() {
-        setUp();
-
         // As an application, creates the object.
 
         //Creates container object with leaf of decimal type.
@@ -673,8 +659,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processModuleWithContainerModId() {
-
-        setUp();
         data = new Builder();
         //As an application, creates the object.
         LeafModelObject object = new LeafModelObject();
@@ -718,7 +702,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processTreeBuilderForListHavingList() {
-        setUp();
         // Creates two binary leaf -lists for two list app areas.
         List<byte[]> destArea1 = new ArrayList<>();
         byte[] arr = Base64.getDecoder().decode("QXdnRQ==");
@@ -840,10 +823,10 @@ public class DefaultDataTreeBuilderTest {
 
         n = it.next();
         key = n.getKey();
-        assertThat(true, is(key instanceof LeafListKey));
+        assertTrue(key instanceof LeafListKey);
 
         LeafListKey leafListKey = (LeafListKey) key;
-        assertThat("BwcH", is(leafListKey.value()));
+        assertEquals("Wrong Base64 value", "QndjSA==", leafListKey.value());
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -854,7 +837,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("AAE=", is(leafListKey.value()));
+        assertEquals("Wrong Base64 value", "QUFFPQ==", leafListKey.value());
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -896,7 +879,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("JHI8", is(leafListKey.value()));
+        assertEquals("Wrong Base64 value", "SkhJOA==", leafListKey.value());
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -907,7 +890,7 @@ public class DefaultDataTreeBuilderTest {
         assertThat(true, is(key instanceof LeafListKey));
 
         leafListKey = (LeafListKey) key;
-        assertThat("1111", is(leafListKey.value()));
+        assertEquals("Wrong Base64 value", "MTExMQ==", leafListKey.value());
 
         sid = key.schemaId();
         assertThat("destination-areas", is(sid.name()));
@@ -1173,7 +1156,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processEnumeration() {
-        setUp();
         data = new Builder();
         ModelObjectId.Builder moIdBdlr = ModelObjectId.builder()
                 .addChild(DefaultCont.class);
@@ -1211,7 +1193,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processIdentityRef() {
-        setUp();
         DefaultState state = new DefaultState();
         state.type(TunnelP2p.class);
         DefaultTunnel tunnel = new DefaultTunnel();
@@ -1246,7 +1227,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processRpc() {
-        setUp();
         InTypedef typedef = new InTypedef("con-leaf");
         DefaultIn con = new DefaultIn();
         DefaultContentInput input = new DefaultContentInput();
@@ -1308,7 +1288,6 @@ public class DefaultDataTreeBuilderTest {
      */
     @Test
     public void processDataTypesToDataNode() {
-        setUp();
         data = new Builder();
         data = buildRootLeafAndLeafList(data);
         data = buildContainer(data);
@@ -1357,7 +1336,8 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(it.next(), "leaf2", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
         validateDataNode(it.next(), "leaf3", ns,
-                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
+                         "MTEwMTE="); //Base 64 encoding of '11011'
         validateDataNode(it.next(), "leaf4", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
         validateDataNode(it.next(), "leaf5", ns,
@@ -1373,7 +1353,8 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(it.next(), "leaf11", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, null);
         validateDataNode(it.next(), "leaf12", ns,
-                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
+                        "MTEwMTE="); //Base 64 encoding of '11011'
         validateDataNode(it.next(), "leaf13", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "*");
         validateDataNode(it.next(), "leaf14", ns,
@@ -1389,9 +1370,11 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(it.next(), "ll2", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "ten");
         validateDataNode(it.next(), "ll3", ns,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true,
+                         "MTEwMTE="); //Base 64 encoding of '11011'
         validateDataNode(it.next(), "ll3", ns,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110111");
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true,
+                        "MTEwMTEx"); //Base 64 encoding of '110111'
         validateDataNode(it.next(), "ll4", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "thousand");
         validateDataNode(it.next(), "ll4", ns,
@@ -1417,9 +1400,11 @@ public class DefaultDataTreeBuilderTest {
         validateDataNode(it.next(), "ll11", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, null);
         validateDataNode(it.next(), "ll12", ns,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "11011");
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true,
+                         "MTEwMTE="); //Base 64 encoding of '11011'
         validateDataNode(it.next(), "ll12", ns,
-                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "110111");
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true,
+                         "MTEwMTEx"); //Base 64 encoding of '110111'
         validateDataNode(it.next(), "ll13", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "*");
         validateDataNode(it.next(), "ll14", ns,

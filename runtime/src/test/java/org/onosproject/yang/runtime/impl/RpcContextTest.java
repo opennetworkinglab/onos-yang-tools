@@ -19,9 +19,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.onosproject.yang.gen.v1.hello.rev20150105.hello.hellosecond.DefaultHelloSecondInput;
 import org.onosproject.yang.gen.v1.hello.rev20150105.hello.hellosecond.HelloSecondInput;
+import org.onosproject.yang.gen.v1.hello.rev20150105.hello.hellosecond.HelloSecondOutput;
 import org.onosproject.yang.gen.v1.hello.rev20150105.hello.helloworld.DefaultHelloWorldInput;
 import org.onosproject.yang.gen.v1.hello.rev20150105.hello.helloworld.HelloWorldInput;
+import org.onosproject.yang.model.DataNode.Type;
 import org.onosproject.yang.model.DefaultModelObjectData;
+import org.onosproject.yang.model.DefaultResourceData;
+import org.onosproject.yang.model.InnerNode;
+import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.ModelConverter;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
@@ -91,11 +96,48 @@ public class RpcContextTest {
 
         //Now test converting to a second RPC in the same YANG
         HelloSecondInput hsInput = new DefaultHelloSecondInput();
-        hsInput.x("second-input");
+        hsInput.x(new byte[]{0x1, 0x2, 0x3, 0x4}); //In base64 this is AQIDBA==
         ModelObjectData hsInputMod = DefaultModelObjectData.builder().
                 addModelObject((ModelObject) hsInput).build();
-        assertNotNull(hsInputMod);
+        assertEquals(1, hsInputMod.modelObjects().size());
         ResourceData rdSecond = mc.createDataNode(hsInputMod);
-        assertNotNull(rdSecond);
+        assertEquals(1, rdSecond.dataNodes().size());
+        InnerNode in = (InnerNode) rdSecond.dataNodes().get(0);
+        assertEquals(1, in.childNodes().size());
+        in.childNodes().entrySet().iterator().forEachRemaining(node -> {
+            LeafNode leafNode = (LeafNode) node.getValue();
+            assertEquals("Wrong Base64 value", "AQIDBA==",
+                                    leafNode.value().toString());
+        });
+
+        //Now test decoding the output when it's binary (Base64)
+        LeafNode greetingNode = LeafNode
+            .builder("greeting", "urn:params:xml:ns:yang:hello")
+            .type(Type.SINGLE_INSTANCE_LEAF_VALUE_NODE)
+            .value("BQYHCA==") //Base64 encoding of 0x5 0x6 0x7 0x8
+            .build();
+        InnerNode outputNode = InnerNode
+            .builder("output", "urn:params:xml:ns:yang:hello")
+            .addNode(greetingNode)
+            .type(Type.SINGLE_INSTANCE_NODE)
+            .build();
+        ResourceId rid = ResourceId.builder()
+                .addBranchPointSchema("/", null)
+                .addBranchPointSchema("hello-second", "urn:params:xml:ns:yang:hello")
+                .build();
+
+        ResourceData hsOutputRd = DefaultResourceData.builder()
+                    .addDataNode(outputNode)
+                    .resourceId(rid)
+                    .build();
+        assertNotNull(hsOutputRd);
+        ModelObjectData hsOutputMod = mc.createModel(hsOutputRd);
+        assertEquals(1, hsOutputMod.modelObjects().size());
+        HelloSecondOutput hsOutput = (HelloSecondOutput) hsOutputMod.modelObjects().get(0);
+        assertEquals(4, hsOutput.greeting().length);
+        assertEquals(0x05, hsOutput.greeting()[0]);
+        assertEquals(0x06, hsOutput.greeting()[1]);
+        assertEquals(0x07, hsOutput.greeting()[2]);
+        assertEquals(0x08, hsOutput.greeting()[3]);
     }
 }

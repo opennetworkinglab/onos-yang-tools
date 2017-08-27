@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.runtime.impl;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -127,7 +128,8 @@ public class YtbResourceIdTest {
     /**
      * Prior setup for each UT.
      */
-    private void setUp() {
+    @Before
+    public void setUp() {
         processSchemaRegistry();
         reg = registry();
         treeBuilder = new DefaultDataTreeBuilder(reg);
@@ -139,7 +141,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processKeysInRid() {
-        setUp();
         data = new Builder();
         mid = buildMidWithKeys().build();
         data.identifier(mid);
@@ -155,7 +156,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processNodeAndLeafListInRid() {
-        setUp();
         data = new Builder();
         ModelObjectId.Builder builder = buildMidWithKeys();
         Tdef1 tdef1 = new Tdef1(Tdef1Union.fromString("thousand"));
@@ -173,7 +173,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processAugmentedLeafListRid() {
-        setUp();
         data = new Builder();
         mid = builder().addChild(DefaultVal.class)
                 .addChild(AugmentedSchVal.LeafIdentifier.LL, fromString("num"))
@@ -215,7 +214,7 @@ public class YtbResourceIdTest {
 
         byte[] arr = Base64.getDecoder().decode("QXdnRQ==");
         key = buildRidForLeafList(LL8, arr);
-        assertThat(key.value(), is("AwgE"));
+        assertThat(key.value(), is("QXdnRQ=="));
 
         Id id = new Id(IdUnion.fromString("true"));
         key = buildRidForLeafList(LL9, id);
@@ -230,7 +229,6 @@ public class YtbResourceIdTest {
      * @return leaf list key
      */
     private LeafListKey buildRidForLeafList(LeafIdentifier lId, Object val) {
-        setUp();
         data = new Builder();
         mid = ModelObjectId.builder().addChild(lId, val).build();
         data.identifier(mid);
@@ -278,7 +276,8 @@ public class YtbResourceIdTest {
 
         validateKeyLeaf(it.next(), "leaf7", nameSpace, "num");
 
-        validateKeyLeaf(it.next(), "leaf8", nameSpace, "11011");
+        validateKeyLeaf(it.next(), "leaf8", nameSpace,
+                "MTEwMTE="); //Base 64 encoding of '11011'
 
         //FIXME: Union under object provider.
         validateKeyLeaf(it.next(), "leaf9", nameSpace, "true");
@@ -331,7 +330,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processRpcInputForUsesAug() {
-        setUp();
         EstablishSubscriptionInput input = new
                 DefaultEstablishSubscriptionInput();
         EventStream tgt = new DefaultEventStream();
@@ -370,7 +368,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processRpcOutputForUsesAug() {
-        setUp();
         EstablishSubscriptionOutput output = new
                 DefaultEstablishSubscriptionOutput();
         Success result = new DefaultSuccess();
@@ -403,7 +400,6 @@ public class YtbResourceIdTest {
      */
     @Test
     public void processContainerForUsesAug() {
-        setUp();
         Subscriptions subs = new DefaultSubscriptions();
         Subscription sub = new DefaultSubscription();
         sub.identifier(new SubscriptionId(1112L));
