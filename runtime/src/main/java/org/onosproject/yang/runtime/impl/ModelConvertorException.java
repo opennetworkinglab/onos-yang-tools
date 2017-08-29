@@ -31,6 +31,16 @@ class ModelConvertorException extends RuntimeException {
     }
 
     /**
+     * Creates  model converter exception with an exception message and cause.
+     *
+     * @param exceptionMessage message with which exception must be thrown
+     * @param cause cause of the exception
+     */
+    ModelConvertorException(String exceptionMessage, Throwable cause) {
+        super(exceptionMessage, cause);
+    }
+
+    /**
      * Creates  model converter exception with the cause for it.
      *
      * @param cause cause of the exception

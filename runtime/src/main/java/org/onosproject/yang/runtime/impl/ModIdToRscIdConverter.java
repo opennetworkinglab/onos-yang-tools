@@ -209,47 +209,51 @@ class ModIdToRscIdConverter {
         YangNode tempNode;
         while (it.hasNext()) {
             path = it.next();
-            //Get the java package for given atomic path. this package will
-            // be java package for schema node
-            pkg = fetchPackage(path);
-            if (curNode instanceof YangAugmentableNode) {
-                tempNode = fetchFromAugment((YangNode) curNode, pkg, builder);
-                if (tempNode != null) {
-                    curNode = tempNode;
+            try {
+                //Get the java package for given atomic path. this package will
+                // be java package for schema node
+                pkg = fetchPackage(path);
+                if (curNode instanceof YangAugmentableNode) {
+                    tempNode = fetchFromAugment((YangNode) curNode, pkg, builder);
+                    if (tempNode != null) {
+                        curNode = tempNode;
+                    } else {
+                        //fetch the node for which model object identifier
+                        // contains the atomic path.
+                        curNode = fetchNode(((YangNode) curNode).getChild(), pkg, builder);
+                    }
                 } else {
-                    //fetch the node for which model object identifier
-                    // contains the atomic path.
                     curNode = fetchNode(((YangNode) curNode).getChild(), pkg, builder);
                 }
-            } else {
-                curNode = fetchNode(((YangNode) curNode).getChild(), pkg, builder);
-            }
-            //if the current node is null and atomic path list contains
-            // another node, then there is possibility that its a leaf node.
-            if (curNode == null && paths.indexOf(path) == paths.size() - 1) {
-                //check leaf nodes in previous nodes.
-                handleLeafInRid(preNode, id, builder, path);
-            } else if (curNode != null) {
+                //if the current node is null and atomic path list contains
+                // another node, then there is possibility that its a leaf node.
+                if (curNode == null && paths.indexOf(path) == paths.size() - 1) {
+                    //check leaf nodes in previous nodes.
+                    handleLeafInRid(preNode, id, builder, path);
+                } else if (curNode != null) {
 
-                builder.addBranchPointSchema(curNode.getName(), curNode
-                        .getNameSpace().getModuleNamespace());
-                //list node can have key leaf in it. so resource identifier
-                // should have key leaves also.
-                if (curNode instanceof YangList) {
-                    YangList list = (YangList) curNode;
-                    MultiInstanceNode mil = (MultiInstanceNode) path;
-                    Object keysObj = mil.key();
-                    Set<String> keys = list.getKeyLeaf();
-                    for (String key : keys) {
-                        Object obj = getKeyObject(keysObj, key, list);
-                        builder.addKeyLeaf(key, list.getNameSpace()
-                                .getModuleNamespace(), obj);
+                    builder.addBranchPointSchema(curNode.getName(), curNode
+                                                 .getNameSpace().getModuleNamespace());
+                    //list node can have key leaf in it. so resource identifier
+                    // should have key leaves also.
+                    if (curNode instanceof YangList) {
+                        YangList list = (YangList) curNode;
+                        MultiInstanceNode mil = (MultiInstanceNode) path;
+                        Object keysObj = mil.key();
+                        Set<String> keys = list.getKeyLeaf();
+                        for (String key : keys) {
+                            Object obj = getKeyObject(keysObj, key, list);
+                            builder.addKeyLeaf(key, list.getNameSpace()
+                                               .getModuleNamespace(), obj);
+                        }
                     }
+                } else {
+                    throw new ModelConvertorException("invalid model object id." + id);
                 }
-            } else {
-                throw new ModelConvertorException("invalid model object id." + id);
+                preNode = curNode;
+            } catch (Exception e) {
+                throw new ModelConvertorException("Encountered an Exception processing " + path, e);
             }
-            preNode = curNode;
         }
         if (!isMoIdWithLeaf) {
             // last node with respect to the last class in model object
