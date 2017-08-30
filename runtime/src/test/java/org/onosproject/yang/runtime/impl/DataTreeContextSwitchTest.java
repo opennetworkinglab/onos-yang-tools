@@ -1257,7 +1257,7 @@ public class DataTreeContextSwitchTest {
         n = it.next();
         validateDataNode(n.getValue(), "leaf-aug", nameSpace,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE,
-                         true, "1011");
+                         true, "MTAxMQ==");
         n = it.next();
         validateDataNode(n.getValue(), "leaf-inter-aug", nameSpace,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE,

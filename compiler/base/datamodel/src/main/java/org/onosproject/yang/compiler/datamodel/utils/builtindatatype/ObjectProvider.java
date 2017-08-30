@@ -23,7 +23,6 @@ import org.onosproject.yang.compiler.datamodel.YangUnion;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Base64;
 import java.util.Iterator;
 
 public final class ObjectProvider {
@@ -81,9 +80,6 @@ public final class ObjectProvider {
             case BOOLEAN:
                 return Boolean.parseBoolean(leafValue);
             case BINARY:
-                byte[] data = Base64.getDecoder().decode(leafValue);
-                String str = new String(data);
-                return str;
             case BITS:
             case IDENTITYREF:
             case ENUMERATION:

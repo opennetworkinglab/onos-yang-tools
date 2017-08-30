@@ -51,6 +51,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,7 +127,8 @@ final class YobUtils {
                 break;
 
             case BINARY:
-                parentSetter.invoke(parentObj, ((String) value).getBytes());
+                byte[] data = Base64.getDecoder().decode((String) value);
+                parentSetter.invoke(parentObj, data);
                 break;
 
             case BITS:
