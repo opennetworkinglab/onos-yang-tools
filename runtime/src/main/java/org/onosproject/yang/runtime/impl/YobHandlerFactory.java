@@ -61,13 +61,13 @@ final class YobHandlerFactory {
      *
      * @param type data node type
      * @return handler to create the object
-     * @throws ModelConvertorException if the data node type is not supported in YOB
+     * @throws ModelConverterException if the data node type is not supported in YOB
      */
     YobHandler getYobHandlerForContext(DataNode.Type type) {
         YobHandler yobHandler = HANDLER_MAP.get(type);
         if (yobHandler == null) {
             log.error(E_DATA_NODE_TYPE_IS_NOT_SUPPORT);
-            throw new ModelConvertorException(E_DATA_NODE_TYPE_IS_NOT_SUPPORT);
+            throw new ModelConverterException(E_DATA_NODE_TYPE_IS_NOT_SUPPORT);
         }
         return yobHandler;
     }

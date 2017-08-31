@@ -248,11 +248,11 @@ class ModIdToRscIdConverter {
                         }
                     }
                 } else {
-                    throw new ModelConvertorException("invalid model object id." + id);
+                    throw new ModelConverterException("invalid model object id." + id);
                 }
                 preNode = curNode;
             } catch (Exception e) {
-                throw new ModelConvertorException("Encountered an Exception processing " + path, e);
+                throw new ModelConverterException("Encountered an Exception processing " + path, e);
             }
         }
         if (!isMoIdWithLeaf) {
@@ -281,7 +281,7 @@ class ModIdToRscIdConverter {
             }
         }
         if (curNode == null) {
-            throw new ModelConvertorException("invalid model object id." + id);
+            throw new ModelConverterException("invalid model object id." + id);
         }
         isMoIdWithLeaf = true;
         if (curNode instanceof YangLeaf) {
@@ -344,7 +344,7 @@ class ModIdToRscIdConverter {
         try {
             return getAttributeOfObject(keys, getCamelCase(keyName, null));
         } catch (NoSuchMethodException e) {
-            throw new ModelConvertorException("invalid key value in model id for list" +
+            throw new ModelConverterException("invalid key value in model id for list" +
                                                       "." + keys.getClass().getName());
         }
     }
@@ -471,7 +471,7 @@ class ModIdToRscIdConverter {
             }
         }
         if (leaf == null) {
-            throw new ModelConvertorException(
+            throw new ModelConverterException(
                     "The specified key " + key + " is not present in the " +
                             "YANG schema node.");
         }

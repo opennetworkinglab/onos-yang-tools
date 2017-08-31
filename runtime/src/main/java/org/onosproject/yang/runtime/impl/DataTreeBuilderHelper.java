@@ -427,9 +427,9 @@ public class DataTreeBuilderHelper {
                     obj = getAttributeOfObject(
                             parentNodeInfo.getYangObject(), name);
                 } catch (NoSuchMethodException e) {
-                    throw new ModelConvertorException(
+                    throw new ModelConverterException(
                             "Not processable case node with augment in " +
-                                    "data tree");
+                                    "data tree", e);
                 }
                 parentNodeInfo = new DataTreeNodeInfo();
                 parentNodeInfo.setYangObject(obj);
@@ -460,7 +460,7 @@ public class DataTreeBuilderHelper {
                 nodeObj = processAugmentNode(curNode, parentNodeInfo);
                 break;
             default:
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Non processable schema node has arrived for adding " +
                                 "it in data tree");
         }
@@ -631,9 +631,9 @@ public class DataTreeBuilderHelper {
                 return getAttributeOfObject(
                         parentNodeInfo.getYangObject(), name);
             } catch (NoSuchMethodException e) {
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Not processable case node with augment in " +
-                                "data tree");
+                                "data tree", e);
             }
         }
 
@@ -658,7 +658,7 @@ public class DataTreeBuilderHelper {
                 return childObj;
             }
         } catch (ClassNotFoundException | NoSuchMethodException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
         return null;
     }
@@ -702,7 +702,7 @@ public class DataTreeBuilderHelper {
         try {
             return getAttributeOfObject(parentObj, nodeJavaName);
         } catch (NoSuchMethodException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -764,7 +764,7 @@ public class DataTreeBuilderHelper {
                         leafType = getAttributeOfObject(parentObj,
                                                         getJavaName(yangLeaf));
                     } catch (NoSuchMethodException e) {
-                        throw new ModelConvertorException(e);
+                        throw new ModelConverterException(e);
                     }
                     Object obj = getLeafObject(yangNode, yangLeaf, parentObj,
                                                leafType, false);
@@ -829,7 +829,7 @@ public class DataTreeBuilderHelper {
             obj = (List<Object>) getAttributeOfObject(parentObj,
                                                       getJavaName(leafList));
         } catch (NoSuchMethodException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
         if (obj != null) {
             Set<Object> objects = getLeafListObject(yangNode, leafList,

@@ -385,7 +385,7 @@ final class YobUtils {
             }
             Class<?> moduleClass = reg.getRegisteredClass(parent);
             if (moduleClass == null) {
-                throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS + parent
+                throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + parent
                         .getJavaClassNameOrBuiltInType());
             }
             return moduleClass.getClassLoader();
@@ -487,7 +487,7 @@ final class YobUtils {
         derivedId = getDerivedIdentity(leafValue.toString(), identityRef
                 .getReferredIdentity());
         if (derivedId == null) {
-            throw new ModelConvertorException(E_INVALID_IDENTITY_DATA +
+            throw new ModelConverterException(E_INVALID_IDENTITY_DATA +
                                                       leafValue.toString());
         }
         qualifiedClassName = derivedId.getJavaPackage() + PERIOD +
@@ -586,7 +586,7 @@ final class YobUtils {
             if (intf != null) {
                 leafId = intf.getName() + ENUM_LEAF_IDENTIFIER;
             } else {
-                throw new ModelConvertorException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS);
+                throw new ModelConverterException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS);
             }
 
             Class<Enum> leafIdentifier =
@@ -598,7 +598,7 @@ final class YobUtils {
                 }
             }
         } catch (ClassNotFoundException e) {
-            throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS);
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS);
         }
         return null;
     }
@@ -614,7 +614,7 @@ final class YobUtils {
         try {
             return loader.loadClass(name);
         } catch (ClassNotFoundException e) {
-            throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS + name);
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + name);
         }
     }
 
@@ -631,14 +631,14 @@ final class YobUtils {
             return defaultClass.newInstance();
         } catch (ClassNotFoundException e) {
             log.error(L_FAIL_TO_LOAD_CLASS, name);
-            throw new ModelConvertorException(E_FAIL_TO_LOAD_CLASS + name);
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + name);
         } catch (NullPointerException e) {
             log.error(L_REFLECTION_FAIL_TO_CREATE_OBJ, name);
-            throw new ModelConvertorException(E_REFLECTION_FAIL_TO_CREATE_OBJ +
+            throw new ModelConverterException(E_REFLECTION_FAIL_TO_CREATE_OBJ +
                                                       name);
         } catch (InstantiationException | IllegalAccessException e) {
             log.error(L_FAIL_TO_CREATE_OBJ, name);
-            throw new ModelConvertorException(E_FAIL_TO_CREATE_OBJ + name);
+            throw new ModelConverterException(E_FAIL_TO_CREATE_OBJ + name);
         }
     }
 
@@ -737,20 +737,20 @@ final class YobUtils {
                         midb = midb.addChild(listClass, keyObj);
                     }
                 } catch (NoSuchMethodException e) {
-                    throw new ModelConvertorException(
+                    throw new ModelConverterException(
                             "Failed to load setter method for " +
                                     javaName + " in key class"
                                     + keyClassName);
                 } catch (InvocationTargetException e) {
-                    throw new ModelConvertorException(
+                    throw new ModelConverterException(
                             "Failed to invoke setter method for " +
                                     javaName + " in key class"
                                     + keyClassName);
                 } catch (ClassNotFoundException e) {
-                    throw new ModelConvertorException("Failed to load key class"
+                    throw new ModelConverterException("Failed to load key class"
                                                               + keyClassName);
                 } catch (IllegalAccessException | InstantiationException e) {
-                    throw new ModelConvertorException("Failed Instantiation of key class"
+                    throw new ModelConverterException("Failed Instantiation of key class"
                                                               + keyClassName);
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
@@ -800,7 +800,7 @@ final class YobUtils {
                     }
                 }
             } catch (ClassNotFoundException e) {
-                throw new ModelConvertorException("Failed to load leaf identifier class." +
+                throw new ModelConverterException("Failed to load leaf identifier class." +
                                                           leafName);
             }
         }
@@ -870,7 +870,7 @@ final class YobUtils {
                     }
                 }
             } catch (ClassNotFoundException e) {
-                throw new ModelConvertorException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS);
+                throw new ModelConverterException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS);
             }
         }
         return midb;

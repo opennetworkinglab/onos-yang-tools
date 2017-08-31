@@ -242,13 +242,13 @@ class YobWorkBench {
             method.invoke(parentObj, curObj);
         } catch (NoSuchFieldException e) {
             log.error(L_FAIL_TO_GET_FIELD, parentClassName);
-            throw new ModelConvertorException(E_FAIL_TO_GET_FIELD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_GET_FIELD + parentClassName);
         } catch (NoSuchMethodException e) {
             log.error(L_FAIL_TO_GET_METHOD, parentClassName);
-            throw new ModelConvertorException(E_FAIL_TO_GET_METHOD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + parentClassName);
         } catch (InvocationTargetException | IllegalAccessException e) {
             log.error(L_FAIL_TO_INVOKE_METHOD, parentClassName);
-            throw new ModelConvertorException(E_FAIL_TO_INVOKE_METHOD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + parentClassName);
         }
     }
 
@@ -279,9 +279,9 @@ class YobWorkBench {
                 schemaContext = parentSchema.getChildSchema(targetNode);
 
             } catch (DataModelException e) {
-                throw new ModelConvertorException(parentSchema.getName() +
+                throw new ModelConverterException(parentSchema.getName() +
                                                           E_HAS_NO_CHILD +
-                                                          targetNode.getName());
+                                                          targetNode.getName(), e);
             }
 
             nonSchemaHolder = schemaContext.getContextSwitchedNode();
@@ -346,9 +346,9 @@ class YobWorkBench {
                         childContext.getContextSwitchedNode());
 
             } catch (DataModelException e) {
-                throw new ModelConvertorException(ctxSwitchedNode.getName() +
+                throw new ModelConverterException(ctxSwitchedNode.getName() +
                                                           E_HAS_NO_CHILD +
-                                                          targetNode.getName());
+                                                          targetNode.getName(), e);
             }
         } else if (ctxSwitchedNode.getYangSchemaNodeType() ==
                 YANG_AUGMENT_NODE) {
@@ -376,10 +376,10 @@ class YobWorkBench {
             method.invoke(builder, instance);
         } catch (NoSuchMethodException e) {
             log.error(L_FAIL_TO_GET_METHOD, ADD_AUGMENT_METHOD);
-            throw new ModelConvertorException(E_FAIL_TO_GET_METHOD + ADD_AUGMENT_METHOD);
+            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + ADD_AUGMENT_METHOD);
         } catch (InvocationTargetException | IllegalAccessException e) {
             log.error(L_FAIL_TO_INVOKE_METHOD, ADD_AUGMENT_METHOD);
-            throw new ModelConvertorException(E_FAIL_TO_INVOKE_METHOD + ADD_AUGMENT_METHOD);
+            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + ADD_AUGMENT_METHOD);
         }
     }
 

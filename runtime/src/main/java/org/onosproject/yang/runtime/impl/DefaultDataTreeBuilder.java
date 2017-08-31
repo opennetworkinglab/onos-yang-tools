@@ -126,7 +126,7 @@ class DefaultDataTreeBuilder {
         }
 
         if (converter.isMoIdWithLeaf() && nonEmpty(modelObjects)) {
-            throw new ModelConvertorException(
+            throw new ModelConverterException(
                     "invalid module object data when model object identifier" +
                             " contains leaf node, no object should be added to" +
                             " model object list." + modelData);
@@ -155,7 +155,7 @@ class DefaultDataTreeBuilder {
                     processDataNodeConversion((YangNode) curNode, helper,
                                               rscData, modObj);
                 } else {
-                    throw new ModelConvertorException(
+                    throw new ModelConverterException(
                             "failed to convert model object in data node" +
                                     modObj);
                 }
@@ -200,7 +200,7 @@ class DefaultDataTreeBuilder {
                 }
                 break;
             default:
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Non processable schema node has arrived for adding " +
                                 "it in data tree");
         }
@@ -645,7 +645,7 @@ class DefaultDataTreeBuilder {
                     }
                 }
             } catch (NoSuchMethodException e) {
-                throw new ModelConvertorException(e);
+                throw new ModelConverterException(e);
             }
         }
     }
@@ -682,7 +682,7 @@ class DefaultDataTreeBuilder {
                     addDataNode(builder, rscData);
                 }
             } catch (NoSuchMethodException e) {
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Failed to create data node for leaf "
                                 + leaf.getName());
             }
@@ -864,7 +864,7 @@ class DefaultDataTreeBuilder {
                 }
                 break;
             default:
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Non processable schema node has arrived for adding " +
                                 "it in data tree");
         }

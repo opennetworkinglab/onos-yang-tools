@@ -127,7 +127,7 @@ final class ModelConverterUtil {
             getterMethod = nodeClass.getDeclaredMethod(fieldName);
             return getterMethod.invoke(nodeObj);
         } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -148,7 +148,7 @@ final class ModelConverterUtil {
             getterMethod = nodeClass.getDeclaredMethod(fieldName);
             return getterMethod.invoke(nodeObj);
         } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -169,7 +169,7 @@ final class ModelConverterUtil {
             return getterMethod.invoke(childClass);
         } catch (InvocationTargetException | NoSuchMethodException |
                 IllegalAccessException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -183,7 +183,7 @@ final class ModelConverterUtil {
         Class<?>[] interfaces = obj.getClass().getInterfaces();
         if (interfaces.length > ONE) {
             // TODO: Need to handle when impl class has more than one interface.
-            throw new ModelConvertorException("Implementation class having more than one" +
+            throw new ModelConverterException("Implementation class having more than one" +
                                                       " interface is not handled");
         }
         return interfaces[0];
@@ -248,7 +248,7 @@ final class ModelConverterUtil {
             return (boolean) getterMethod.invoke(nodeObj, value);
         } catch (IllegalAccessException | InvocationTargetException |
                 ClassNotFoundException | NoSuchMethodException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -268,7 +268,7 @@ final class ModelConverterUtil {
                                  YangType dataType) {
 
         if (fieldObj == null) {
-            throw new ModelConvertorException("Value of " + holder.getName()
+            throw new ModelConverterException("Value of " + holder.getName()
                                                       + " is null");
         }
 
@@ -318,7 +318,7 @@ final class ModelConverterUtil {
                 return ((LeafSchemaContext) leaf).fromString(val);
 
             default:
-                throw new ModelConvertorException(
+                throw new ModelConverterException(
                         "Unsupported data type. Cannot be processed.");
         }
     }
@@ -350,7 +350,7 @@ final class ModelConverterUtil {
             return String.valueOf(getterMethod.invoke(null, fieldObj));
         } catch (ClassNotFoundException | NoSuchMethodException |
                 InvocationTargetException | IllegalAccessException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -367,7 +367,7 @@ final class ModelConverterUtil {
 
         YangIdentity id = getDerivedIdentity(fieldObj, ir);
         if (id == null) {
-            throw new ModelConvertorException("Value for identity is invalid");
+            throw new ModelConverterException("Value for identity is invalid");
         }
         String idName = id.getJavaClassNameOrBuiltInType();
         String idPkg = id.getJavaPackage() + PERIOD + getCapitalCase(idName);
@@ -382,7 +382,7 @@ final class ModelConverterUtil {
             return String.valueOf(method.invoke(fieldObj)).trim();
         } catch (ClassNotFoundException | NoSuchMethodException |
                 InvocationTargetException | IllegalAccessException e) {
-            throw new ModelConvertorException(e);
+            throw new ModelConverterException(e);
         }
     }
 
@@ -522,7 +522,7 @@ final class ModelConverterUtil {
                 return getNameWithOutSpecialChar(
                         mil.leafIdentifier().toString().toLowerCase());
             default:
-                throw new ModelConvertorException("leaf/leaf-list can't be at this " +
+                throw new ModelConverterException("leaf/leaf-list can't be at this " +
                                                           "position");
         }
     }
