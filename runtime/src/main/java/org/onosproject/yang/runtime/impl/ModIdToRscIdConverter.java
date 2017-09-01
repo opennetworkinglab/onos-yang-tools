@@ -17,11 +17,13 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
+import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangOutput;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeType;
@@ -165,7 +167,6 @@ class ModIdToRscIdConverter {
         YangNode node = (YangNode) reg.getForRegClassQualifiedName(modPkg.toString(),
                                                                    true);
         if (node != null) {
-            isInputOrOutput = true;
             modNode = node;
             //in this case we should update the lastIndexNode for object to
             // data fetchNode conversion. because we need to create the data fetchNode
@@ -181,6 +182,10 @@ class ModIdToRscIdConverter {
                     break;
                 }
                 node = node.getNextSibling();
+            }
+            if (lastIndexNode instanceof YangInput ||
+                    lastIndexNode instanceof YangOutput) {
+                isInputOrOutput = true;
             }
         } else {
             modPkg.append(PERIOD);

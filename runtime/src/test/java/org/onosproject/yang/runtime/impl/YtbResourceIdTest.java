@@ -64,6 +64,10 @@ import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions
 import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.Subscription;
 import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.subscription.receivers.receiver.AugmentedReceiver;
 import org.onosproject.yang.gen.v1.yrtsubscription.yrtsubscription.subscriptions.subscription.receivers.receiver.DefaultAugmentedReceiver;
+import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.gr1.Cont;
+import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.gr1.DefaultCont;
+import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.gr2.DefaultListener;
+import org.onosproject.yang.gen.v1.ytbmodulewithcontainer.rev20160826.ytbmodulewithcontainer.gr2.Listener;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData.Builder;
 import org.onosproject.yang.model.InnerModelObject;
@@ -478,5 +482,45 @@ public class YtbResourceIdTest {
         validateDataNode(it.next(), "status", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true,
                          "active");
+    }
+
+    /**
+     * Processes uses under module, which has model object.
+     */
+    @Test
+    public void processGroupingInModule() {
+        Cont cont = new DefaultCont();
+        Listener listener = new DefaultListener();
+        listener.yangAutoPrefixWait("wait");
+        cont.addToListener(listener);
+        data = new Builder();
+        data.addModelObject((ModelObject) cont);
+        rscData = treeBuilder.getResourceData(data.build());
+        List<DataNode> contDn = rscData.dataNodes();
+        String ns = "yms:test:ytb:module:with:container";
+        Iterator<DataNode> it = contDn.iterator();
+
+        DataNode contNode = it.next();
+        validateDataNode(contNode, "cont", ns, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) contNode).childNodes();
+        List<DataNode> list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+
+        it = list.iterator();
+        DataNode lis = it.next();
+        validateDataNode(lis, "listener", ns, MULTI_INSTANCE_NODE,
+                         true, null);
+        child = ((InnerNode) lis).childNodes();
+        list = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            list.add(c.getValue());
+        }
+        it = list.iterator();
+        validateDataNode(it.next(), "wait", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "wait");
     }
 }

@@ -10,4 +10,23 @@ module YtbModuleWithContainer {
             }
         }
     }
+
+    grouping gr2 {
+        list listener {
+            key "wait";
+            leaf "wait" {
+                type string;
+            }
+        }
+    }
+
+    grouping gr1 {
+        container cont {
+            uses gr2;
+        }
+
+        uses gr2;
+    }
+
+    uses gr1;
 }
