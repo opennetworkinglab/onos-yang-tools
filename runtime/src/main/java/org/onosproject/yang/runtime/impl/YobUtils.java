@@ -870,7 +870,7 @@ final class YobUtils {
                     }
                 }
             } catch (ClassNotFoundException e) {
-                throw new ModelConverterException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS);
+                throw new ModelConverterException(E_FAIL_TO_LOAD_LEAF_IDENTIFIER_CLASS, e);
             }
         }
         return midb;

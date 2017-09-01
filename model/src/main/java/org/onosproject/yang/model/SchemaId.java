@@ -19,6 +19,8 @@ package org.onosproject.yang.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.google.common.collect.ComparisonChain;
+
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.model.ModelConstants.INCOMPLETE_SCHEMA_INFO;
@@ -68,6 +70,7 @@ public class SchemaId implements Comparable<SchemaId>, Cloneable, Serializable {
      * @throws CloneNotSupportedException if the object's class does not
      *                                    support the {@code Cloneable} interface
      */
+    @Override
     public SchemaId clone() throws CloneNotSupportedException {
         return (SchemaId) super.clone();
     }
@@ -79,23 +82,23 @@ public class SchemaId implements Comparable<SchemaId>, Cloneable, Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        SchemaId that = (SchemaId) obj;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(nameSpace, that.nameSpace);
+        if (obj instanceof SchemaId) {
+            SchemaId that = (SchemaId) obj;
+            return Objects.equals(name, that.name) &&
+                    Objects.equals(nameSpace, that.nameSpace);
+        }
+        return false;
     }
 
     @Override
     public int compareTo(SchemaId o) {
-        checkNotNull(o);
-        if (name.equals(o.name)) {
-            if (nameSpace.equals(o.nameSpace)) {
-                return 0;
-            }
-        }
-        return -1;
+        return ComparisonChain.start()
+                .compare(this.name, o.name)
+                .compare(this.nameSpace, o.nameSpace)
+                .result();
     }
 
     @Override
