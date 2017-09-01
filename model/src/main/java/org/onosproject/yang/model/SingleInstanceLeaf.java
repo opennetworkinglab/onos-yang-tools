@@ -18,6 +18,10 @@ package org.onosproject.yang.model;
 
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_LEAF_VALUE_NODE;
 
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
+
 /**
  * Represents a leaf attribute in class.
  */
@@ -51,5 +55,30 @@ public class SingleInstanceLeaf<E extends LeafIdentifier> extends AtomicPath {
      */
     public void leafIdentifier(E leaf) {
         this.leafIdentifier = leaf;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof SingleInstanceLeaf) {
+            SingleInstanceLeaf<?> that = (SingleInstanceLeaf<?>) obj;
+            // super.type is ensured to be equal
+            return Objects.equals(this.leafIdentifier, that.leafIdentifier);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type(), leafIdentifier);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("leafIdentifier", leafIdentifier)
+                .toString();
     }
 }

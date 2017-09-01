@@ -18,6 +18,10 @@ package org.onosproject.yang.model;
 
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
 
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
+
 /**
  * Represents a multi instance object.
  */
@@ -73,5 +77,32 @@ public class MultiInstanceNode<T extends InnerModelObject, K extends KeyInfo>
      */
     public void key(K k) {
         key = k;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof MultiInstanceNode) {
+            MultiInstanceNode<?, ?> that = (MultiInstanceNode<?, ?>) obj;
+            // super.type is ensured to be equal
+            return Objects.equals(this.listClass, that.listClass) &&
+                   Objects.equals(this.key, that.key);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type(), listClass, key);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("listClass", listClass)
+                .add("key", key)
+                .toString();
     }
 }

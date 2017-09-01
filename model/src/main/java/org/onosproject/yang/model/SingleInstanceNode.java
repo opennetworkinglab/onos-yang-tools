@@ -18,6 +18,10 @@ package org.onosproject.yang.model;
 
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
+
 /**
  * Represents a single instance object.
  */
@@ -51,5 +55,30 @@ public class SingleInstanceNode<T extends InnerModelObject> extends AtomicPath {
      */
     public void container(Class<T> container) {
         containerClass = container;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof SingleInstanceNode) {
+            SingleInstanceNode<?> that = (SingleInstanceNode<?>) obj;
+            // super.type is ensured to be equal
+            return Objects.equals(this.containerClass, that.containerClass);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type(), containerClass);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("containerClass", containerClass)
+                .toString();
     }
 }
