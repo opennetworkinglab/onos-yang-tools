@@ -18,6 +18,7 @@ package org.onosproject.yang.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Objects.hash;
@@ -68,13 +69,14 @@ public final class ModelObjectId {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        ModelObjectId that = (ModelObjectId) obj;
-        List<AtomicPath> thatList = that.atomicPaths;
-        return atomicPaths.size() == thatList.size() &&
-                atomicPaths.containsAll(thatList);
+        if (obj instanceof ModelObjectId) {
+            ModelObjectId that = (ModelObjectId) obj;
+            return Objects.equals(this.atomicPaths, that.atomicPaths);
+        }
+        return false;
     }
 
     @Override

@@ -18,6 +18,10 @@ package org.onosproject.yang.model;
 
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
+
 /**
  * Represents a leaf-list attribute in class.
  */
@@ -73,5 +77,32 @@ public class MultiInstanceLeaf<E extends LeafIdentifier>
      */
     public void value(Object v) {
         value = v;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof MultiInstanceLeaf) {
+            MultiInstanceLeaf<?> that = (MultiInstanceLeaf<?>) obj;
+            // super.type is ensured to be equal
+            return Objects.equals(this.leafIdentifier, that.leafIdentifier) &&
+                   Objects.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type(), leafIdentifier, value);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("leafIdentifier", leafIdentifier)
+                .add("value", value)
+                .toString();
     }
 }
