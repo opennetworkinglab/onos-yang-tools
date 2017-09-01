@@ -37,7 +37,7 @@ public interface ModelConverter {
      * Produces an immutable tree structure rooted at the returned DataNode
      * using the supplied model POJO object.
      * <p>
-     * Model object identifier will be converted to resource identfier and
+     * Model object identifier will be converted to resource identifier and
      * list of model objects will be converted to list of data nodes.
      *
      * @param modelData model object data
