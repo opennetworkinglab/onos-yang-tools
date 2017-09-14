@@ -1,0 +1,15 @@
+module Test {
+    yang-version 1.1;
+    namespace http://huawei.com;
+    prefix Ant;
+    list ospf {
+        key "process-id";
+        anydata interface {
+            status current;
+            reference "RFC 7950";
+        }
+        leaf process-id {
+            type "string";
+        }
+    }
+}

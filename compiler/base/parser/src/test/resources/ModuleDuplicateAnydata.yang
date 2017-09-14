@@ -1,0 +1,17 @@
+module Test {
+    yang-version 1.1;
+    namespace http://huawei.com;
+    prefix Ant;
+    anydata valid {
+        status current;
+        reference "RFC 7950";
+    }
+    anydata invalid {
+        status current;
+        reference "RFC 7950";
+    }
+    anydata valid {
+        status current;
+        reference "RFC 7950";
+    }
+}

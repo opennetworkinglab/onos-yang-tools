@@ -1,0 +1,25 @@
+module Test {
+    yang-version 1.1;
+    namespace http://huawei.com;
+    prefix Ant;
+    container ospf {
+        anydata valid {
+            status current;
+            reference "RFC 7950";
+        }
+        list valid {
+            key "process-id";
+            container interface {
+                leaf invalid-interval {
+                    type "uint16";
+                    units "seconds";
+                    status current;
+                    reference "RFC 6020";
+                }
+            }
+            leaf process-id {
+                type "string";
+            }
+        }
+    }
+}

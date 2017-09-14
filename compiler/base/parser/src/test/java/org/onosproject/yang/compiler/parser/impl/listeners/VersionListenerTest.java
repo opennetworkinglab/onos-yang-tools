@@ -52,7 +52,7 @@ public class VersionListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/VersionValidEntry.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getVersion(), is((byte) 1));
+        assertThat(((YangModule) node).getVersion(), is("1"));
     }
 
     /**
@@ -64,7 +64,7 @@ public class VersionListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/ValidVersionWithDoubleQuotes.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getVersion(), is((byte) 1));
+        assertThat(((YangModule) node).getVersion(), is("1"));
     }
 
     /**
@@ -76,7 +76,7 @@ public class VersionListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/VersionNotPresent.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getVersion(), is((byte) 1));
+        assertThat(((YangModule) node).getVersion(), is("1"));
     }
 
     /**
@@ -97,7 +97,7 @@ public class VersionListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/VersionOrder.yang");
 
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getVersion(), is((byte) 1));
+        assertThat(((YangModule) node).getVersion(), is("1"));
     }
 
     /**

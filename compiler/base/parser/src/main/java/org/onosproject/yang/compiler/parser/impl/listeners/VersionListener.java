@@ -89,7 +89,7 @@ public final class VersionListener {
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, VERSION_DATA, ctx.version().getText(), ENTRY);
 
-        byte version = getValidVersion(ctx);
+        String version = getValidVersion(ctx);
 
         // Obtain the node of the stack.
         Parsable tmpNode = listener.getParsedDataStack().peek();

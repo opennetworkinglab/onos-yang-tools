@@ -72,6 +72,8 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FALSE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INVALID_TREE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ONE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ONE_DOT_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_SQUARE_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
@@ -100,7 +102,6 @@ public final class ListenerUtil {
     private static final Pattern PREDICATE =
             Pattern.compile("\\[(.*?)\\]");
     private static final String XML = "xml";
-    private static final String ONE = "1";
     private static final int IDENTIFIER_LENGTH = 64;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String REGEX_EQUAL = "[=]";
@@ -201,17 +202,16 @@ public final class ListenerUtil {
      * @param ctx version context object of the grammar rule
      * @return valid version
      */
-    public static byte getValidVersion(YangVersionStatementContext ctx) {
+    public static String getValidVersion(YangVersionStatementContext ctx) {
 
         String value = removeQuotesAndHandleConcat(ctx.version().getText());
-        if (!value.equals(ONE)) {
-            ParserException parserException = new ParserException("YANG file error: Input version not supported");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        if (value.equals(ONE) || value.equals(ONE_DOT_ONE)) {
+            return value;
         }
-
-        return Byte.valueOf(value);
+        ParserException parserException = new ParserException("YANG file error: Input version not supported");
+        parserException.setLine(ctx.getStart().getLine());
+        parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
+        throw parserException;
     }
 
     /**

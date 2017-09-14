@@ -15,6 +15,7 @@
  */
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.YangAnydata;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangCase;
 import org.onosproject.yang.compiler.datamodel.YangChoice;
@@ -36,6 +37,7 @@ import org.onosproject.yang.compiler.datamodel.YangUnion;
 import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.datamodel.utils.GeneratedLanguage;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
+import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAnydataTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaCaseTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaChoiceTranslator;
@@ -151,6 +153,25 @@ public final class YangDataModelFactory {
         switch (targetLanguage) {
             case JAVA_GENERATION: {
                 return new YangJavaContainerTranslator();
+            }
+            default: {
+                throw new TranslatorException("Only YANG to Java is supported.");
+            }
+        }
+    }
+
+    /**
+     * Returns based on the target language generate the inherited data model node.
+     *
+     * @param targetLanguage target language in which YANG mapping needs to be
+     * generated
+     * @return the corresponding inherited node based on the target language
+     */
+    public static YangAnydata getYangAnydataNode(GeneratedLanguage
+                                                      targetLanguage) {
+        switch (targetLanguage) {
+            case JAVA_GENERATION: {
+                return new YangJavaAnydataTranslator();
             }
             default: {
                 throw new TranslatorException("Only YANG to Java is supported.");

@@ -1,0 +1,51 @@
+module listAnydata {
+
+    yang-version 1.1;
+
+    namespace "yrt:list.anydata";
+
+    prefix "l";
+
+    organization "ON-LAB";
+
+    description "This module defines for list.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+    anydata mydata {
+    }
+
+    list l1 {
+        key "k1 k2 k3";
+            leaf k1 {
+               type string;
+            }
+
+            leaf k2 {
+              type string;
+            }
+
+            leaf k3 {
+              type string;
+            }
+
+            container c1 {
+                leaf leaf_c1 {
+                  type string;
+                }
+            }
+            anydata mydata {
+            }
+    }
+
+    leaf-list leaf1 {
+        type string;
+    }
+
+    augment "/l:l1/l:c1/" {
+        anydata mydata {
+        }
+    }
+}

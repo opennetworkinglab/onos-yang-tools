@@ -118,6 +118,7 @@ package org.onosproject.yang.compiler.parser.antlrgencode;
     DEFAULT_DENY_WRITE : IDENTIFIER COLON DEFAULT_DENY_WRITE_KEYWORD;
     DEFAULT_DENY_ALL_KEYWORD : 'default-deny-all';
     DEFAULT_DENY_ALL : IDENTIFIER COLON DEFAULT_DENY_ALL_KEYWORD;
+    ANYDATA_KEYWORD : 'anydata';
 
     // Lexer tokens to be skipped
     COMMENT

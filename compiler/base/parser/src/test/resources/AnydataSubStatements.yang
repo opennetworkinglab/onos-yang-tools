@@ -1,0 +1,11 @@
+module Test {
+    yang-version 1.1;
+    namespace http://huawei.com;
+    prefix Ant;
+    anydata ospf {
+        config true;
+        description "anydata description";
+        status current;
+        reference "anydata reference";
+    }
+}

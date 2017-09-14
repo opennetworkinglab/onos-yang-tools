@@ -211,7 +211,7 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
      */
     public static String getDerivedPackage(YangIdentity id) {
         String derPkg;
-        byte version;
+        String version;
         String moduleName;
         YangRevision revision;
         String nodeName;

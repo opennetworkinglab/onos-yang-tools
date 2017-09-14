@@ -197,21 +197,22 @@ public final class AugmentListener {
      */
     private static void valSubStatCardinality(AugmentStatementContext ctx) {
 
+        String text = ctx.augment().getText();
         validateCardinalityMaxOne(ctx.statusStatement(), STATUS_DATA,
-                                  AUGMENT_DATA, ctx.augment().getText());
+                                  AUGMENT_DATA, text);
 
         validateCardinalityMaxOne(ctx.descriptionStatement(), DESCRIPTION_DATA,
-                                  AUGMENT_DATA, ctx.augment().getText());
+                                  AUGMENT_DATA, text);
 
         validateCardinalityMaxOne(ctx.referenceStatement(), REFERENCE_DATA,
-                                  AUGMENT_DATA, ctx.augment().getText());
+                                  AUGMENT_DATA, text);
 
         validateCardinalityMaxOne(ctx.whenStatement(), WHEN_DATA, AUGMENT_DATA,
-                                  ctx.augment().getText());
+                                  text);
 
         validateCardinalityEitherOne(ctx.dataDefStatement(), DATA_DEF_DATA,
                                      ctx.caseStatement(), CASE_DATA,
-                                     AUGMENT_DATA, ctx.augment().getText(),
+                                     AUGMENT_DATA, text,
                                      ctx);
     }
 

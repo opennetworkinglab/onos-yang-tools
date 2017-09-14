@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
@@ -38,10 +39,10 @@ import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangTranslatorOperatorNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeHolder;
-import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.JavaLeafInfoContainer;
+import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAnydataTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaEnumerationTranslator;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaInputTranslator;
@@ -289,6 +290,10 @@ public final class YangJavaModelUtils {
              */
             translator.getEnumTempFiles()
                     .addEnumAttributeToTempFiles((YangNode) info, config);
+        } else if (info instanceof YangJavaAnydataTranslator) {
+            // TODO remove this check if anydata code generation is not
+            // supported.
+            // Do nothing
         } else if (!(info instanceof YangChoice) && !(info instanceof
                 YangRpc)) {
             /*Do nothing, only the interface needs to be generated for choice*/

@@ -147,7 +147,8 @@ public final class JavaIdentifierSyntaxTest {
     public void getRootPackageTest()
             throws ParseException {
         conflictResolver.setPrefixForIdentifier(null);
-        String rootPackage = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE1), conflictResolver);
+        String rootPackage = getRootPackage("1", CHILD_PACKAGE,
+                                            getYangRevision(DATE1), conflictResolver);
         assertThat(rootPackage.equals(UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER
                                               + UtilConstants.PERIOD + CHILD_WITH_PERIOD +
                                               UtilConstants.PERIOD + DATE_WITH_REV1), is(true));
@@ -162,7 +163,8 @@ public final class JavaIdentifierSyntaxTest {
         thrown.expect(ArrayIndexOutOfBoundsException.class);
         thrown.expectMessage("The given prefix in pom.xml is invalid.");
         conflictResolver.setPrefixForIdentifier(INVALID_PREFIX);
-        String rootPackage1 = getRootPackage((byte) 1, INVALID_NAME_SPACE_FOR_INVALID_PREFIX, getYangRevision(DATE1),
+        String rootPackage1 = getRootPackage("1",
+                                             INVALID_NAME_SPACE_FOR_INVALID_PREFIX, getYangRevision(DATE1),
                                              conflictResolver);
     }
 
@@ -173,7 +175,8 @@ public final class JavaIdentifierSyntaxTest {
     public void getRootPackageWithRevTest()
             throws ParseException {
         Date date = simpleDateFormat.parse(DATE2);
-        String rootPkgWithRev = getRootPackage((byte) 1, CHILD_PACKAGE, getYangRevision(DATE2), null);
+        String rootPkgWithRev = getRootPackage("1", CHILD_PACKAGE,
+                                               getYangRevision(DATE2), null);
         assertThat(rootPkgWithRev.equals(
                 UtilConstants.DEFAULT_BASE_PKG + UtilConstants.PERIOD + VERSION_NUMBER + UtilConstants.PERIOD +
                         CHILD_WITH_PERIOD + UtilConstants.PERIOD + DATE_WITH_REV2), is(true));

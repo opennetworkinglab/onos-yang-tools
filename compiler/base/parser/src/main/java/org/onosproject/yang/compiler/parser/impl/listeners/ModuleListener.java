@@ -50,6 +50,7 @@ import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerUtil
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsEmpty;
 import static org.onosproject.yang.compiler.parser.impl.parserutils.ListenerValidation.checkStackIsNotEmpty;
 import static org.onosproject.yang.compiler.translator.tojava.YangDataModelFactory.getYangModuleNode;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ONE;
 
 /*
  * Reference: RFC6020 and YANG ANTLR Grammar
@@ -103,7 +104,7 @@ public final class ModuleListener {
         yangModule.setFileName(listener.getFileName());
 
         if (ctx.moduleBody().moduleHeaderStatement().yangVersionStatement() == null) {
-            yangModule.setVersion((byte) 1);
+            yangModule.setVersion(ONE);
         }
 
         listener.getParsedDataStack().push(yangModule);

@@ -36,6 +36,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.ASTERISK;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ONE_DOT_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX_WITH_ALL_SPECIAL_CHAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REVISION_PREFIX;
@@ -75,7 +76,7 @@ public final class JavaIdentifierSyntax {
      * @param resolver object of YANG to java naming conflict util
      * @return the root package string
      */
-    public static String getRootPackage(byte version, String name,
+    public static String getRootPackage(String version, String name,
                                         YangRevision revision,
                                         YangToJavaNamingConflictUtil resolver) {
 
@@ -97,7 +98,10 @@ public final class JavaIdentifierSyntax {
      * @param ver YANG version
      * @return version
      */
-    private static String getYangVersion(byte ver) {
+    private static String getYangVersion(String ver) {
+        if (ver.equals(ONE_DOT_ONE)) {
+            ver = "11";
+        }
         return VERSION_PREFIX + ver;
     }
 

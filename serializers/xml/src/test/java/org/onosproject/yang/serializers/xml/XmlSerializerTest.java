@@ -59,6 +59,8 @@ public class XmlSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer xmlSerializer;
 
+    public static final String LNS = "yrt:list.anydata";
+
     @BeforeClass
     public static void prepare() {
         context = new MockYangSerializerContext();
@@ -525,5 +527,63 @@ public class XmlSerializerTest {
             }
         }
         return newCompBuilder.build();
+    }
+
+    /**
+     * Validates data node in which XML element is of type YANG anydata.
+     */
+    @Test
+    public void testListWithAnydata() {
+        String path = "src/test/resources/testListAnydata.xml";
+        DefaultCompositeStream external =
+                new DefaultCompositeStream(null, parseInput(path));
+        CompositeData compositeData = xmlSerializer.decode(external, context);
+        DataNode rootNode = validateRootDataNode(compositeData.resourceData());
+        List<String> keyNames = new LinkedList<>();
+        keyNames.add("k1");
+        keyNames.add("k2");
+        keyNames.add("k3");
+
+        List<String> keyNs = new LinkedList<>();
+        keyNs.add(LNS);
+        keyNs.add(LNS);
+        keyNs.add(LNS);
+
+        List<Object> values = new LinkedList<>();
+        values.add("k1_Value");
+        values.add("k2_Value");
+        values.add("k3_Value");
+
+        DataNode listl1 = validateListDataNode(rootNode, "l1", LNS,
+                                               keyNames, keyNs, values);
+        validateLeafDataNode(listl1, "k1", LNS, "k1_Value");
+        validateLeafDataNode(listl1, "k2", LNS, "k2_Value");
+        validateLeafDataNode(listl1, "k3", LNS, "k3_Value");
+        DataNode c1 = validateContainerDataNode(listl1, "c1", LNS);
+        DataNode mydata = validateContainerDataNode(c1, "mydata", LNS);
+        validateLeafDataNode(c1, "leaf_c1", LNS, "l1_value");
+
+        values = new LinkedList<>();
+        values.add("k1_Value1");
+        values.add("k2_Value2");
+        values.add("k3_Value3");
+
+        DataNode listl2 = validateListDataNode(rootNode, "l1", LNS,
+                                               keyNames, keyNs, values);
+        validateLeafDataNode(listl2, "k1", LNS, "k1_Value1");
+        validateLeafDataNode(listl2, "k2", LNS, "k2_Value2");
+        validateLeafDataNode(listl2, "k3", LNS, "k3_Value3");
+        c1 = validateContainerDataNode(listl2, "c1", LNS);
+        mydata = validateContainerDataNode(c1, "mydata", LNS);
+        validateLeafDataNode(c1, "leaf_c1", LNS, "l1_value1");
+
+        // validate module level anydata
+        validateContainerDataNode(rootNode, "mydata", LNS);
+
+        // encode test
+        CompositeStream compositeStream = xmlSerializer.encode(
+                getNewCompositeData(compositeData), context);
+        InputStream inputStream = compositeStream.resourceData();
+        assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
     }
 }

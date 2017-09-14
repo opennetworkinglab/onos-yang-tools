@@ -29,6 +29,7 @@ import java.util.Map;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
+import static org.onosproject.yang.compiler.datamodel.YangNodeType.ANYDATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.YangNodeType.RPC_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.addUnresolvedAugment;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.cloneListOfLeaf;
@@ -1027,8 +1028,8 @@ public abstract class YangNode
         if (this instanceof SchemaDataNode) {
             parentContext = getParentSchemaContext(this.getParent());
 
-            // As rpc node is not leaf holder
-            if (this.nodeType != RPC_NODE) {
+            // As rpc and anydata node is not leaf holder
+            if (nodeType != RPC_NODE && nodeType != ANYDATA_NODE) {
                 ((YangLeavesHolder) this).setLeafParentContext();
             }
             // setting the schema Id

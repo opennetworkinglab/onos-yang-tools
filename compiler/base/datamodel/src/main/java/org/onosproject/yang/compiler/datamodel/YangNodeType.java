@@ -117,5 +117,10 @@ public enum YangNodeType {
     /**
      * Deviation node.
      */
-    DEVIATION_NODE
+    DEVIATION_NODE,
+
+    /**
+     * Anydata node.
+     */
+    ANYDATA_NODE
 }

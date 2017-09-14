@@ -370,7 +370,8 @@ import YangLexer;
      *                       list-stmt /
      *                       choice-stmt /
      *                       anyxml-stmt /
-     *                       uses-stmt
+     *                       uses-stmt /
+     *                       anydata-stmt
      */
     dataDefStatement : containerStatement
                     | leafStatement
@@ -378,7 +379,8 @@ import YangLexer;
                     | listStatement
                     | choiceStatement
                     | anyxmlStatement
-                    | usesStatement;
+                    | usesStatement
+                    | anydataStatement;
 
     /**
      *  if-feature-stmt     = if-feature-keyword sep identifier-ref-arg-str
@@ -951,7 +953,7 @@ import YangLexer;
      *                        anyxml-stmt
      */
     shortCaseStatement : containerStatement | leafStatement | leafListStatement
-            | listStatement | anyxmlStatement;
+            | listStatement | anyxmlStatement | anydataStatement;
 
     /**
      *  case-stmt           = case-keyword sep identifier-arg-str optsep
@@ -1357,6 +1359,28 @@ import YangLexer;
      */
     defaultDenyAllStatement : DEFAULT_DENY_ALL STMTEND;
 
+
+   /**
+    * anydata-stmt        = anydata-keyword sep identifier-arg-str optsep
+    *                       (";" /
+    *                        "{" stmtsep
+    *                            ;; these stmts can appear in any order
+    *                            [when-stmt]
+    *                            *if-feature-stmt
+    *                            *must-stmt
+    *                            [config-stmt]
+    *                            [mandatory-stmt]
+    *                            [status-stmt]
+    *                            [description-stmt]
+    *                            [reference-stmt]
+    *                         "}") stmtsep
+    */
+    anydataStatement : ANYDATA_KEYWORD identifier (STMTEND |
+               LEFT_CURLY_BRACE stmtSep (whenStatement | ifFeatureStatement
+               | mustStatement | configStatement | mandatoryStatement
+               | statusStatement | descriptionStatement | referenceStatement)*
+               RIGHT_CURLY_BRACE) stmtSep;
+
     /**
      * unknown-statement   = prefix ":" identifier [sep string] optsep
      *                        (";" / "{" *unknown-statement2 "}")
@@ -1456,4 +1480,5 @@ import YangLexer;
                   | FALSE_KEYWORD | MAX_KEYWORD | MIN_KEYWORD | NOT_SUPPORTED_KEYWORD | OBSOLETE_KEYWORD
                   | REPLACE_KEYWORD | SYSTEM_KEYWORD | TRUE_KEYWORD | UNBOUNDED_KEYWORD | USER_KEYWORD
                   | COMPILER_ANNOTATION_KEYWORD | APP_DATA_STRUCTURE_KEYWORD | DATA_STRUCTURE_KEYWORD
-                  | APP_EXTENDED_KEYWORD | DEFAULT_DENY_WRITE_KEYWORD | DEFAULT_DENY_ALL_KEYWORD;
+                  | APP_EXTENDED_KEYWORD | DEFAULT_DENY_WRITE_KEYWORD | DEFAULT_DENY_ALL_KEYWORD
+                  | ANYDATA_KEYWORD;

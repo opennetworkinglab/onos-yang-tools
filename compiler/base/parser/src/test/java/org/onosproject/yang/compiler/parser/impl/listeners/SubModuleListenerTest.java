@@ -53,7 +53,7 @@ public class SubModuleListenerTest {
         // Check whether the module name is set correctly.
         assertThat(yangNode.getName(), is("Test"));
         // Checks for the version value in data model tree.
-        assertThat(yangNode.getVersion(), is((byte) 1));
+        assertThat(yangNode.getVersion(), is("1"));
         // Checks identifier of belongsto in data model tree.
         assertThat(yangNode.getBelongsTo().getBelongsToModuleName(), is("ONOS"));
         // Checks for the version value in data model tree.
@@ -79,7 +79,7 @@ public class SubModuleListenerTest {
         // Check whether the module name is set correctly.
         assertThat(yangNode.getName(), is("Test"));
         // Checks for the version value in data model tree.
-        assertThat(yangNode.getVersion(), is((byte) 1));
+        assertThat(yangNode.getVersion(), is("1"));
         // Checks identifier of belongsto in data model tree.
         assertThat(yangNode.getBelongsTo().getBelongsToModuleName(), is("ONOS"));
         // Checks for the version value in data model tree.

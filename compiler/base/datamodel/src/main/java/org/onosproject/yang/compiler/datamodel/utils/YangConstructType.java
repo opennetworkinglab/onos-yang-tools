@@ -437,7 +437,12 @@ public enum YangConstructType {
     /**
      * Identifies unknown statement data.
      */
-    UNKNOWN_STATEMENT;
+    UNKNOWN_STATEMENT,
+
+    /**
+     * Identifies the YANG anydata element parsed data.
+     */
+    ANYDATA_DATA;
 
     /**
      * Returns the YANG construct keyword corresponding to enum values.
@@ -616,6 +621,8 @@ public enum YangConstructType {
                 return "deviate-replace";
             case UNKNOWN_STATEMENT:
                 return "unknown-statement";
+            case ANYDATA_DATA:
+                return "anydata";
             default:
                 return "yang";
         }

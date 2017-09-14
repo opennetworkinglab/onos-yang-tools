@@ -92,7 +92,7 @@ public abstract class YangModule
         implements YangLeavesHolder, YangDesc, YangReference, Parsable,
         CollisionDetector, YangReferenceResolver, RpcNotificationContainer,
         YangFeatureHolder, YangIsFilterContentNodes, YangNamespace,
-        YangDeviationHolder {
+        YangDeviationHolder, YangVersionHolder {
 
     private static final long serialVersionUID = 806201610L;
 
@@ -170,7 +170,7 @@ public abstract class YangModule
     /**
      * YANG version.
      */
-    private byte version;
+    private String version;
 
     /*-
      * Reference RFC 6020.
@@ -639,7 +639,7 @@ public abstract class YangModule
      *
      * @return the version
      */
-    public byte getVersion() {
+    public String getVersion() {
         return version;
     }
 
@@ -648,7 +648,7 @@ public abstract class YangModule
      *
      * @param version the version to set
      */
-    public void setVersion(byte version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 
