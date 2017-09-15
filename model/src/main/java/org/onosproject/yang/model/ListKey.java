@@ -103,6 +103,7 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
     @Override
     public String toString() {
         return toStringHelper(getClass())
+                .add("identifier", schemaId())
                 .add("value", keyLeafs)
                 .toString();
     }
