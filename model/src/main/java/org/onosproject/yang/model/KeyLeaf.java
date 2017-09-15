@@ -51,6 +51,7 @@ public class KeyLeaf implements Cloneable {
      * @throws CloneNotSupportedException if the object's class does not
      *                                    support the {@code Cloneable} interface
      */
+    @Override
     public KeyLeaf clone() throws CloneNotSupportedException {
         KeyLeaf clonedLeaf = (KeyLeaf) super.clone();
         clonedLeaf.leafSchema = leafSchema.clone();

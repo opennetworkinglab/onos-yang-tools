@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Represents an entity which identifies a unique branching node
@@ -135,9 +136,13 @@ public final class ListKey extends NodeKey<ListKey> implements Comparable<ListKe
          * @param name      key leaf name
          * @param nameSpace key leaf namespace
          * @param val       value of key
+         * @throws IllegalArgumentException if duplicate key already exists
          */
         public void addKeyLeaf(String name, String nameSpace, Object val) {
             KeyLeaf keyLeaf = new KeyLeaf(name, nameSpace, val);
+            checkArgument(!keyLeafs.contains(keyLeaf),
+                          "Attempted to add duplicate key: %s@%s=%s",
+                          name, nameSpace, val);
             keyLeafs.add(keyLeaf);
         }
 
