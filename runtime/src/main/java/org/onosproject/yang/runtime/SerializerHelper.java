@@ -17,7 +17,9 @@
 package org.onosproject.yang.runtime;
 
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
+import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
@@ -323,14 +325,12 @@ public final class SerializerHelper {
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             throw new IllegalArgumentException(E_RESID);
                         }
-                        valObject = ((LeafSchemaContext) childSchema)
-                                .fromString(value);
+                        valObject = getLeaf(value, childSchema);
                         builder = LeafNode.builder(name, namespace).type(nodeType)
                                 .value(valObject);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = ((LeafSchemaContext) childSchema)
-                                .fromString(value);
+                        valObject = getLeafList(value, childSchema);
                         builder = LeafNode.builder(name, namespace).type(nodeType)
                                 .value(valObject);
                         builder = builder.addLeafListValue(valObject);
@@ -347,8 +347,7 @@ public final class SerializerHelper {
             } else {
                 switch (nodeType) {
                     case SINGLE_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = ((LeafSchemaContext) childSchema)
-                                .fromString(value);
+                        valObject = getLeaf(value, childSchema);
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             builder = builder.addKeyLeaf(
                                     name, namespace, valObject);
@@ -357,8 +356,7 @@ public final class SerializerHelper {
                                 name, namespace, valObject).type(nodeType);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = ((LeafSchemaContext) childSchema)
-                                .fromString(value);
+                        valObject = getLeafList(value, childSchema);
                         builder = builder.createChildBuilder(
                                 name, namespace, valObject).type(nodeType);
                         builder = builder.addLeafListValue(valObject);
@@ -375,6 +373,47 @@ public final class SerializerHelper {
             throw new IllegalArgumentException(e.getMessage());
         }
         return builder;
+    }
+
+    /**
+     * Returns the corresponding datatype value object for given leaf-list
+     * value.
+     *
+     * @param val value in string
+     * @param ctx schema context
+     * @return object of value
+     * @throws IllegalArgumentException a violation of data type rules
+     */
+    private static Object getLeafList(String val, SchemaContext ctx)
+            throws IllegalArgumentException {
+        LeafSchemaContext schema;
+        try {
+            schema = (LeafSchemaContext) ctx;
+            ((YangLeafList) schema).getDataType().isValidValue(val);
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        return schema.fromString(val);
+    }
+
+    /**
+     * Returns the corresponding datatype value object for given leaf value.
+     *
+     * @param val value in string
+     * @param ctx schema context
+     * @return object of value
+     * @throws IllegalArgumentException a violation of data type rules
+     */
+    private static Object getLeaf(String val, SchemaContext ctx)
+            throws IllegalArgumentException {
+        LeafSchemaContext schema;
+        try {
+            schema = (LeafSchemaContext) ctx;
+            ((YangLeaf) schema).getDataType().isValidValue(val);
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        return schema.fromString(val);
     }
 
     /**

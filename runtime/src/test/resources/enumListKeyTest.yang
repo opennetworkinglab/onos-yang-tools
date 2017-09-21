@@ -1,0 +1,34 @@
+module enumListKeyTest {
+
+    yang-version 1;
+
+    namespace "ydt.enumListKeyTest";
+
+    prefix "enumListKeyTest";
+
+    organization "ON-LAB";
+
+    description "This module defines for enumListKeyTest classifier.";
+
+    revision "2016-05-24" {
+        description "Initial revision.";
+    }
+
+    list enumList {
+        key enumleaf;
+            leaf enumleaf {
+                type enumeration {
+                  enum ten { value "10";}
+                  enum hundred { value "100";}
+                  enum thousand { value "1000"; }
+                }
+            }
+            leaf enumleaf1 {
+                type enumeration {
+                  enum ten { value "10";}
+                  enum hundred { value "100";}
+                  enum thousand { value "1000"; }
+                }
+            }
+    }
+}

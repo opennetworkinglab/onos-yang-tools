@@ -296,7 +296,7 @@ public class YangType<T> extends DefaultLocationInfo
      * @param value input data value
      * @throws DataModelException a violation of data model rules
      */
-    void isValidValue(String value)
+    public void isValidValue(String value)
             throws DataModelException {
         switch (getDataType()) {
             case INT8:
@@ -384,7 +384,9 @@ public class YangType<T> extends DefaultLocationInfo
                 break;
             }
             case EMPTY: {
-                if (value.length() > 0) {
+                // In case of xml empty value can come as null but in case of
+                // json and all it will come as ""
+                if (value != null && value.length() > 0) {
                     throw new DataTypeException("YANG file error : Input value \"" + value
                                                         + "\" is not allowed for a data type " + getDataType());
                 }

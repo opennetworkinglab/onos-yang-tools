@@ -91,11 +91,11 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "lfnint64Max", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "32767";
+        value = "255";
         dBlr = addDataNode(dBlr, "lfnuint8Max", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "2147483647";
+        value = "65535";
         dBlr = addDataNode(dBlr, "lfnuint16Max", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
@@ -481,11 +481,11 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "lfnint64Max", null, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "32767";
+        value = "255";
         dBlr = addDataNode(dBlr, "lfnuint8Max", null, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "2147483647";
+        value = "65535";
         dBlr = addDataNode(dBlr, "lfnuint16Max", null, value, null);
         dBlr = exitDataNode(dBlr);
 
@@ -653,9 +653,9 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfnint64Min(), is(10090L));
         assertThat(cont.lfnint64Max(), is(100700L));
 
-        val = 32767;
+        val = 255;
         assertThat(cont.lfnuint8Max(), is(val));
-        assertThat(cont.lfnuint16Max(), is(2147483647));
+        assertThat(cont.lfnuint16Max(), is(65535));
         assertThat(cont.lfnuint32Max(), is(10000L));
         assertThat(cont.lfuint64Max().toString(), is("32656256558"));
         assertThat(cont.lfstr(), is("string1"));
@@ -811,9 +811,9 @@ public class YobSimpleDataTypeTest {
         assertThat(cont.lfnint64Min().get(0), is(10090L));
         assertThat(cont.lfnint64Max().get(0), is(100700L));
 
-        val = 32767;
+        val = 255;
         assertThat(cont.lfnuint8Max().get(0), is(val));
-        assertThat(cont.lfnuint16Max().get(0), is(2147483647));
+        assertThat(cont.lfnuint16Max().get(0), is(65535));
         assertThat(cont.lfnuint32Max().get(0), is(10000L));
         assertThat(cont.lfuint64Max().get(0).toString(), is("32656256558"));
         assertThat(cont.lfstr().get(0), is("string1"));

@@ -1,0 +1,22 @@
+module dataTypes {
+
+    yang-version 1;
+
+    namespace "ydt.dataTypes";
+
+    prefix "datatypes";
+
+    organization "ON-LAB";
+
+    description "This module defines all data types.";
+
+    revision "2016-05-24" {
+        description "Initial revision.";
+    }
+
+    container datatype{
+        leaf integer {
+            type int8;
+        }
+    }
+}

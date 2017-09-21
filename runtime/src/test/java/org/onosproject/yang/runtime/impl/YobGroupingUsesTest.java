@@ -55,6 +55,18 @@ public class YobGroupingUsesTest {
     private static final String TE_NS = "urn:ietf:params:xml:ns:yang:yrt-ietf-te-topology";
     private static final String TE = "urn:ietf:params:xml:ns:yang:ietf-te";
     private static final String RPC_NS = "yms:test:ytb:ytb:rpc";
+    private static final String DURATION_TIME =
+            "P9243983843671636195325300973389215743Y441498414397233640755" +
+                    "748678783585602855222287242483601612720MT42429291980" +
+                    "9198503801168838636847720848117391695063559947287623" +
+                    "02419062212H5803675020235950787S";
+    private static final String REPEAT_INTERVAL =
+            "R006733702120616055381223229783008865740416144969234/P988414" +
+                    "1350640084815248711164804331178923236350109520293255" +
+                    "5007727609859241946405817769469072177M30614037188965" +
+                    "5752702322778693919891230979781747844670759083567190" +
+                    "85127201004965309450WT393H91819305489488863421529096" +
+                    "58695920717372841701557104867M992396486515481883800S";
     TestYangSerializerContext context = new TestYangSerializerContext();
     private DataNode.Builder dBlr;
     private String value;
@@ -79,13 +91,13 @@ public class YobGroupingUsesTest {
         dBlr = addDataNode(dBlr, "schedule-id", TE_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "start";
-        dBlr = addDataNode(dBlr, "start", TE_NS, value, null);
+        String time = "2000-06-12T06:23:21.52Z";
+        dBlr = addDataNode(dBlr, "start", TE_NS, time, null);
         dBlr = exitDataNode(dBlr);
-        value = "schedule-duration";
-        dBlr = addDataNode(dBlr, "schedule-duration", TE_NS, value, null);
+        dBlr = addDataNode(dBlr, "schedule-duration", TE_NS, DURATION_TIME, null);
         dBlr = exitDataNode(dBlr);
         value = "repeat-interval";
-        dBlr = addDataNode(dBlr, "repeat-interval", TE_NS, value, null);
+        dBlr = addDataNode(dBlr, "repeat-interval", TE_NS, REPEAT_INTERVAL, null);
         dBlr = exitDataNode(dBlr);
         dBlr = exitDataNode(dBlr); // schedule
         dBlr = exitDataNode(dBlr); // schedules
@@ -113,9 +125,9 @@ public class YobGroupingUsesTest {
         assertThat(linkTmp.name().toString(), is("name"));
         Schedule sh = linkTmp.teLinkAttributes().schedules().schedule().get(0);
         assertThat(sh.scheduleId(), is(100L));
-        assertThat(sh.start().toString(), is("start"));
-        assertThat(sh.scheduleDuration(), is("schedule-duration"));
-        assertThat(sh.repeatInterval(), is("repeat-interval"));
+        assertThat(sh.start().toString(), is("2000-06-12T06:23:21.52Z"));
+        assertThat(sh.scheduleDuration(), is(DURATION_TIME));
+        assertThat(sh.repeatInterval(), is(REPEAT_INTERVAL));
     }
 
     private DataNode buildDataNodeWithIdentityRef() {

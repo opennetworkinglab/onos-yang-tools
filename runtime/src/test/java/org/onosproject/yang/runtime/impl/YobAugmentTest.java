@@ -305,7 +305,7 @@ public class YobAugmentTest {
         InnerModelObject obj = it.next().getValue();
         AugmentedEventStream es = (AugmentedEventStream) obj;
         DateAndTime replay = es.replayStartTime();
-        assertThat(replay.toString(), is("2000-06-12T06:23:21"));
+        assertThat(replay.toString(), is("2000-06-12T06:23:21.52Z"));
     }
 
     private ResourceData buildDnForInputUsesAug() {
@@ -318,7 +318,7 @@ public class YobAugmentTest {
         value = "stream";
         dBlr = addDataNode(dBlr, "stream", SUB_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-        value = "2000-06-12T06:23:21";
+        value = "2000-06-12T06:23:21.52Z";
         dBlr = addDataNode(dBlr, "replay-start-time", SUB_NAME_SPACE,
                            value, null);
         dBlr = exitDataNode(dBlr);
