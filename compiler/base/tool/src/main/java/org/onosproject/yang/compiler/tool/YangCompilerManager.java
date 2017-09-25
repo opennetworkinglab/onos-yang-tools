@@ -151,12 +151,9 @@ public class YangCompilerManager implements YangCompilerService {
      */
     private static void serializeModuleMetaData(String serFileName, YangNode node)
             throws IOException {
-        try {
-            FileOutputStream outStream = new FileOutputStream(serFileName);
-            ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
+        try (FileOutputStream outStream = new FileOutputStream(serFileName);
+             ObjectOutputStream objOutStream = new ObjectOutputStream(outStream)) {
             objOutStream.writeObject(node);
-            objOutStream.close();
-            outStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -440,11 +437,10 @@ public class YangCompilerManager implements YangCompilerService {
         nodelist.addAll(yangNodeSet);
         model = processYangModel(path, nodelist, id, false);
         String serFileName = path + YANG_META_DATA;
-        FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(model);
-        objectOutputStream.close();
-        fileOutputStream.close();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(model);
+        }
     }
 
     /**
@@ -517,12 +513,10 @@ public class YangCompilerManager implements YangCompilerService {
     public static YangModel deSerializeDataModel(String info)
             throws IOException {
         YangModel model;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(info);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        try (FileInputStream fileInputStream = new FileInputStream(info);
+             ObjectInputStream objectInputStream =
+                new ObjectInputStream(fileInputStream)) {
             model = ((YangModel) objectInputStream.readObject());
-            objectInputStream.close();
-            fileInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
             throw new IOException(info + " failed to fetch nodes due to " + e
                     .getLocalizedMessage(), e);
@@ -559,39 +553,39 @@ public class YangCompilerManager implements YangCompilerService {
             throws IOException {
 
         YangModel model = null;
-        JarFile jar = new JarFile(jarFile);
-        Enumeration<?> enumEntries = jar.entries();
+        try (JarFile jar = new JarFile(jarFile)) {
+            Enumeration<?> enumEntries = jar.entries();
 
-        File dir = new File(directory + SLASH + YANG_RESOURCES);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+            File dir = new File(directory + SLASH + YANG_RESOURCES);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-        while (enumEntries.hasMoreElements()) {
-            JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.getName().endsWith(YANG_META_DATA) ||
+            while (enumEntries.hasMoreElements()) {
+                JarEntry file = (JarEntry) enumEntries.nextElement();
+                if (file.getName().endsWith(YANG_META_DATA) ||
                     file.getName().endsWith(".yang")) {
-                String name = getFileName(file.getName());
-                File serializedFile = new File(directory + SLASH +
-                                                       YANG_RESOURCES + SLASH + name);
-                if (file.isDirectory()) {
-                    serializedFile.mkdirs();
-                    continue;
-                }
-                InputStream inputStream = jar.getInputStream(file);
+                    String name = getFileName(file.getName());
+                    File serializedFile = new File(directory + SLASH +
+                                                  YANG_RESOURCES + SLASH + name);
+                    if (file.isDirectory()) {
+                        serializedFile.mkdirs();
+                        continue;
+                    }
+                    try (InputStream inputStream = jar.getInputStream(file);
+                         FileOutputStream fileOutputStream =
+                                 new FileOutputStream(serializedFile)) {
 
-                FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
-                while (inputStream.available() > 0) {
-                    fileOutputStream.write(inputStream.read());
-                }
-                fileOutputStream.close();
-                inputStream.close();
-                if (serializedFile.getName().endsWith(YANG_META_DATA)) {
-                    model = deSerializeDataModel(serializedFile.toString());
+                        while (inputStream.available() > 0) {
+                            fileOutputStream.write(inputStream.read());
+                        }
+                        if (serializedFile.getName().endsWith(YANG_META_DATA)) {
+                            model = deSerializeDataModel(serializedFile.toString());
+                        }
+                    }
                 }
             }
         }
-        jar.close();
         return model;
     }
 }
