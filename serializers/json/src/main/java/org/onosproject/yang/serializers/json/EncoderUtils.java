@@ -23,6 +23,7 @@ import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.runtime.YangSerializerContext;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -110,9 +111,14 @@ public final class EncoderUtils {
         DataNodeSiblingPositionType prevChildType = UNKNOWN_TYPE;
         DataNodeSiblingPositionType currChildType = UNKNOWN_TYPE;
 
-        List<DataNode> sortedChildList = sortChildrenList(childrenList);
-        checkNotNull(sortedChildList, "sorted children list cannot be null");
-        Iterator<DataNode> it = sortedChildList.iterator();
+        /*
+         * Dynamic Config preserves the order of child nodes.
+         * So, we no longer need to sort the children.
+         */
+        //List<DataNode> sortedChildList = sortChildrenList(childrenList);
+        //checkNotNull(sortedChildList, "sorted children list cannot be null");
+        Collection<DataNode> dataNodeList = childrenList.values();
+        Iterator<DataNode> it = dataNodeList.iterator();
         DataNode currChild = it.next();
         DataNode nextChild = null;
         boolean lastChildNotProcessed = true;

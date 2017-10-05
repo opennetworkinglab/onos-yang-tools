@@ -40,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,6 +58,7 @@ public final class SerializersUtil {
     private static final String ROOT_ELEMENT_START = "<root ";
     private static final String ROOT_ELEMENT_END = "</root>";
     private static final String URI_ENCODING_CHAR_SET = "ISO-8859-1";
+    private static final String UTF8_ENCODING = "utf-8";
     private static final String ERROR_LIST_MSG = "List/Leaf-list node should be " +
             "in format \"nodeName=key\"or \"nodeName=instance-value\"";
     private static final String EQUAL = "=";
@@ -142,7 +144,8 @@ public final class SerializersUtil {
             return null;
         }
 
-        List<String> paths = urlPathArgsDecode(SLASH_SPLITTER.split(uriString));
+        //List<String> paths = urlPathArgsDecode(SLASH_SPLITTER.split(uriString));
+        List<String> paths = Arrays.asList(uriString.split(SLASH));
 
         if (!paths.isEmpty()) {
             ResourceId.Builder ridBuilder =
@@ -160,6 +163,7 @@ public final class SerializersUtil {
      * @param paths the original paths
      * @return list of decoded paths
      */
+    @Deprecated
     public static List<String> urlPathArgsDecode(Iterable<String> paths) {
         try {
             List<String> decodedPathArgs = new ArrayList<>();
@@ -263,18 +267,11 @@ public final class SerializersUtil {
 
 
     private static String uriDecodedString(String keyStr) {
-        /*
-         * replaceAll() may be an expensive operation. So, call
-         * contains() to determine if replaceAll() is really need
-         * to be invoked.
-         */
-        if (keyStr.contains(URI_ENCODED_SLASH)) {
-            keyStr = keyStr.replaceAll(URI_ENCODED_SLASH, SLASH);
+        try {
+            keyStr = URLDecoder.decode(keyStr, UTF8_ENCODING);
+        } catch (UnsupportedEncodingException ex) {
+            throw new SerializerUtilException("UnsupportedEncodingException: " + ex.getMessage());
         }
-        if (keyStr.contains(URI_ENCODED_COLON)) {
-            keyStr = keyStr.replaceAll(URI_ENCODED_COLON, COLON);
-        }
-        //TODO: need to decode other percentage encoded characters.
 
         return keyStr;
     }
