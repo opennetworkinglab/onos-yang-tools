@@ -17,33 +17,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+    </dependencies>
 
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onos-yang-compiler</artifactId>
+        <artifactId>onos-yang-compiler-plugin</artifactId>
         <version>2.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>onos-yang-compiler-plugin</artifactId>
-    <packaging>pom</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <modules>
-        <module>maven</module>
-        <module>buck</module>
-        <module>utils</module>
-    </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-yang-compiler-tool</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>onos-yang-compiler-plugin-utils</artifactId>
+    <packaging>bundle</packaging>
 </project>
-
-

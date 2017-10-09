@@ -56,6 +56,8 @@ import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.onosproject.yang.compiler.plugin.utils.PluginUtils.getValidModelId;
+
 /**
  * Description of a Buck Yang Library.
  */
@@ -100,7 +102,8 @@ public class YangLibraryDescription
 
         BuildRule yangLib = resolver.getRuleOptional(yangParams.getBuildTarget())
                 .or(() -> resolver.addToIndex(new YangLibrary(
-                        yangParams, pathResolver, args.srcs, args.modelId.get())));
+                        yangParams, pathResolver, args.srcs,
+                        getValidModelId(args.modelId.get()))));
 
         if (params.getBuildTarget().getFlavors().contains(SOURCES)) {
             return yangLib;
@@ -183,5 +186,4 @@ public class YangLibraryDescription
 
         //TODO other params here
     }
-
 }

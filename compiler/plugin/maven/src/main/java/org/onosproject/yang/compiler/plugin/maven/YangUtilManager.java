@@ -42,6 +42,7 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.addToCompilationRoot;
 import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.addToProjectResource;
 import static org.onosproject.yang.compiler.plugin.maven.YangPluginUtils.resolveInterJarDependencies;
+import static org.onosproject.yang.compiler.plugin.utils.PluginUtils.getValidModelId;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_BASE_PKG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DEFAULT_JAR_RES_PATH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
@@ -183,7 +184,7 @@ public class YangUtilManager extends AbstractMojo {
             }
 
             if (modelId != null) {
-                bldr.setModelId(modelId);
+                bldr.setModelId(getValidModelId(modelId));
             } else {
                 bldr.setModelId(project.getArtifactId());
             }

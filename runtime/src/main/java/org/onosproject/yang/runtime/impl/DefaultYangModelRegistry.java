@@ -49,6 +49,7 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSet;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
 import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
@@ -67,6 +68,8 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     private static final String E_MEXIST =
             "Model with given modelId already exist";
     private static final String E_NULL = "Model must not be null";
+    private static final String E_NOT_VAL = "Model id is invalid";
+
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -133,9 +136,15 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             }
         }
 
-        if (!modelIdStore.containsKey(model.getYangModelId())) {
+        // Validating the model Id
+        String id = model.getYangModelId();
+        if (!id.matches(REGEX)) {
+            throw new IllegalArgumentException(E_NOT_VAL);
+        }
+
+        if (!modelIdStore.containsKey(id)) {
             updateRegClassStore(param);
-            modelIdStore.put(model.getYangModelId(), model);
+            modelIdStore.put(id, model);
         } else if ((info != null) && (!registerClassStore
                 .containsKey(info.getModuleClass()))) {
             updateRegClassStore(param);

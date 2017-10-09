@@ -33,7 +33,8 @@ public interface YangModelRegistry {
      * @param param parameters having model to be registered with additional
      *              information provided by app
      * @throws IllegalArgumentException when requested model with provided
-     *                                  identifier is already registered
+     *                                  identifier is already registered or
+     *                                  not valid
      */
     void registerModel(ModelRegistrationParam param)
             throws IllegalArgumentException;
