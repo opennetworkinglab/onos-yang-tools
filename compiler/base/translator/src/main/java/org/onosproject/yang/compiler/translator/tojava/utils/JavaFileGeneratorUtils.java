@@ -24,8 +24,11 @@ import org.onosproject.yang.compiler.datamodel.YangCompilerAnnotation;
 import org.onosproject.yang.compiler.datamodel.YangDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
+import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
+import org.onosproject.yang.compiler.datamodel.YangRevision;
+import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
@@ -42,7 +45,6 @@ import org.onosproject.yang.compiler.translator.tojava.TempJavaEventFragmentFile
 import org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaServiceFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaTypeFragmentFiles;
-import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaIdentityTranslator;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.compiler.utils.io.impl.JavaDocGen.JavaDocType;
 
@@ -96,6 +98,7 @@ import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeI
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.getNodesPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.ClassDefinitionGenerator.generateClassDefinition;
 import static org.onosproject.yang.compiler.translator.tojava.utils.IndentationType.FOUR_SPACE;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.CLASS_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodClassTypes.INTERFACE_TYPE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getIfConditionBegin;
@@ -393,7 +396,7 @@ public final class JavaFileGeneratorUtils {
 
         if (file.exists()) {
             throw new IOException(" file " + file.getName() + " is already generated for "
-                    + className + " @ " + pkg + "\n" +
+                                          + className + " @ " + pkg + "\n" +
                                           ERROR_MSG_FOR_GEN_CODE);
         }
 
@@ -428,7 +431,7 @@ public final class JavaFileGeneratorUtils {
 
         if (file.exists()) {
             throw new IOException(" file " + file.getName() +
-                                  " is already generated for: " + name + "\n" +
+                                          " is already generated for: " + name + "\n" +
                                           ERROR_MSG_FOR_GEN_CODE);
         }
         boolean isFileCreated;
@@ -894,7 +897,7 @@ public final class JavaFileGeneratorUtils {
      * @return derived package info.
      */
     public static JavaQualifiedTypeInfoTranslator getDerivedPkfInfo(YangIdentity id) {
-        String pkg = YangJavaIdentityTranslator.getDerivedPackage(id);
+        String pkg = getDerivedPackage(id);
         String name;
         if (id.isNameConflict()) {
             name = getCapitalCase(
@@ -1046,5 +1049,38 @@ public final class JavaFileGeneratorUtils {
         builder.append(getReturnString(NEG_ONE, EIGHT_SPACE_INDENTATION))
                 .append(signatureClose()).append(methodClose(FOUR_SPACE));
         return builder.toString();
+    }
+
+    /**
+     * Gets the derived package of YangIdentity.
+     *
+     * @param id YANG Identity.
+     * @return package of identity.
+     */
+    public static String getDerivedPackage(YangIdentity id) {
+        String derPkg;
+        String version;
+        String moduleName;
+        YangRevision revision;
+        String nodeName;
+
+        YangNode node = id.getParent();
+        if (node instanceof YangModule) {
+            YangModule module = (YangModule) node;
+            version = module.getVersion();
+            moduleName = module.getModuleName();
+            revision = module.getRevision();
+            nodeName = module.getName();
+        } else {
+            YangSubModule subModule = (YangSubModule) node;
+            version = subModule.getVersion();
+            moduleName = subModule.getModuleName();
+            revision = subModule.getRevision();
+            nodeName = subModule.getName();
+        }
+        String modulePkg = getRootPackage(version, moduleName, revision, null);
+        String modJava = getCamelCase(nodeName, null);
+        derPkg = modulePkg + PERIOD + modJava.toLowerCase();
+        return derPkg;
     }
 }
