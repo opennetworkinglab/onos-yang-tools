@@ -16,10 +16,6 @@
 package org.onosproject.yang.compiler.translator.tojava.javamodel;
 
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
-import org.onosproject.yang.compiler.datamodel.YangModule;
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.compiler.datamodel.YangRevision;
-import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.javadatamodel.YangJavaIdentity;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGenerator;
@@ -41,7 +37,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGene
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getRootPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethodForIdentity;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethodForIdentity;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.FAIL_AT_ENTRY;
@@ -50,10 +45,8 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUt
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_CURLY_BRACKET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_FILE_EXTENSION;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.io.impl.FileSystemUtil.closeFile;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 
@@ -203,39 +196,6 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
         return imports;
     }
 
-    /**
-     * Gets the derived package of YangIdentity.
-     *
-     * @param id YANG Identity.
-     * @return package of identity.
-     */
-    public static String getDerivedPackage(YangIdentity id) {
-        String derPkg;
-        String version;
-        String moduleName;
-        YangRevision revision;
-        String nodeName;
-
-        YangNode node = id.getParent();
-        if (node instanceof YangModule) {
-            YangModule module = (YangModule) node;
-            version = module.getVersion();
-            moduleName = module.getModuleName();
-            revision = module.getRevision();
-            nodeName = module.getName();
-        } else {
-            YangSubModule subModule = (YangSubModule) node;
-            version = subModule.getVersion();
-            moduleName = subModule.getModuleName();
-            revision = subModule.getRevision();
-            nodeName = subModule.getName();
-        }
-        String modulePkg = getRootPackage(version, moduleName, revision, null);
-        String modJava = getCamelCase(nodeName, null);
-        derPkg = modulePkg + PERIOD + modJava.toLowerCase();
-        return derPkg;
-    }
-
     private void addStringMethodsToClass(File file, String className,
                                          List<YangIdentity> idList)
             throws IOException {
@@ -254,4 +214,3 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
         /* Do nothing, file is already generated in entry*/
     }
 }
-
