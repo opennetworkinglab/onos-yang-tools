@@ -13,3 +13,4 @@ dependency-reduced-pom.xml
 .idea
 *.DS_Store
 /bin/
+YangLexer.tokens
