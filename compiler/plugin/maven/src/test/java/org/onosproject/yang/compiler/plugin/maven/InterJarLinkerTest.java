@@ -25,6 +25,7 @@ import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.tool.YangCompilerManager;
 import org.onosproject.yang.compiler.tool.YangFileInfo;
+import org.onosproject.yang.compiler.tool.YangNodeInfo;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.YangModel;
 
@@ -279,10 +280,11 @@ public class InterJarLinkerTest {
 
         createDirectories(TARGET_RESOURCE_PATH);
 
-        List<YangNode> nodes = new ArrayList<>();
-        nodes.addAll(utilManager.getYangNodeSet());
+        List<YangNodeInfo> nodeInfo = new ArrayList<>();
+        setNodeInfo(utilManager.getYangFileInfoSet(), nodeInfo);
+
         //process model which will have only port pair node.
-        processYangModel(TARGET_RESOURCE_PATH, nodes, id, false);
+        processYangModel(TARGET_RESOURCE_PATH, nodeInfo, id, false);
 
         //create a test jar file.
         provideTestJarFile(name);
@@ -293,6 +295,13 @@ public class InterJarLinkerTest {
         utilManager.setYangFileInfoSet(removeFileInfoFromSet(
                 utilManager.getYangFileInfoSet(), name));
         utilManager.getYangNodeSet().remove(node);
+    }
+
+    private void setNodeInfo(Set<YangFileInfo> yangFileInfoSet,
+        List<YangNodeInfo> infos) {
+        for (YangFileInfo i : yangFileInfoSet) {
+            infos.add(new YangNodeInfo(i.getRootNode(), i.isInterJar()));
+        }
     }
 
     /**

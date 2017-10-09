@@ -104,28 +104,26 @@ public class YangCompilerManager implements YangCompilerService {
      * Returns YANG model for application.
      *
      * @param path    path for metadata file
-     * @param list    list of YANG node
+     * @param info    list of YANG node info
      * @param modelId model id
      * @param fromUt  if method is called from unit test
      * @return YANG model
-     * @throws IOException when fails to IO operations
      */
     public static YangModel processYangModel(
-            String path, List<YangNode> list, String modelId, boolean fromUt)
-            throws IOException {
+            String path, List<YangNodeInfo> info, String modelId, boolean fromUt) {
         YangModel.Builder b = DefaultYangModel.builder();
         YangModuleId id;
-        for (YangNode node : list) {
-            id = processModuleId(node);
+        for (YangNodeInfo i : info) {
+            id = processModuleId(i.getNode());
             String serFile = path + id.moduleName() + id.revision() + ".ser";
             if (!fromUt) {
-                serializeModuleMetaData(serFile, node);
+                serializeModuleMetaData(serFile, i.getNode());
             }
             //take the absolute jar path and make a new path for our yang files.
-            String fileName = getFileName(node.getFileName());
+            String fileName = getFileName(i.getNode().getFileName());
             YangModuleExtendedInfo module = new YangModuleExtendedInfo(
-                    id, new File(path + fileName), new File(serFile));
-            module.setSchema(node);
+                    id, new File(path + fileName), new File(serFile), i.isInterJar());
+            module.setSchema(i.getNode());
             b.addModule(id, module);
         }
         return b.addModelId(modelId).build();
@@ -147,15 +145,13 @@ public class YangCompilerManager implements YangCompilerService {
      *
      * @param serFileName path of resource directory
      * @param node        YangNode
-     * @throws IOException when fails to IO operations
      */
-    private static void serializeModuleMetaData(String serFileName, YangNode node)
-            throws IOException {
+    private static void serializeModuleMetaData(String serFileName, YangNode node) {
         try (FileOutputStream outStream = new FileOutputStream(serFileName);
              ObjectOutputStream objOutStream = new ObjectOutputStream(outStream)) {
             objOutStream.writeObject(node);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info("Error while serializing YANG node", e);
         }
     }
 
@@ -224,8 +220,7 @@ public class YangCompilerManager implements YangCompilerService {
                 createDirectories(resourceGenDir);
 
                 // Resolve inter jar dependency.
-                addSchemaToFileSet(dependentSchema(
-                        param.getDependentSchemas()));
+                addSchemaToFileSet(dependentSchema(param.getDependentSchemas()));
 
                 // Carry out the parsing for all the YANG files.
                 parseYangFileInfoSet();
@@ -306,10 +301,8 @@ public class YangCompilerManager implements YangCompilerService {
      * Resolved inter-jar dependencies.
      *
      * @param dependentSchema dependent schema list
-     * @throws IOException when fails to do IO operations
      */
-    private void addSchemaToFileSet(Set<YangNode> dependentSchema)
-            throws IOException {
+    private void addSchemaToFileSet(Set<YangNode> dependentSchema) {
         if (dependentSchema == null || dependentSchema.isEmpty()) {
             return;
         }
@@ -320,6 +313,7 @@ public class YangCompilerManager implements YangCompilerService {
             dependentFileInfo.setRootNode(node);
             dependentFileInfo.setForTranslator(false);
             dependentFileInfo.setYangFileName(node.getName());
+            dependentFileInfo.setInterJar(true);
             yangFileInfoSet.add(dependentFileInfo);
         }
     }
@@ -431,11 +425,10 @@ public class YangCompilerManager implements YangCompilerService {
      * @param id   model id
      * @throws IOException when fails to IO operations
      */
-    public void processSerialization(String path, String id) throws
-            IOException {
-        List<YangNode> nodelist = new ArrayList<>();
-        nodelist.addAll(yangNodeSet);
-        model = processYangModel(path, nodelist, id, false);
+    public void processSerialization(String path, String id) throws IOException {
+        List<YangNodeInfo> nodeInfo = new ArrayList<>();
+        setNodeInfo(yangFileInfoSet, nodeInfo);
+        model = processYangModel(path, nodeInfo, id, false);
         String serFileName = path + YANG_META_DATA;
         try (FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
@@ -443,6 +436,45 @@ public class YangCompilerManager implements YangCompilerService {
         }
     }
 
+    private void setNodeInfo(Set<YangFileInfo> yangFileInfoSet,
+        List<YangNodeInfo> infos) {
+        for (YangFileInfo i : yangFileInfoSet) {
+            infos.add(new YangNodeInfo(i.getRootNode(), i.isInterJar()));
+        }
+    }
+
+    /**
+     * Returns YANG model for serialization.
+     *
+     * @param path    path for metadata file
+     * @param list    set of YANG file info
+     * @param modelId model id
+     * @param fromUt  if method is called from unit test
+     * @return YANG model
+     */
+    private static YangModel getModelForSerialization(
+        String path, Set<YangFileInfo> list, String modelId, boolean fromUt) {
+        YangModel.Builder b = DefaultYangModel.builder();
+        YangModuleId id;
+        boolean interJar;
+
+        for (YangFileInfo info : list) {
+            YangNode node = info.getRootNode();
+            id = processModuleId(node);
+            interJar = info.isInterJar();
+            String serFile = path + id.moduleName() + id.revision() + ".ser";
+            if (!fromUt) {
+                serializeModuleMetaData(serFile, node);
+            }
+            //take the absolute jar path and make a new path for our yang files.
+            String fileName = getFileName(node.getFileName());
+            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
+                id, new File(path + fileName), new File(serFile), interJar);
+            module.setSchema(node);
+            b.addModule(id, module);
+        }
+        return b.addModelId(modelId).build();
+    }
     /**
      * Copies yang files to resource directory.
      *
@@ -539,6 +571,19 @@ public class YangCompilerManager implements YangCompilerService {
             }
         }
         return yangNodes;
+    }
+
+    /**
+     * Sets YANG node info.
+     *
+     * @param model YANG model
+     * @param infos node info to be filled
+     */
+    public static void setNodeInfo(YangModel model, List<YangNodeInfo> infos) {
+        for (YangModule m : model.getYangModules()) {
+            YangModuleExtendedInfo i = (YangModuleExtendedInfo) m;
+            infos.add(new YangNodeInfo(i.getSchema(), i.isInterJar()));
+        }
     }
 
     /**

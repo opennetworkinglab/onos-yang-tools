@@ -17,9 +17,8 @@
 package org.onosproject.yang.compiler.tool;
 
 
-import org.onosproject.yang.compiler.datamodel.YangNode;
-
 import java.util.Objects;
+import org.onosproject.yang.compiler.datamodel.YangNode;
 
 /**
  * Represents YANG file information.
@@ -40,6 +39,11 @@ public class YangFileInfo {
      * Flag to know if the root node require to be translated.
      */
     private boolean isForTranslator = true;
+
+    /**
+     * Flag to know if the root node is an inter-jar node.
+     */
+    private boolean isInterJar;
 
     /**
      * Returns data model node for YANG file.
@@ -93,6 +97,24 @@ public class YangFileInfo {
      */
     public void setForTranslator(boolean isForTranslator) {
         this.isForTranslator = isForTranslator;
+    }
+
+    /**
+     * Return true if node is inter-jar node.
+     *
+     * @return true if inter-jar, false otherwise
+     */
+    public boolean isInterJar() {
+        return isInterJar;
+    }
+
+    /**
+     * Sets true if it's inter-jar node.
+     *
+     * @param interJar flag indicating if it's inter-jar node
+     */
+    public void setInterJar(boolean interJar) {
+        isInterJar = interJar;
     }
 
     @Override

@@ -16,23 +16,22 @@
 
 package org.onosproject.yang.runtime.helperutils;
 
-import org.onosproject.yang.compiler.datamodel.YangNode;
-import org.onosproject.yang.model.YangModel;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.parseJarFile;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.processYangModel;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.setNodeInfo;
+import static org.osgi.framework.FrameworkUtil.getBundle;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.onosproject.yang.compiler.tool.YangCompilerManager.getYangNodes;
-import static org.onosproject.yang.compiler.tool.YangCompilerManager.parseJarFile;
-import static org.onosproject.yang.compiler.tool.YangCompilerManager.processYangModel;
-import static org.osgi.framework.FrameworkUtil.getBundle;
-import static org.slf4j.LoggerFactory.getLogger;
+import org.onosproject.yang.compiler.tool.YangNodeInfo;
+import org.onosproject.yang.model.YangModel;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
 
 /**
  * Utilities for runtime to use apache tools.
@@ -63,7 +62,7 @@ public final class YangApacheUtils {
         BundleContext context = getBundle(modClass).getBundleContext();
         if (context != null) {
             Bundle bundle = context.getBundle();
-            List<YangNode> curNodes = new ArrayList<>();
+            List<YangNodeInfo> nodeInfo = new ArrayList<>();
             String jarPath;
             String metaPath;
             jarPath = getJarPathFromBundleLocation(
@@ -71,16 +70,11 @@ public final class YangApacheUtils {
             metaPath = jarPath + SLASH + YANG_RESOURCES + SLASH;
             YangModel model = processJarParsingOperations(jarPath);
             if (model != null) {
-                curNodes.addAll(getYangNodes(model));
+                setNodeInfo(model, nodeInfo);
                 // process model creations.
-                if (!curNodes.isEmpty()) {
-                    try {
-                        return processYangModel(metaPath, curNodes,
+                if (!nodeInfo.isEmpty()) {
+                      return processYangModel(metaPath, nodeInfo,
                                                 model.getYangModelId(), false);
-                    } catch (IOException e) {
-                        log.error(" failed to create process YANG model " +
-                                          e.getMessage(), e);
-                    }
                 }
             }
         }

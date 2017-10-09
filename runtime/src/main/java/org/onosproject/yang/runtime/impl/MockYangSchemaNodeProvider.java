@@ -18,6 +18,7 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.compiler.tool.YangNodeInfo;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.runtime.ModelRegistrationParam;
 
@@ -98,17 +99,20 @@ public final class MockYangSchemaNodeProvider {
         //Create model registration param.
         ModelRegistrationParam.Builder b = builder();
 
-        //create a new YANG model
-        YangModel model = null;
-        try {
-            model = processYangModel(META_PATH, nodes, id, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<YangNodeInfo> nodeInfo = new ArrayList<>();
+        setNodeInfo(nodes, nodeInfo);
+        YangModel model = processYangModel(META_PATH, nodeInfo, id, true);
 
         //set YANG model
         b.setYangModel(model);
         return b.build();
+    }
+
+    private static void setNodeInfo(List<YangNode> nodes, List<YangNodeInfo> nodeInfos) {
+        for (YangNode node : nodes) {
+            YangNodeInfo nodeInfo = new YangNodeInfo(node, false);
+            nodeInfos.add(nodeInfo);
+        }
     }
 
     static YangModel processModelTest() {
@@ -118,7 +122,9 @@ public final class MockYangSchemaNodeProvider {
             Set<YangNode> appNode = getYangNodes(model);
             List<YangNode> nodes = new ArrayList<>();
             nodes.addAll(appNode);
-            return processYangModel(META_PATH, nodes, id, false);
+            List<YangNodeInfo> nodeInfo = new ArrayList<>();
+            setNodeInfo(nodes, nodeInfo);
+            return processYangModel(META_PATH, nodeInfo, id, false);
         } catch (IOException e) {
             e.printStackTrace();
         }
