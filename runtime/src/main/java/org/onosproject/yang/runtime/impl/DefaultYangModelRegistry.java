@@ -25,6 +25,7 @@ import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
@@ -49,6 +50,7 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSet;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.tool.YangCompilerManager.processModuleId;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
@@ -152,8 +154,17 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             throw new IllegalArgumentException(E_MEXIST);
         }
 
-        //Register all the YANG nodes.
-        registerModule(curNodes);
+        //Register all the YANG nodes, excluding nodes from dependent jar.
+        if (curNodes != null && !curNodes.isEmpty()) {
+            for (YangNode node : curNodes) {
+                YangModuleId mid = processModuleId(node);
+                YangModuleExtendedInfo m =
+                        (YangModuleExtendedInfo) model.getYangModule(mid);
+                if (!m.isInterJar()) {
+                    registerModule(node);
+                }
+            }
+        }
 
         //update child context
         updateChildContext(curNodes);
@@ -162,21 +173,17 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     /**
      * Register specific model.
      *
-     * @param curNodes current nodes
+     * @param node YANG node
      */
-    private void registerModule(Set<YangNode> curNodes) {
+    private void registerModule(YangNode node) {
         String name;
         //register all the nodes present in YANG model.
-        if (curNodes != null && !curNodes.isEmpty()) {
-            for (YangNode node : curNodes) {
-                name = getInterfaceClassName(node);
-                if (!regClassNameKeyStore.containsKey(name)) {
-                    processApplicationContext(node, name);
-                } else {
-                    log.info("class already registered with model registry " +
-                                     "{}", name);
-                }
-            }
+        name = getInterfaceClassName(node);
+        if (!regClassNameKeyStore.containsKey(name)) {
+            processApplicationContext(node, name);
+        } else {
+            log.info("class already registered with model registry " +
+                             "{}", name);
         }
     }
 
@@ -185,10 +192,17 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         synchronized (DefaultYangModelRegistry.class) {
             YangModel model = checkNotNull(param.getYangModel(), E_NULL);
             modelIdStore.remove(model.getYangModelId());
-            //Unregister all yang files
+            //Unregister all yang files, excluding nodes from dependent jar.
             Set<YangNode> curNodes = getNodes(model);
-            for (YangNode node : curNodes) {
-                processUnReg(getInterfaceClassName(node));
+            if (curNodes != null && !curNodes.isEmpty()) {
+                for (YangNode node : curNodes) {
+                    YangModuleId id = processModuleId(node);
+                    YangModuleExtendedInfo m =
+                            (YangModuleExtendedInfo) model.getYangModule(id);
+                    if (!m.isInterJar()) {
+                        processUnReg(getInterfaceClassName(node));
+                    }
+                }
             }
         }
     }
@@ -500,14 +514,18 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      *
      * @param param model registrations param
      */
-    public void updateRegClassStore(ModelRegistrationParam param) {
+    void updateRegClassStore(ModelRegistrationParam param) {
         Class<?> service;
         AppModuleInfo info;
         for (YangModuleId id : param.getYangModel().getYangModulesId()) {
-            info = param.getAppModuleInfo(id);
-            if (info != null) {
-                service = info.getModuleClass();
-                addRegClass(service.getName(), service);
+            YangModuleExtendedInfo i = (YangModuleExtendedInfo) param
+                    .getYangModel().getYangModule(id);
+            if (!i.isInterJar()) {
+                info = param.getAppModuleInfo(id);
+                if (info != null) {
+                    service = info.getModuleClass();
+                    addRegClass(service.getName(), service);
+                }
             }
         }
     }
@@ -518,7 +536,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
      * @param name    qualified name of the class
      * @param service generated class
      */
-    public void addRegClass(String name, Class<?> service) {
+    void addRegClass(String name, Class<?> service) {
         if (!registerClassStore.containsKey(name)) {
             registerClassStore.put(name, service);
         }
