@@ -21,14 +21,14 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-utils</artifactId>
-            <version>2.3-SNAPSHOT</version>
+            <version>2.3.0-b1</version>
         </dependency>
     </dependencies>
 
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-compiler-base</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <version>2.3.0-b1</version>
     </parent>
 
     <artifactId>onos-yang-compiler-datamodel</artifactId>
