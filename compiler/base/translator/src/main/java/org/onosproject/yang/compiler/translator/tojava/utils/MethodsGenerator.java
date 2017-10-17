@@ -96,6 +96,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenera
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.multiAttrMethodSignature;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.valueAssign;
+import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getEnumYangName;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getIdentityRefName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ADD_AUGMENTATION;
@@ -1208,7 +1209,7 @@ public final class MethodsGenerator {
                     str = getEnumJavaAttribute(yangEnum.getNamedValue())
                             .toUpperCase();
                     builder.append(getEnumValueMethodCases(
-                            QUOTES + yangEnum.getNamedValue() + QUOTES, str,
+                            QUOTES + getEnumYangName(yangEnum.getNamedValue()) + QUOTES, str,
                             name));
                 }
                 break;

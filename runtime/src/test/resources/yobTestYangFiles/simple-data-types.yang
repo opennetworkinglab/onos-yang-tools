@@ -174,7 +174,7 @@ module simple-data-types {
 
         leaf lfenum {
             type enumeration {
-                enum enum1;
+                enum 3.3ms;
                 enum enum2;
                 enum enum3;
                 enum enum4;

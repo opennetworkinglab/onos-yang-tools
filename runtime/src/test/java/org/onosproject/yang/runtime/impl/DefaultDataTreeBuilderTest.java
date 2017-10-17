@@ -126,6 +126,8 @@ import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL8;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.YtbDataTypes.LeafIdentifier.LL9;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Cont1.LeafIdentifier.LEAF15;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Cont1.LeafIdentifier.LEAF16;
+import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Cont1.LeafIdentifier.LL16;
 import static org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.def1.def1union.Def1UnionEnum1.of;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
@@ -1361,6 +1363,8 @@ public class DefaultDataTreeBuilderTest {
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "physical");
         validateDataNode(it.next(), "leaf15", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "physical");
+        validateDataNode(it.next(), "leaf16", ns,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "3.3ms");
         validateDataNode(it.next(), "ll1", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "leaf-list1");
         validateDataNode(it.next(), "ll1", ns,
@@ -1413,7 +1417,8 @@ public class DefaultDataTreeBuilderTest {
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "virtual");
         validateDataNode(it.next(), "ll15", ns,
                          MULTI_INSTANCE_LEAF_VALUE_NODE, true, "physical");
-
+        validateDataNode(it.next(), "ll16", ns,
+                         MULTI_INSTANCE_LEAF_VALUE_NODE, true, "3.3ms");
         return it;
     }
 
@@ -1430,6 +1435,8 @@ public class DefaultDataTreeBuilderTest {
         Def1 def1 = new Def1(union);
         Def1Union union2 = new Def1Union(of(10));
         Def1Union union22 = new Def1Union(of(10000));
+        Def1Union union33 = new Def1Union(of(100000));
+        Def1 def13 = new Def1(union33);
         Def1 def11 = new Def1(union22);
         Def1 def12 = new Def1(union2);
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
@@ -1462,6 +1469,7 @@ public class DefaultDataTreeBuilderTest {
         cont1.leaf13(def11);
         cont1.leaf14(def6);
         cont1.leaf15(def71);
+        cont1.leaf16(def13);
         cont1.addToLl1("leaf-list1");
         cont1.addToLl1("leaf-list1-2");
         cont1.addToLl2(def1);
@@ -1490,7 +1498,7 @@ public class DefaultDataTreeBuilderTest {
         cont1.addToLl14(def6);
         cont1.addToLl14(def61);
         cont1.addToLl15(def71);
-
+        cont1.addToLl16(def13);
         cont1.cont2(cont2);
         data.addModelObject((ModelObject) cont1);
         return data;
@@ -1511,6 +1519,8 @@ public class DefaultDataTreeBuilderTest {
         Def1Union union22 = new Def1Union(of(10000));
         Def1 def11 = new Def1(union22);
         Def1 def12 = new Def1(union2);
+        Def1Union union33 = new Def1Union(of(100000));
+        Def1 def13 = new Def1(union33);
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
         byte[] arr1 = Base64.getDecoder().decode("MTEwMTEx");
         BitSet bits = new BitSet();
@@ -1540,6 +1550,7 @@ public class DefaultDataTreeBuilderTest {
         augC.leaf13(def11);
         augC.leaf14(def6);
         augC.leaf15(def71);
+        augC.leaf16(def13);
         augC.addToLl1("leaf-list1");
         augC.addToLl1("leaf-list1-2");
         augC.addToLl2(def1);
@@ -1568,6 +1579,7 @@ public class DefaultDataTreeBuilderTest {
         augC.addToLl14(def6);
         augC.addToLl14(def61);
         augC.addToLl15(def71);
+        augC.addToLl16(def13);
         cont2.addAugmentation((InnerModelObject) augC);
         return cont2;
     }
@@ -1587,6 +1599,8 @@ public class DefaultDataTreeBuilderTest {
         Def1 def1 = new Def1(union);
         Def1Union union22 = new Def1Union(of("*"));
         Def1 def11 = new Def1(union22);
+        Def1Union union33 = new Def1Union(of("3.3ms"));
+        Def1 def13 = new Def1(union33);
         data = addLeafModelObject(LEAF2, def1, data);
 
         byte[] arr = Base64.getDecoder().decode("MTEwMTE=");
@@ -1624,6 +1638,7 @@ public class DefaultDataTreeBuilderTest {
         Def7 def71 = new Def7(def7);
         data = addLeafModelObject(LEAF15, def71, data);
 
+        data = addLeafModelObject(LEAF16, def13, data);
         List<Object> objs = new LinkedList<>();
         objs.add("leaf-list1");
         objs.add("leaf-list1-2");
@@ -1703,6 +1718,10 @@ public class DefaultDataTreeBuilderTest {
         objs = new LinkedList<>();
         objs.add(def71);
         data = addLeafListModelObject(LL15, objs, data);
+
+        objs = new LinkedList<>();
+        objs.add(def13);
+        data = addLeafListModelObject(LL16, objs, data);
         return data;
     }
 

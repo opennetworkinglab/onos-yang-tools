@@ -147,7 +147,7 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "lfdecimal6", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "enum1";
+        value = "3.3ms";
         dBlr = addDataNode(dBlr, "lfenum", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
@@ -367,7 +367,7 @@ public class YobSimpleDataTypeTest {
         dBlr = addDataNode(dBlr, "llref6", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
-        value = "enum1";
+        value = "3.3ms";
         dBlr = addDataNode(dBlr, "llref7", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
 
@@ -673,7 +673,7 @@ public class YobSimpleDataTypeTest {
                    is("-922337203685477.5808"));
         assertThat(cont.lfdecimal6().toString(),
                    is("-9223372036854.775808"));
-        assertThat(cont.lfenum().toString(), is("enum1"));
+        assertThat(cont.lfenum().toString(), is("3.3ms"));
         assertThat(cont.lfbits().toString(), is("{0}"));
         String str = new String(cont.lfbinary());
         assertThat(str, is("hey"));
@@ -750,7 +750,7 @@ public class YobSimpleDataTypeTest {
         assertThat(cont3.llref5().get(0).toString(), is("-922337203685470058.08"));
         value = 121;
         assertThat(cont3.llref6().get(0), is(value));
-        assertThat(cont3.llref7().get(0).toString(), is("enum1"));
+        assertThat(cont3.llref7().get(0).toString(), is("3.3ms"));
         assertThat(cont3.llref8().get(0).toString(), is("-9223372036000.775808"));
         arr = Base64.getDecoder().decode("MTExMTExMTE=");
         assertThat(cont3.llref9().get(0), is(arr));

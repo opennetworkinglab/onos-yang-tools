@@ -28,12 +28,13 @@ import org.onosproject.yang.compiler.utils.UtilConstants.Operation;
 import java.util.List;
 
 import static java.util.Collections.sort;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getDefaultDefinition;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOpenCloseParaWithValue;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.signatureClose;
+import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getEnumYangName;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.DIAMOND_CLOSE_BRACKET;
@@ -239,7 +240,7 @@ public final class JavaCodeSnippetGen {
     public static String generateEnumAttributeStringWithSchemaName(
             String name, int value) {
         String enumName = getEnumJavaAttribute(name);
-        String str = value + COMMA + SPACE + QUOTES + name + QUOTES;
+        String str = value + COMMA + SPACE + QUOTES + getEnumYangName(name) + QUOTES;
         return getJavaDoc(ENUM_ATTRIBUTE, name, false, null) +
                 FOUR_SPACE_INDENTATION + enumName.toUpperCase() +
                 getOpenCloseParaWithValue(str) + COMMA + NEW_LINE;

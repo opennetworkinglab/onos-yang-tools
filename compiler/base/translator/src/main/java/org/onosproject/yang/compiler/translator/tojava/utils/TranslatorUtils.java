@@ -32,6 +32,7 @@ import java.io.IOException;
 
 import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
+import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_AUTO_PREFIX;
 
 /**
  * Represents common translator utilities.
@@ -161,6 +162,19 @@ public final class TranslatorUtils {
         String name = identity.getName();
         if (identity.isNameConflict()) {
             name = name + UtilConstants.IDENTITY;
+        }
+        return name;
+    }
+
+    /**
+     * Returns enum YANG attribute name for given javaName.
+     *
+     * @param name enum javaName
+     * @return YANG attribute name
+     */
+    public static String getEnumYangName(String name) {
+        if (name.startsWith(YANG_AUTO_PREFIX)) {
+            name = name.replaceFirst(YANG_AUTO_PREFIX, "");
         }
         return name;
     }
