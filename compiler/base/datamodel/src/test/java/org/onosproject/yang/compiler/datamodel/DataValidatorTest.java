@@ -17,9 +17,11 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.junit.Test;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.DataTypeException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangInt8;
 
+import static org.junit.Assert.fail;
 import static org.onosproject.yang.compiler.datamodel.CheckValidationTest.dataValidation;
 import static org.onosproject.yang.compiler.datamodel.CheckValidationTest.rangeCheck;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.BINARY;
@@ -40,7 +42,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
  * Unit tests for data type validations.Creates and validates different data
  * types against their data types covering different scenarios.
  */
-public class DataValidator {
+public class DataValidatorTest {
 
     /*
      * Creating nodes of type INT8 and testing the data validation.
@@ -171,6 +173,36 @@ public class DataValidator {
         rangeCheck(newNode, "-932337203685477580.9");
         rangeCheck(newNode, "932337203685477580.8");
         dataValidation(newNode, " ");
+    }
+
+    /**
+     * Creating nodes of type BIT and testing valid and invalid values.
+     */
+    @Test
+    public void positiveBits() throws DataModelException {
+
+        YangType<YangBits> newNode = new YangType<>();
+        newNode.setDataType(BITS);
+        YangBits bitNode = new YangBits();
+        YangBit yb1 = new YangBit();
+        yb1.setBitName("test1");
+        bitNode.addBitInfo(yb1);
+        newNode.setDataTypeExtendedInfo(bitNode);
+        try {
+            newNode.isValidValue("test1");
+        } catch (DataModelException e) {
+            fail("'test1' is valid. Unexpected " + e.getMessage());
+        }
+        try {
+            newNode.isValidValue("test2");
+            fail("Expecting exception.");
+        } catch (DataTypeException e) {
+        }
+        try {
+            newNode.isValidValue(null);
+        } catch (DataModelException e) {
+            fail("null is valid. Unexpected " + e.getMessage());
+        }
     }
 
     /**

@@ -225,17 +225,21 @@ public class YangBits extends DefaultLocationInfo implements Parsable, Serializa
     /**
      * Returns the object of YANG bits based on specific set of bit names.
      *
-     * @param bits set of bit names
+     * @param bits set of bit names. Treats null the same as empty string
      * @return Object of YANG bits
      */
     public YangBits fromString(String bits) {
+        if (bits == null || bits.isEmpty()) {
+            bitDataSet.clear();
+            return this;
+        }
         try {
             String[] bitNames = bits.trim().split(Pattern.quote(SPACE));
             setBitDataSet(bitNames);
             return this;
         } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**
