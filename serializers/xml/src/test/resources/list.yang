@@ -38,4 +38,18 @@ module list {
     leaf-list leaf1 {
         type string;
     }
+
+    container c2 {
+       config false;
+       list l2 {
+          key "m1 m2";
+          leaf m1 {
+              type string;
+          }
+
+          leaf m2 {
+              type string;
+          }
+       }
+    }
 }

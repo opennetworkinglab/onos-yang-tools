@@ -60,6 +60,7 @@ public class XmlSerializerTest {
     private static YangSerializer xmlSerializer;
 
     public static final String LNS = "yrt:list.anydata";
+    private static final String LIST_NS = "yrt:list";
 
     @BeforeClass
     public static void prepare() {
@@ -579,6 +580,50 @@ public class XmlSerializerTest {
 
         // validate module level anydata
         validateContainerDataNode(rootNode, "mydata", LNS);
+
+        // encode test
+        CompositeStream compositeStream = xmlSerializer.encode(
+                getNewCompositeData(compositeData), context);
+        InputStream inputStream = compositeStream.resourceData();
+        assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
+    }
+
+    /**
+     * Validates data node in which XML element is of type YANG List with config false.
+     */
+    @Test
+    public void testListWithConfigFalse() {
+        String path = "src/test/resources/testListWithConfigFalse.xml";
+        DefaultCompositeStream external =
+                new DefaultCompositeStream(null, parseInput(path));
+        CompositeData compositeData = xmlSerializer.decode(external, context);
+        DataNode rootNode = validateRootDataNode(compositeData.resourceData());
+        List<String> keyNames = new LinkedList<>();
+        keyNames.add("m1");
+        keyNames.add("m2");
+
+        List<String> keyNs = new LinkedList<>();
+        keyNs.add(LIST_NS);
+        keyNs.add(LIST_NS);
+
+        List<Object> values = new LinkedList<>();
+        values.add("m1_Value");
+        values.add("m2_Value");
+
+        DataNode c2Node = validateContainerDataNode(rootNode, "c2", LIST_NS);
+        DataNode listl1 = validateListDataNode(c2Node, "l2", LIST_NS,
+                                               keyNames, keyNs, values);
+        validateLeafDataNode(listl1, "m1", LIST_NS, "m1_Value");
+        validateLeafDataNode(listl1, "m2", LIST_NS, "m2_Value");
+
+        List<Object> values1 = new LinkedList<>();
+        values1.add("m1_Value1");
+        values1.add("m2_Value1");
+
+        DataNode listl2 = validateListDataNode(c2Node, "l2", LIST_NS,
+                                               keyNames, keyNs, values1);
+        validateLeafDataNode(listl2, "m1", LIST_NS, "m1_Value1");
+        validateLeafDataNode(listl2, "m2", LIST_NS, "m2_Value1");
 
         // encode test
         CompositeStream compositeStream = xmlSerializer.encode(

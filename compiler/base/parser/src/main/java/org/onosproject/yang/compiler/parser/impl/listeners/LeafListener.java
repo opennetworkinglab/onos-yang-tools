@@ -138,11 +138,9 @@ public final class LeafListener {
             leaf.setContainedIn(leavesHolder);
             if (tmpData instanceof YangList) {
                 YangList list = (YangList) tmpData;
-                if (list.isConfig()) {
-                    for (String key : list.getKeyList()) {
-                        if (key.equals(leaf.getName())) {
-                            leaf.setKeyLeaf(true);
-                        }
+                for (String key : list.getKeyList()) {
+                    if (key.equals(leaf.getName())) {
+                        leaf.setKeyLeaf(true);
                     }
                 }
             }
