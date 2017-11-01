@@ -138,7 +138,6 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.formatFile
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getAbsolutePackagePath;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.insertDataIntoJavaFile;
 
 /**
@@ -1253,7 +1252,7 @@ public class TempJavaFragmentFiles {
      * @return directory path
      */
     private String getTempDirPath(String path) {
-        return getPackageDirPathFromJavaJPackage(path) + SLASH +
+        return path + SLASH +
                 getGeneratedJavaClassName() + TEMP_FOLDER_NAME_SUFFIX + SLASH;
     }
 
