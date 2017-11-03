@@ -29,6 +29,8 @@ public final class ObjectProvider {
 
     // Object provider constant error string.
     private static final String E_DATATYPE = "Data type not supported.";
+    private static final String T = "true";
+    private static final String F = "false";
     private static final String E_NONEMPTY = "Value is of non Empty type";
 
     /**
@@ -40,14 +42,13 @@ public final class ObjectProvider {
     /**
      * Returns object from string value.
      *
-     * @param typeInfo  refers to YANG type information
-     * @param leafValue leafValue argument is used to set the value
-     *                  in method
-     * @param dataType  yang data type
+     * @param typeInfo refers to YANG type information
+     * @param v        v argument is leaf value used to set the value in method
+     * @param dataType yang data type
      * @return values object of corresponding given data type
      * @throws IllegalArgumentException if input is not valid
      */
-    public static Object getObject(YangType typeInfo, String leafValue,
+    public static Object getObject(YangType typeInfo, String v,
                                    YangDataTypes dataType)
             throws IllegalArgumentException {
         YangDataTypes type;
@@ -58,49 +59,51 @@ public final class ObjectProvider {
         }
         switch (type) {
             case INT8:
-                return Byte.parseByte(leafValue);
+                return Byte.parseByte(v);
             case UINT8:
             case INT16:
-                return Short.parseShort(leafValue);
+                return Short.parseShort(v);
             case UINT16:
             case INT32:
-                return Integer.parseInt(leafValue);
+                return Integer.parseInt(v);
             case UINT32:
             case INT64:
-                return Long.parseLong(leafValue);
+                return Long.parseLong(v);
             case UINT64:
-                return new BigInteger(leafValue);
+                return new BigInteger(v);
             case EMPTY:
-                if (leafValue == null || leafValue.equals("")) {
+                if (v == null || v.equals("")) {
                     return null;
-                } else if (leafValue.equals("true") ||
-                        leafValue.equals("false")) {
-                    return Boolean.parseBoolean(leafValue);
+                } else if (v.equals(T) || v.equals(F)) {
+                    return Boolean.parseBoolean(v);
                 }
             case BOOLEAN:
-                return Boolean.parseBoolean(leafValue);
+                if (v.equals(T) || v.equals(F)) {
+                    return Boolean.parseBoolean(v);
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
             case BINARY:
             case BITS:
             case IDENTITYREF:
             case ENUMERATION:
             case STRING:
             case INSTANCE_IDENTIFIER:
-                return leafValue;
+                return v;
             case DECIMAL64:
-                return new BigDecimal(leafValue);
+                return new BigDecimal(v);
             case LEAFREF:
                 YangType refType = ((YangLeafRef) typeInfo
                         .getDataTypeExtendedInfo()).getEffectiveDataType();
-                return getObject(refType, leafValue, refType.getDataType());
+                return getObject(refType, v, refType.getDataType());
             case DERIVED:
                 // referred typedef's list of type will always has only one type
                 YangType rt = ((YangDerivedInfo) typeInfo
                         .getDataTypeExtendedInfo()).getReferredTypeDef()
                         .getTypeList().get(0);
-                return getObject(rt, leafValue, ((YangDerivedInfo)
+                return getObject(rt, v, ((YangDerivedInfo)
                         typeInfo.getDataTypeExtendedInfo()).getEffectiveBuiltInType());
             case UNION:
-                return parseUnionTypeInfo(typeInfo, leafValue);
+                return parseUnionTypeInfo(typeInfo, v);
             default:
                 throw new IllegalArgumentException(E_DATATYPE);
         }
