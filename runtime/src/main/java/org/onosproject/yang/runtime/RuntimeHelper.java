@@ -21,17 +21,20 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.linker.YangLinker;
 import org.onosproject.yang.compiler.linker.impl.YangLinkerManager;
+import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
-import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translate;
+import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -65,17 +68,50 @@ public final class RuntimeHelper {
     /**
      * Returns YANG node for given YANG model.
      *
-     * @param model YANG model
+     * @param model           YANG model
+     * @param yangSchemaStore YANG schema store
      * @return YANG nodes for given model
      */
-    public static Set<YangNode> getNodes(YangModel model) {
+    public static Set<YangNode> getNodes(
+            YangModel model,
+            ConcurrentMap<String, ConcurrentMap<String, YangSchemaNode>> yangSchemaStore) {
         Set<YangNode> nodes = new HashSet<>();
         for (YangModule info : model.getYangModules()) {
             YangModuleExtendedInfo ex = (YangModuleExtendedInfo) info;
-            nodes.add(ex.getSchema());
+            YangNode node = ex.getSchema();
+            if (ex.isInterJar()) {
+                String name = node.getName();
+                String date = getDateInStringFormat(node);
+                String revName = name;
+                if (date != null) {
+                    revName = name + AT + date;
+                }
+                node = (YangNode) yangSchemaStore.get(name).get(revName);
+            }
+            nodes.add((YangNode) node);
         }
         //Target linking.
         return addLinkerAndJavaInfo(nodes);
+    }
+
+    /**
+     * Returns self YANG node for given YANG model.
+     *
+     * @param model           YANG model
+     * @param yangSchemaStore YANG schema store
+     * @return YANG nodes for given model
+     */
+    public static Set<YangNode> getSelfNodes(
+            YangModel model,
+            ConcurrentMap<String, ConcurrentMap<String, YangSchemaNode>> yangSchemaStore) {
+        Set<YangNode> nodes = new HashSet<>();
+        for (YangModule info : model.getYangModules()) {
+            YangModuleExtendedInfo ex = (YangModuleExtendedInfo) info;
+            if (!ex.isInterJar()) {
+                nodes.add(ex.getSchema());
+            }
+        }
+        return nodes;
     }
 
     /**

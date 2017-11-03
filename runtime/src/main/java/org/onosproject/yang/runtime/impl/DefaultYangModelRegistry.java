@@ -50,11 +50,11 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSet;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
-import static org.onosproject.yang.compiler.tool.YangCompilerManager.processModuleId;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
 import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
+import static org.onosproject.yang.runtime.RuntimeHelper.getSelfNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getServiceName;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -65,13 +65,12 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         SingleInstanceNodeContext {
 
     private static final String AT = "@";
-    private final Logger log = getLogger(getClass());
     private static final String E_NEXIST = "node with {} namespace not found.";
     private static final String E_MEXIST =
             "Model with given modelId already exist";
     private static final String E_NULL = "Model must not be null";
     private static final String E_NOT_VAL = "Model id is invalid";
-
+    private final Logger log = getLogger(getClass());
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -127,7 +126,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     public void registerModel(ModelRegistrationParam param) throws
             IllegalArgumentException {
         YangModel model = checkNotNull(param.getYangModel(), E_NULL);
-        Set<YangNode> curNodes = getNodes(model);
+        Set<YangNode> curNodes = getNodes(model, yangSchemaStore);
 
         //adding class info if added by application.
         AppModuleInfo info = null;
@@ -157,12 +156,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         //Register all the YANG nodes, excluding nodes from dependent jar.
         if (curNodes != null && !curNodes.isEmpty()) {
             for (YangNode node : curNodes) {
-                YangModuleId mid = processModuleId(node);
-                YangModuleExtendedInfo m =
-                        (YangModuleExtendedInfo) model.getYangModule(mid);
-                if (!m.isInterJar()) {
-                    registerModule(node);
-                }
+                registerModule(node);
             }
         }
 
@@ -179,12 +173,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         String name;
         //register all the nodes present in YANG model.
         name = getInterfaceClassName(node);
-        if (!regClassNameKeyStore.containsKey(name)) {
-            processApplicationContext(node, name);
-        } else {
-            log.info("class already registered with model registry " +
-                             "{}", name);
-        }
+        processApplicationContext(node, name);
     }
 
     @Override
@@ -193,15 +182,10 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             YangModel model = checkNotNull(param.getYangModel(), E_NULL);
             modelIdStore.remove(model.getYangModelId());
             //Unregister all yang files, excluding nodes from dependent jar.
-            Set<YangNode> curNodes = getNodes(model);
+            Set<YangNode> curNodes = getSelfNodes(model, yangSchemaStore);
             if (curNodes != null && !curNodes.isEmpty()) {
                 for (YangNode node : curNodes) {
-                    YangModuleId id = processModuleId(node);
-                    YangModuleExtendedInfo m =
-                            (YangModuleExtendedInfo) model.getYangModule(id);
-                    if (!m.isInterJar()) {
-                        processUnReg(getInterfaceClassName(node));
-                    }
+                    processUnReg(getInterfaceClassName(node));
                 }
             }
         }
