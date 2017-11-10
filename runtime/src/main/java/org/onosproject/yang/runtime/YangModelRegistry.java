@@ -40,6 +40,32 @@ public interface YangModelRegistry {
             throws IllegalArgumentException;
 
     /**
+     * Registers the given generated node class under provided anydata class.
+     *
+     * @param id  identifier to reference anydata container under which
+     *            application is expecting the data
+     * @param id1 identifier to reference the node defined in YANG file which
+     *            application can send as content or child nodes under anydata
+     * @throws IllegalArgumentException when provided identifier is not
+     *                                  not valid
+     */
+    void registerAnydataSchema(Class id, Class id1)
+            throws IllegalArgumentException;
+
+    /**
+     * Unregisters the given generated node class under provided anydata class.
+     *
+     * @param id  identifier to reference anydata container under which
+     *            application has registered the schema
+     * @param id1 identifier to reference the node defined in YANG file which
+     *            application can send as content or child nodes under anydata
+     * @throws IllegalArgumentException when provided identifier is not
+     *                                  not valid
+     */
+    void unregisterAnydataSchema(Class id, Class id1)
+            throws IllegalArgumentException;
+
+    /**
      * Unregisters the specified model.
      *
      * @param param parameters having model to be registered with additional

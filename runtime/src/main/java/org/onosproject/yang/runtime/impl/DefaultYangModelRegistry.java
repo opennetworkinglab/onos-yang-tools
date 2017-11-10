@@ -164,6 +164,18 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         updateChildContext(curNodes);
     }
 
+    @Override
+    public void registerAnydataSchema(Class id, Class id1) throws
+            IllegalArgumentException{
+        //TODO implemention
+    }
+
+    @Override
+    public void unregisterAnydataSchema(Class id, Class id1) throws
+            IllegalArgumentException {
+        //TODO implemention
+    }
+
     /**
      * Register specific model.
      *
