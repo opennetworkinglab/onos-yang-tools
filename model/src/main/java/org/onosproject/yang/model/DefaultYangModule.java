@@ -34,6 +34,7 @@ public class DefaultYangModule implements YangModule, Serializable {
     private YangModuleId id;
     private File yangSrc;
     private File metadata;
+    private boolean interJar;
 
     /**
      * Creates an instance of default YANG module.
@@ -49,6 +50,25 @@ public class DefaultYangModule implements YangModule, Serializable {
         this.id = id;
         this.yangSrc = yangSrc;
         this.metadata = metadata;
+    }
+
+    /**
+     * Creates an instance of default YANG module.
+     *
+     * @param id       YANG module id
+     * @param yangSrc  YANG source file path
+     * @param metadata YANG metadata source file path
+     * @param interJar is this module is in dependent jar
+     */
+    public DefaultYangModule(YangModuleId id, File yangSrc, File metadata,
+                             boolean interJar) {
+        checkNotNull(yangSrc);
+        checkNotNull(metadata);
+        checkNotNull(id);
+        this.id = id;
+        this.yangSrc = yangSrc;
+        this.metadata = metadata;
+        this.interJar = interJar;
     }
 
     @Override
@@ -74,6 +94,16 @@ public class DefaultYangModule implements YangModule, Serializable {
                                              metadata);
         }
     }
+
+    /**
+     * Returns true if it's inter-jar node.
+     *
+     * @return true if inter-jar node, false otherwise
+     */
+    public boolean isInterJar() {
+        return interJar;
+    }
+
 
     @Override
     public int hashCode() {

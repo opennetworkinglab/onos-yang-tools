@@ -31,7 +31,7 @@ public interface YangModel {
     Set<YangModule> getYangModules();
 
     /**
-     * Returns set of YANG modules identifier.
+     * Returns set of YANG modules identifier which belongs to this artifact.
      *
      * @return YANG module identifier
      */

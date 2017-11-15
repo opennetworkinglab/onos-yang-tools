@@ -29,7 +29,6 @@ import java.io.Serializable;
 public class YangModuleExtendedInfo extends DefaultYangModule implements Serializable {
 
     private YangNode schema;
-    private boolean interJar;
 
     /**
      * Creates an instance of YANG module extended information.
@@ -39,7 +38,19 @@ public class YangModuleExtendedInfo extends DefaultYangModule implements Seriali
      * @param metadata meta data resource path
      * @param interJar flag indicating if module is from inter-jar
      */
-    public YangModuleExtendedInfo(YangModuleId id, File yangSrc, File metadata, boolean interJar) {
+    public YangModuleExtendedInfo(YangModuleId id, File yangSrc, File metadata,
+                                  boolean interJar) {
+        super(id, yangSrc, metadata, interJar);
+    }
+
+    /**
+     * Creates an instance of YANG module extended information.
+     *
+     * @param id       module id
+     * @param yangSrc  YANG resource path
+     * @param metadata meta data resource path
+     */
+    public YangModuleExtendedInfo(YangModuleId id, File yangSrc, File metadata) {
         super(id, yangSrc, metadata);
     }
 
@@ -59,23 +70,5 @@ public class YangModuleExtendedInfo extends DefaultYangModule implements Seriali
      */
     public void setSchema(YangNode schema) {
         this.schema = schema;
-    }
-
-    /**
-     * Returns true if it's inter-jar node.
-     *
-     * @return true if inter-jar node, false otherwise
-     */
-    public boolean isInterJar() {
-        return interJar;
-    }
-
-    /**
-     * Sets true if it's inter-jar node.
-     *
-     * @param interJar true if inter-jar node, false otherwise
-     */
-    public void interJar(boolean interJar) {
-        this.interJar = interJar;
     }
 }

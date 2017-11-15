@@ -64,7 +64,9 @@ public class DefaultYangModel implements YangModel, Serializable {
     public Set<YangModuleId> getYangModulesId() {
         Set<YangModuleId> ids = new LinkedHashSet<>();
         for (Map.Entry<YangModuleId, YangModule> entry : moduleMap.entrySet()) {
-            ids.add(entry.getKey());
+            if (!entry.getValue().isInterJar()) {
+                ids.add(entry.getKey());
+            }
         }
         return ids;
     }

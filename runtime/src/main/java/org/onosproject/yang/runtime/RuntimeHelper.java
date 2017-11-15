@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translate;
-import static org.onosproject.yang.compiler.utils.UtilConstants.AT;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -75,6 +74,7 @@ public final class RuntimeHelper {
     public static Set<YangNode> getNodes(
             YangModel model,
             ConcurrentMap<String, ConcurrentMap<String, YangSchemaNode>> yangSchemaStore) {
+        Set<YangNode> selfNodes = new HashSet<>();
         Set<YangNode> nodes = new HashSet<>();
         for (YangModule info : model.getYangModules()) {
             YangModuleExtendedInfo ex = (YangModuleExtendedInfo) info;
@@ -84,14 +84,17 @@ public final class RuntimeHelper {
                 String date = getDateInStringFormat(node);
                 String revName = name;
                 if (date != null) {
-                    revName = name + AT + date;
+                    revName = name + "@" + date;
                 }
                 node = (YangNode) yangSchemaStore.get(name).get(revName);
+            } else {
+                selfNodes.add((YangNode) node);
             }
             nodes.add((YangNode) node);
         }
         //Target linking.
-        return addLinkerAndJavaInfo(nodes);
+        addLinkerAndJavaInfo(nodes);
+        return selfNodes;
     }
 
     /**

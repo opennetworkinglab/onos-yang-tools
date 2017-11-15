@@ -43,4 +43,11 @@ public interface YangModule {
      * @return stream
      */
     InputStream getMetadata();
+
+    /**
+     * Returns true if module is used as inter jar, false otherwise.
+     *
+     * @return true if module is used as inter jar, false otherwise
+     */
+    boolean isInterJar();
 }

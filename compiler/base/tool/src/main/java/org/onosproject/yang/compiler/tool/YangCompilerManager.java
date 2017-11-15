@@ -80,16 +80,15 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class YangCompilerManager implements YangCompilerService {
 
     private static final Logger log = getLogger(YangCompilerManager.class);
+    private static final String SLASH = File.separator;
     private final YangUtilsParser yangUtilsParser = new YangUtilsParserManager();
     private final YangLinker yangLinker = new YangLinkerManager();
     private final Set<YangNode> yangNodeSet = new HashSet<>();
-
     // YANG file information set.
     private Set<YangFileInfo> yangFileInfoSet; //initialize in tool invocation;
     private YangFileInfo curYangFileInfo = new YangFileInfo();
     private Set<Path> genJavaPath = new LinkedHashSet<>();
     private YangModel model;
-    private static final String SLASH = File.separator;
 
     @Override
     public YangCompiledOutput compileYangFiles(YangCompilationParam param)
@@ -98,72 +97,6 @@ public class YangCompilerManager implements YangCompilerService {
             processYangFiles(param);
             return new DefaultYangCompiledOutput(model, genJavaPath);
         }
-    }
-
-    /**
-     * Returns YANG model for application.
-     *
-     * @param path    path for metadata file
-     * @param info    list of YANG node info
-     * @param modelId model id
-     * @param fromUt  if method is called from unit test
-     * @return YANG model
-     */
-    public static YangModel processYangModel(
-            String path, List<YangNodeInfo> info, String modelId, boolean fromUt) {
-        YangModel.Builder b = DefaultYangModel.builder();
-        YangModuleId id;
-        for (YangNodeInfo i : info) {
-            id = processModuleId(i.getNode());
-            String serFile = path + id.moduleName() + id.revision() + ".ser";
-            if (!fromUt) {
-                serializeModuleMetaData(serFile, i.getNode());
-            }
-            //take the absolute jar path and make a new path for our yang files.
-            String fileName = getFileName(i.getNode().getFileName());
-            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
-                    id, new File(path + fileName), new File(serFile), i.isInterJar());
-            module.setSchema(i.getNode());
-            b.addModule(id, module);
-        }
-        return b.addModelId(modelId).build();
-    }
-
-    /**
-     * Returns the file name from provided absolute path.
-     *
-     * @param absPath absolute path
-     * @return file name
-     */
-    private static String getFileName(String absPath) {
-        String[] file = absPath.split(SLASH);
-        return file[file.length - 1];
-    }
-
-    /**
-     * Serializes YANG Node.
-     *
-     * @param serFileName path of resource directory
-     * @param node        YangNode
-     */
-    private static void serializeModuleMetaData(String serFileName, YangNode node) {
-        try (FileOutputStream outStream = new FileOutputStream(serFileName);
-             ObjectOutputStream objOutStream = new ObjectOutputStream(outStream)) {
-            objOutStream.writeObject(node);
-        } catch (IOException e) {
-            log.info("Error while serializing YANG node", e);
-        }
-    }
-
-    /**
-     * Returns YANG module id for a given YANG module node.
-     *
-     * @param module YANG module
-     * @return YANG module id for a given YANG module node
-     */
-    public static YangModuleId processModuleId(YangNode module) {
-        String rev = getDateInStringFormat(module);
-        return new DefaultYangModuleId(module.getName(), rev);
     }
 
     /**
@@ -437,44 +370,12 @@ public class YangCompilerManager implements YangCompilerService {
     }
 
     private void setNodeInfo(Set<YangFileInfo> yangFileInfoSet,
-        List<YangNodeInfo> infos) {
+                             List<YangNodeInfo> infos) {
         for (YangFileInfo i : yangFileInfoSet) {
             infos.add(new YangNodeInfo(i.getRootNode(), i.isInterJar()));
         }
     }
 
-    /**
-     * Returns YANG model for serialization.
-     *
-     * @param path    path for metadata file
-     * @param list    set of YANG file info
-     * @param modelId model id
-     * @param fromUt  if method is called from unit test
-     * @return YANG model
-     */
-    private static YangModel getModelForSerialization(
-        String path, Set<YangFileInfo> list, String modelId, boolean fromUt) {
-        YangModel.Builder b = DefaultYangModel.builder();
-        YangModuleId id;
-        boolean interJar;
-
-        for (YangFileInfo info : list) {
-            YangNode node = info.getRootNode();
-            id = processModuleId(node);
-            interJar = info.isInterJar();
-            String serFile = path + id.moduleName() + id.revision() + ".ser";
-            if (!fromUt) {
-                serializeModuleMetaData(serFile, node);
-            }
-            //take the absolute jar path and make a new path for our yang files.
-            String fileName = getFileName(node.getFileName());
-            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
-                id, new File(path + fileName), new File(serFile), interJar);
-            module.setSchema(node);
-            b.addModule(id, module);
-        }
-        return b.addModelId(modelId).build();
-    }
     /**
      * Copies yang files to resource directory.
      *
@@ -520,6 +421,105 @@ public class YangCompilerManager implements YangCompilerService {
     }
 
     /**
+     * Returns YANG model for application.
+     *
+     * @param path    path for metadata file
+     * @param info    list of YANG node info
+     * @param modelId model id
+     * @param fromUt  if method is called from unit test
+     * @return YANG model
+     */
+    public static YangModel processYangModel(
+            String path, List<YangNodeInfo> info, String modelId, boolean fromUt) {
+        YangModel.Builder b = DefaultYangModel.builder();
+        YangModuleId id;
+        for (YangNodeInfo i : info) {
+            id = processModuleId(i.getNode());
+            String serFile = path + id.moduleName() + id.revision() + ".ser";
+            if (!fromUt) {
+                serializeModuleMetaData(serFile, i.getNode());
+            }
+            //take the absolute jar path and make a new path for our yang files.
+            String fileName = getFileName(i.getNode().getFileName());
+            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
+                    id, new File(path + fileName), new File(serFile), i.isInterJar());
+            module.setSchema(i.getNode());
+            b.addModule(id, module);
+        }
+        return b.addModelId(modelId).build();
+    }
+
+    /**
+     * Returns the file name from provided absolute path.
+     *
+     * @param absPath absolute path
+     * @return file name
+     */
+    private static String getFileName(String absPath) {
+        String[] file = absPath.split(SLASH);
+        return file[file.length - 1];
+    }
+
+    /**
+     * Serializes YANG Node.
+     *
+     * @param serFileName path of resource directory
+     * @param node        YangNode
+     */
+    private static void serializeModuleMetaData(String serFileName, YangNode node) {
+        try (FileOutputStream outStream = new FileOutputStream(serFileName);
+             ObjectOutputStream objOutStream = new ObjectOutputStream(outStream)) {
+            objOutStream.writeObject(node);
+        } catch (IOException e) {
+            log.info("Error while serializing YANG node", e);
+        }
+    }
+
+    /**
+     * Returns YANG module id for a given YANG module node.
+     *
+     * @param module YANG module
+     * @return YANG module id for a given YANG module node
+     */
+    public static YangModuleId processModuleId(YangNode module) {
+        String rev = getDateInStringFormat(module);
+        return new DefaultYangModuleId(module.getName(), rev);
+    }
+
+    /**
+     * Returns YANG model for serialization.
+     *
+     * @param path    path for metadata file
+     * @param list    set of YANG file info
+     * @param modelId model id
+     * @param fromUt  if method is called from unit test
+     * @return YANG model
+     */
+    private static YangModel getModelForSerialization(
+            String path, Set<YangFileInfo> list, String modelId, boolean fromUt) {
+        YangModel.Builder b = DefaultYangModel.builder();
+        YangModuleId id;
+        boolean interJar;
+
+        for (YangFileInfo info : list) {
+            YangNode node = info.getRootNode();
+            id = processModuleId(node);
+            interJar = info.isInterJar();
+            String serFile = path + id.moduleName() + id.revision() + ".ser";
+            if (!fromUt) {
+                serializeModuleMetaData(serFile, node);
+            }
+            //take the absolute jar path and make a new path for our yang files.
+            String fileName = getFileName(node.getFileName());
+            YangModuleExtendedInfo module = new YangModuleExtendedInfo(
+                    id, new File(path + fileName), new File(serFile), interJar);
+            module.setSchema(node);
+            b.addModule(id, module);
+        }
+        return b.addModelId(modelId).build();
+    }
+
+    /**
      * Provides a list of files from list of strings.
      *
      * @param yangFileInfo set of yang file information
@@ -547,7 +547,7 @@ public class YangCompilerManager implements YangCompilerService {
         YangModel model;
         try (FileInputStream fileInputStream = new FileInputStream(info);
              ObjectInputStream objectInputStream =
-                new ObjectInputStream(fileInputStream)) {
+                     new ObjectInputStream(fileInputStream)) {
             model = ((YangModel) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
             throw new IOException(info + " failed to fetch nodes due to " + e
@@ -609,10 +609,10 @@ public class YangCompilerManager implements YangCompilerService {
             while (enumEntries.hasMoreElements()) {
                 JarEntry file = (JarEntry) enumEntries.nextElement();
                 if (file.getName().endsWith(YANG_META_DATA) ||
-                    file.getName().endsWith(".yang")) {
+                        file.getName().endsWith(".yang")) {
                     String name = getFileName(file.getName());
                     File serializedFile = new File(directory + SLASH +
-                                                  YANG_RESOURCES + SLASH + name);
+                                                           YANG_RESOURCES + SLASH + name);
                     if (file.isDirectory()) {
                         serializedFile.mkdirs();
                         continue;
