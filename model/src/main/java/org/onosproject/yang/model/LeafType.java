@@ -23,47 +23,48 @@ package org.onosproject.yang.model;
 public enum LeafType {
 
     /**
-     * Represents INT8.
+     * Represents YANG "int8" mapped to JAVA "byte".
      */
     BYTE,
 
     /**
-     * Represents INT16, UINT8.
+     * Represents YANG "int16", "uint8" mapped to JAVA "short".
      */
     SHORT,
 
     /**
-     * Represents UINT16, INT32.
+     * Represents YANG "uint16", "int32" mapped to JAVA "int".
      */
     INT,
 
     /**
-     * Represents UINT32, INT64.
+     * Represents YANG "uint32", "int64" mapped to JAVA "long".
      */
     LONG,
 
     /**
-     * Represents BOOLEAN, EMPTY.
+     * Represents YANG "boolean", "empty" mapped to JAVA "boolean".
      */
     BOOLEAN,
 
     /**
-     * Represents BITS, IDENTITYREF, ENUMERATION, STRING.
+     * Represents YANG "bits", "identityref", "enumeration", "string" mapped to
+     * JAVA "String".
      */
     STRING,
 
     /**
-     * Represents UINT64.
+     * Represents YANG "uint64" mapped to JAVA "BigInteger".
      */
     BIG_INTEGER,
 
     /**
-     * Represents BASE64.
+     * Represents YANG "binary" mapped to JAVA "byte[]".
      */
     BYTE_ARRAY,
 
     /**
-     * Represents DECIMAL64.
+     * Represents YANG decimal64 mapped to JAVA BigDecimal.
      * The decimal64 type represents a subset of the real numbers, which can
      * be represented by decimal numerals. The value space of decimal64 is
      * the set of numbers that can be obtained by multiplying a 64-bit
@@ -74,7 +75,9 @@ public enum LeafType {
     BIG_DECIMAL,
 
     /**
-     * Represents union.
+     * Represents YANG union, in JAVA it's mapped to a custom generated
+     * class. LeafNode value would be of one among the other types
+     * listed in LeafType.
      */
     UNION
 }
