@@ -100,8 +100,7 @@ public final class ObjectProvider {
                 YangType rt = ((YangDerivedInfo) typeInfo
                         .getDataTypeExtendedInfo()).getReferredTypeDef()
                         .getTypeList().get(0);
-                return getObject(rt, v, ((YangDerivedInfo)
-                        typeInfo.getDataTypeExtendedInfo()).getEffectiveBuiltInType());
+                return getObject(rt, v, rt.getDataType());
             case UNION:
                 return parseUnionTypeInfo(typeInfo, v);
             default:
