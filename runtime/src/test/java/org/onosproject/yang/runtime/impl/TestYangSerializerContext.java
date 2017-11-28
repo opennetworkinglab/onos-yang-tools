@@ -30,10 +30,23 @@ import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.regis
  */
 public class TestYangSerializerContext implements YangSerializerContext {
 
+    // Reference for YANG model registry
+    private DefaultYangModelRegistry reg;
+
+    /**
+     * Returns the YANG model registry.
+     *
+     * @return YANG model registry
+     */
+    public DefaultYangModelRegistry getRegistry() {
+        return reg;
+    }
+
     @Override
     public SchemaContext getContext() {
         processSchemaRegistry();
-        return registry();
+        reg = registry();
+        return reg;
     }
 
     @Override

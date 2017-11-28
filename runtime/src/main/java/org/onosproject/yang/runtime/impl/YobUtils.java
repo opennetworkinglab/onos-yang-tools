@@ -83,6 +83,7 @@ final class YobUtils {
     public static final String FORWARD_SLASH = "/";
     private static final Logger log = LoggerFactory.getLogger(YobUtils.class);
     private static final String ENUM_LEAF_IDENTIFIER = "$LeafIdentifier";
+    static final String ANYDATA_SETTER = "addAnydata";
 
     // no instantiation
     private YobUtils() {

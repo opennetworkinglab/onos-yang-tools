@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
+import java.util.List;
+
 /**
  * Abstraction of YANG version entity. It is used categories the node which
  * can hold the YANG version
@@ -28,4 +30,22 @@ public interface YangVersionHolder {
      * @return the version
      */
     String getVersion();
+
+    /**
+     * Returns the list of imported modules.
+     *
+     * @return the list of imported modules
+     */
+    List<YangImport> getImportList();
+
+    /**
+     * Returns the augmented node schema info for given class canonical name.
+     *
+     * @param s class canonical name
+     * @return augmented node schema info
+     * @throws IllegalArgumentException when provided class canonical name is
+     *                                  not valid augment node path
+     */
+    AugmentedSchemaInfo getAugmentedSchemaInfo(String s)
+            throws IllegalArgumentException;
 }

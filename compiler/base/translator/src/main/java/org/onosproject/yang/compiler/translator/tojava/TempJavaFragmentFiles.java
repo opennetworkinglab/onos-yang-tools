@@ -16,6 +16,7 @@
 package org.onosproject.yang.compiler.translator.tojava;
 
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
+import org.onosproject.yang.compiler.datamodel.YangAnydata;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
 import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
 import org.onosproject.yang.compiler.datamodel.YangCase;
@@ -76,10 +77,11 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.JavaCodeSnip
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateDefaultClassFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateInterfaceFile;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateKeyClassFile;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getAddToListMethodInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
+import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getAddToListMethodImpl;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getAddToListMethodInterface;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getDefaultConstructorString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getFromStringMethod;
@@ -89,7 +91,6 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGener
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterForClass;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getSetterString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getToStringMethod;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getYangDataStructure;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getImportString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.StringGenerator.getOverRideString;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.INVALID_LEAF_HOLDER;
@@ -98,6 +99,7 @@ import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorEr
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorErrorType.MISSING_PARENT_NODE;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getBeanFiles;
 import static org.onosproject.yang.compiler.translator.tojava.utils.TranslatorUtils.getErrorMsg;
+import static org.onosproject.yang.compiler.utils.UtilConstants.ANYDATA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.AUGMENTABLE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BIT_SET;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CLASS_STRING;
@@ -1565,8 +1567,14 @@ public class TempJavaFragmentFiles {
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
 
-        addImportInfoOfNode(MODEL_OBJECT, MODEL_OBJECT_PKG, getGeneratedJavaClassName(),
-                            getJavaFileInfo().getPackage(), false);
+        if (curNode instanceof YangAnydata) {
+            addImportInfoOfNode(ANYDATA, MODEL_OBJECT_PKG,
+                                getGeneratedJavaClassName(),
+                                getJavaFileInfo().getPackage(), false);
+        } else {
+            addImportInfoOfNode(MODEL_OBJECT, MODEL_OBJECT_PKG, getGeneratedJavaClassName(),
+                                getJavaFileInfo().getPackage(), false);
+        }
 
         JavaQualifiedTypeInfoTranslator info = null;
         if (curNode instanceof YangAugmentableNode) {
@@ -1637,7 +1645,12 @@ public class TempJavaFragmentFiles {
             //add model object to extend list
             JavaQualifiedTypeInfoTranslator typeInfo = new
                     JavaQualifiedTypeInfoTranslator();
-            typeInfo.setClassInfo(MODEL_OBJECT);
+            if (curNode instanceof YangAnydata) {
+                typeInfo.setClassInfo(ANYDATA);
+            } else {
+                typeInfo.setClassInfo(MODEL_OBJECT);
+            }
+
             typeInfo.setForInterface(false);
             typeInfo.setPkgInfo(MODEL_OBJECT_PKG);
             typeInfo.setQualified(false);

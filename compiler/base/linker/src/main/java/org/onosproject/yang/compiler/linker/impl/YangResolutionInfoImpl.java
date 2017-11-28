@@ -73,7 +73,7 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
-import static org.onosproject.yang.compiler.datamodel.YangNode.cloneSubTree;
+import static org.onosproject.yang.compiler.datamodel.YangNode.cloneGroupingTree;
 import static org.onosproject.yang.compiler.datamodel.YangPathArgType.ABSOLUTE_PATH;
 import static org.onosproject.yang.compiler.datamodel.YangPathArgType.RELATIVE_PATH;
 import static org.onosproject.yang.compiler.datamodel.exceptions.ErrorMessages.getErrorMsg;
@@ -1373,7 +1373,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
         }
 
         // clone subtree
-        cloneSubTree(srcNode, dstNode, null, true);
+        cloneGroupingTree(srcNode, dstNode, null, true);
 
         /*
          * Cloning of deviated module is done, set isDeviatedNodeCloned

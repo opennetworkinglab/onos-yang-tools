@@ -491,17 +491,42 @@ public abstract class YangNode
      * @param isDeviation flag to check whether cloning is for deviation
      * @throws DataModelException data model error
      */
-    public static void cloneSubTree(YangNode srcRootNode, YangNode dstRootNode,
-                                    YangUses yangUses, boolean isDeviation)
+    public static void cloneGroupingTree(YangNode srcRootNode, YangNode dstRootNode,
+                                         YangUses yangUses, boolean isDeviation)
             throws DataModelException {
 
-        YangNode nextNodeToClone = srcRootNode;
-        TraversalType curTraversal;
+        cloneSubTree(srcRootNode, dstRootNode, yangUses, isDeviation, null);
+    }
 
+    /**
+     * Clones the subtree from the specified source node to the mentioned target
+     * node. The source and target root node cloning is carried out by the
+     * caller.
+     *
+     * @param srcRootNode  source node for sub tree cloning
+     * @param dstRootNode  destination node where the sub tree needs to be cloned
+     * @param yangUses     YANG uses
+     * @param isDeviation  flag to check whether cloning is for deviation
+     * @param childToClone child to be cloned, null indicates all childs to
+     *                     be cloned
+     * @throws DataModelException data model error
+     */
+    public static void cloneSubTree(YangNode srcRootNode, YangNode dstRootNode,
+                                    YangUses yangUses, boolean isDeviation,
+                                    YangNode childToClone)
+            throws DataModelException {
+
+        YangNode nextNodeToClone;
+        TraversalType curTraversal;
         YangNode clonedTreeCurNode = dstRootNode;
         YangNode newNode = null;
 
-        nextNodeToClone = nextNodeToClone.getChild();
+        if (childToClone != null) {
+            nextNodeToClone = childToClone;
+        } else {
+            nextNodeToClone = srcRootNode.getChild();
+        }
+
         if (nextNodeToClone == null) {
             return;
         } else {
@@ -574,10 +599,14 @@ public abstract class YangNode
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
                 } else if (nextNodeToClone.getNextSibling() != null) {
-
-                    curTraversal = SIBLING;
-
-                    nextNodeToClone = nextNodeToClone.getNextSibling();
+                    if (childToClone != null &&
+                            nextNodeToClone.getNextSibling().getParent() == srcRootNode) {
+                        curTraversal = PARENT;
+                        nextNodeToClone = nextNodeToClone.getParent();
+                    } else {
+                        curTraversal = SIBLING;
+                        nextNodeToClone = nextNodeToClone.getNextSibling();
+                    }
                 } else {
                     curTraversal = PARENT;
                     nextNodeToClone = nextNodeToClone.getParent();
@@ -826,10 +855,12 @@ public abstract class YangNode
      */
     public void setNameSpaceAndAddToParentSchemaMap() {
         // Get parent namespace.
-        if (getParent() != null) {
+        if (getParent() != null && getParent().getNodeType() != ANYDATA_NODE) {
             // Get parent namespace and set namespace for self node.
             setNameSpace(getParent().getNameSpace());
             // Process addition of leaf to the child schema map of parent.
+            processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
+        } else if (getParent() != null && getParent().getNodeType() == ANYDATA_NODE) {
             processAdditionOfSchemaNodeToParentMap(getName(), getNameSpace());
         } else {
             // Module/Sub-module
@@ -1073,5 +1104,12 @@ public abstract class YangNode
                 .getListOfLeafList()) {
             yangLeafList.setParentContext(context);
         }
+    }
+
+    @Override
+    public YangSchemaNode addSchema(YangSchemaNode containedSchema)
+            throws IllegalArgumentException {
+        throw new IllegalArgumentException("Schema can only be added for " +
+                                                   "Anydata.");
     }
 }

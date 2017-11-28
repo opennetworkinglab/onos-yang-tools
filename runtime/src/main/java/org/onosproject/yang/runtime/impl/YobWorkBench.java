@@ -46,6 +46,7 @@ import static org.onosproject.yang.runtime.impl.YobConstants.E_HAS_NO_CHILD;
 import static org.onosproject.yang.runtime.impl.YobConstants.L_FAIL_TO_GET_FIELD;
 import static org.onosproject.yang.runtime.impl.YobConstants.L_FAIL_TO_GET_METHOD;
 import static org.onosproject.yang.runtime.impl.YobConstants.L_FAIL_TO_INVOKE_METHOD;
+import static org.onosproject.yang.runtime.impl.YobUtils.ANYDATA_SETTER;
 import static org.onosproject.yang.runtime.impl.YobUtils.getCapitalCase;
 import static org.onosproject.yang.runtime.impl.YobUtils.getInstanceOfClass;
 import static org.onosproject.yang.runtime.impl.YobUtils.getQualifiedDefaultClass;
@@ -221,6 +222,12 @@ class YobWorkBench {
         String parentClassName = parentClass.getName();
         try {
             Class<?> classType = null;
+            if (setter.equals(ANYDATA_SETTER)) {
+                Method method = parentClass.getSuperclass()
+                        .getDeclaredMethod(setter, InnerModelObject.class);
+                method.invoke(parentObj, curObj);
+                return;
+            }
             Field fieldName = parentClass.getDeclaredField(setter);
             if (fieldName != null) {
                 classType = fieldName.getType();

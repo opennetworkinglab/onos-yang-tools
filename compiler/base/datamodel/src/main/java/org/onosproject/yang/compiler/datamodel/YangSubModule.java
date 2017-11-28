@@ -40,6 +40,7 @@ import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES;
 import static org.onosproject.yang.compiler.datamodel.ResolvableType.YANG_USES_AUGMENT;
 import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.detectCollidingChildUtil;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getAugSchemaInfo;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.linkInterFileReferences;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.resolveLinkingForResolutionList;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.updateMap;
@@ -979,5 +980,11 @@ public abstract class YangSubModule
      */
     public void setRpcPresent(boolean rpcPresent) {
         isRpcPresent = rpcPresent;
+    }
+
+    @Override
+    public AugmentedSchemaInfo getAugmentedSchemaInfo(String s)
+            throws IllegalArgumentException {
+        return getAugSchemaInfo(s, augmentResolutionList);
     }
 }

@@ -28,6 +28,7 @@ import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
+import org.onosproject.yang.model.Anydata;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
@@ -43,6 +44,7 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.ROOT;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
+import static org.onosproject.yang.compiler.datamodel.YangNodeType.ANYDATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.nonEmpty;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_NODE;
@@ -64,6 +66,7 @@ import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isMultiInstan
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNodeProcessCompleted;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isNonProcessableNode;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.isTypeEmpty;
+import static org.onosproject.yang.runtime.impl.YobConstants.E_FAIL_TO_LOAD_CLASS;
 
 
 /**
@@ -438,6 +441,7 @@ public class DataTreeBuilderHelper {
         }
 
         switch (curNode.getYangSchemaNodeType()) {
+            case YANG_ANYDATA_NODE:
             case YANG_SINGLE_INSTANCE_NODE:
                 curNodeInfo.type(SINGLE_INSTANCE_NODE);
                 nodeObj = processSingleInstanceNode(curNode, curNodeInfo,
@@ -696,6 +700,11 @@ public class DataTreeBuilderHelper {
      */
     Object getChildObject(YangNode curNode,
                           DataTreeNodeInfo parentNodeInfo) {
+        // check current node parent linking status if current node
+        if (curNode.getParent() != null && curNode.getParent()
+                .getNodeType() == ANYDATA_NODE) {
+            return getAnydataChildObject(curNode, parentNodeInfo);
+        }
         String nodeJavaName = curNode.getJavaAttributeName();
         Object parentObj = getParentObjectOfNode(parentNodeInfo,
                                                  curNode.getParent());
@@ -704,6 +713,42 @@ public class DataTreeBuilderHelper {
         } catch (NoSuchMethodException e) {
             throw new ModelConverterException(e);
         }
+    }
+
+    /**
+     * Returns the child object from the parent object for anydatad. Uses java
+     * name of the current node to search the attribute in the parent object.
+     *
+     * @param curNode current YANG node
+     * @param info    parent data tree node info
+     * @return object of the child node
+     */
+    private Object getAnydataChildObject(YangNode curNode,
+                                         DataTreeNodeInfo info) {
+        // Getting the curNode anydata parent object
+        Anydata parentObj = (Anydata) getParentObjectOfNode(
+                info, curNode.getParent());
+        List<Object> objs = new ArrayList<>();
+        YangSchemaNode node = reg.getForNameSpace(
+                curNode.getNameSpace().getModuleNamespace(), false);
+        // Getting the module class
+        Class<?> moduleClass = reg.getRegisteredClass(node);
+        if (moduleClass == null) {
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + node
+                    .getJavaClassNameOrBuiltInType());
+        }
+
+        // Forming the default class name for the curNode object creation.
+        String className = curNode.getJavaPackage() + PERIOD + DEFAULT_CAPS +
+                getCapitalCase(curNode.getJavaAttributeName());
+        Class childClass;
+        try {
+            childClass = moduleClass.getClassLoader().loadClass(className);
+        } catch (ClassNotFoundException e) {
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + className);
+        }
+        objs.add(parentObj.anydata(childClass));
+        return objs;
     }
 
     /**

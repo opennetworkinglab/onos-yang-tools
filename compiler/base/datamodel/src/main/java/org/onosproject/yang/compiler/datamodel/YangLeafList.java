@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.YangStatusType.CURRENT;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.E_INVALID;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getLeafTypeByDataType;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.validateEmptyDataType;
 
@@ -686,5 +687,16 @@ public abstract class YangLeafList extends DefaultLocationInfo
     @Override
     public void setDefaultDenyAll(boolean defaultDenyAll) {
         this.defaultDenyAll = defaultDenyAll;
+    }
+
+    @Override
+    public Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> getYsnContextInfoMap() {
+        throw new IllegalArgumentException(E_INVALID);
+    }
+
+    @Override
+    public YangSchemaNode addSchema(YangSchemaNode containedSchema)
+            throws IllegalArgumentException {
+        throw new IllegalArgumentException(E_INVALID);
     }
 }

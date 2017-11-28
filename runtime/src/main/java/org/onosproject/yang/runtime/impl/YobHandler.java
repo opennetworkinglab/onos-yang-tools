@@ -16,10 +16,13 @@
 
 package org.onosproject.yang.runtime.impl;
 
+import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.runtime.YangModelRegistry;
 
+import static org.onosproject.yang.compiler.datamodel.YangNodeType.ANYDATA_NODE;
+import static org.onosproject.yang.runtime.impl.YobUtils.ANYDATA_SETTER;
 import static org.onosproject.yang.runtime.impl.YobUtils.getClassLoader;
 import static org.onosproject.yang.runtime.impl.YobUtils.getInstanceOfClass;
 import static org.onosproject.yang.runtime.impl.YobUtils.getQualifiedDefaultClass;
@@ -40,13 +43,25 @@ abstract class YobHandler {
     YobWorkBench createObject(YangSchemaNode schemaNode,
                               DefaultYangModelRegistry reg) {
         YangSchemaNode node = schemaNode;
+        String setterName;
+        YangNode n = (YangNode) node;
+        /**
+         * if current node parent is anydata then it need to be added into
+         * anydata map, so in setter for same in parent will be addAnydata
+         */
+        if (n.getParent() != null && (n.getParent().getNodeType() ==
+                ANYDATA_NODE)) {
+            setterName = ANYDATA_SETTER;
+        } else {
+            setterName = schemaNode.getJavaAttributeName();
+        }
+
         while (node.getReferredSchema() != null) {
             node = node.getReferredSchema();
         }
 
         String qualName = getQualifiedDefaultClass(node);
         ClassLoader classLoader = getClassLoader(node, reg);
-        String setterName = schemaNode.getJavaAttributeName();
         Object builtObject = getInstanceOfClass(classLoader, qualName);
         return new YobWorkBench(classLoader, builtObject, setterName,
                                 schemaNode);

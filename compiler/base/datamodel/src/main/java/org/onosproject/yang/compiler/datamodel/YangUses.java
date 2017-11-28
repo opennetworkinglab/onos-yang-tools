@@ -447,7 +447,7 @@ public abstract class YangUses
         }
 
         try {
-            cloneSubTree(referredGrouping, usesParentNode, this, false);
+            cloneGroupingTree(referredGrouping, usesParentNode, this, false);
         } catch (DataModelException e) {
             throw new DataModelException(e.getMessage());
         }

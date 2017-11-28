@@ -33,5 +33,8 @@ public enum XpathLinkingTypes {
     DEVIATION_LINKING,
 
     // Uses augment linking
-    USES_AUGMENT_LINKING
+    USES_AUGMENT_LINKING,
+
+    // Anydata linking
+    ANYDATA_LINKING
 }

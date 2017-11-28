@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.translator.tojava;
 
+import com.google.common.base.Throwables;
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
@@ -26,12 +27,11 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeType;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
+import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
-
-import com.google.common.base.Throwables;
 
 import java.io.IOException;
 
@@ -66,10 +66,53 @@ public final class JavaCodeGeneratorUtil {
     public static void translate(YangNode rootNode, YangPluginConfig yangPlugin,
                                  boolean codeGen)
             throws TranslatorException, IOException {
-        YangNode codeGenNode = rootNode;
-        TraversalType curTraversal = ROOT;
+        translateToJava(rootNode, yangPlugin, codeGen, true);
+    }
 
-        while (codeGenNode != null) {
+    /**
+     * Updates tree context including parent context and YsnContextInfoMap.
+     *
+     * @param rootNode          root node
+     * @param yangPlugin        YANG plugin configurations
+     * @param codeGen           true if code generation is required
+     * @param translateComplete true if translation is for complete tree
+     * @throws IllegalArgumentException when fails to set the parent context
+     *                                  for provided anydata contained node
+     */
+    public static void updateTreeContext(YangSchemaNode rootNode, YangPluginConfig
+            yangPlugin, boolean codeGen, boolean translateComplete)
+            throws IllegalArgumentException {
+        try {
+            translateToJava((YangNode) rootNode, yangPlugin, codeGen,
+                            translateComplete);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Updating parent context for "
+                                                       + rootNode.getName() +
+                                                       " failed.");
+        }
+    }
+
+    /**
+     * Translated YANG info to java info.
+     *
+     * @param rootNode          root node
+     * @param yangPlugin        YANG plugin configurations
+     * @param codeGen           true if code generation is required
+     * @param translateComplete true if translation is for complete tree
+     * @throws TranslatorException when fails to generate java code file the current node
+     * @throws IOException         when fails to do IO operations
+     */
+    private static void translateToJava(YangNode rootNode, YangPluginConfig
+            yangPlugin, boolean codeGen, boolean translateComplete)
+            throws TranslatorException, IOException {
+        YangNode codeGenNode = rootNode;
+        YangNode parentNode = null;
+        TraversalType curTraversal = ROOT;
+        if (!translateComplete) {
+            parentNode = rootNode.getParent();
+        }
+
+        while (codeGenNode != parentNode) {
             if (curTraversal != PARENT) {
                 if (!(codeGenNode instanceof JavaCodeGenerator)) {
                     throw new TranslatorException("Unsupported node to generate code " +
@@ -86,7 +129,9 @@ public final class JavaCodeGeneratorUtil {
                         } else {
                             //this will update java file info for the target
                             // node.
-                            updateJavaInfo(codeGenNode, yangPlugin);
+                            if (translateComplete) {
+                                updateJavaInfo(codeGenNode, yangPlugin);
+                            }
                             if (codeGenNode instanceof YangNotification) {
                                 //to know in generated code what was the enum
                                 // name generated for current notification

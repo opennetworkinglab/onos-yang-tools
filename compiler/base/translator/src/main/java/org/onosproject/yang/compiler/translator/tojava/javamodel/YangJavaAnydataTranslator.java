@@ -23,7 +23,10 @@ import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
+import java.io.IOException;
+
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateCodeAndUpdateInParent;
 
 /**
  * Represents container information extended to support java code generation.
@@ -105,17 +108,16 @@ public class YangJavaAnydataTranslator
      */
     @Override
     public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
-        // TODO uncomment this part if code needs to be generated for anydata
-        //        try {
-//            generateCodeAndUpdateInParent(this, yangPlugin, false);
-//        } catch (IOException e) {
-//            throw new TranslatorException(
-//                    "Failed to prepare generate code entry for anydata node " +
-//                            getName() + " in " +
-//                            getLineNumber() + " at " +
-//                            getCharPosition()
-//                            + " in " + getFileName() + " " + e.getLocalizedMessage());
-//        }
+        try {
+            generateCodeAndUpdateInParent(this, yangPlugin, false);
+        } catch (IOException e) {
+            throw new TranslatorException("Failed to generate code for " +
+                                                  "anydata node " +
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+        }
     }
 
     /**
@@ -125,17 +127,16 @@ public class YangJavaAnydataTranslator
      */
     @Override
     public void generateCodeExit() throws TranslatorException {
-        // TODO uncomment this part if code needs to be generated for anydata
-//        try {
-//            generateJava(GENERATE_INTERFACE_WITH_BUILDER, this);
-//        } catch (IOException e) {
-//            throw new TranslatorException("Failed to generate code for " +
-//                                                  "anydata node " +
-//                                                  getName() + " in " +
-//                                                  getLineNumber() + " at " +
-//                                                  getCharPosition()
-//                                                  + " in " + getFileName() +
-//                                                  " " + e.getLocalizedMessage());
-//        }
+        try {
+            getTempJavaCodeFragmentFiles().generateJavaFile(
+                    GENERATE_INTERFACE_WITH_BUILDER, this);
+        } catch (IOException e) {
+            throw new TranslatorException("Failed to generate code for " +
+                                                  "anydata node " +
+                                                  getName() + " in " +
+                                                  getLineNumber() + " at " +
+                                                  getCharPosition()
+                                                  + " in " + getFileName() + " " + e.getLocalizedMessage());
+        }
     }
 }

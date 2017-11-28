@@ -1,0 +1,24 @@
+module anyTest {
+
+    yang-version 1.1;
+
+    namespace "yrt:list.test.anydata";
+
+    prefix "l";
+
+    organization "ON-LAB";
+
+    description "This module defines for list.";
+
+    revision "2016-06-24" {
+        description "Initial revision.";
+    }
+
+    anydata mydata {
+
+    }
+    container c1 {
+        anydata mydata2 {
+        }
+    }
+}

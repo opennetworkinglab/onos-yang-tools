@@ -48,14 +48,24 @@ import java.util.concurrent.ConcurrentMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableSet;
+import static org.onosproject.yang.compiler.datamodel.YangSchemaNodeType.YANG_ANYDATA_NODE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getNodeIdFromSchemaId;
+import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.updateTreeContext;
 import static org.onosproject.yang.compiler.utils.UtilConstants.REGEX;
 import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
 import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getSelfNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getServiceName;
+import static org.onosproject.yang.runtime.impl.AnydataHandler.getSchemaNode;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.AT;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.E_MEXIST;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NEXIST;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NOT_VAL;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NULL;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.FMT_INV;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.errorMsg;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -63,14 +73,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class DefaultYangModelRegistry implements YangModelRegistry,
         SingleInstanceNodeContext {
-
-    private static final String AT = "@";
-    private static final String E_NEXIST = "node with {} namespace not found.";
-    private static final String E_MEXIST =
-            "Model with given modelId already exist";
-    private static final String E_NULL = "Model must not be null";
-    private static final String E_NOT_VAL = "Model id is invalid";
     private final Logger log = getLogger(getClass());
+
     /*
      * Map for storing YANG schema nodes. Key will be the schema name of
      * module node defined in YANG file.
@@ -165,9 +169,20 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     }
 
     @Override
-    public void registerAnydataSchema(Class id, Class id1) throws
-            IllegalArgumentException{
-        //TODO implemention
+    public void registerAnydataSchema(Class ac, Class cc) throws
+            IllegalArgumentException {
+        YangSchemaNode anySchema = getSchemaNode(ac, this);
+        if (anySchema != null && anySchema.getYangSchemaNodeType() == YANG_ANYDATA_NODE) {
+            YangSchemaNode cSchema = getSchemaNode(cc, this);
+            if (cSchema != null) {
+                YangSchemaNode clonedNode = anySchema.addSchema(cSchema);
+                updateTreeContext(clonedNode, null, false, false);
+            } else {
+                throw new IllegalArgumentException(errorMsg(FMT_INV, cc));
+            }
+        } else {
+            throw new IllegalArgumentException(errorMsg(FMT_INV, ac));
+        }
     }
 
     @Override

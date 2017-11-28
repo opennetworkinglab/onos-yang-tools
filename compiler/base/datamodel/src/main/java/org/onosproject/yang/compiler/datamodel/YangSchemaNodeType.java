@@ -61,6 +61,11 @@ public enum YangSchemaNodeType {
     /**
      * Represents the Augmented Node.
      */
-    YANG_AUGMENT_NODE
+    YANG_AUGMENT_NODE,
+
+    /**
+     * Represents the Anydata Node.
+     */
+    YANG_ANYDATA_NODE
 
 }

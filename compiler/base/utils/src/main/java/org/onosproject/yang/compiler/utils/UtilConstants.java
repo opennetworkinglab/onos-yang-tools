@@ -1964,6 +1964,8 @@ public final class UtilConstants {
     public static final String IDENTITY = "_identity";
     public static final String TYPEDEF = "_typedef";
 
+    public static final String ANYDATA = "Anydata";
+
     // Regex for model id validation
     public static final String REGEX = "[A-Za-z0-9_\\-.@]+";
 

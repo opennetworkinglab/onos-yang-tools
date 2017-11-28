@@ -60,7 +60,7 @@ public final class TestUtils implements DataNodeListener {
     public static final String L_NAME = "list";
     public static final String LMNG = "yrt.Logistics-manager";
     public static final String LMNG_N = "Logistics-manager";
-
+    public static final String TANY_NS = "yrt:list.test.anydata";
     // Logger list is used for walker testing.
     private static final List<String> LOGGER = new ArrayList<>();
 

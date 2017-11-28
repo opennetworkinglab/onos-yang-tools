@@ -173,4 +173,21 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @param context schema context
      */
     void setRootContext(SchemaContext context);
+
+    /**
+     * Returns YANG schema node context info map.
+     *
+     * @return YANG schema node context info map
+     */
+    Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> getYsnContextInfoMap();
+
+    /**
+     * Adds schema to anydata.
+     *
+     * @param containedSchema schema to be added
+     * @return cloned YANG schema node
+     * @throws IllegalArgumentException when fails to do data model operations
+     */
+    YangSchemaNode addSchema(YangSchemaNode containedSchema)
+            throws IllegalArgumentException;
 }

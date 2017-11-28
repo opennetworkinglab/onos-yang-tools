@@ -156,7 +156,7 @@ public abstract class YangAnydata
 
     @Override
     public YangSchemaNodeType getYangSchemaNodeType() {
-        return YangSchemaNodeType.YANG_SINGLE_INSTANCE_NODE;
+        return YangSchemaNodeType.YANG_ANYDATA_NODE;
     }
 
     /**
@@ -371,5 +371,24 @@ public abstract class YangAnydata
         } catch (DataModelException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    @Override
+    public YangSchemaNode addSchema(YangSchemaNode containedSchema) throws
+            IllegalArgumentException {
+        YangNode nodeToClone = (YangNode) containedSchema;
+        try {
+            cloneSubTree(nodeToClone.getParent(), this, null,
+                         false, nodeToClone);
+        } catch (DataModelException e) {
+            throw new IllegalArgumentException(e);
+        }
+        YangNode child = getChild();
+        // Contained Schema Name
+        String name = containedSchema.getName();
+        while (child.getName() != name) {
+            child = child.getNextSibling();
+        }
+        return child;
     }
 }
