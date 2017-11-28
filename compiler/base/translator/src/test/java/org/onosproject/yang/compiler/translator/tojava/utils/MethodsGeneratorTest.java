@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -44,11 +45,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.CLOSE_PARENTHESI
 import static org.onosproject.yang.compiler.utils.UtilConstants.COMMA;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EQUAL;
-import static org.onosproject.yang.compiler.utils.UtilConstants.EQUALS_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.GET_METHOD_PREFIX;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_LANG;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OBJECT_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OPEN_PARENTHESIS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OVERRIDE;
@@ -57,11 +56,9 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.QUOTES;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SEMI_COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SET_METHOD_PREFIX;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SIXTEEN_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STATIC;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_DATA_TYPE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.SUFFIX_S;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TWELVE_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VALUE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.VOID;
@@ -154,11 +151,7 @@ public final class MethodsGeneratorTest {
     public void getEqualsMethodTest() {
         JavaAttributeInfo testAttr = getTestAttribute();
         String method = MethodsGenerator.getEqualsMethod(testAttr);
-        StringBuilder builder = new StringBuilder()
-                .append(SIXTEEN_SPACE_INDENTATION).append(OBJECT_STRING)
-                .append(SUFFIX_S).append(PERIOD).append(EQUALS_STRING)
-                .append(OPEN_PARENTHESIS);
-        assertThat(true, is(method.contains(builder.toString())));
+        assertThat(method, containsString(testAttr.getAttributeName()));
     }
 
     /**

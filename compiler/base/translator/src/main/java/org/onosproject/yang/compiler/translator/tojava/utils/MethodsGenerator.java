@@ -966,17 +966,13 @@ public final class MethodsGenerator {
     public static String getEqualsMethod(JavaAttributeInfo attr) {
         String attributeName = attr.getAttributeName();
         if (attributeName.contains(OPERATION_TYPE_ATTRIBUTE)) {
-            return SIXTEEN_SPACE_INDENTATION + OBJECT_STRING + SUFFIX_S +
-                    NEW_LINE + SIXTEEN_SPACE_INDENTATION +
-                    PERIOD + EQUALS_STRING + OPEN_PARENTHESIS + attributeName +
-                    COMMA + NEW_LINE + SIXTEEN_SPACE_INDENTATION + SPACE + OTHER
-                    + PERIOD + attributeName + CLOSE_PARENTHESIS + SPACE + AND +
-                    AND;
+            return SIXTEEN_SPACE_INDENTATION + "Objects" + NEW_LINE +
+                   SIXTEEN_SPACE_INDENTATION + ".deepEquals(" + attributeName + "," + NEW_LINE +
+                   SIXTEEN_SPACE_INDENTATION + SPACE + OTHER + "." + attributeName + ") &&";
         }
-        return SIXTEEN_SPACE_INDENTATION + OBJECT_STRING + SUFFIX_S +
-                PERIOD + EQUALS_STRING + OPEN_PARENTHESIS + attributeName +
-                COMMA + SPACE + OTHER + PERIOD + attributeName +
-                CLOSE_PARENTHESIS + SPACE + AND + AND;
+        return SIXTEEN_SPACE_INDENTATION +
+                "Objects.deepEquals(" + attributeName + ", " +
+                                OTHER + "." + attributeName + ") &&";
     }
 
     /**
