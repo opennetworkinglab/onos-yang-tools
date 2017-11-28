@@ -49,13 +49,11 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.TEMP;
-import static org.onosproject.yang.compiler.utils.UtilConstants.VERSION_ERROR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RESOURCES;
 import static org.onosproject.yang.compiler.utils.io.impl.YangFileScanner.getYangFiles;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.deleteDirectory;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getDirectory;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
-import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getVersionValue;
 
 /**
  * Represents ONOS YANG utility maven plugin.
@@ -67,7 +65,6 @@ import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getVersion
         requiresDependencyResolution = COMPILE)
 public class YangUtilManager extends AbstractMojo {
 
-    private static final int SUPPORTED_VERSION = 339;
     private String codeGenDir;
     private YangCompiledOutput output;
 
@@ -147,7 +144,6 @@ public class YangUtilManager extends AbstractMojo {
         String metaDataGenDir;
         String outputDir;
         try {
-            validateMavenVersion();
             /*
              * For deleting the generated code in previous build.
              */
@@ -213,18 +209,6 @@ public class YangUtilManager extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(
                     "Failed to process files");
-        }
-    }
-
-    /**
-     * Validates current maven version of system.
-     *
-     * @throws MojoExecutionException when maven version is below 3.3.9
-     */
-    private void validateMavenVersion() throws MojoExecutionException {
-        String version = runtime.getMavenVersion();
-        if (getVersionValue(version) < SUPPORTED_VERSION) {
-            throw new MojoExecutionException(VERSION_ERROR + version);
         }
     }
 }
