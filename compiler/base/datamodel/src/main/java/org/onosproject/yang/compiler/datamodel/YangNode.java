@@ -1026,7 +1026,10 @@ public abstract class YangNode
      */
     public void setParentContext() {
         if (this instanceof SchemaDataNode) {
-            parentContext = getParentSchemaContext(this.getParent());
+            SchemaContext t = getParentSchemaContext(this.getParent());
+            if (t != null) {
+                parentContext = t;
+            }
 
             // As rpc and anydata node is not leaf holder
             if (nodeType != RPC_NODE && nodeType != ANYDATA_NODE) {
