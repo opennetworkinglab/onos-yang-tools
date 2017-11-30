@@ -21,11 +21,11 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-compiler-plugin</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.3.1</version>
     </parent>
 
     <artifactId>onos-yang-compiler-maven-plugin</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.3.1</version>
     <packaging>maven-plugin</packaging>
 
     <dependencies>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-plugin-utils</artifactId>
-            <version>2.4-SNAPSHOT</version>
+            <version>2.3.1</version>
         </dependency>
     </dependencies>
 
