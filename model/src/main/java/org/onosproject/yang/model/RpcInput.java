@@ -20,6 +20,14 @@ package org.onosproject.yang.model;
  * Abstraction for RPC input.
  */
 public class RpcInput {
+
+    /**
+     * Resource identifier pointing to an RPC. Its an absolute resource
+     * identifier starting with logical root node "/" and can be used by
+     * application as is for model conversion of RPC input.
+     */
+    private ResourceId id;
+
     /**
      * Input data to the RPC execution.
      */
@@ -43,11 +51,31 @@ public class RpcInput {
     }
 
     /**
+     * Creates an instance of RpcInput.
+     *
+     * @param id   rpc identifier
+     * @param data input for thr Rpc execution
+     */
+    public RpcInput(ResourceId id, DataNode data) {
+        this.id = id;
+        this.data = data;
+    }
+
+    /**
+     * Returns the rpc identifier to which input belongs.
+     *
+     * @return id rpc identifier
+     */
+    public ResourceId id() {
+        return id;
+    }
+
+    /**
      * Returns the data specified in this input.
      *
      * @return data specified in this input
      */
     public DataNode data() {
-        return this.data;
+        return data;
     }
 }
