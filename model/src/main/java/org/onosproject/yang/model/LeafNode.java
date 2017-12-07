@@ -30,12 +30,27 @@ public final class LeafNode extends DataNode {
     private Object value;
 
     /**
+     * Leaf value namespace, it will be non null only if leaf type is
+     * identityref.
+     */
+    private String valueNamespace;
+
+    /**
      * Returns value contained in leaf node.
      *
      * @return value contained in leaf node
      */
     public Object value() {
         return value;
+    }
+
+    /**
+     * Returns value namespace contained in leaf node.
+     *
+     * @return value namespace contained in leaf node
+     */
+    public String valueNamespace() {
+        return valueNamespace;
     }
 
     /**
@@ -52,6 +67,7 @@ public final class LeafNode extends DataNode {
         return "{" +
                     "key=" + key() + ", " +
                     "value=" + asString() +
+                    "valueNamespace=" + valueNamespace() +
                "}";
     }
 
@@ -63,6 +79,7 @@ public final class LeafNode extends DataNode {
     public LeafNode(Builder builder) {
         super(builder);
         value = builder.value;
+        valueNamespace = builder.valueNamespace;
     }
 
     /**
@@ -99,6 +116,12 @@ public final class LeafNode extends DataNode {
         private Object value;
 
         /**
+         * Leaf value namespace, it will be non null only if leaf type is
+         * identityref.
+         */
+        private String valueNamespace;
+
+        /**
          * Creates an instance of data node builder.
          *
          * @param name      name of node
@@ -116,6 +139,7 @@ public final class LeafNode extends DataNode {
         public Builder(LeafNode node) {
             super(node);
             value = node.value;
+            valueNamespace = node.valueNamespace;
         }
 
         /**
@@ -126,6 +150,17 @@ public final class LeafNode extends DataNode {
          */
         public Builder value(Object value) {
             this.value = value;
+            return this;
+        }
+
+        /**
+         * Sets valueNamepsace of leaf node builder.
+         *
+         * @param valueNamespace value namespace
+         * @return leaf node builder
+         */
+        public Builder valueNamespace(String valueNamespace) {
+            this.valueNamespace = valueNamespace;
             return this;
         }
 
@@ -153,7 +188,6 @@ public final class LeafNode extends DataNode {
             throw new IllegalStateException("leaf node can't have a child " +
                                                     "node");
         }
-
 
         @Override
         public InnerNode.Builder addKeyLeaf(String name, String nameSpace, Object val) {
