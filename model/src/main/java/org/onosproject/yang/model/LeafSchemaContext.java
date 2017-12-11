@@ -47,4 +47,13 @@ public interface LeafSchemaContext extends SchemaContext {
      *                                  schema
      */
     Object fromString(String value);
+
+    /**
+     * Returns value namespace.
+     *
+     * @param value leaf value in string
+     * @return value namespace, null indicates that value namespace is same
+     * as leaf namespace
+     */
+    String getValueNamespace(String value);
 }

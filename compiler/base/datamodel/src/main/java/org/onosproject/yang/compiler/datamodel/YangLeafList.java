@@ -19,7 +19,7 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
-import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.ObjectProvider;
+import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.LeafContextUtil;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.LeafRestriction;
 import org.onosproject.yang.model.LeafSchemaContext;
@@ -666,7 +666,12 @@ public abstract class YangLeafList extends DefaultLocationInfo
 
     @Override
     public Object fromString(String value) {
-        return ObjectProvider.getObject(dataType, value, dataType.getDataType());
+        return LeafContextUtil.getObject(dataType, value, dataType.getDataType());
+    }
+
+    @Override
+    public String getValueNamespace(String value) {
+        return LeafContextUtil.getValueNamespace(dataType, value, dataType.getDataType());
     }
 
     @Override
