@@ -36,6 +36,11 @@ public final class LeafNode extends DataNode {
     private String valueNamespace;
 
     /**
+     * Type of leaf.
+     */
+    private LeafType leafType;
+
+    /**
      * Returns value contained in leaf node.
      *
      * @return value contained in leaf node
@@ -54,6 +59,15 @@ public final class LeafNode extends DataNode {
     }
 
     /**
+     * Returns type of leaf.
+     *
+     * @return type of leaf
+     */
+    public LeafType leafType() {
+        return leafType;
+    }
+
+    /**
      * Returns value as string, for usage in serializers.
      *
      * @return string representation of value
@@ -68,6 +82,7 @@ public final class LeafNode extends DataNode {
                     "key=" + key() + ", " +
                     "value=" + asString() +
                     "valueNamespace=" + valueNamespace() +
+                    "leafType=" + leafType.toString() +
                "}";
     }
 
@@ -80,6 +95,7 @@ public final class LeafNode extends DataNode {
         super(builder);
         value = builder.value;
         valueNamespace = builder.valueNamespace;
+        leafType = builder.leafType;
     }
 
     /**
@@ -122,6 +138,11 @@ public final class LeafNode extends DataNode {
         private String valueNamespace;
 
         /**
+         * Type of leaf.
+         */
+        private LeafType leafType;
+
+        /**
          * Creates an instance of data node builder.
          *
          * @param name      name of node
@@ -140,6 +161,7 @@ public final class LeafNode extends DataNode {
             super(node);
             value = node.value;
             valueNamespace = node.valueNamespace;
+            leafType = node.leafType;
         }
 
         /**
@@ -161,6 +183,17 @@ public final class LeafNode extends DataNode {
          */
         public Builder valueNamespace(String valueNamespace) {
             this.valueNamespace = valueNamespace;
+            return this;
+        }
+
+        /**
+         * Sets leaf type of leaf node builder.
+         *
+         * @param leafType type of leaf
+         * @return leaf node builder
+         */
+        public Builder leafType(LeafType leafType) {
+            this.leafType = leafType;
             return this;
         }
 
