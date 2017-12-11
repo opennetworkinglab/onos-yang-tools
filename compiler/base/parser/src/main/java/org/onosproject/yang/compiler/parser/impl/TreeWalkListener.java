@@ -24,6 +24,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangListener;
 import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.AnydataStatementContext;
+import org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.YangStatementContext;
 import org.onosproject.yang.compiler.parser.impl.listeners.AnydataListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppDataStructureListener;
 import org.onosproject.yang.compiler.parser.impl.listeners.AppExtendedNameListener;
@@ -1952,6 +1953,16 @@ public class TreeWalkListener implements GeneratedYangListener {
 
     @Override
     public void exitUnknown2(Unknown2Context currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void enterYangStatement(YangStatementContext currentContext) {
+        // do nothing
+    }
+
+    @Override
+    public void exitYangStatement(YangStatementContext currentContext) {
         // do nothing
     }
 

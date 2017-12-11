@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateCodeAndUpdateInParent;
+import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.generateJava;
 
 /**
  * Represents container information extended to support java code generation.
@@ -128,8 +129,7 @@ public class YangJavaAnydataTranslator
     @Override
     public void generateCodeExit() throws TranslatorException {
         try {
-            getTempJavaCodeFragmentFiles().generateJavaFile(
-                    GENERATE_INTERFACE_WITH_BUILDER, this);
+            generateJava(GENERATE_INTERFACE_WITH_BUILDER, this);
         } catch (IOException e) {
             throw new TranslatorException("Failed to generate code for " +
                                                   "anydata node " +

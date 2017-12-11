@@ -1225,8 +1225,8 @@ import YangLexer;
      *                             *(data-def-stmt stmtsep)
      *                         "}")
      */
-    notificationStatement : NOTIFICATION_KEYWORD identifier (STMTEND | stmtSep
-            LEFT_CURLY_BRACE ((ifFeatureStatement | statusStatement
+    notificationStatement : NOTIFICATION_KEYWORD identifier (STMTEND |
+            LEFT_CURLY_BRACE stmtSep ((ifFeatureStatement | statusStatement
             | descriptionStatement | referenceStatement | typedefStatement
             | defaultDenyAllStatement | groupingStatement | dataDefStatement)
             stmtSep)* RIGHT_CURLY_BRACE);
@@ -1386,7 +1386,8 @@ import YangLexer;
      *                        (";" / "{" *unknown-statement2 "}")
      */
     unknownStatement : unknown string? (STMTEND
-                     | LEFT_CURLY_BRACE unknownStatement2* RIGHT_CURLY_BRACE);
+                     | LEFT_CURLY_BRACE (yangStatement |unknownStatement2)*
+                     RIGHT_CURLY_BRACE) stmtSep;
 
     /**
      *   unknown-statement2   = [prefix ":"] identifier [sep string] optsep
@@ -1394,6 +1395,106 @@ import YangLexer;
      */
     unknownStatement2 : unknown2 string? (STMTEND
                       | LEFT_CURLY_BRACE unknownStatement2* RIGHT_CURLY_BRACE);
+
+    /**
+     * yang-stmt as per RFC 7950
+     * yang-stmt           = action-stmt / -- not handled
+     *                      anydata-stmt /
+     *                      anyxml-stmt /
+     *                      argument-stmt /
+     *                      augment-stmt /
+     *                      base-stmt /
+     *                      belongs-to-stmt /
+     *                      bit-stmt /
+     *                      case-stmt /
+     *                      choice-stmt /
+     *                      config-stmt /
+     *                      contact-stmt /
+     *                      container-stmt /
+     *                      default-stmt /
+     *                      description-stmt /
+     *                      deviate-add-stmt /
+     *                      deviate-delete-stmt /
+     *                      deviate-not-supported-stmt /
+     *                      deviate-replace-stmt /
+     *                      deviation-stmt /
+     *                      enum-stmt /
+     *                      error-app-tag-stmt /
+     *                      error-message-stmt /
+     *                      extension-stmt /
+     *                      feature-stmt /
+     *                      fraction-digits-stmt /
+     *                      grouping-stmt /
+     *                      identity-stmt /
+     *                      if-feature-stmt /
+     *                      import-stmt /
+     *                      include-stmt /
+     *                      input-stmt /
+     *                      key-stmt /
+     *                      leaf-list-stmt /
+     *                      leaf-stmt /
+     *                      length-stmt /
+     *                      list-stmt /
+     *                      mandatory-stmt /
+     *                      max-elements-stmt /
+     *                      min-elements-stmt /
+     *                      modifier-stmt / -- not handled
+     *                      module-stmt /
+     *                      must-stmt /
+     *                      namespace-stmt /
+     *                      notification-stmt /
+     *                      ordered-by-stmt /
+     *                      organization-stmt /
+     *                      output-stmt /
+     *                      path-stmt /
+     *                      pattern-stmt /
+     *                      position-stmt /
+     *                      prefix-stmt /
+     *                      presence-stmt /
+     *                      range-stmt /
+     *                      reference-stmt /
+     *                      refine-stmt /
+     *                      require-instance-stmt /
+     *                      revision-date-stmt /
+     *                      revision-stmt /
+     *                      rpc-stmt /
+     *                      status-stmt /
+     *                      submodule-stmt /
+     *                      typedef-stmt /
+     *                      type-stmt /
+     *                      unique-stmt /
+     *                      units-stmt /
+     *                      uses-augment-stmt / -- not handled
+     *                      uses-stmt /
+     *                      value-stmt /
+     *                      when-stmt /
+     *                      yang-version-stmt /
+     *                      yin-element-stmt
+     *    ;; Ranges
+     */
+     yangStatement :  anydataStatement
+                | anyxmlStatement | argumentStatement | augmentStatement
+                | baseStatement | belongstoStatement | bitStatement
+                | caseStatement | choiceStatement    | configStatement
+                | contactStatement | containerStatement | defaultStatement
+                | descriptionStatement | deviationStatement | enumStatement
+                | errorAppTagStatement | errorMessageStatement | extensionStatement
+                | featureStatement | fractionDigitStatement | groupingStatement
+                | identityStatement | ifFeatureStatement | importStatement
+                | includeStatement | inputStatement | keyStatement
+                | leafListStatement | leafStatement | lengthStatement
+                | listStatement | mandatoryStatement | maxElementsStatement
+                | minElementsStatement | moduleStatement | mustStatement
+                | namespaceStatement | notificationStatement | orderedByStatement
+                | organizationStatement | outputStatement | pathStatement
+                | patternStatement | positionStatement | prefixStatement
+                | presenceStatement | rangeStatement | referenceStatement
+                | refineStatement | requireInstanceStatement | revisionDateStatement
+                | revisionStatement | rpcStatement | statusStatement
+                | subModuleStatement | typedefStatement | typeStatement
+                | uniqueStatement | unitsStatement | usesStatement
+                | valueStatement | whenStatement | yangVersionStatement
+                | yinElementStatement ;
 
     /**
      *  stmtend             = ";" / "{" *unknown-statement "}"

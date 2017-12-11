@@ -18,9 +18,9 @@ package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.AugmentedSchemaInfo;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
-import org.onosproject.yang.compiler.datamodel.YangModule;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeContextInfo;
+import org.onosproject.yang.compiler.datamodel.YangVersionHolder;
 
 import java.util.Iterator;
 
@@ -30,6 +30,7 @@ import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.QNAME
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
 import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.REV_REGEX;
+import static org.onosproject.yang.runtime.impl.YobConstants.DEFAULT;
 
 public final class AnydataHandler {
 
@@ -100,17 +101,22 @@ public final class AnydataHandler {
                 info = it.next();
                 schema = info.getSchemaNode();
                 if (schema instanceof SchemaDataNode) {
-                    if (schema.getJavaAttributeName().equalsIgnoreCase(paths[i])) {
+                    String name = paths[i];
+                    if (i == paths.length - 1) {
+                        name = name.replaceFirst(DEFAULT, "");
+                    }
+                    if (schema.getJavaAttributeName().equalsIgnoreCase(name)) {
                         isSuccess = true;
                         break;
                     }
                 }
             }
             if (!isSuccess) {
-                // In case of augment the top level node will not be found in
-                // above iteration.
-                if (i == index && i < paths.length - 1) {
-                    AugmentedSchemaInfo in = ((YangModule) s).getAugmentedSchemaInfo(cn);
+                // In case of augment the node will not be found in above
+                // iteration.
+                if (i < paths.length - 1) {
+                    AugmentedSchemaInfo in = ((YangVersionHolder) s)
+                            .getAugmentedSchemaInfo(cn);
                     i = in.getPosition();
                     schema = in.getSchemaNode();
                 } else {

@@ -1772,4 +1772,18 @@ public interface GeneratedYangListener extends ParseTreeListener {
      * @param currentContext current context in the parsed tree
      */
     void exitAnydataStatement(AnydataStatementContext currentContext);
+    /**
+     * Enters a parse tree produced by GeneratedYangParser for grammar rule
+     * YangStatement.
+     *
+     * @param currentContext current context in the parsed tree
+     */
+    void enterYangStatement(YangStatementContext currentContext);
+    /**
+     * Exits a parse tree produced by GeneratedYangParser for grammar rule
+     * YangStatement.
+     *
+     * @param currentContext current context in the parsed tree
+     */
+    void exitYangStatement(YangStatementContext currentContext);
 }
