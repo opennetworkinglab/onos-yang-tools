@@ -166,6 +166,15 @@ public final class InnerNode extends DataNode {
         }
 
         @Override
+        public LeafNode.Builder createChildBuilder(String name, String nameSpace,
+                                                   Object value, String valNamespace) {
+            return LeafNode.builder(name, nameSpace)
+                    .parent(this)
+                    .value(value)
+                    .valueNamespace(valNamespace);
+        }
+
+        @Override
         public InnerNode.Builder deleteChild(NodeKey key) {
             childNodes.remove(key);
             return this;

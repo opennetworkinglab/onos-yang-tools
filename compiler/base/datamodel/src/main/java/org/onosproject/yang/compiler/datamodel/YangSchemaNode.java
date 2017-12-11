@@ -18,6 +18,7 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.SchemaContext;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.util.Map;
 

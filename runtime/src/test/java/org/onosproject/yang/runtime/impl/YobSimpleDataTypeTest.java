@@ -50,6 +50,7 @@ public class YobSimpleDataTypeTest {
     private static final String DATA_TYPE_NAME_SPACE = "simple:data:types";
     private static final String DATA_TYPE_NAME_SPACE_LL =
             "simple:data:types:ll";
+    private static final String VALUE_NAMESPACE = "yms:test:ytb:data:types";
     TestYangSerializerContext context = new TestYangSerializerContext();
     private Builder dBlr;
     private String value;
@@ -248,197 +249,154 @@ public class YobSimpleDataTypeTest {
         value = "8";
         dBlr = addDataNode(dBlr, "lref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "val";
         dBlr = addDataNode(dBlr, "lref2", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "zero";
         dBlr = addDataNode(dBlr, "lref3", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b2 b3";
         dBlr = addDataNode(dBlr, "lref4", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "-92233720368547758.08";
         dBlr = addDataNode(dBlr, "lref5", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "10";
         dBlr = addDataNode(dBlr, "lref6", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "enum4";
         dBlr = addDataNode(dBlr, "lref7", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "-9223372036854.775808";
         dBlr = addDataNode(dBlr, "lref8", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "MTAxMDEwMTAx";
         dBlr = addDataNode(dBlr, "lref9", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "";
         dBlr = addDataNode(dBlr, "lref10", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "";
         dBlr = addDataNode(dBlr, "lref11", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b3";
         dBlr = addDataNode(dBlr, "lref12", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "";
         dBlr = addDataNode(dBlr, "lref13", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b1 b2 b3";
         dBlr = addDataNode(dBlr, "lref14", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "/cont";
         dBlr = addDataNode(dBlr, "lref15", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "physical";
-        dBlr = addDataNode(dBlr, "lref16", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref16", DATA_TYPE_NAME_SPACE, value,
+                           VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-
         value = "784985";
         dBlr = addDataNode(dBlr, "lref17", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "MTExMTExMTE=";
         dBlr = addDataNode(dBlr, "lref18", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "hundred";
         dBlr = addDataNode(dBlr, "lref19", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "leafref";
         dBlr = addDataNode(dBlr, "lref20", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "val";
         dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "pro";
         dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "physical";
-        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value,
+                           VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-
         value = "virtual";
-        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value,
+                           VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-
         dBlr = addDataNode(dBlr, "cont3", DATA_TYPE_NAME_SPACE, null, null);
-
         value = "108";
         dBlr = addDataNode(dBlr, "llref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "val";
         dBlr = addDataNode(dBlr, "llref2", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "one";
         dBlr = addDataNode(dBlr, "llref3", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b1 b3";
         dBlr = addDataNode(dBlr, "llref4", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "-922337203685470058.08";
         dBlr = addDataNode(dBlr, "llref5", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "121";
         dBlr = addDataNode(dBlr, "llref6", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "3.3ms";
         dBlr = addDataNode(dBlr, "llref7", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "-9223372036000.775808";
         dBlr = addDataNode(dBlr, "llref8", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "MTExMTExMTE=";
         dBlr = addDataNode(dBlr, "llref9", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "";
         dBlr = addDataNode(dBlr, "llref11", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b2";
         dBlr = addDataNode(dBlr, "llref12", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "";
         dBlr = addDataNode(dBlr, "llref13", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "b1";
         dBlr = addDataNode(dBlr, "llref14", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "/cont/con2";
         dBlr = addDataNode(dBlr, "llref15", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "virtual";
-        dBlr = addDataNode(dBlr, "llref16", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref16", DATA_TYPE_NAME_SPACE, value,
+                           "yms:test:ytb:data:types", null);
         dBlr = exitDataNode(dBlr);
-
         value = "78498522";
         dBlr = addDataNode(dBlr, "llref17", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "MDEwMTAxMDEw";
         dBlr = addDataNode(dBlr, "llref18", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "ten";
         dBlr = addDataNode(dBlr, "llref19", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "leaflistref";
         dBlr = addDataNode(dBlr, "llref20", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "check";
         dBlr = addDataNode(dBlr, "lref21", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "val";
         dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "pro";
         dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
         dBlr = exitDataNode(dBlr);
-
         value = "physical";
-        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value,
+                           VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-
         value = "virtual";
-        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value,
+                           VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-
         dBlr = exitDataNode(dBlr);
         return dBlr;
     }

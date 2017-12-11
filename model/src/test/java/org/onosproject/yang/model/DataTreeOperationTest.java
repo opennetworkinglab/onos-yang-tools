@@ -100,7 +100,7 @@ public class DataTreeOperationTest {
                 .exitNode()
 
                 //C1's child leaf L1
-                .createChildBuilder(L1, L1_NAMESPACE, 10)
+                .createChildBuilder(L1, L1_NAMESPACE, 10, null)
                 .type(SINGLE_INSTANCE_LEAF_VALUE_NODE)
 
                 //Builder l1 and traverse back to c1
@@ -114,7 +114,7 @@ public class DataTreeOperationTest {
                 .type(SINGLE_INSTANCE_NODE)
                 //C2's leaf l2
 
-                .createChildBuilder(L2, L2_NAMESPACE, "string")
+                .createChildBuilder(L2, L2_NAMESPACE, "string", null)
                 .type(MULTI_INSTANCE_LEAF_VALUE_NODE)
 
                 //build l2 and add it to c2 and traverse back to c2.
@@ -281,7 +281,7 @@ public class DataTreeOperationTest {
                 //Reach to c2 by fetching it from the map.
                 .getChildBuilder(keys.get(1))
                 //add l3 in c2.
-                .createChildBuilder(L3, L3_NAMESPACE, 15)
+                .createChildBuilder(L3, L3_NAMESPACE, 15, null)
                 .type(MULTI_INSTANCE_LEAF_VALUE_NODE)
                 .addLeafListValue(16)
 

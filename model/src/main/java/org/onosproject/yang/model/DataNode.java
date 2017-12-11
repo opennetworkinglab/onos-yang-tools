@@ -209,8 +209,23 @@ public abstract class DataNode {
          * @param value     value for leaf node
          * @return child node builder
          */
+        @Deprecated
         public abstract LeafNode.Builder createChildBuilder(
                 String name, String nameSpace, Object value);
+
+        /**
+         * Creates a child build of type leaf node and set a back reference
+         * of parent node. it is used while creating a data tree. the value
+         * of leaf is set while creation.
+         *
+         * @param name         name of leaf node
+         * @param nameSpace    namespace of leaf node
+         * @param value        value for leaf node
+         * @param valNamespace leaf value namespace
+         * @return child node builder
+         */
+        public abstract LeafNode.Builder createChildBuilder(
+                String name, String nameSpace, Object value, String valNamespace);
 
         /**
          * Deletes child node for a given node key from parent node.

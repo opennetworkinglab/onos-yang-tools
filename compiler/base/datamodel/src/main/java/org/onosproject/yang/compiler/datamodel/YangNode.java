@@ -21,6 +21,7 @@ import org.onosproject.yang.compiler.utils.io.impl.YangIoUtils;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -211,6 +211,13 @@ public final class LeafNode extends DataNode {
         }
 
         @Override
+        public LeafNode.Builder createChildBuilder(String name, String nameSpace,
+                                                   Object value, String valNamespace) {
+            throw new IllegalStateException("leaf node can't have a child " +
+                                                    "node");
+        }
+
+        @Override
         public InnerNode.Builder deleteChild(NodeKey key) {
             throw new IllegalStateException("leaf node can't have a child " +
                                                     "node");

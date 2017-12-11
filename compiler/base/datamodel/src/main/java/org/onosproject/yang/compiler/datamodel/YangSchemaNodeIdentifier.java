@@ -16,6 +16,8 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
+import org.onosproject.yang.model.YangNamespace;
+
 import java.io.Serializable;
 import java.util.Objects;
 

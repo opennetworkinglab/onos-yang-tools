@@ -22,6 +22,7 @@ import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -115,11 +116,11 @@ public final class LeafContextUtil {
      * @param typeInfo refers to YANG type information
      * @param v        v argument is leaf value used to set the value in method
      * @param dataType yang data type
-     * @return value namespace of corresponding given data type and value
+     * @return YANG namespace of corresponding given data type and value
      * @throws IllegalArgumentException if input is not valid
      */
-    public static String getValueNamespace(YangType typeInfo, String v,
-                                           YangDataTypes dataType)
+    public static YangNamespace getValueNamespace(YangType typeInfo, String v,
+                                                  YangDataTypes dataType)
             throws IllegalArgumentException {
         YangDataTypes type;
         if (dataType != null) {
@@ -166,23 +167,22 @@ public final class LeafContextUtil {
         }
     }
 
-    private static String getReferIdNamespace(YangIdentity refId, String v) {
+    private static YangNamespace getReferIdNamespace(YangIdentity refId, String v) {
         String baseIdentity = refId.getYangSchemaNodeIdentifier().getName();
         if (v.equals(baseIdentity)) {
-            return refId.getYangSchemaNodeIdentifier().getNameSpace()
-                    .getModuleNamespace();
+            return refId.getYangSchemaNodeIdentifier().getNameSpace();
         }
         for (YangIdentity i : refId.getExtendList()) {
             String refIdentity = i.getYangSchemaNodeIdentifier().getName();
             if (v.equals(refIdentity)) {
-                return i.getYangSchemaNodeIdentifier().getNameSpace()
-                        .getModuleNamespace();
+                return i.getYangSchemaNodeIdentifier().getNameSpace();
             }
         }
         throw new IllegalArgumentException("Invalid value of data");
     }
 
-    private static String getUnionValNamespace(YangType type, String leafValue) {
+    private static YangNamespace getUnionValNamespace(YangType type,
+                                                      String leafValue) {
         Iterator<YangType<?>> it = ((YangUnion) type.getDataTypeExtendedInfo())
                 .getTypeList().listIterator();
         while (it.hasNext()) {

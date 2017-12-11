@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.compiler.datamodel;
+package org.onosproject.yang.model;
 
 /**
  * Representation of YANG namespace.

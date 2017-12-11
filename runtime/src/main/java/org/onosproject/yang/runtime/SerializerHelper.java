@@ -29,6 +29,7 @@ import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.SingleInstanceNodeContext;
+import org.onosproject.yang.model.YangNamespace;
 import org.onosproject.yang.runtime.impl.DefaultYangModelRegistry;
 
 import java.util.Iterator;
@@ -278,6 +279,37 @@ public final class SerializerHelper {
     public static Builder addDataNode(Builder builder,
                                       String name, String namespace,
                                       String value, DataNode.Type type) {
+        return addDataNode(builder, name, namespace, value, null, type);
+    }
+
+    /**
+     * Adds a data node to a given data node builder.
+     * <p>
+     * Name and builder is mandatory inputs. If namespace is not provided
+     * parents namespace will be added for data node. Value should be
+     * provided for leaf/leaf-list. In case of leaf-list it's expected that this
+     * API is called for each leaf-list instance. Callers aware about the node
+     * type can opt to provide data node type, implementation will carry out
+     * validations based on input type and obtained type.
+     * <p>
+     * This API will also carry out necessary schema related validations.
+     *
+     * @param builder      data node builder
+     * @param name         name of data node
+     * @param namespace    namespace of data node
+     * @param value        value of data node
+     * @param valNamespace value's namespace, either module name of namespace,
+     *                     null indicates its same as leaf
+     * @param type         type of data node
+     * @return data node builder with added information
+     * @throws IllegalArgumentException when given input is not as per the
+     *                                  schema context
+     * @throws IllegalStateException    when a key is added under a atomic child
+     */
+    public static Builder addDataNode(Builder builder,
+                                      String name, String namespace,
+                                      String value, String valNamespace,
+                                      DataNode.Type type) {
         try {
             Object valObject;
             SchemaContext node;
@@ -326,13 +358,17 @@ public final class SerializerHelper {
                             throw new IllegalArgumentException(E_RESID);
                         }
                         valObject = getLeaf(value, childSchema);
+                        valNamespace = getValidValNamespace(value, childSchema,
+                                                            valNamespace);
                         builder = LeafNode.builder(name, namespace).type(nodeType)
-                                .value(valObject);
+                                .value(valObject).valueNamespace(valNamespace);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
                         valObject = getLeafList(value, childSchema);
+                        valNamespace = getValidValNamespace(value, childSchema,
+                                                            valNamespace);
                         builder = LeafNode.builder(name, namespace).type(nodeType)
-                                .value(valObject);
+                                .value(valObject).valueNamespace(valNamespace);
                         builder = builder.addLeafListValue(valObject);
                         break;
                     default:
@@ -348,17 +384,23 @@ public final class SerializerHelper {
                 switch (nodeType) {
                     case SINGLE_INSTANCE_LEAF_VALUE_NODE:
                         valObject = getLeaf(value, childSchema);
+                        valNamespace = getValidValNamespace(value, childSchema,
+                                                            valNamespace);
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             builder = builder.addKeyLeaf(
                                     name, namespace, valObject);
                         }
                         builder = builder.createChildBuilder(
-                                name, namespace, valObject).type(nodeType);
+                                name, namespace, valObject, valNamespace)
+                                .type(nodeType);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
                         valObject = getLeafList(value, childSchema);
+                        valNamespace = getValidValNamespace(value, childSchema,
+                                                            valNamespace);
                         builder = builder.createChildBuilder(
-                                name, namespace, valObject).type(nodeType);
+                                name, namespace, valObject, valNamespace)
+                                .type(nodeType);
                         builder = builder.addLeafListValue(valObject);
                         break;
                     default:
@@ -414,6 +456,33 @@ public final class SerializerHelper {
             throw new IllegalArgumentException(e.getMessage());
         }
         return schema.fromString(val);
+    }
+
+
+    /**
+     * Returns valid value namespace which is module's namespace.
+     *
+     * @param val    value in string
+     * @param ctx    schema context
+     * @param actual valNamespace either module name of namespace
+     * @return validated value module's namespace
+     * @throws IllegalArgumentException if input namespace is invalid
+     */
+    private static String getValidValNamespace(String val, SchemaContext ctx,
+                                               String actual)
+            throws IllegalArgumentException {
+        LeafSchemaContext schema = (LeafSchemaContext) ctx;
+        YangNamespace expected = schema.getValueNamespace(val);
+        if (actual == null) {
+            if (expected == null ||
+                    expected.getModuleNamespace().equals(ctx.getSchemaId().namespace())) {
+                return null;
+            }
+        } else if (actual.equals(expected.getModuleName()) ||
+                actual.equals(expected.getModuleNamespace())) {
+            return expected.getModuleNamespace();
+        }
+        throw new IllegalArgumentException("Invalid input for value namespace");
     }
 
     /**

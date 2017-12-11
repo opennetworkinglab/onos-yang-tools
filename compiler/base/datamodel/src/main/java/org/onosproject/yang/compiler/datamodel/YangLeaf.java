@@ -26,6 +26,7 @@ import org.onosproject.yang.model.LeafSchemaContext;
 import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -347,11 +348,6 @@ public abstract class YangLeaf extends DefaultLocationInfo
         return dataType;
     }
 
-    @Override
-    public boolean isEmptyDataType() {
-        return validateEmptyDataType(dataType);
-    }
-
     /**
      * Sets the data type.
      *
@@ -359,6 +355,11 @@ public abstract class YangLeaf extends DefaultLocationInfo
      */
     public void setDataType(YangType<?> dataType) {
         this.dataType = dataType;
+    }
+
+    @Override
+    public boolean isEmptyDataType() {
+        return validateEmptyDataType(dataType);
     }
 
     /**
@@ -480,16 +481,16 @@ public abstract class YangLeaf extends DefaultLocationInfo
     }
 
     @Override
+    public void setIfFeatureList(List<YangIfFeature> ifFeatureList) {
+        this.ifFeatureList = ifFeatureList;
+    }
+
+    @Override
     public void addIfFeatureList(YangIfFeature ifFeature) {
         if (getIfFeatureList() == null) {
             setIfFeatureList(new LinkedList<>());
         }
         getIfFeatureList().add(ifFeature);
-    }
-
-    @Override
-    public void setIfFeatureList(List<YangIfFeature> ifFeatureList) {
-        this.ifFeatureList = ifFeatureList;
     }
 
     @Override
@@ -676,8 +677,9 @@ public abstract class YangLeaf extends DefaultLocationInfo
     }
 
     @Override
-    public String getValueNamespace(String value) {
-        return LeafContextUtil.getValueNamespace(dataType, value, dataType.getDataType());
+    public YangNamespace getValueNamespace(String value) {
+        return LeafContextUtil.getValueNamespace(dataType, value,
+                                                 dataType.getDataType());
     }
 
     @Override

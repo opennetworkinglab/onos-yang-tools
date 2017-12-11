@@ -34,7 +34,7 @@ import org.onosproject.yang.compiler.datamodel.YangLeafList;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangList;
-import org.onosproject.yang.compiler.datamodel.YangNamespace;
+import org.onosproject.yang.model.YangNamespace;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangPathPredicate;

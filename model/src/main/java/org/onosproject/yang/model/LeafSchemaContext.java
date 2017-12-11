@@ -55,5 +55,5 @@ public interface LeafSchemaContext extends SchemaContext {
      * @return value namespace, null indicates that value namespace is same
      * as leaf namespace
      */
-    String getValueNamespace(String value);
+    YangNamespace getValueNamespace(String value);
 }

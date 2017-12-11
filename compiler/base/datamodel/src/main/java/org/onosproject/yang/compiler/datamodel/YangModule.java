@@ -18,6 +18,7 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.util.HashMap;
 import java.util.LinkedList;

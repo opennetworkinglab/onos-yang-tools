@@ -145,7 +145,9 @@ public class YobGroupingUsesTest {
         dBlr = addDataNode(dBlr, "name", TE, value, null);
         dBlr = exitDataNode(dBlr);
         value = "tunnel-p2p";
-        dBlr = addDataNode(dBlr, "type", TE, value, null);
+        dBlr = addDataNode(dBlr, "type", TE, value,
+                           "yrt-ietf-te-types",
+                           null);
         dBlr = exitDataNode(dBlr); // tunnel-p2p
         dBlr = exitDataNode(dBlr); // state
         dBlr = exitDataNode(dBlr); // tunnel

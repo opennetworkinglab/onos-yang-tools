@@ -21,7 +21,7 @@ import org.onosproject.yang.compiler.datamodel.YangContainer;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangModule;
-import org.onosproject.yang.compiler.datamodel.YangNamespace;
+import org.onosproject.yang.model.YangNamespace;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
