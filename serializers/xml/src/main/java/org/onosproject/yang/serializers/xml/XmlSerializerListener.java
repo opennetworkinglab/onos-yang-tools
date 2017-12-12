@@ -27,6 +27,8 @@ import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.getResourceId;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertXmlAttributesToAnnotations;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.getLatterSegment;
+import static org.onosproject.yang.serializers.utils.SerializersUtil.getPreSegment;
 import static org.onosproject.yang.serializers.xml.XmlNodeType.OBJECT_NODE;
 import static org.onosproject.yang.serializers.xml.XmlNodeType.TEXT_NODE;
 
@@ -34,6 +36,8 @@ import static org.onosproject.yang.serializers.xml.XmlNodeType.TEXT_NODE;
  * Default implementation of XML listener.
  */
 class XmlSerializerListener implements XmlListener {
+
+    private static final String COLON = ":";
 
     /**
      * Data node builder.
@@ -99,9 +103,22 @@ class XmlSerializerListener implements XmlListener {
             }
         } else if (nodeType == TEXT_NODE) {
             if (dnBuilder != null) {
+                String valNamespace = null;
+                String actVal;
+                String valPrefix;
+                String value = element.getText();
+                if (value != null) {
+                    actVal = getLatterSegment(value, COLON);
+                    valPrefix = getPreSegment(value, COLON);
+                    if (valPrefix != null) {
+                        valNamespace = element.getNamespaceForPrefix(valPrefix).getURI();
+                    }
+                } else {
+                    actVal = value;
+                }
                 dnBuilder = addDataNode(dnBuilder, element.getName(),
                                         element.getNamespace().getURI(),
-                                        element.getText(), null);
+                                        actVal, valNamespace, null);
             }
         }
     }

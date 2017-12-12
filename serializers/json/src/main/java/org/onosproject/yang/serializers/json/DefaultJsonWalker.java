@@ -138,20 +138,31 @@ public class DefaultJsonWalker implements JsonWalker {
         }
     }
 
-    private void addDataNode(String fieldName, String value, DataNode.Type nodeType) {
+    private void addDataNode(String fieldName, String value, String valNamespace,
+                             DataNode.Type nodeType) {
         String nodeName = getLatterSegment(fieldName, COLON);
         String namespace = getPreSegment(fieldName, COLON);
+
         dataNodeBuilder = SerializerHelper.addDataNode(dataNodeBuilder,
                                                        nodeName, namespace,
-                                                       value, nodeType);
+                                                       value, valNamespace,
+                                                       nodeType);
     }
 
     private void addNoneLeafDataNode(String fieldName, DataNode.Type nodeType) {
-        addDataNode(fieldName, null, nodeType);
+        addDataNode(fieldName, null, null, nodeType);
     }
 
     private void addLeafDataNode(String fieldName, String value, DataNode.Type nodeType) {
-        addDataNode(fieldName, value, nodeType);
+        String valNamespace = null;
+        String actVal;
+        if (value != null) {
+            actVal = getLatterSegment(value, COLON);
+            valNamespace = getPreSegment(value, COLON);
+        } else {
+            actVal = value;
+        }
+        addDataNode(fieldName, actVal, valNamespace, nodeType);
     }
 
     private void addSingleInstanceNodeToDataTree(String fieldName) {
