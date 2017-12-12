@@ -75,13 +75,18 @@ public class DefaultJsonBuilder implements JsonBuilder {
     }
 
     @Override
-    public void addNodeWithValueTopHalf(String nodeName, String value) {
+    public void addNodeWithValueTopHalf(String nodeName, String value,
+                                        String valNamespace) {
         if (isNullOrEmpty(nodeName)) {
             return;
         }
         appendField(nodeName);
         treeString.append(QUOTE);
         treeString.append(value);
+        if (valNamespace != null) {
+            treeString.append(COLON);
+            treeString.append(valNamespace);
+        }
         treeString.append(QUOTE);
         treeString.append(COMMA);
     }
@@ -102,13 +107,17 @@ public class DefaultJsonBuilder implements JsonBuilder {
     }
 
     @Override
-    public void addValueToLeafListNode(String value) {
+    public void addValueToLeafListNode(String value, String valNamespace) {
         if (isNullOrEmpty(value)) {
             return;
         }
 
         treeString.append(QUOTE);
         treeString.append(value);
+        if (valNamespace != null) {
+            treeString.append(COLON);
+            treeString.append(valNamespace);
+        }
         treeString.append(QUOTE);
         treeString.append(COMMA);
     }

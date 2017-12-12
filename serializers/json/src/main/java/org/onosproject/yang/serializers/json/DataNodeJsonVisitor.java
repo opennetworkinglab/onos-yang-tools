@@ -52,6 +52,7 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
     public void enterDataNode(DataNode dataNode,
                               DataNodeSiblingPositionType siblingType) {
         String nodeName = getNodeName(dataNode);
+        String valNamespace = null;
         switch (dataNode.type()) {
             case SINGLE_INSTANCE_NODE:
                 jsonBuilder.addNodeTopHalf(nodeName, JsonNodeType.OBJECT);
@@ -65,8 +66,13 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
                 break;
             case SINGLE_INSTANCE_LEAF_VALUE_NODE:
                 LeafNode sLeafNode = (LeafNode) dataNode;
+                if (sLeafNode.valueNamespace() != null) {
+                    valNamespace = getModuleNameFromNameSpace(
+                            jsonSerializerContext, sLeafNode.valueNamespace());
+                }
                 jsonBuilder.addNodeWithValueTopHalf(nodeName,
-                                                    sLeafNode.asString());
+                                                    sLeafNode.asString(),
+                                                    valNamespace);
                 break;
             case MULTI_INSTANCE_LEAF_VALUE_NODE:
                 if (siblingType == FIRST_INSTANCE ||
@@ -74,7 +80,12 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
                     jsonBuilder.addNodeTopHalf(nodeName, JsonNodeType.ARRAY);
                 }
                 LeafNode mLeafNode = (LeafNode) dataNode;
-                jsonBuilder.addValueToLeafListNode(mLeafNode.asString());
+                if (mLeafNode.valueNamespace() != null) {
+                    valNamespace = getModuleNameFromNameSpace(
+                            jsonSerializerContext, mLeafNode.valueNamespace());
+                }
+                jsonBuilder.addValueToLeafListNode(mLeafNode.asString(),
+                                                   valNamespace);
                 break;
             default:
                 break;

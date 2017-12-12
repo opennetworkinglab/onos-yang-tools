@@ -45,8 +45,10 @@ public interface JsonBuilder {
      *
      * @param nodeName name of child to be added
      * @param value    value of the child node
+     * @param valNamespace value namespace
      */
-    void addNodeWithValueTopHalf(String nodeName, String value);
+    void addNodeWithValueTopHalf(String nodeName, String value,
+                                 String valNamespace);
 
     /**
      * Adds a child with list of values to JSON data tree. This method is
@@ -62,8 +64,9 @@ public interface JsonBuilder {
      * Adds value to a leaf list node.
      *
      * @param value value to be added
+     * @param valNamespace value namespace
      */
-    void addValueToLeafListNode(String value);
+    void addValueToLeafListNode(String value, String valNamespace);
 
     /**
      * Adds the bottom half(a right brace/bracket) of a JSON
