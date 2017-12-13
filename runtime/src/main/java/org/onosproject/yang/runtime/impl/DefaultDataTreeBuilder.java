@@ -58,6 +58,7 @@ import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
 import static org.onosproject.yang.runtime.RuntimeHelper.DEFAULT_CAPS;
 import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
 import static org.onosproject.yang.runtime.RuntimeHelper.getCapitalCase;
+import static org.onosproject.yang.runtime.impl.DataTreeBuilderHelper.getValNamespace;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.TRUE;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getAttributeOfObject;
 import static org.onosproject.yang.runtime.impl.ModelConverterUtil.getJavaName;
@@ -224,8 +225,8 @@ class DefaultDataTreeBuilder {
                 child = child.getNextSibling();
             }
             while (child != null && child instanceof YangRpc &&
-                    !name.contains(child.getJavaPackage() + "."
-                    + child.getJavaClassNameOrBuiltInType().toLowerCase())) {
+                    !name.contains(child.getJavaPackage() + "." +
+                    child.getJavaClassNameOrBuiltInType().toLowerCase())) {
                 child = child.getNextSibling();
             }
             if (child != null) {
@@ -477,11 +478,13 @@ class DefaultDataTreeBuilder {
                         objects.add(null);
                     }
                     for (Object obj : objects) {
+                        String valNamespace = getValNamespace(obj, leafList);
                         DataNode node = LeafNode
                                 .builder(leafList.getName(), leafList
                                         .getNameSpace().getModuleNamespace())
                                 .value(obj)
-                                .type(MULTI_INSTANCE_LEAF_VALUE_NODE).build();
+                                .type(MULTI_INSTANCE_LEAF_VALUE_NODE)
+                                .valueNamespace(valNamespace).build();
                         rscData.addDataNode(node);
                     }
                 }
@@ -515,10 +518,12 @@ class DefaultDataTreeBuilder {
                         }
                         obj = null;
                     }
+                    String valNamespace = getValNamespace(obj, leaf);
                     DataNode node = LeafNode.builder(leaf.getName(), leaf
                             .getNameSpace().getModuleNamespace())
                             .value(obj)
-                            .type(SINGLE_INSTANCE_LEAF_VALUE_NODE).build();
+                            .type(SINGLE_INSTANCE_LEAF_VALUE_NODE)
+                            .valueNamespace(valNamespace).build();
                     rscData.addDataNode(node);
                     break;
                 }

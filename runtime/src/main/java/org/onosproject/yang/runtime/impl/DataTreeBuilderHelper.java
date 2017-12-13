@@ -32,6 +32,8 @@ import org.onosproject.yang.model.Anydata;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
+import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.YangNamespace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -906,9 +908,10 @@ public class DataTreeBuilderHelper {
                                        YangLeafList leafList) {
         if (extBuilder != null) {
             for (Object val : leafListVal) {
+                String valNamespace = getValNamespace(val, leafList);
                 DataNode.Builder leaf = extBuilder.createChildBuilder(
                         leafList.getName(), leafList.getNameSpace()
-                                .getModuleNamespace(), val);
+                                .getModuleNamespace(), val, valNamespace);
                 leaf.type(MULTI_INSTANCE_LEAF_VALUE_NODE);
                 leaf.addLeafListValue(val);
                 extBuilder = leaf.exitNode();
@@ -918,9 +921,11 @@ public class DataTreeBuilderHelper {
         //In case of root node leaf lists.
         List<DataNode.Builder> builders = new ArrayList<>();
         for (Object val : leafListVal) {
+            String valNamespace = getValNamespace(val, leafList);
             DataNode.Builder leaf = LeafNode.builder(
                     leafList.getName(), leafList.getNameSpace()
-                            .getModuleNamespace()).value(val);
+                            .getModuleNamespace()).value(val)
+                    .valueNamespace(valNamespace);
             leaf.type(MULTI_INSTANCE_LEAF_VALUE_NODE);
             leaf.addLeafListValue(val);
             builders.add(leaf);
@@ -962,6 +967,7 @@ public class DataTreeBuilderHelper {
      * @param val      value for the leaf
      */
     DataNode.Builder createLeafNode(YangLeaf yangLeaf, Object val) {
+        String valNamespace = getValNamespace(val, yangLeaf);
         if (extBuilder != null) {
             //Add leaf to key leaves.
             if (yangLeaf.isKeyLeaf()) {
@@ -971,7 +977,7 @@ public class DataTreeBuilderHelper {
             //build leaf node and add to parent node.
             DataNode.Builder leaf = extBuilder.createChildBuilder(
                     yangLeaf.getName(), yangLeaf.getNameSpace()
-                            .getModuleNamespace(), val);
+                            .getModuleNamespace(), val, valNamespace);
             leaf.type(SINGLE_INSTANCE_LEAF_VALUE_NODE);
 
             extBuilder = leaf.exitNode();
@@ -980,7 +986,7 @@ public class DataTreeBuilderHelper {
         return LeafNode.builder(yangLeaf.getName(), yangLeaf.getNameSpace()
                 .getModuleNamespace())
                 .type(SINGLE_INSTANCE_LEAF_VALUE_NODE)
-                .value(val);
+                .value(val).valueNamespace(valNamespace);
     }
 
     /**
@@ -1006,5 +1012,16 @@ public class DataTreeBuilderHelper {
             return new ModelConverterTraversalInfo(curNode.getParent(), PARENT);
         }
         return new ModelConverterTraversalInfo((YangNode) exitBuilderSchema, PARENT);
+    }
+
+    public static String getValNamespace(Object val, LeafSchemaContext lsc) {
+        String valNamespace = null;
+        if (val != null) {
+            YangNamespace yn = lsc.getValueNamespace(val.toString());
+            if (yn != null) {
+                valNamespace = yn.getModuleNamespace();
+            }
+        }
+        return valNamespace;
     }
 }
