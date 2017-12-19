@@ -1,0 +1,17 @@
+module identity-types {
+    yang-version 1;
+    namespace "identity:list:ns:test:json:ser";
+    prefix "type";
+    revision "2013-07-15";
+
+    identity int-type {
+    }
+
+    identity physical {
+        base int-type;
+    }
+
+    identity Loopback {
+        base physical;
+    }
+}

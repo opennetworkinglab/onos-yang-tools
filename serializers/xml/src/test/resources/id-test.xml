@@ -1,0 +1,21 @@
+<test xmlns="identity:ns:test:json:ser" operation="create">
+    <con>
+        <interface xmlns:types="identity:list:ns:test:json:ser">types:physical</interface>
+        <interfaces>
+            <int-list>
+                <iden xmlns:second="identity:list:second:ns:test:json:ser">second:virtual</iden>
+                <available>
+                    <ll xmlns:types="identity:list:ns:test:json:ser">types:Loopback</ll>
+                    <ll xmlns:test="identity:ns:test:json:ser">test:Giga</ll>
+                    <ll xmlns:second="identity:list:second:ns:test:json:ser">second:Ethernet</ll>
+                </available>
+            </int-list>
+            <int-list>
+                <iden>optical</iden>
+                <available>
+                    <ll>Giga</ll>
+                </available>
+            </int-list>
+        </interfaces>
+    </con>
+</test>

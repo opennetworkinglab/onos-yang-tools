@@ -243,6 +243,19 @@ public final class TestUtils implements DataNodeListener {
     }
 
     /**
+     * Validates the leaf data node with value namespace.
+     *
+     * @param leaf    leaf data node
+     * @param value   leaf value
+     * @param valueNs leaf value namespace
+     */
+    public static void validateLeafDataNodeNs(LeafNode leaf, Object value,
+                                              String valueNs) {
+        assertEquals(leaf.value(), value);
+        assertEquals(leaf.valueNamespace(), valueNs);
+    }
+
+    /**
      * Walks in the given built data tree and validates it.
      */
     public static void walkINTree(DataNode node,

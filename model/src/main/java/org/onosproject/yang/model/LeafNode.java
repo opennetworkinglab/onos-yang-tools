@@ -82,7 +82,7 @@ public final class LeafNode extends DataNode {
                     "key=" + key() + ", " +
                     "value=" + asString() +
                     "valueNamespace=" + valueNamespace() +
-                    "leafType=" + leafType.toString() +
+                    "leafType=" + String.valueOf(type) +
                "}";
     }
 

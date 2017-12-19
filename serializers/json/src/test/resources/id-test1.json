@@ -1,0 +1,28 @@
+{
+  "identity-test:con": {
+    "identity-test:interface": "identity-types:physical",
+    "identity-test:interfaces": {
+      "int-list": [
+        {
+          "iden": "identity-types-second:virtual",
+          "available": {
+            "ll": [
+              "identity-types:Loopback",
+              "identity-test:Giga",
+              "identity-types-second:Ethernet"
+            ]
+          }
+        },
+        {
+          "iden": "optical",
+          "available": {
+            "ll": [
+              "Giga"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+

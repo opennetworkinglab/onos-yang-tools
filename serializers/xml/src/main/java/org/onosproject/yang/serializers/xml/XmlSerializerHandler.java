@@ -20,8 +20,11 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.LeafNode;
 
 import java.util.Stack;
+
+import static org.onosproject.yang.serializers.xml.XmlSerializerLeafHandler.XML_PREFIX;
 
 /**
  * Represents an serializer handler to process the XML content and add
@@ -56,6 +59,10 @@ public abstract class XmlSerializerHandler {
             nameSpace = node.key().schemaId().namespace();
             name = node.key().schemaId().name();
         }
+        String valueNs = null;
+        if (node instanceof LeafNode) {
+            valueNs = ((LeafNode) node).valueNamespace();
+        }
 
         if (elementStack.isEmpty()) {
             Element rootElement = DocumentHelper.createDocument()
@@ -76,6 +83,9 @@ public abstract class XmlSerializerHandler {
                                                    nameSpace);
             } else {
                 newElement = xmlElement.addElement(name);
+            }
+            if (valueNs != null) {
+                newElement.addNamespace(XML_PREFIX, valueNs);
             }
             return newElement;
         }

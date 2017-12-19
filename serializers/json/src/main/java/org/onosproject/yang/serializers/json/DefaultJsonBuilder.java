@@ -82,11 +82,12 @@ public class DefaultJsonBuilder implements JsonBuilder {
         }
         appendField(nodeName);
         treeString.append(QUOTE);
-        treeString.append(value);
         if (valNamespace != null) {
-            treeString.append(COLON);
             treeString.append(valNamespace);
+            treeString.append(COLON);
         }
+        treeString.append(value);
+
         treeString.append(QUOTE);
         treeString.append(COMMA);
     }

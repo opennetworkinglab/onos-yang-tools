@@ -22,16 +22,26 @@ import org.onosproject.yang.model.LeafNode;
 
 import java.util.Stack;
 
+import static org.onosproject.yang.serializers.xml.XmlSerializerListener.COLON;
+
 /**
  * Represents a leaf node handler in XML serializer.
  */
 public class XmlSerializerLeafHandler extends XmlSerializerHandler {
 
+    protected static final String XML_PREFIX = "yangid";
+
     @Override
     public void setXmlValue(DataNode node, Stack<Element> elementStack) {
         Object value = ((LeafNode) node).value();
         if (value != null) {
-            elementStack.peek().setText(value.toString());
+            Element ele = elementStack.peek();
+            if (ele.getNamespaceForPrefix(XML_PREFIX) != null) {
+                elementStack.peek().setText(XML_PREFIX + COLON +
+                                                    value.toString());
+            } else {
+                elementStack.peek().setText(value.toString());
+            }
         }
     }
 }

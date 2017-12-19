@@ -18,7 +18,9 @@ package org.onosproject.yang.serializers.xml;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
@@ -56,11 +58,23 @@ import static org.hamcrest.Matchers.is;
  */
 public class XmlSerializerTest {
 
-    private static YangSerializerContext context;
-    private static YangSerializer xmlSerializer;
-
     public static final String LNS = "yrt:list.anydata";
     private static final String LIST_NS = "yrt:list";
+    private static YangSerializerContext context;
+    private static YangSerializer xmlSerializer;
+    private static String idXml = "<test xmlns=\"identity:ns:test:json:ser" +
+            "\"><con><interface xmlns:yangid=\"identity:list:ns:test:jso" +
+            "n:ser\">yangid:physical</interface><interfaces><int-list><ide" +
+            "n xmlns:yangid=\"identity:list:second:ns:test:json:ser\">ya" +
+            "ngid:virtual</iden><available><ll xmlns:yangid=\"identity:li" +
+            "st:ns:test:json:ser\">yangid:Loopback</ll><ll xmlns:yangid=" +
+            "\"identity:ns:test:json:ser\">yangid:Giga</ll><ll xmlns:yan" +
+            "gid=\"identity:list:second:ns:test:json:ser\">yangid:Ether" +
+            "net</ll></available></int-list><int-list><iden>optical</iden><av" +
+            "ailable><ll>Giga</ll></available></int-list></interfaces></con><" +
+            "/test>";
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @BeforeClass
     public static void prepare() {
@@ -441,6 +455,35 @@ public class XmlSerializerTest {
                                                                context);
         InputStream inputStream = compositeStream.resourceData();
         assertThat(convertInputStreamToString(inputStream), is(parseXml(path)));
+    }
+
+    /**
+     * Validates XML encode and decode with value namespace for leaf with
+     * identity-ref types.
+     */
+    @Test
+    public void identityValueNsTest() {
+        String path = "src/test/resources/id-test.xml";
+        DefaultCompositeStream external =
+                new DefaultCompositeStream(null, parseInput(path));
+        CompositeData compositeData = xmlSerializer.decode(external, context);
+        CompositeStream compositeStream = xmlSerializer.encode(compositeData,
+                                                               context);
+        InputStream inputStream = compositeStream.resourceData();
+        assertThat(convertInputStreamToString(inputStream), is(idXml));
+    }
+
+    /**
+     * Validates the error message for identity-ref without proper namespace.
+     */
+    @Test
+    public void identityValueNsErrorTest() {
+        thrown.expect(XmlSerializerException.class);
+        thrown.expectMessage("Invalid input for value namespace");
+        String path = "src/test/resources/id-test2.xml";
+        DefaultCompositeStream external =
+                new DefaultCompositeStream(null, parseInput(path));
+        xmlSerializer.decode(external, context);
     }
 
     /**

@@ -1,0 +1,61 @@
+module identity-test {
+    yang-version 1;
+    namespace "identity:ns:test:json:ser";
+    prefix "id";
+
+    import identity-types {
+        prefix "type";
+    }
+
+    revision "2013-07-15";
+
+    identity optical {
+        base type:int-type;
+    }
+
+    identity Giga {
+        base type:physical;
+    }
+
+    typedef available {
+        type identityref {
+            base "type:physical";
+        }
+    }
+
+    typedef typed{
+        type union {
+            type int32;
+            type int8;
+            type identityref {
+                base type:int-type;
+            }
+        }
+    }
+
+    container test {
+        leaf l {
+            type string;
+        }
+        container con {
+            leaf interface {
+                type identityref {
+                    base "type:int-type";
+                }
+            }
+            container interfaces {
+                list int-list {
+                    key "iden";
+                    leaf iden {
+                        type "id:typed";
+                    }
+                    container available {
+                        leaf-list ll {
+                            type available;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

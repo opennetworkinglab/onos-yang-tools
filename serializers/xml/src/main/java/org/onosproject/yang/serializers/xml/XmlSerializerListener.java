@@ -17,11 +17,14 @@
 package org.onosproject.yang.serializers.xml;
 
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.AnnotatedNodeInfo;
 import org.onosproject.yang.runtime.CompositeData;
 import org.onosproject.yang.runtime.HelperContext;
+
+import java.util.List;
 
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
@@ -37,7 +40,7 @@ import static org.onosproject.yang.serializers.xml.XmlNodeType.TEXT_NODE;
  */
 class XmlSerializerListener implements XmlListener {
 
-    private static final String COLON = ":";
+    protected static final String COLON = ":";
 
     /**
      * Data node builder.
@@ -95,32 +98,44 @@ class XmlSerializerListener implements XmlListener {
             return;
         }
 
-        if (nodeType == OBJECT_NODE) {
-            if (dnBuilder != null) {
-                dnBuilder = addDataNode(dnBuilder, element.getName(),
-                                        element.getNamespace().getURI(),
-                                        null, null);
-            }
-        } else if (nodeType == TEXT_NODE) {
-            if (dnBuilder != null) {
-                String valNamespace = null;
-                String actVal;
-                String valPrefix;
-                String value = element.getText();
-                if (value != null) {
-                    actVal = getLatterSegment(value, COLON);
-                    valPrefix = getPreSegment(value, COLON);
-                    if (valPrefix != null) {
-                        valNamespace = element.getNamespaceForPrefix(valPrefix).getURI();
-                    }
-                } else {
-                    actVal = value;
+        if (dnBuilder != null) {
+            if (nodeType == OBJECT_NODE) {
+                List cont = element.content();
+                if (cont != null && cont.size() == 2 &&
+                        isValueNsForLeaf(cont, element)) {
+                    return;
                 }
                 dnBuilder = addDataNode(dnBuilder, element.getName(),
                                         element.getNamespace().getURI(),
-                                        actVal, valNamespace, null);
+                                        null, null);
+            } else if (nodeType == TEXT_NODE) {
+                dnBuilder = addDataNode(dnBuilder, element.getName(),
+                                        element.getNamespace().getURI(),
+                                        element.getText(), null, null);
             }
         }
+
+    }
+
+    private boolean isValueNsForLeaf(List cont, Element element) {
+        for (Object c : cont) {
+            if (c instanceof Namespace) {
+                String value = element.getText();
+                String valueNs = ((Namespace) c).getURI();
+                if (value != null) {
+                    String actVal = getLatterSegment(value, COLON);
+                    String valPrefix = getPreSegment(value, COLON);
+                    if (valPrefix != null && actVal != null &&
+                            valPrefix.equals(((Namespace) c).getPrefix())) {
+                        dnBuilder = addDataNode(dnBuilder, element.getName(),
+                                                element.getNamespace().getURI(),
+                                                actVal, valueNs, null);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override

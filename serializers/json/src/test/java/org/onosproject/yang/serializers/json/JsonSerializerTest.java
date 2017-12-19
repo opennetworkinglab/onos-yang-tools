@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
 import org.onosproject.yang.model.NodeKey;
@@ -60,6 +62,16 @@ public class JsonSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
 
+    private static String outputIdTestJson = "{\"identity-test:con\":{\"inte" +
+            "rface\":\"identity-types:physical\",\"interfaces\":{\"int-list" +
+            "\":[{\"iden\":\"identity-types-second:virtual\",\"available\":" +
+            "{\"ll\":[\"Loopback:identity-types\",\"Giga:identity-test\",\"" +
+            "Ethernet:identity-types-second\"]}},{\"iden\":\"optical\",\"av" +
+            "ailable\":{\"ll\":[\"Giga\"]}}]}}}";
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void demo1Test() throws IOException {
         String path = "src/test/resources/test.json";
@@ -94,6 +106,52 @@ public class JsonSerializerTest {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    @Test
+    public void identityValueNsTest() throws IOException {
+        String path = "src/test/resources/id-test1.json";
+        // decode
+        DefaultCompositeStream external =
+                new DefaultCompositeStream("identity-test:test", parseInput(path));
+        CompositeData compositeData = jsonSerializer.decode(external, context);
+        ResourceData resourceData = compositeData.resourceData();
+        ResourceId rid = resourceData.resourceId();
+        DataNode rootNode = resourceData.dataNodes().get(0);
+
+        // encode
+        RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
+        runtimeContextBuilder.setDataFormat("JSON");
+        DefaultResourceData.Builder resourceDataBuilder = DefaultResourceData.builder();
+        resourceDataBuilder.addDataNode(rootNode);
+        resourceDataBuilder.resourceId(rid);
+
+        ResourceData resourceDataOutput = resourceDataBuilder.build();
+        DefaultCompositeData.Builder compositeDataBuilder = DefaultCompositeData.builder();
+        compositeDataBuilder.resourceData(resourceDataOutput);
+        CompositeData compositeData1 = compositeDataBuilder.build();
+        // CompositeData --- YangRuntimeService ---> CompositeStream.
+        CompositeStream compositeStreamOutPut = jsonSerializer.encode(compositeData1,
+                                                                      context);
+        InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
+        ObjectNode rootNodeOutput;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+            assertEquals(rootNodeOutput.toString(), outputIdTestJson);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void identityValueNsErrorTest() throws IOException {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Invalid input for value namespace");
+        String path = "src/test/resources/id-test2.json";
+        DefaultCompositeStream external =
+                new DefaultCompositeStream("identity-test:test", parseInput(path));
+        jsonSerializer.decode(external, context);
     }
 
     @Test

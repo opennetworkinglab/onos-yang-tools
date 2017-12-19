@@ -1,0 +1,19 @@
+module  identity-types-second{
+    yang-version 1;
+    namespace "identity:list:second:ns:test:json:ser";
+    prefix "sec";
+
+    import identity-types {
+        prefix "type";
+    }
+
+    revision "2013-07-15";
+
+    identity virtual {
+        base type:int-type;
+    }
+
+    identity Ethernet {
+        base type:physical;
+    }
+}

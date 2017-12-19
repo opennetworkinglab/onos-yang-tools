@@ -20,6 +20,23 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.DefaultTest;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Giga;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Optical;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Typed;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.Con;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.DefaultCon;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.DefaultInterfaces;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.Interfaces;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.DefaultIntList;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.IntList;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.intlist.Available;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.intlist.DefaultAvailable;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.typed.TypedUnion;
+import org.onosproject.yang.gen.v1.identitytypes.rev20130715.identitytypes.Loopback;
+import org.onosproject.yang.gen.v1.identitytypes.rev20130715.identitytypes.Physical;
+import org.onosproject.yang.gen.v1.identitytypessecond.rev20130715.identitytypessecond.Ethernet;
+import org.onosproject.yang.gen.v1.identitytypessecond.rev20130715.identitytypessecond.Virtual;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.Bitdef;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.DefaultType;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.DefaultVal;
@@ -75,6 +92,7 @@ import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafIdentifier;
 import org.onosproject.yang.model.LeafListKey;
+import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectId;
@@ -112,6 +130,7 @@ import static org.onosproject.yang.model.ModelObjectId.builder;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateLeafDataNodeNs;
 
 /**
  * Unit test cases for resource id conversion from model object id.
@@ -120,6 +139,7 @@ public class YtbResourceIdTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+    DefaultYangModelRegistry reg;
     private ResourceData rscData;
     private DefaultDataTreeBuilder treeBuilder;
     private ResourceId id;
@@ -127,7 +147,6 @@ public class YtbResourceIdTest {
     private SchemaId sid;
     private ModelObjectId mid;
     private Builder data;
-    DefaultYangModelRegistry reg;
 
     /**
      * Prior setup for each UT.
@@ -522,5 +541,137 @@ public class YtbResourceIdTest {
         it = list.iterator();
         validateDataNode(it.next(), "wait", ns,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE, true, "wait");
+    }
+
+    /**
+     * Processes identity with value namespace.
+     */
+    @Test
+    public void processIdentity() {
+        org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Available
+                avail1 = new org.onosproject.yang.gen.v1.identitytest
+                .rev20130715.identitytest.Available(Loopback.class);
+        org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Available
+                avail2 = new org.onosproject.yang.gen.v1.identitytest
+                .rev20130715.identitytest.Available(Giga.class);
+        org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Available
+                avail3 = new org.onosproject.yang.gen.v1.identitytest
+                .rev20130715.identitytest.Available(Ethernet.class);
+
+        Available available = new DefaultAvailable();
+        available.addToLl(avail1);
+        available.addToLl(avail2);
+        available.addToLl(avail3);
+
+        TypedUnion typedUnion = new TypedUnion(Virtual.class);
+        Typed typed = new Typed(typedUnion);
+        IntList list = new DefaultIntList();
+        list.iden(typed);
+        list.available(available);
+
+        org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Available
+                avail4 = new org.onosproject.yang.gen.v1.identitytest
+                .rev20130715.identitytest.Available(Giga.class);
+
+        Available available2 = new DefaultAvailable();
+        available2.addToLl(avail4);
+
+        TypedUnion typedUnion2 = new TypedUnion(Optical.class);
+        Typed typed2 = new Typed(typedUnion2);
+        IntList list2 = new DefaultIntList();
+        list2.iden(typed2);
+        list2.available(available2);
+
+        Interfaces ifs = new DefaultInterfaces();
+        ifs.addToIntList(list);
+        ifs.addToIntList(list2);
+
+        Con con = new DefaultCon();
+        con.yangAutoPrefixInterface(Physical.class);
+        con.interfaces(ifs);
+
+        mid = builder().addChild(DefaultTest.class).build();
+        data = new Builder();
+        data.identifier(mid);
+        data.addModelObject((ModelObject) con);
+        rscData = treeBuilder.getResourceData(data.build());
+
+        List<DataNode> contDn = rscData.dataNodes();
+        String ns = "identity:ns:test:json:ser";
+        String ns2 = "identity:list:ns:test:json:ser";
+        String ns3 = "identity:list:second:ns:test:json:ser";
+        Iterator<DataNode> it = contDn.iterator();
+
+        DataNode contNode = it.next();
+        validateDataNode(contNode, "con", ns, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        Map<NodeKey, DataNode> child = ((InnerNode) contNode).childNodes();
+        List<DataNode> ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+
+        it = ints.iterator();
+        DataNode ifl = it.next();
+        validateLeafDataNodeNs((LeafNode) ifl, "physical", ns2);
+
+        DataNode inters = it.next();
+        validateDataNode(inters, "interfaces", ns, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        child = ((InnerNode) inters).childNodes();
+        ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+        Iterator<DataNode> listIt = ints.iterator();
+        DataNode intLi1 = listIt.next();
+        validateDataNode(intLi1, "int-list", ns,
+                         MULTI_INSTANCE_NODE, true, null);
+        child = ((InnerNode) intLi1).childNodes();
+        ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+        it = ints.iterator();
+        DataNode id1 = it.next();
+        validateLeafDataNodeNs((LeafNode) id1, "virtual", ns3);
+        DataNode avail = it.next();
+        validateDataNode(avail, "available", ns,
+                         SINGLE_INSTANCE_NODE, true, null);
+
+        child = ((InnerNode) avail).childNodes();
+        ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+        it = ints.iterator();
+        validateLeafDataNodeNs((LeafNode) it.next(), "Loopback", ns2);
+        validateLeafDataNodeNs((LeafNode) it.next(), "Giga", ns);
+        validateLeafDataNodeNs((LeafNode) it.next(), "Ethernet", ns3);
+        DataNode intLi2 = listIt.next();
+
+        validateDataNode(intLi2, "int-list", ns,
+                         MULTI_INSTANCE_NODE, true, null);
+        child = ((InnerNode) intLi2).childNodes();
+        ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+        it = ints.iterator();
+        DataNode id2 = it.next();
+        validateLeafDataNodeNs((LeafNode) id2, "optical", ns);
+        DataNode availab2 = it.next();
+        validateDataNode(availab2, "available", ns,
+                         SINGLE_INSTANCE_NODE, true, null);
+
+        child = ((InnerNode) availab2).childNodes();
+        ints = new LinkedList<>();
+        for (Map.Entry<NodeKey, DataNode> c : child.entrySet()) {
+            ints.add(c.getValue());
+        }
+        it = ints.iterator();
+        validateLeafDataNodeNs((LeafNode) it.next(), "Giga", ns);
     }
 }
