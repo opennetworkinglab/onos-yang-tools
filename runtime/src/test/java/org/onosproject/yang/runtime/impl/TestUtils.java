@@ -61,6 +61,11 @@ public final class TestUtils implements DataNodeListener {
     public static final String LMNG = "yrt.Logistics-manager";
     public static final String LMNG_N = "Logistics-manager";
     public static final String TANY_NS = "yrt:list.test.anydata";
+    public static final String ACTN_SCHD_NS =
+            "urn:ietf:params:xml:ns:yang:actn-ietf-schedule";
+    public static final String ACTN_TE =
+            "urn:ietf:params:xml:ns:yang:actn-ietf-te";
+
     // Logger list is used for walker testing.
     private static final List<String> LOGGER = new ArrayList<>();
 

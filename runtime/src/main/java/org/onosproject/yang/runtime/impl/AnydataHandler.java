@@ -16,21 +16,15 @@
 
 package org.onosproject.yang.runtime.impl;
 
-import org.onosproject.yang.compiler.datamodel.AugmentedSchemaInfo;
-import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
-import org.onosproject.yang.compiler.datamodel.YangSchemaNodeContextInfo;
-import org.onosproject.yang.compiler.datamodel.YangVersionHolder;
-
-import java.util.Iterator;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.DOT_REGEX;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.INVAL_ANYDATA;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.QNAME_PRE;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.errorMsg;
+import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getTargetNode;
 import static org.onosproject.yang.runtime.RuntimeHelper.PERIOD;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.REV_REGEX;
-import static org.onosproject.yang.runtime.impl.YobConstants.DEFAULT;
 
 public final class AnydataHandler {
 
@@ -72,59 +66,7 @@ public final class AnydataHandler {
             throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, c));
         }
 
-        YangSchemaNode targetNode = getTargetNode(cn, paths, module, index + 1);
+        YangSchemaNode targetNode = getTargetNode(cn, module, index + 1);
         return targetNode;
-    }
-
-    /**
-     * Returns the targeted child node YANG schema from the given schema node.
-     *
-     * @param paths canonical name of class
-     * @param s     top level schema node
-     * @param index index of child in module
-     * @return targeted child node YANG schema
-     * @throws IllegalArgumentException when provided identifier is not
-     *                                  not valid
-     */
-    private static YangSchemaNode getTargetNode(
-            String cn, String[] paths, YangSchemaNode s,
-            int index) throws IllegalArgumentException {
-        int i = index;
-        YangSchemaNodeContextInfo info;
-        YangSchemaNode schema = s;
-
-        while (i < paths.length) {
-            Iterator<YangSchemaNodeContextInfo> it = schema.getYsnContextInfoMap()
-                    .values().iterator();
-            boolean isSuccess = false;
-            while (it.hasNext()) {
-                info = it.next();
-                schema = info.getSchemaNode();
-                if (schema instanceof SchemaDataNode) {
-                    String name = paths[i];
-                    if (i == paths.length - 1) {
-                        name = name.replaceFirst(DEFAULT, "");
-                    }
-                    if (schema.getJavaAttributeName().equalsIgnoreCase(name)) {
-                        isSuccess = true;
-                        break;
-                    }
-                }
-            }
-            if (!isSuccess) {
-                // In case of augment the node will not be found in above
-                // iteration.
-                if (i < paths.length - 1) {
-                    AugmentedSchemaInfo in = ((YangVersionHolder) s)
-                            .getAugmentedSchemaInfo(cn);
-                    i = in.getPosition();
-                    schema = in.getSchemaNode();
-                } else {
-                    throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, cn));
-                }
-            }
-            i++;
-        }
-        return schema;
     }
 }

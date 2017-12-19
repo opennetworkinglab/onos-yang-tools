@@ -35,6 +35,7 @@ import org.onosproject.yang.compiler.datamodel.YangDeviation;
 import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfo;
 import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
+import org.onosproject.yang.compiler.datamodel.YangGrouping;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangIfFeature;
 import org.onosproject.yang.compiler.datamodel.YangImport;
@@ -64,6 +65,7 @@ import org.onosproject.yang.compiler.datamodel.YangUnion;
 import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
 import org.onosproject.yang.compiler.datamodel.YangUnits;
 import org.onosproject.yang.compiler.datamodel.YangUses;
+import org.onosproject.yang.compiler.datamodel.YangVersionHolder;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.LeafType;
@@ -1607,5 +1609,56 @@ public final class DataModelUtils {
             }
         }
         throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, s));
+    }
+
+    /**
+     * Returns the targeted child node YANG schema from the given schema node.
+     *
+     * @param cn    canonical name of class
+     * @param s     top level schema node
+     * @param index index of child in module
+     * @return targeted child node YANG schema
+     * @throws IllegalArgumentException when provided identifier is not
+     *                                  not valid
+     */
+    public static YangNode getTargetNode(
+            String cn, YangSchemaNode s,
+            int index) throws IllegalArgumentException {
+        int i = index;
+        YangNode schema = (YangNode) s;
+        // canonical name of class element array spitted using '.' regex
+        String[] paths = cn.split(DOT_REGEX);
+        while (i < paths.length) {
+            boolean isSuccess = false;
+            schema = schema.getChild();
+            while (schema != null) {
+                if (schema instanceof SchemaDataNode || (schema instanceof
+                        YangGrouping && i != paths.length - 1)) {
+                    String name = paths[i];
+                    if (i == paths.length - 1) {
+                        name = name.replaceFirst(DEFAULT, "");
+                    }
+                    if (schema.getJavaAttributeName().equalsIgnoreCase(name)) {
+                        isSuccess = true;
+                        break;
+                    }
+                }
+                schema = schema.getNextSibling();
+            }
+            if (!isSuccess) {
+                // In case of augment the node will not be found in above
+                // iteration.
+                if (i < paths.length - 1) {
+                    AugmentedSchemaInfo in = ((YangVersionHolder) s)
+                            .getAugmentedSchemaInfo(cn);
+                    i = in.getPosition();
+                    schema = ((YangNode) in.getSchemaNode());
+                } else {
+                    throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, cn));
+                }
+            }
+            i++;
+        }
+        return schema;
     }
 }
