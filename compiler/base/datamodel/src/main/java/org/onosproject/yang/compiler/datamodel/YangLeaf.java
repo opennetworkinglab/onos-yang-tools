@@ -21,9 +21,9 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.LeafContextUtil;
 import org.onosproject.yang.model.DataNode.Type;
+import org.onosproject.yang.model.LeafObjectType;
 import org.onosproject.yang.model.LeafRestriction;
 import org.onosproject.yang.model.LeafSchemaContext;
-import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.YangNamespace;
@@ -661,7 +661,7 @@ public abstract class YangLeaf extends DefaultLocationInfo
 
 
     @Override
-    public LeafType getLeafType() {
+    public LeafObjectType getLeafObjectType() {
         return getLeafTypeByDataType(dataType, dataType.getDataType());
     }
 

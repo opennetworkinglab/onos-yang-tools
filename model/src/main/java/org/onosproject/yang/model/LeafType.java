@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present Open Networking Foundation
+ * Copyright 2017-present Open Networking Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,67 +17,158 @@
 package org.onosproject.yang.model;
 
 /**
- * Represents mapping of java data types with corresponding yang leaf's data
- * type.
+ * Represents ENUM to identify the effective built in data type.
  */
 public enum LeafType {
 
     /**
-     * Represents YANG "int8" mapped to JAVA "byte".
+     * Reference:RFC 6020.
+     * <p>
+     * int8 represents integer values between -128 and 127, inclusively.
      */
-    BYTE,
+    INT8,
 
     /**
-     * Represents YANG "int16", "uint8" mapped to JAVA "short".
+     * Reference:RFC 6020.
+     * <p>
+     * int16 represents integer values between -32768 and 32767, inclusively.
      */
-    SHORT,
+    INT16,
 
     /**
-     * Represents YANG "uint16", "int32" mapped to JAVA "int".
+     * Reference:RFC 6020.
+     * <p>
+     * int32 represents integer values between -2147483648 and 2147483647,
+     * inclusively.
      */
-    INT,
+    INT32,
 
     /**
-     * Represents YANG "uint32", "int64" mapped to JAVA "long".
+     * Reference:RFC 6020.
+     * <p>
+     * int64 represents integer values between -9223372036854775808 and
+     * 9223372036854775807, inclusively.
      */
-    LONG,
+    INT64,
 
     /**
-     * Represents YANG "boolean", "empty" mapped to JAVA "boolean".
+     * Reference:RFC 6020.
+     * <p>
+     * uint8 represents integer values between 0 and 255, inclusively.
      */
-    BOOLEAN,
+    UINT8,
 
     /**
-     * Represents YANG "bits", "identityref", "enumeration", "string" mapped to
-     * JAVA "String".
+     * Reference:RFC 6020.
+     * <p>
+     * uint16 represents integer values between 0 and 65535, inclusively.
+     */
+    UINT16,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * uint32 represents integer values between 0 and 4294967295, inclusively.
+     */
+    UINT32,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * uint64 represents integer values between 0 and 18446744073709551615,
+     * inclusively.
+     */
+    UINT64,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * The decimal64 type represents a subset of the real numbers, which can be
+     * represented by decimal numerals. The value space of decimal64 is the set
+     * of numbers that can be obtained by multiplying a 64-bit signed integer by
+     * a negative power of ten, i.e., expressible as "i x 10^-n" where i is an
+     * integer64 and n is an integer between 1 and 18, inclusively.
+     */
+    DECIMAL64,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * The string built-in type represents human-readable strings in YANG. Legal
+     * characters are tab, carriage return, line feed, and the legal characters
+     * of Unicode and ISO/IEC 10646
      */
     STRING,
 
     /**
-     * Represents YANG "uint64" mapped to JAVA "BigInteger".
+     * Reference:RFC 6020.
+     * <p>
+     * The boolean built-in type represents a boolean value.
      */
-    BIG_INTEGER,
+    BOOLEAN,
 
     /**
-     * Represents YANG "binary" mapped to JAVA "byte[]".
+     * Reference:RFC 6020.
+     * <p>
+     * The enumeration built-in type represents values from a set of assigned
+     * names.
      */
-    BYTE_ARRAY,
+    ENUMERATION,
 
     /**
-     * Represents YANG decimal64 mapped to JAVA BigDecimal.
-     * The decimal64 type represents a subset of the real numbers, which can
-     * be represented by decimal numerals. The value space of decimal64 is
-     * the set of numbers that can be obtained by multiplying a 64-bit
-     * signed integer by a negative power of ten, i.e., expressible as
-     * "i x 10^-n" where i is an integer64 and n is an integer between 1 and
-     * 18, inclusively.
+     * Reference:RFC 6020.
+     * <p>
+     * The bits built-in type represents a bit set. That is, a bits value is a
+     * set of flags identified by small integer position numbers starting at 0.
+     * Each bit number has an assigned name.
      */
-    BIG_DECIMAL,
+    BITS,
 
     /**
-     * Represents YANG union, in JAVA it's mapped to a custom generated
-     * class. LeafNode value would be of one among the other types
-     * listed in LeafType.
+     * Reference:RFC 6020.
+     * <p>
+     * The binary built-in type represents any binary data, i.e., a sequence of
+     * octets.
      */
-    UNION
+    BINARY,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * The identityref type is used to reference an existing identity.
+     */
+    IDENTITYREF,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * The empty built-in type represents a leaf that does not have any value,
+     * it conveys information by its presence or absence.
+     * <p>
+     * An empty type cannot have a default value.
+     */
+    EMPTY,
+
+    /**
+     * Reference:RFC 6020.
+     * <p>
+     * The instance-identifier built-in type is used to uniquely identify a
+     * particular instance node in the data tree.
+     * <p>
+     * The syntax for an instance-identifier is a subset of the XPath
+     * abbreviated syntax, formally defined by the rule "instance-identifier".
+     * It is used to uniquely identify a node in the data tree. Predicates are
+     * used only for specifying the values for the key nodes for list entries, a
+     * value of a leaf-list entry, or a positional index for a list without
+     * keys. For identifying list entries with keys, each predicate consists of
+     * one equality test per key, and each key MUST have a corresponding
+     * predicate.
+     * <p>
+     * If the leaf with the instance-identifier type represents configuration
+     * data, and the "require-instance" property is "true", the node it refers
+     * to MUST also represent configuration. Such a leaf puts a constraint on
+     * valid data. All such leaf nodes MUST reference existing nodes or leaf
+     * nodes with their default value in use for the data to be valid.
+     */
+    INSTANCE_IDENTIFIER,
 }

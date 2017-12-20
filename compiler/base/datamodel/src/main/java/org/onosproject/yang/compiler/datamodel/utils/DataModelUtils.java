@@ -68,7 +68,7 @@ import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.datamodel.YangVersionHolder;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
-import org.onosproject.yang.model.LeafType;
+import org.onosproject.yang.model.LeafObjectType;
 import org.onosproject.yang.model.SchemaId;
 
 import java.io.File;
@@ -106,15 +106,15 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.ENUMERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UNION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
-import static org.onosproject.yang.model.LeafType.BIG_DECIMAL;
-import static org.onosproject.yang.model.LeafType.BIG_INTEGER;
-import static org.onosproject.yang.model.LeafType.BOOLEAN;
-import static org.onosproject.yang.model.LeafType.BYTE;
-import static org.onosproject.yang.model.LeafType.BYTE_ARRAY;
-import static org.onosproject.yang.model.LeafType.INT;
-import static org.onosproject.yang.model.LeafType.LONG;
-import static org.onosproject.yang.model.LeafType.SHORT;
-import static org.onosproject.yang.model.LeafType.STRING;
+import static org.onosproject.yang.model.LeafObjectType.BIG_DECIMAL;
+import static org.onosproject.yang.model.LeafObjectType.BIG_INTEGER;
+import static org.onosproject.yang.model.LeafObjectType.BOOLEAN;
+import static org.onosproject.yang.model.LeafObjectType.BYTE;
+import static org.onosproject.yang.model.LeafObjectType.BYTE_ARRAY;
+import static org.onosproject.yang.model.LeafObjectType.INT;
+import static org.onosproject.yang.model.LeafObjectType.LONG;
+import static org.onosproject.yang.model.LeafObjectType.SHORT;
+import static org.onosproject.yang.model.LeafObjectType.STRING;
 
 /**
  * Represents utilities for data model tree.
@@ -124,20 +124,9 @@ public final class DataModelUtils {
     public static final String FALSE = "false";
     public static final String TYPEDEF = "Typedef";
     public static final String IDENTITY = "Identity";
-    private static final String SLASH = File.separator;
     public static final String FMT_NOT_EXIST =
             "Requested %s is not child in %s.";
-    private static final String E_DATATYPE = "Data type not supported.";
     public static final String E_ID = "Schema id should not be null.";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private static final String E_INVALID_REF = "YANG file error: A leaf " +
-            "reference, in unique, does not refer to a leaf under the list";
-    private static final String E_UNIQUE = "YANG file error: Same leaf " +
-            "cannot be mentioned more than one time in the unique statement";
-    private static final String E_TARGET_NODE = "YANG file error: The target" +
-            " node in unique reference path is invalid";
-    private static final String E_DATATREE = "Internal datamodel error: Datam" +
-            "odel tree is not correct";
     public static final String E_NOT_ALLOWED =
             "%s with the name %s in file %s at line %s is not allowed. Please" +
                     " avoid the %s extension in the name.";
@@ -148,6 +137,17 @@ public final class DataModelUtils {
     public static final String DEFAULT = "Default";
     public static final String INVAL_ANYDATA =
             "Requested %s is not valid node for anydata.";
+    private static final String SLASH = File.separator;
+    private static final String E_DATATYPE = "Data type not supported.";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final String E_INVALID_REF = "YANG file error: A leaf " +
+            "reference, in unique, does not refer to a leaf under the list";
+    private static final String E_UNIQUE = "YANG file error: Same leaf " +
+            "cannot be mentioned more than one time in the unique statement";
+    private static final String E_TARGET_NODE = "YANG file error: The target" +
+            " node in unique reference path is invalid";
+    private static final String E_DATATREE = "Internal datamodel error: Datam" +
+            "odel tree is not correct";
 
     /**
      * Creates a new data model tree utility.
@@ -1314,14 +1314,14 @@ public final class DataModelUtils {
     }
 
     /**
-     * Returns the yang leaf type for corresponding supplied data type.
+     * Returns the yang leaf object type for corresponding supplied data type.
      *
      * @param type     YANG type
      * @param dataType YANG data type
      * @return leaf type
      */
-    public static LeafType getLeafTypeByDataType(YangType type,
-                                                 YangDataTypes dataType) {
+    public static LeafObjectType getLeafTypeByDataType(YangType type,
+                                                       YangDataTypes dataType) {
 
         switch (dataType) {
             case BITS:
@@ -1359,7 +1359,7 @@ public final class DataModelUtils {
             case INSTANCE_IDENTIFIER:
                 return STRING;
             case UNION:
-                return LeafType.UNION;
+                return LeafObjectType.UNION;
 
             default:
                 throw new IllegalArgumentException(E_DATATYPE);

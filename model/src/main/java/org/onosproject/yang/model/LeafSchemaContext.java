@@ -23,11 +23,11 @@ package org.onosproject.yang.model;
 public interface LeafSchemaContext extends SchemaContext {
 
     /**
-     * Returns type of the leaf.
+     * Returns type of the leaf object.
      *
-     * @return value of leaf in object
+     * @return type of leaf object
      */
-    LeafType getLeafType();
+    LeafObjectType getLeafObjectType();
 
     /**
      * Returns the restrictions associated with leaf/leaf-list. Returns null

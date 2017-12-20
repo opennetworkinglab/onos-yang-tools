@@ -79,11 +79,11 @@ public final class LeafNode extends DataNode {
     @Override
     public String toString() {
         return "{" +
-                    "key=" + key() + ", " +
-                    "value=" + asString() +
-                    "valueNamespace=" + valueNamespace() +
-                    "leafType=" + String.valueOf(type) +
-               "}";
+                "key=" + key() + ", " +
+                "value=" + asString() +
+                "valueNamespace=" + valueNamespace() +
+                "leafType=" + leafType.toString() +
+                "}";
     }
 
     /**
