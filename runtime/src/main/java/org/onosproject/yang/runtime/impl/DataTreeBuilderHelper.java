@@ -132,6 +132,7 @@ public class DataTreeBuilderHelper {
      * @param curSchema current root node schema
      * @param builder   data node builder
      * @param obj       current root object
+     * @return data node builder
      */
     DataNode.Builder getDataTree(YangSchemaNode curSchema, DataNode.Builder builder,
                                  Object obj) {
@@ -903,6 +904,7 @@ public class DataTreeBuilderHelper {
      *
      * @param leafListVal set of values
      * @param leafList    YANG leaf list
+     * @return node builders for leaf list or null
      */
     List<DataNode.Builder> addLeafList(Set<Object> leafListVal,
                                        YangLeafList leafList) {
@@ -965,6 +967,7 @@ public class DataTreeBuilderHelper {
      *
      * @param yangLeaf YANG leaf
      * @param val      value for the leaf
+     * @return datanode builder created
      */
     DataNode.Builder createLeafNode(YangLeaf yangLeaf, Object val) {
         String valNamespace = getValNamespace(val, yangLeaf);

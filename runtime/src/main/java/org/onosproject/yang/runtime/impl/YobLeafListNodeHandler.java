@@ -57,8 +57,10 @@ class YobLeafListNodeHandler extends YobHandler {
     /**
      * Builds the object.
      *
+     * @param curWorkbench current work bench
      * @param registry YANG schema registry
      */
+    @Override
     void buildObject(YobWorkBench curWorkbench,
                             YangModelRegistry registry) {
         // For multi instance leaf no need to build an object.

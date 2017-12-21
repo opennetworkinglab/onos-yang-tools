@@ -737,6 +737,7 @@ public class TempJavaFragmentFiles {
      * @param attr      attribute
      * @param type      type
      * @param tempFiles temp fragment file
+     * @throws IOException on IO error
      */
     static void addBitsHandler(JavaAttributeInfo attr, YangType type,
                                TempJavaFragmentFiles tempFiles)

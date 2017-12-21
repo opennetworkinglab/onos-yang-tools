@@ -674,6 +674,7 @@ final class YobUtils {
      * Returns key leaf schema.
      *
      * @param keyleaf key leaf
+     * @param node to look in
      * @return node YANG schema node
      */
     static YangLeaf getKeyLeafSchema(KeyLeaf keyleaf, YangSchemaNode
@@ -699,6 +700,8 @@ final class YobUtils {
      * @param node YANG node
      * @param key  node key
      * @return model object id builder
+     * @param <T> list class type
+     * @param <K> key type
      */
     static <T extends InnerModelObject & MultiInstanceObject<K>,
             K extends KeyInfo<T>> ModelObjectId.Builder handleListKey(

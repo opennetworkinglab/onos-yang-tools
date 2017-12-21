@@ -35,7 +35,9 @@ public abstract class XmlSerializerHandler {
     /**
      * Sets the namespace and tag name in element tree maintained in stack.
      *
+     * @param dataNode data node
      * @param elementStack element tree stack
+     * @return Element
      */
     Element processXmlContext(DataNode dataNode,
                               Stack<Element> elementStack) {
@@ -49,6 +51,7 @@ public abstract class XmlSerializerHandler {
      * Returns the new element name by updating tag name and namespace.
      *
      * @param node YDT context node
+     * @param elementStack dom elements
      * @return new element name by updating tag name and namespace
      */
     Element updateNameAndNamespace(DataNode node,

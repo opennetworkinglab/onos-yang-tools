@@ -1171,6 +1171,7 @@ public final class MethodsGenerator {
      * Returns of method for enum class.
      *
      * @param className class name
+     * @param enumeration in yang
      * @param type      method body type
      * @return of method
      */
@@ -1573,6 +1574,7 @@ public final class MethodsGenerator {
      * Returns to string method for typedef.
      *
      * @param attr attribute name
+     * @param type in yang
      * @return to string method for typedef
      */
     static String getToStringForType(String attr, YangType type) {

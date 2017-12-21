@@ -33,7 +33,7 @@ public class RpcInput {
      */
     private DataNode data;
 
-    /**
+    /*
      * TODO
      * Any other meta data or contextual information
      * to help the RPC execution can be here.

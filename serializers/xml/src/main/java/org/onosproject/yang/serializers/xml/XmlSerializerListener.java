@@ -71,7 +71,7 @@ class XmlSerializerListener implements XmlListener {
     }
 
     /**
-     * Sets the composite data node builder.
+     * Returns the composite data node builder.
      *
      * @return composite data builder
      */
@@ -80,9 +80,9 @@ class XmlSerializerListener implements XmlListener {
     }
 
     /**
-     * Returns composite data builder.
+     * Sets composite data builder.
      *
-     * @return composite data builder
+     * @param cBuilder composite data builder
      */
     public void cBuilder(CompositeData.Builder cBuilder) {
         this.cBuilder = cBuilder;

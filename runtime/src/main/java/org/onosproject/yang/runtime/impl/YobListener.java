@@ -63,6 +63,7 @@ class YobListener implements DataNodeListener {
     /**
      * Creates an instance of YANG object builder listener.
      *
+     * @param node last index schema node
      * @param reg YANG model registry
      */
     public YobListener(YangSchemaNode node, DefaultYangModelRegistry reg) {

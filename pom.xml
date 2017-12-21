@@ -30,7 +30,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <onos-build-conf.version>1.3</onos-build-conf.version>
+        <onos-build-conf.version>1.12.0</onos-build-conf.version>
         <guava.version>22.0</guava.version>
     </properties>
 
@@ -126,13 +126,14 @@
                     <testSourceDirectory>${project.build.testSourceDirectory}
                     </testSourceDirectory>
                     <!-- end: workaround for unexpected NullPointerException on Eclipse -->
-                    <configLocation>onos/checkstyle.xml</configLocation>
+                    <configLocation>onos/checkstyle-mvn.xml</configLocation>
                     <suppressionsLocation>onos/suppressions.xml
                     </suppressionsLocation>
                     <failsOnError>false</failsOnError>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <includeTestSourceDirectory>true
                     </includeTestSourceDirectory>
+                    <headerLocation>onos/apache2-java.header</headerLocation>
                 </configuration>
                 <executions>
                     <execution>

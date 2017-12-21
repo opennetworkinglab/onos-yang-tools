@@ -540,6 +540,7 @@ public final class SerializerHelper {
      * @param name      name of the child node
      * @param namespace namespace of the child node
      * @return schema context
+     * @throws IllegalArgumentException on argument error
      */
     public static SchemaContext getChildSchemaContext(
             SchemaContext context, String name, String namespace)

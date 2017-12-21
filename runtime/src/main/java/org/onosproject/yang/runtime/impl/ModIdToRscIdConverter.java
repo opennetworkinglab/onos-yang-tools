@@ -145,6 +145,7 @@ class ModIdToRscIdConverter {
      * the module schema fetchNode from model registry.
      *
      * @param pkg package for child node
+     * @return first matching module schema
      */
     YangSchemaNode fetchModuleNode(String pkg) {
         YangSchemaNode modNode;

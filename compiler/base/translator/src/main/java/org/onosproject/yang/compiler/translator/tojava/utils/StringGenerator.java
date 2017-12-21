@@ -1060,8 +1060,9 @@ public final class StringGenerator {
     /**
      * Returns string for service class.
      *
-     * @param name1 name of even listener class
-     * @param name2 name of even class
+     * @param name1 name of event listener class
+     * @param type name of service
+     * @param name2 name of event class
      * @return listener service string for service class
      */
     static String getEventExtendsString(String name1, String type,
@@ -1090,6 +1091,7 @@ public final class StringGenerator {
      * Returns static modifier string.
      *
      * @param modifier modifier
+     * @param keyWord keyword
      * @return static modifier string
      */
     static String getSpecificModifier(String modifier, String keyWord) {
@@ -1377,6 +1379,7 @@ public final class StringGenerator {
      * @param name     class name
      * @param attrName attribute name
      * @param attrType attribute type
+     * @param genType java file generation type
      * @return setter string
      */
     static String getSetterInterfaceString(String name,

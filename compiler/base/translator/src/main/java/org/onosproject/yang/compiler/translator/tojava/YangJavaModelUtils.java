@@ -532,6 +532,7 @@ public final class YangJavaModelUtils {
      *
      * @param curNode current java node whose package string needs to be set
      * @return returns the root package string
+     * @throws TranslatorException on error
      */
     public static String getCurNodePackage(YangNode curNode)
             throws TranslatorException {
