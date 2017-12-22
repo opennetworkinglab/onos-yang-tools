@@ -98,7 +98,7 @@ public abstract class YangNotification
         extends YangNode
         implements YangLeavesHolder, YangCommonInfo, Parsable, CollisionDetector,
         YangAugmentableNode, YangIfFeatureHolder, InvalidOpTypeHolder,
-        SingleInstanceNodeContext, DefaultDenyAllExtension {
+        SingleInstanceNodeContext, SchemaDataNode, DefaultDenyAllExtension {
 
     private static final long serialVersionUID = 806201611L;
 

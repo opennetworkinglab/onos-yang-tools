@@ -1,5 +1,5 @@
 {
-  "identity-test:con": {
+  "identity-test:con1": {
     "identity-test:interface": "identity-types:physical",
     "identity-test:interfaces": {
       "int-list": [

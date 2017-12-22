@@ -21,7 +21,6 @@ import org.onosproject.yang.compiler.datamodel.YangContainer;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeaf;
 import org.onosproject.yang.compiler.datamodel.YangModule;
-import org.onosproject.yang.model.YangNamespace;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangNotification;
 import org.onosproject.yang.compiler.datamodel.YangOutput;
@@ -55,6 +54,7 @@ import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaId;
+import org.onosproject.yang.model.YangNamespace;
 import org.onosproject.yang.runtime.mockclass.testmodule.DefaultTestNotification;
 import org.onosproject.yang.runtime.mockclass.testmodule.testnotification.DefaultTestContainer;
 import org.onosproject.yang.runtime.mockclass.testmodule.testrpc.DefaultTestInput;
@@ -128,7 +128,7 @@ public class MoIdToRscIdTest {
     @Test
     public void nullMoId() {
         setUp();
-        rscId = builder.fetchResourceId(null);
+        rscId = builder.fetchResourceId(null).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(1, is(nodeKeys.size()));
 
@@ -144,7 +144,7 @@ public class MoIdToRscIdTest {
     public void emptyMoId() {
         setUp();
         mid = ModelObjectId.builder().build();
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(1, is(nodeKeys.size()));
 
@@ -162,7 +162,7 @@ public class MoIdToRscIdTest {
         mid = ModelObjectId.builder()
                 .addChild(YtbModuleWithLeafList.LeafIdentifier.TIME, 0)
                 .build();
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(2, is(nodeKeys.size()));
 
@@ -182,7 +182,7 @@ public class MoIdToRscIdTest {
     public void moIdWithContainer() {
         setUp();
         mid = ModelObjectId.builder().addChild(DefaultCont53.class).build();
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(2, is(nodeKeys.size()));
 
@@ -203,7 +203,7 @@ public class MoIdToRscIdTest {
         setUp();
         mid = ModelObjectId.builder().addChild(DefaultCont53.class)
                 .addChild(Cont53.LeafIdentifier.LEAF55).build();
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
 
@@ -230,7 +230,7 @@ public class MoIdToRscIdTest {
         mid = new ModelObjectId.Builder()
                 .addChild(DefaultList56.class, key).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(2, is(nodeKeys.size()));
 
@@ -255,7 +255,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultContainerLeaf.class)
                 .addChild(AugmentedContainerLeaf.LeafIdentifier.LEAFAUG)
                 .build();
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
 
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
@@ -280,7 +280,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultList56.class, key)
                 .addChild(List56.LeafIdentifier.LEAF57, 10).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
 
@@ -312,7 +312,7 @@ public class MoIdToRscIdTest {
         mid = new ModelObjectId.Builder()
                 .addChild(DefaultTestInput.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
 
@@ -342,7 +342,7 @@ public class MoIdToRscIdTest {
                                   .testrpc.testinput.DefaultTestContainer.class)
                 .build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
 
@@ -374,7 +374,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultTestOutput.class)
                 .build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
 
@@ -401,7 +401,7 @@ public class MoIdToRscIdTest {
         mid = new ModelObjectId.Builder()
                 .addChild(DefaultTestNotification.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(2, is(nodeKeys.size()));
 
@@ -426,7 +426,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultTestNotification.class)
                 .addChild(DefaultTestContainer.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
 
@@ -454,7 +454,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultMultiplexes.class, keys1)
                 .addChild(DefaultApplicationAreas.class, key2).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
         String nameSpace = "yms:test:ytb:tree:builder:for:list:having:list";
@@ -485,7 +485,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultList56.class, keys)
                 .addChild(DefaultCont56.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
         String nameSpace = "modelObjectTest";
@@ -509,7 +509,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultCont56.class)
                 .addChild(Cont56.LeafIdentifier.CL56).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
 
@@ -538,7 +538,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultList56.class, keys)
                 .addChild(DefaultCont56.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(3, is(nodeKeys.size()));
         String nameSpace = "modelObjectTest";
@@ -562,7 +562,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultCont56.class)
                 .addChild(Cont56.LeafIdentifier.CL56).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
 
@@ -587,7 +587,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultCont56.class)
                 .addChild(DefaultCont57.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(4, is(nodeKeys.size()));
 
@@ -623,7 +623,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultCont57.class)
                 .addChild(DefaultCont58.class).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(5, is(nodeKeys.size()));
 
@@ -657,7 +657,7 @@ public class MoIdToRscIdTest {
                 .addChild(DefaultCont57.class)
                 .addChild(DefaultList57.class, keys1).build();
 
-        rscId = builder.fetchResourceId(mid);
+        rscId = builder.fetchResourceId(mid).build();
         nodeKeys = rscId.nodeKeys();
         assertThat(5, is(nodeKeys.size()));
 

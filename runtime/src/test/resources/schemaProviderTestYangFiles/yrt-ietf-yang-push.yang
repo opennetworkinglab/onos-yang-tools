@@ -1,10 +1,6 @@
  module yrt-ietf-yang-push {
-    /*
-     * ---------------------------------------------------
-     * Not Supported
+
     yang-version 1.1;
-     * ---------------------------------------------------
-     */
     namespace "urn:ietf:params:xml:ns:yang:yrt-ietf-yang-push";
     prefix yp;
 
@@ -435,10 +431,7 @@
            data. Such a push-update might also be triggered by a
            subscriber requesting an on-demand synchronization.";
       }
-      /*
-       * --------------------------------------------------------------------
-       * datastore-changes not currently supported.
-       * Will replace datastore-change-string in a future release.
+
       anydata datastore-changes {
         description
           "This contains datastore contents that has changed
@@ -450,9 +443,7 @@
            state (and assuming yang-patch could also be applied to
            operational data).";
       }
-       *
-       * --------------------------------------------------------------------
-       */
+
       leaf datastore-changes-string {
         type string;
         description

@@ -18,6 +18,8 @@ package org.onosproject.yang.model;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -28,7 +30,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class Anydata extends InnerModelObject {
 
-    private final ConcurrentMap<Class<? extends InnerModelObject>, InnerModelObject> anydatas =
+    private final ConcurrentMap<Class<? extends InnerModelObject>,
+            List<InnerModelObject>> anydatas =
             new ConcurrentHashMap<>();
 
     /**
@@ -37,7 +40,20 @@ public abstract class Anydata extends InnerModelObject {
      * @param obj model object of anydata
      */
     public void addAnydata(InnerModelObject obj) {
-        anydatas.put(obj.getClass(), obj);
+        List<InnerModelObject> node = anydatas.get(obj.getClass());
+        if (node != null && !node.isEmpty()) {
+            if (node.get(0) instanceof MultiInstanceObject && obj instanceof
+                    MultiInstanceObject) {
+                node.add(obj);
+            } else {
+                throw new IllegalArgumentException(
+                        "ANYDATA error: Object already exist");
+            }
+        } else {
+            node = new ArrayList<>();
+            node.add(obj);
+        }
+        anydatas.put(obj.getClass(), node);
     }
 
     /**
@@ -54,18 +70,17 @@ public abstract class Anydata extends InnerModelObject {
      *
      * @return map of anydatas
      */
-    public Map<Class<? extends InnerModelObject>, InnerModelObject> anydatas() {
+    public Map<Class<? extends InnerModelObject>, List<InnerModelObject>> anydatas() {
         return ImmutableMap.copyOf(anydatas);
     }
 
     /**
      * Returns the anydata for to a given anydata class.
      *
-     * @param c   anydata class
-     * @param <T> anydata class type
+     * @param c any class which extends the InnerModelObject
      * @return anydata object if available, null otherwise
      */
-    public <T extends InnerModelObject> T anydata(Class<T> c) {
-        return (T) anydatas.get(c);
+    public List<InnerModelObject> anydata(Class<? extends InnerModelObject> c) {
+        return anydatas.get(c);
     }
 }

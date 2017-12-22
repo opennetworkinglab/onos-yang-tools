@@ -117,7 +117,7 @@ class DefaultDataTreeBuilder {
 
         //Create resource identifier.
         ModIdToRscIdConverter converter = new ModIdToRscIdConverter(reg);
-        rscData.resourceId(converter.fetchResourceId(id));
+        rscData.resourceId(converter.fetchResourceId(id).build());
         YangSchemaNode lastIndexNode = converter.getLastIndexNode();
 
         //If module object list is empty or null then we just need to

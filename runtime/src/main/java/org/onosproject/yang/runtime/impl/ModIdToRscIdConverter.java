@@ -91,16 +91,16 @@ class ModIdToRscIdConverter {
 
 
     /**
-     * Fetch resource identifier from model object identifier.
+     * Fetch resource identifier builder from model object identifier.
      *
      * @param id model object identifier
-     * @return resource identifier from model object identifier
+     * @return resource identifier builder from model object identifier
      */
-    ResourceId fetchResourceId(ModelObjectId id) {
+    ResourceId.Builder fetchResourceId(ModelObjectId id) {
 
         ResourceId.Builder rid = ResourceId.builder().addBranchPointSchema("/", null);
         if (id == null || id.atomicPaths().isEmpty()) {
-            return rid.build();
+            return rid;
         }
 
         List<AtomicPath> paths = id.atomicPaths();
@@ -121,7 +121,7 @@ class ModIdToRscIdConverter {
             lastIndexNode = fetchModNodeFromLeaf(identifier.getClass().getName());
             if (lastIndexNode != null) {
                 handleLeafInRid(lastIndexNode, id, rid, path);
-                return rid.build();
+                return rid;
             }
         }
 
@@ -202,9 +202,9 @@ class ModIdToRscIdConverter {
      *
      * @param id      model object identifier
      * @param builder resource id builder
-     * @return resource identifier
+     * @return resource identifier builder
      */
-    private ResourceId convertToResourceId(ModelObjectId id, YangSchemaNode
+    private ResourceId.Builder convertToResourceId(ModelObjectId id, YangSchemaNode
             modNode, ResourceId.Builder builder) {
         List<AtomicPath> paths = id.atomicPaths();
         Iterator<AtomicPath> it = paths.iterator();
@@ -239,18 +239,20 @@ class ModIdToRscIdConverter {
                 } else if (curNode != null) {
 
                     builder.addBranchPointSchema(curNode.getName(), curNode
-                                                 .getNameSpace().getModuleNamespace());
+                            .getNameSpace().getModuleNamespace());
                     //list node can have key leaf in it. so resource identifier
                     // should have key leaves also.
                     if (curNode instanceof YangList) {
                         YangList list = (YangList) curNode;
                         MultiInstanceNode mil = (MultiInstanceNode) path;
                         Object keysObj = mil.key();
-                        Set<String> keys = list.getKeyLeaf();
-                        for (String key : keys) {
-                            Object obj = getKeyObject(keysObj, key, list);
-                            builder.addKeyLeaf(key, list.getNameSpace()
-                                               .getModuleNamespace(), obj);
+                        if (keysObj != null) {
+                            Set<String> keys = list.getKeyLeaf();
+                            for (String key : keys) {
+                                Object obj = getKeyObject(keysObj, key, list);
+                                builder.addKeyLeaf(key, list.getNameSpace()
+                                        .getModuleNamespace(), obj);
+                            }
                         }
                     }
                 } else {
@@ -266,7 +268,8 @@ class ModIdToRscIdConverter {
             // identifier. model object will be an object for last index node.
             lastIndexNode = curNode;
         }
-        return builder.build();
+        builder.appInfo(curNode);
+        return builder;
     }
 
     private void handleLeafInRid(YangSchemaNode preNode, ModelObjectId id,

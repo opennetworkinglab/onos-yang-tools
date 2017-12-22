@@ -7,7 +7,7 @@
   -->
 
 <test xmlns="identity:ns:test:json:ser" operation="create">
-    <con>
+    <con1>
         <interface>physical</interface>
-    </con>
+    </con1>
 </test>

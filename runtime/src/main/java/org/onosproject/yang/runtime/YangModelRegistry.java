@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.runtime;
 
+import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.model.YangModuleId;
@@ -40,7 +41,8 @@ public interface YangModelRegistry {
             throws IllegalArgumentException;
 
     /**
-     * Registers the given generated node class under provided anydata class.
+     * Registers the given generated node referenced by given model object
+     * identifier under provided anydata model object identifier.
      *
      * @param id  identifier to reference anydata container under which
      *            application is expecting the data
@@ -49,7 +51,7 @@ public interface YangModelRegistry {
      * @throws IllegalArgumentException when provided identifier is not
      *                                  not valid
      */
-    void registerAnydataSchema(Class id, Class id1)
+    void registerAnydataSchema(ModelObjectId id, ModelObjectId id1)
             throws IllegalArgumentException;
 
     /**

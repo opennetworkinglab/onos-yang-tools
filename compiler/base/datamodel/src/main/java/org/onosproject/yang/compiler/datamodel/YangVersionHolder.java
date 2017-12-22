@@ -28,15 +28,4 @@ public interface YangVersionHolder {
      * @return the version
      */
     String getVersion();
-
-    /**
-     * Returns the augmented node schema info for given class canonical name.
-     *
-     * @param s class canonical name
-     * @return augmented node schema info
-     * @throws IllegalArgumentException when provided class canonical name is
-     *                                  not valid augment node path
-     */
-    AugmentedSchemaInfo getAugmentedSchemaInfo(String s)
-            throws IllegalArgumentException;
 }

@@ -574,7 +574,7 @@ public abstract class YangUses
     }
 
     @Override
-    public YangNode clone(YangUses node, boolean isDeviation) throws
+    public YangNode clone(YangUses node, boolean isDeviation, boolean isAnyData) throws
             CloneNotSupportedException {
         YangNode clnNode = (YangNode) super.clone();
         clnNode.setParent(null);

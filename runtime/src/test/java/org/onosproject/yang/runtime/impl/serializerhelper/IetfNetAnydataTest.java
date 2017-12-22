@@ -17,13 +17,17 @@
 package org.onosproject.yang.runtime.impl.serializerhelper;
 
 import org.junit.Test;
-import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.Node;
-import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
-import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.Mydata2;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.DefaultNode;
+import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
+import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.DefaultC1;
+import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.DefaultMydata2;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.ListKey;
+import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.runtime.HelperContext;
@@ -118,8 +122,22 @@ public class IetfNetAnydataTest {
         dBlr = addDataNode(dBlr, "c1", TANY_NS, value, null);
         // Adding anydata container
         dBlr = addDataNode(dBlr, "mydata2", TANY_NS, value, null);
-        context.getRegistry().registerAnydataSchema(Mydata2.class, Node.class);
-        context.getRegistry().registerAnydataSchema(Mydata2.class, Link.class);
+        ModelObjectId id = new ModelObjectId.Builder()
+                .addChild(DefaultC1.class).addChild(DefaultMydata2.class)
+                .build();
+        ModelObjectId id1 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultNode.class, null)
+                .build();
+        ModelObjectId id2 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultLink.class, null)
+                .build();
+        context.getRegistry().registerAnydataSchema(id, id1);
+        context.getRegistry().registerAnydataSchema(id, id2);
+
         // Adding list inside anydata container
         dBlr = addDataNode(dBlr, "link", TOPONS, value, null);
         value = "link-id";

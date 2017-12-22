@@ -27,6 +27,7 @@ import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.SingleInstanceNodeContext;
@@ -58,7 +59,6 @@ import static org.onosproject.yang.runtime.RuntimeHelper.getInterfaceClassName;
 import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getSelfNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getServiceName;
-import static org.onosproject.yang.runtime.impl.AnydataHandler.getSchemaNode;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.AT;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.E_MEXIST;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NEXIST;
@@ -169,11 +169,12 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     }
 
     @Override
-    public void registerAnydataSchema(Class ac, Class cc) throws
+    public void registerAnydataSchema(ModelObjectId ac, ModelObjectId cc) throws
             IllegalArgumentException {
-        YangSchemaNode anySchema = getSchemaNode(ac, this);
+        ModIdToRscIdConverter idConverter = new ModIdToRscIdConverter(this);
+        YangSchemaNode anySchema = ((YangSchemaNode) idConverter.fetchResourceId(ac).appInfo());
         if (anySchema != null && anySchema.getYangSchemaNodeType() == YANG_ANYDATA_NODE) {
-            YangSchemaNode cSchema = getSchemaNode(cc, this);
+            YangSchemaNode cSchema = ((YangSchemaNode) idConverter.fetchResourceId(cc).appInfo());
             if (cSchema != null) {
                 YangSchemaNode clonedNode = anySchema.addSchema(cSchema);
                 updateTreeContext(clonedNode, null, false, false);

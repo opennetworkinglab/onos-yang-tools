@@ -1,5 +1,5 @@
 <test xmlns="identity:ns:test:json:ser" operation="create">
-    <con>
+    <con1>
         <interface xmlns:types="identity:list:ns:test:json:ser">types:physical</interface>
         <interfaces>
             <int-list>
@@ -17,5 +17,5 @@
                 </available>
             </int-list>
         </interfaces>
-    </con>
+    </con1>
 </test>

@@ -65,7 +65,17 @@ public final class TestUtils implements DataNodeListener {
             "urn:ietf:params:xml:ns:yang:actn-ietf-schedule";
     public static final String ACTN_TE =
             "urn:ietf:params:xml:ns:yang:actn-ietf-te";
-
+    public static final String PUSH_NS =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-yang-push";
+    public static final String PATCH_NS =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-yang-patch";
+    public static final String INTERF_NS =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-interfaces";
+    public static final String NOTIF_NS = "http://example.com/event";
+    public static final String OTN_TUNN =
+            "urn:ietf:params:xml:ns:yang:yrt-ietf-otn-tunnel";
+    public static final String ACTN_TE_TYPES =
+            "urn:ietf:params:xml:ns:yang:actn-ietf-te-types";
     // Logger list is used for walker testing.
     private static final List<String> LOGGER = new ArrayList<>();
 

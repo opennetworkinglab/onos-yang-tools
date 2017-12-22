@@ -16,7 +16,6 @@
 
 package org.onosproject.yang.compiler.datamodel.utils;
 
-import org.onosproject.yang.compiler.datamodel.AugmentedSchemaInfo;
 import org.onosproject.yang.compiler.datamodel.CollisionDetector;
 import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.DefaultYangNamespace;
@@ -35,7 +34,6 @@ import org.onosproject.yang.compiler.datamodel.YangDeviation;
 import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfo;
 import org.onosproject.yang.compiler.datamodel.YangEntityToResolveInfoImpl;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
-import org.onosproject.yang.compiler.datamodel.YangGrouping;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangIfFeature;
 import org.onosproject.yang.compiler.datamodel.YangImport;
@@ -58,14 +56,12 @@ import org.onosproject.yang.compiler.datamodel.YangReferenceResolver;
 import org.onosproject.yang.compiler.datamodel.YangResolutionInfo;
 import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
-import org.onosproject.yang.compiler.datamodel.YangSchemaNodeContextInfo;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNodeIdentifier;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
 import org.onosproject.yang.compiler.datamodel.YangUniqueHolder;
 import org.onosproject.yang.compiler.datamodel.YangUnits;
 import org.onosproject.yang.compiler.datamodel.YangUses;
-import org.onosproject.yang.compiler.datamodel.YangVersionHolder;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.LeafObjectType;
@@ -105,7 +101,6 @@ import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.Yang
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.EMPTY;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.ENUMERATION;
 import static org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes.UNION;
-import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.model.LeafObjectType.BIG_DECIMAL;
 import static org.onosproject.yang.model.LeafObjectType.BIG_INTEGER;
 import static org.onosproject.yang.model.LeafObjectType.BOOLEAN;
@@ -1527,138 +1522,5 @@ public final class DataModelUtils {
                 node.getFileName() + " at line " + node.getLineNumber() +
                 " is already present " + "in file " + oldNode.getFileName() +
                 " at " + "line " + oldNode.getLineNumber() + "" + ".";
-    }
-
-    /**
-     * Returns the augmented node schema info for given class canonical name.
-     *
-     * @param s                     class canonical name
-     * @param augmentResolutionList augment resolution list
-     * @return augmented node schema info
-     * @throws IllegalArgumentException when provided class canonical name is
-     *                                  not valid augment node path
-     */
-    public static AugmentedSchemaInfo getAugSchemaInfo(
-            String s, List<YangResolutionInfo> augmentResolutionList)
-            throws IllegalArgumentException {
-        String[] p1 = s.split(DOT_REGEX);
-
-        Iterator<YangResolutionInfo> it = augmentResolutionList.iterator();
-        while (it.hasNext()) {
-            YangNode node = ((YangNode) it.next().getEntityToResolveInfo()
-                    .getEntityToResolve());
-            String as = node.getJavaPackage();
-            // Splitting the augmented node package using '.'
-            String[] p2 = as.split(DOT_REGEX);
-            int i = p2.length;
-            int p1Len = p1.length;
-            StringBuilder sb = new StringBuilder();
-
-            /*
-             * This is to avoid unnecessary iteration if the entity to
-             * resolve splitted array last node is same as package need to be
-             * found last node then only proceed else go to next iteration.
-             *
-             * for example: if given class canonical name is
-             *  org.onosproject.yang.gen.v1.yrtnetworktopology
-             * .rev20151208.yrtnetworktopology.networks.network
-             * .augmentedndnetwork.Link
-             *
-             * so search needs to be till org.onosproject.yang.gen.v1
-             * .yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network
-             * where the augmentedndnetwork represents the java name of the node
-             */
-            if (i <= p1Len - 2 && p2[i - 1].equals(p1[i - 1])) {
-                sb.append(QNAME_PRE);
-                for (int j = 4; j < i; j++) {
-                    sb.append(PERIOD);
-                    sb.append(p1[j]);
-                }
-                if (sb.toString().equals(as)) {
-                    int targetndex = i + 1;
-                    String name = p1[targetndex];
-
-                    // check for the last node does it starts with "Default"
-                    if (targetndex == p1Len - 1) {
-                        name = name.replaceFirst(DEFAULT, "");
-                    }
-
-                    /*
-                     * Once node is found then iterating threw the ysn context
-                     * info map to find targeted node
-                     */
-
-                    Map<YangSchemaNodeIdentifier, YangSchemaNodeContextInfo> m =
-                            node.getYsnContextInfoMap();
-                    if (!m.isEmpty()) {
-                        Iterator<YangSchemaNodeContextInfo> mapIt =
-                                m.values().iterator();
-                        while (mapIt.hasNext()) {
-                            YangSchemaNodeContextInfo in = mapIt.next();
-                            YangSchemaNode schema = in.getSchemaNode();
-                            if (schema instanceof SchemaDataNode) {
-                                if (schema.getJavaAttributeName()
-                                        .equalsIgnoreCase(name)) {
-                                    return new AugmentedSchemaInfo(
-                                            schema, targetndex);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, s));
-    }
-
-    /**
-     * Returns the targeted child node YANG schema from the given schema node.
-     *
-     * @param cn    canonical name of class
-     * @param s     top level schema node
-     * @param index index of child in module
-     * @return targeted child node YANG schema
-     * @throws IllegalArgumentException when provided identifier is not
-     *                                  not valid
-     */
-    public static YangNode getTargetNode(
-            String cn, YangSchemaNode s,
-            int index) throws IllegalArgumentException {
-        int i = index;
-        YangNode schema = (YangNode) s;
-        // canonical name of class element array spitted using '.' regex
-        String[] paths = cn.split(DOT_REGEX);
-        while (i < paths.length) {
-            boolean isSuccess = false;
-            schema = schema.getChild();
-            while (schema != null) {
-                if (schema instanceof SchemaDataNode || (schema instanceof
-                        YangGrouping && i != paths.length - 1)) {
-                    String name = paths[i];
-                    if (i == paths.length - 1) {
-                        name = name.replaceFirst(DEFAULT, "");
-                    }
-                    if (schema.getJavaAttributeName().equalsIgnoreCase(name)) {
-                        isSuccess = true;
-                        break;
-                    }
-                }
-                schema = schema.getNextSibling();
-            }
-            if (!isSuccess) {
-                // In case of augment the node will not be found in above
-                // iteration.
-                if (i < paths.length - 1) {
-                    AugmentedSchemaInfo in = ((YangVersionHolder) s)
-                            .getAugmentedSchemaInfo(cn);
-                    i = in.getPosition();
-                    schema = ((YangNode) in.getSchemaNode());
-                } else {
-                    throw new IllegalArgumentException(errorMsg(INVAL_ANYDATA, cn));
-                }
-            }
-            i++;
-        }
-        return schema;
     }
 }

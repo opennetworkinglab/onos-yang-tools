@@ -1,0 +1,14 @@
+module event {
+
+    namespace "http://example.com/event";
+    prefix "ev";
+
+    notification event {
+        container c {
+            leaf event-class {
+                type string;
+            }
+        }
+    }
+}
+

@@ -21,6 +21,7 @@ import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
+import org.onosproject.yang.compiler.datamodel.YangAugmentableNode;
 import org.onosproject.yang.compiler.datamodel.YangInput;
 import org.onosproject.yang.compiler.datamodel.YangLeavesHolder;
 import org.onosproject.yang.compiler.datamodel.YangNode;
@@ -34,6 +35,7 @@ import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
 import static org.onosproject.yang.compiler.datamodel.TraversalType.PARENT;
@@ -146,6 +148,19 @@ public final class JavaCodeGeneratorUtil {
                             if (codeGenNode instanceof YangLeavesHolder ||
                                     codeGenNode instanceof SchemaDataNode) {
                                 codeGenNode.setParentContext();
+                                if (!translateComplete && codeGenNode
+                                        instanceof YangAugmentableNode) {
+                                    List<YangAugment> augList =
+                                            ((YangAugmentableNode) codeGenNode)
+                                                    .getAugmentedInfoList();
+                                    if (augList != null && !augList.isEmpty()) {
+                                        for (YangAugment a : augList) {
+                                            a.setLeafNameSpaceAndAddToParentSchemaMap();
+                                            a.setLeafParentContext();
+                                            processAugNode((YangAugment) a);
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {

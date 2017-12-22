@@ -17,19 +17,21 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.junit.Test;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.DefaultNode;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.Node;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.node.SupportingNode;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
-import org.onosproject.yang.gen.v1.ytbaugmentfromanotherfile.rev20160826.ytbaugmentfromanotherfile.networks.network.node.augmentedndnode.terminationpoint.SupportingTerminationPoint;
 import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.DefaultC1;
 import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.DefaultMydata2;
-import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.Mydata2;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultResourceData;
+import org.onosproject.yang.model.InnerModelObject;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
+import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.ResourceData;
 
 import java.util.List;
@@ -59,9 +61,21 @@ public class YobAnydataTest {
         dBlr = addDataNode(dBlr, "c1", TANY_NS, value, null);
         // Adding anydata container
         dBlr = addDataNode(dBlr, "mydata2", TANY_NS, value, null);
-        context.getRegistry().registerAnydataSchema(Mydata2.class, Node.class);
-        context.getRegistry().registerAnydataSchema(Mydata2.class, DefaultLink.class);
-        context.getRegistry().registerAnydataSchema(Mydata2.class, SupportingTerminationPoint.class);
+        ModelObjectId id = new ModelObjectId.Builder()
+                .addChild(DefaultC1.class).addChild(DefaultMydata2.class)
+                .build();
+        ModelObjectId id1 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultNode.class, null)
+                .build();
+        ModelObjectId id2 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultLink.class, null)
+                .build();
+        context.getRegistry().registerAnydataSchema(id, id1);
+        context.getRegistry().registerAnydataSchema(id, id2);
 
         // Adding list inside anydata container
         dBlr = addDataNode(dBlr, "link", NW_TOPO_NAME_SPACE, value, null);
@@ -116,13 +130,13 @@ public class YobAnydataTest {
         DefaultC1 c1 = ((DefaultC1) modelObject);
         DefaultMydata2 mydata2 = ((DefaultMydata2) c1.mydata2());
 
-        Link link = mydata2.anydata(DefaultLink.class);
-        assertThat(link.linkId().toString(), is("link-id"));
-        assertThat(link.source().sourceNode().toString(), is("source-node"));
+        List<InnerModelObject> link = mydata2.anydata(DefaultLink.class);
+        assertThat(((Link) link.get(0)).linkId().toString(), is("link-id"));
+        assertThat(((Link) link.get(0)).source().sourceNode().toString(), is("source-node"));
 
-        Node node = mydata2.anydata(DefaultNode.class);
-        assertThat(node.nodeId().toString(), is("node1"));
-        SupportingNode snode = (SupportingNode) node.supportingNode().get(0);
+        List<InnerModelObject> node = mydata2.anydata(DefaultNode.class);
+        assertThat(((Node) node.get(0)).nodeId().toString(), is("node1"));
+        SupportingNode snode = ((Node) node.get(0)).supportingNode().get(0);
         assertThat(snode.networkRef().toString(), is("network3"));
         assertThat(snode.nodeRef().toString(), is("network4"));
     }

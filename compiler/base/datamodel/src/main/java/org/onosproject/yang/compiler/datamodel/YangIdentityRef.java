@@ -293,7 +293,7 @@ public class YangIdentityRef
     }
 
     @Override
-    public YangNode clone(YangUses yangUses, boolean isDeviation)
+    public YangNode clone(YangUses yangUses, boolean isDeviation, boolean isAnyData)
             throws CloneNotSupportedException {
         return (YangNode) super.clone();
     }

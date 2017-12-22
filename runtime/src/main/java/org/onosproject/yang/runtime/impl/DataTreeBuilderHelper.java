@@ -719,7 +719,7 @@ public class DataTreeBuilderHelper {
     }
 
     /**
-     * Returns the child object from the parent object for anydatad. Uses java
+     * Returns the child object from the parent object for anydata. Uses java
      * name of the current node to search the attribute in the parent object.
      *
      * @param curNode current YANG node
@@ -731,7 +731,6 @@ public class DataTreeBuilderHelper {
         // Getting the curNode anydata parent object
         Anydata parentObj = (Anydata) getParentObjectOfNode(
                 info, curNode.getParent());
-        List<Object> objs = new ArrayList<>();
         YangSchemaNode node = reg.getForNameSpace(
                 curNode.getNameSpace().getModuleNamespace(), false);
         // Getting the module class
@@ -750,8 +749,10 @@ public class DataTreeBuilderHelper {
         } catch (ClassNotFoundException e) {
             throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + className);
         }
-        objs.add(parentObj.anydata(childClass));
-        return objs;
+        if (curNode.getType().equals(SINGLE_INSTANCE_NODE)) {
+            return parentObj.anydata(childClass).get(0);
+        }
+        return parentObj.anydata(childClass);
     }
 
     /**

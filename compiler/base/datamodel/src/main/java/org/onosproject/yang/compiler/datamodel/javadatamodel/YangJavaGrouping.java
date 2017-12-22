@@ -49,6 +49,6 @@ public class YangJavaGrouping
 
     @Override
     public String getJavaAttributeName() {
-        return getJavaFileInfo().getJavaAttributeName();
+        throw new RuntimeException("Attribute name is not applicable ");
     }
 }

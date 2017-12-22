@@ -37,7 +37,7 @@ module identity-test {
         leaf l {
             type string;
         }
-        container con {
+        container con1 {
             leaf interface {
                 type identityref {
                     base "type:int-type";

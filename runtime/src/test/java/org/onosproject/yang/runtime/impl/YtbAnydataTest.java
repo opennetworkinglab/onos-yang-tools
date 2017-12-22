@@ -21,18 +21,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.Uri;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.NetworkId;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.NodeId;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.DefaultNode;
-import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.Node;
 import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.node.DefaultSupportingNode;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.LinkId;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.DefaultLink;
-import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.Link;
 import org.onosproject.yang.gen.v1.yrtnetworktopology.rev20151208.yrtnetworktopology.networks.network.augmentedndnetwork.link.DefaultSource;
 import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.DefaultC1;
 import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.DefaultMydata2;
-import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.Mydata2;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DefaultModelObjectData.Builder;
 import org.onosproject.yang.model.InnerNode;
@@ -88,8 +87,21 @@ public class YtbAnydataTest {
     @Test
     public void processAnydataTest() {
 
-        reg.registerAnydataSchema(Mydata2.class, Node.class);
-        reg.registerAnydataSchema(Mydata2.class, Link.class);
+        ModelObjectId id = new ModelObjectId.Builder()
+                .addChild(DefaultC1.class).addChild(DefaultMydata2.class)
+                .build();
+        ModelObjectId id1 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultNode.class, null)
+                .build();
+        ModelObjectId id2 = new ModelObjectId.Builder()
+                .addChild(DefaultNetworks.class)
+                .addChild(DefaultNetwork.class, null)
+                .addChild(DefaultLink.class, null)
+                .build();
+        reg.registerAnydataSchema(id, id1);
+        reg.registerAnydataSchema(id, id2);
         DefaultC1 c1 = new DefaultC1();
         DefaultMydata2 mydata2 = new DefaultMydata2();
 
@@ -100,6 +112,12 @@ public class YtbAnydataTest {
         source.sourceNode(new NodeId(new Uri("source-node")));
         link.source(source);
 
+        DefaultLink link1 = new DefaultLink();
+        link1.linkId(new LinkId(new Uri("link-id1")));
+        DefaultSource source1 = new DefaultSource();
+        source1.sourceNode(new NodeId(new Uri("source-node1")));
+        link1.source(source1);
+
         //node
         DefaultNode node = new DefaultNode();
         node.nodeId(new NodeId(new Uri("node1")));
@@ -108,6 +126,7 @@ public class YtbAnydataTest {
         sn.nodeRef(new NodeId(new Uri("network4")));
         node.addToSupportingNode(sn);
         mydata2.addAnydata(link);
+        mydata2.addAnydata(link1);
         mydata2.addAnydata(node);
 
         c1.mydata2(mydata2);
@@ -164,5 +183,24 @@ public class YtbAnydataTest {
         validateDataNode(n, "source-node", TOPONS,
                          SINGLE_INSTANCE_LEAF_VALUE_NODE,
                          false, "source-node");
+
+        n = it.next();
+        validateDataNode(n, "link", TOPONS, MULTI_INSTANCE_NODE,
+                         true, null);
+
+        it1 = ((InnerNode) n).childNodes().values().iterator();
+        n = it1.next();
+        validateDataNode(n, "link-id", TOPONS,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE,
+                         false, "link-id1");
+        n = it1.next();
+        validateDataNode(n, "source", TOPONS, SINGLE_INSTANCE_NODE,
+                         true, null);
+
+        it2 = ((InnerNode) n).childNodes().values().iterator();
+        n = it2.next();
+        validateDataNode(n, "source-node", TOPONS,
+                         SINGLE_INSTANCE_LEAF_VALUE_NODE,
+                         false, "source-node1");
     }
 }

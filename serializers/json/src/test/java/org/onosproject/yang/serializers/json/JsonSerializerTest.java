@@ -62,7 +62,7 @@ public class JsonSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
 
-    private static String outputIdTestJson = "{\"identity-test:con\":{\"inte" +
+    private static String outputIdTestJson = "{\"identity-test:con1\":{\"inte" +
             "rface\":\"identity-types:physical\",\"interfaces\":{\"int-list" +
             "\":[{\"iden\":\"identity-types-second:virtual\",\"available\":" +
             "{\"ll\":[\"Loopback:identity-types\",\"Giga:identity-test\",\"" +

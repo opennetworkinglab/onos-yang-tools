@@ -63,7 +63,7 @@ public class XmlSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer xmlSerializer;
     private static String idXml = "<test xmlns=\"identity:ns:test:json:ser" +
-            "\"><con><interface xmlns:yangid=\"identity:list:ns:test:jso" +
+            "\"><con1><interface xmlns:yangid=\"identity:list:ns:test:jso" +
             "n:ser\">yangid:physical</interface><interfaces><int-list><ide" +
             "n xmlns:yangid=\"identity:list:second:ns:test:json:ser\">ya" +
             "ngid:virtual</iden><available><ll xmlns:yangid=\"identity:li" +
@@ -71,8 +71,8 @@ public class XmlSerializerTest {
             "\"identity:ns:test:json:ser\">yangid:Giga</ll><ll xmlns:yan" +
             "gid=\"identity:list:second:ns:test:json:ser\">yangid:Ether" +
             "net</ll></available></int-list><int-list><iden>optical</iden><av" +
-            "ailable><ll>Giga</ll></available></int-list></interfaces></con><" +
-            "/test>";
+            "ailable><ll>Giga</ll></available></int-list></interfaces></con1" +
+            "></test>";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 

@@ -24,7 +24,9 @@ import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.YangNamespace;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.onosproject.yang.compiler.datamodel.TraversalType.CHILD;
@@ -446,11 +448,12 @@ public abstract class YangNode
      *
      * @param yangUses    YANG uses
      * @param isDeviation flag to identify cloning is for deviation
+     * @param isAnyData   flag to identify call is for anydata clone
      * @return cloned node
      * @throws CloneNotSupportedException clone is not supported by the referred
      *                                    node
      */
-    public YangNode clone(YangUses yangUses, boolean isDeviation)
+    public YangNode clone(YangUses yangUses, boolean isDeviation, boolean isAnyData)
             throws CloneNotSupportedException {
         YangNode clonedNode = (YangNode) super.clone();
 
@@ -477,6 +480,29 @@ public abstract class YangNode
         }
         if (clonedNode instanceof YangAugmentableNode) {
             ((YangAugmentableNode) clonedNode).cloneAugmentInfo();
+            if (isAnyData) {
+                // clone
+                List<YangAugment> clonedYangAugmentedInfo = new ArrayList<>();
+                List<YangAugment> yangAugmentedInfo =
+                        ((YangAugmentableNode) this).getAugmentedInfoList();
+                if (yangAugmentedInfo != null && !yangAugmentedInfo.isEmpty()) {
+                    for (YangAugment info : yangAugmentedInfo) {
+                        try {
+                            YangAugment augment = (YangAugment) info.clone(
+                                    null, false, true);
+                            cloneSubTree(info, augment, null,
+                                         false, null);
+                            augment.setParent(info.getParent());
+                            augment.setAugmentedNode(clonedNode);
+                            clonedYangAugmentedInfo.add(augment);
+                        } catch (DataModelException e) {
+                            throw new IllegalArgumentException(e);
+                        }
+                    }
+                }
+                ((YangAugmentableNode) clonedNode).getAugmentedInfoList()
+                        .addAll(clonedYangAugmentedInfo);
+            }
         }
         return clonedNode;
     }
@@ -554,7 +580,13 @@ public abstract class YangNode
                 }
 
                 if (curTraversal != PARENT) {
-                    newNode = nextNodeToClone.clone(yangUses, isDeviation);
+                    if (childToClone != null) {
+                        newNode = nextNodeToClone.clone(yangUses, isDeviation,
+                                                        true);
+                    } else {
+                        newNode = nextNodeToClone.clone(yangUses, isDeviation,
+                                                        false);
+                    }
                     if (newNode instanceof YangUses) {
                         ((YangUses) newNode).setCloned(true);
                     }

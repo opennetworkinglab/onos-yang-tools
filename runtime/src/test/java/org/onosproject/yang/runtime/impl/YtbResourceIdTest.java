@@ -24,14 +24,14 @@ import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Default
 import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Giga;
 import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Optical;
 import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.Typed;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.Con;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.DefaultCon;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.DefaultInterfaces;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.Interfaces;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.DefaultIntList;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.IntList;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.intlist.Available;
-import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con.interfaces.intlist.DefaultAvailable;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.Con1;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.DefaultCon1;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.DefaultInterfaces;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.Interfaces;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.interfaces.DefaultIntList;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.interfaces.IntList;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.interfaces.intlist.Available;
+import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.test.con1.interfaces.intlist.DefaultAvailable;
 import org.onosproject.yang.gen.v1.identitytest.rev20130715.identitytest.typed.TypedUnion;
 import org.onosproject.yang.gen.v1.identitytypes.rev20130715.identitytypes.Loopback;
 import org.onosproject.yang.gen.v1.identitytypes.rev20130715.identitytypes.Physical;
@@ -47,7 +47,6 @@ import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.Vir;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.id.IdUnion;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.tdef1.Tdef1Union;
-import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.DefaultCon1;
 import org.onosproject.yang.gen.v1.modulelistandkey.rev20160826.modulelistandkey.type.Leaf1Union;
 import org.onosproject.yang.gen.v1.modulelistandkeyaugment.rev20160826.modulelistandkeyaugment.val.AugmentedSchVal;
 import org.onosproject.yang.gen.v1.yrtietfinettypes.rev20130715.yrtietfinettypes.DomainName;
@@ -182,7 +181,10 @@ public class YtbResourceIdTest {
         data = new Builder();
         ModelObjectId.Builder builder = buildMidWithKeys();
         Tdef1 tdef1 = new Tdef1(Tdef1Union.fromString("thousand"));
-        mid = builder.addChild(DefaultCon1.class).addChild(LL, tdef1).build();
+        mid = builder.addChild(org.onosproject.yang.gen.v1.modulelistandkey
+                                       .rev20160826.modulelistandkey
+                                       .type.DefaultCon1.class)
+                .addChild(LL, tdef1).build();
         data.identifier(mid);
         rscData = treeBuilder.getResourceData(data.build());
         id = rscData.resourceId();
@@ -300,7 +302,7 @@ public class YtbResourceIdTest {
         validateKeyLeaf(it.next(), "leaf7", nameSpace, "num");
 
         validateKeyLeaf(it.next(), "leaf8", nameSpace,
-                "MTEwMTE="); //Base 64 encoding of '11011'
+                        "MTEwMTE="); //Base 64 encoding of '11011'
 
         //FIXME: Union under object provider.
         validateKeyLeaf(it.next(), "leaf9", nameSpace, "true");
@@ -586,7 +588,7 @@ public class YtbResourceIdTest {
         ifs.addToIntList(list);
         ifs.addToIntList(list2);
 
-        Con con = new DefaultCon();
+        Con1 con = new DefaultCon1();
         con.yangAutoPrefixInterface(Physical.class);
         con.interfaces(ifs);
 
@@ -603,7 +605,7 @@ public class YtbResourceIdTest {
         Iterator<DataNode> it = contDn.iterator();
 
         DataNode contNode = it.next();
-        validateDataNode(contNode, "con", ns, SINGLE_INSTANCE_NODE,
+        validateDataNode(contNode, "con1", ns, SINGLE_INSTANCE_NODE,
                          true, null);
 
         Map<NodeKey, DataNode> child = ((InnerNode) contNode).childNodes();
