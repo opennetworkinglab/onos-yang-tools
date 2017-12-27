@@ -481,30 +481,48 @@ public abstract class YangNode
         if (clonedNode instanceof YangAugmentableNode) {
             ((YangAugmentableNode) clonedNode).cloneAugmentInfo();
             if (isAnyData) {
-                // clone
-                List<YangAugment> clonedYangAugmentedInfo = new ArrayList<>();
-                List<YangAugment> yangAugmentedInfo =
-                        ((YangAugmentableNode) this).getAugmentedInfoList();
-                if (yangAugmentedInfo != null && !yangAugmentedInfo.isEmpty()) {
-                    for (YangAugment info : yangAugmentedInfo) {
-                        try {
-                            YangAugment augment = (YangAugment) info.clone(
-                                    null, false, true);
-                            cloneSubTree(info, augment, null,
-                                         false, null);
-                            augment.setParent(info.getParent());
-                            augment.setAugmentedNode(clonedNode);
-                            clonedYangAugmentedInfo.add(augment);
-                        } catch (DataModelException e) {
-                            throw new IllegalArgumentException(e);
-                        }
-                    }
-                }
-                ((YangAugmentableNode) clonedNode).getAugmentedInfoList()
-                        .addAll(clonedYangAugmentedInfo);
+                cloneAugmentedInfo(clonedNode);
             }
         }
         return clonedNode;
+    }
+
+    /**
+     * Clones the augmented subtree information and update the same in the
+     * current cloned augmentable node.
+     *
+     * @param clonedNode current cloned node who's augmented info needs to be
+     *                   cloned
+     * @throws CloneNotSupportedException clone is not supported by the referred
+     *                                    node
+     */
+    private void cloneAugmentedInfo(YangNode clonedNode) throws CloneNotSupportedException {
+        // clone
+        List<YangAugment> clonedYangAugmentedInfo = new ArrayList<>();
+        List<YangAugment> yangAugmentedInfo =
+                ((YangAugmentableNode) this).getAugmentedInfoList();
+        if (yangAugmentedInfo != null && !yangAugmentedInfo.isEmpty()) {
+            for (YangAugment info : yangAugmentedInfo) {
+                try {
+                    // clone the top level augment node
+                    YangAugment augment = (YangAugment) info.clone(
+                            null, false, true);
+                    // clone the subtree of top level node and updating the
+                    // same in clonned top level node
+                    cloneSubTree(info, augment, null,
+                                 false, null);
+                    augment.setParent(info.getParent());
+                    augment.setAugmentedNode(clonedNode);
+                    // adding the cloned augmented subtree in augmented info
+                    // list
+                    clonedYangAugmentedInfo.add(augment);
+                } catch (DataModelException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        }
+        ((YangAugmentableNode) clonedNode).getAugmentedInfoList()
+                .addAll(clonedYangAugmentedInfo);
     }
 
     /**
@@ -547,8 +565,9 @@ public abstract class YangNode
         TraversalType curTraversal;
         YangNode clonedTreeCurNode = dstRootNode;
         YangNode newNode = null;
-
+        boolean isAnydata = false;
         if (childToClone != null) {
+            isAnydata = true;
             nextNodeToClone = childToClone;
         } else {
             nextNodeToClone = srcRootNode.getChild();
@@ -580,13 +599,8 @@ public abstract class YangNode
                 }
 
                 if (curTraversal != PARENT) {
-                    if (childToClone != null) {
-                        newNode = nextNodeToClone.clone(yangUses, isDeviation,
-                                                        true);
-                    } else {
-                        newNode = nextNodeToClone.clone(yangUses, isDeviation,
-                                                        false);
-                    }
+                    newNode = nextNodeToClone.clone(yangUses, isDeviation,
+                                                    isAnydata);
                     if (newNode instanceof YangUses) {
                         ((YangUses) newNode).setCloned(true);
                     }
@@ -632,7 +646,7 @@ public abstract class YangNode
                      */
                     nextNodeToClone = nextNodeToClone.getChild();
                 } else if (nextNodeToClone.getNextSibling() != null) {
-                    if (childToClone != null &&
+                    if (isAnydata &&
                             nextNodeToClone.getNextSibling().getParent() == srcRootNode) {
                         curTraversal = PARENT;
                         nextNodeToClone = nextNodeToClone.getParent();

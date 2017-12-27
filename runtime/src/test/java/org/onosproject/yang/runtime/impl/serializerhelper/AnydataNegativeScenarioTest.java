@@ -16,12 +16,22 @@
 
 package org.onosproject.yang.runtime.impl.serializerhelper;
 
-import org.onosproject.yang.gen.v11.listanydata.rev20160624.ListAnydataOpParam;
+import org.junit.Test;
+import org.onosproject.yang.gen.v1.check.check.DefaultList52;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.DefaultNetworks;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.DefaultNetwork;
+import org.onosproject.yang.gen.v1.yrtietfnetwork.rev20151208.yrtietfnetwork.networks.network.DefaultNode;
+import org.onosproject.yang.gen.v11.anytest.rev20160624.AnyTestOpParam;
+import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.DefaultC1;
+import org.onosproject.yang.gen.v11.anytest.rev20160624.anytest.c1.DefaultMydata2;
+import org.onosproject.yang.gen.v11.listanydata.rev20160624.listanydata.DefaultL1;
+import org.onosproject.yang.gen.v11.listanydata.rev20160624.listanydata.l1.DefaultMydata;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.runtime.impl.TestYangSerializerContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.INVAL_ANYDATA;
+import static org.onosproject.yang.runtime.impl.UtilsConstants.FMT_INV;
 
 /**
  * Tests the serializer helper methods.
@@ -39,16 +49,22 @@ public class AnydataNegativeScenarioTest {
      * Test anydata add to data node negative test scenario when given
      * referenced node is not of type anydata.
      */
-//    @Test
+    @Test
     public void addToDataTest() {
         boolean isExpOccurred = false;
-//        context.getContext();
-//        try {
-//            context.getRegistry().registerAnydataSchema(Node.class, Node.class);
-//        } catch (IllegalArgumentException e) {
-//            isExpOccurred = true;
-//            assertEquals(e.getMessage(), String.format(FMT_INV, Node.class));
-//        }
+        context.getContext();
+        ModelObjectId id1 = null;
+        try {
+            id1 = new ModelObjectId.Builder()
+                    .addChild(DefaultNetworks.class)
+                    .addChild(DefaultNetwork.class, null)
+                    .addChild(DefaultNode.class, null)
+                    .build();
+            context.getRegistry().registerAnydataSchema(id1, id1);
+        } catch (IllegalArgumentException e) {
+            isExpOccurred = true;
+            assertEquals(e.getMessage(), String.format(FMT_INV, id1));
+        }
         assertEquals(isExpOccurred, true);
     }
 
@@ -56,17 +72,23 @@ public class AnydataNegativeScenarioTest {
      * Test anydata add to data node negative test scenario when given
      * referenced node module is not registered.
      */
-//    @Test
+    @Test
     public void addToData2Test() {
         boolean isExpOccurred = false;
         context.getContext();
+        ModelObjectId id1 = null;
         try {
-//            context.getRegistry().registerAnydataSchema(Mydata.class,
-//                                                        ListAnydataOpParam.class);
+            ModelObjectId id = new ModelObjectId.Builder()
+                    .addChild(DefaultC1.class).addChild(DefaultMydata2.class)
+                    .build();
+            id1 = new ModelObjectId.Builder()
+                    .addChild(AnyTestOpParam.class)
+                    .build();
+            context.getRegistry().registerAnydataSchema(id, id1);
         } catch (IllegalArgumentException e) {
             isExpOccurred = true;
             assertEquals(e.getMessage(), String.format(
-                    INVAL_ANYDATA, ListAnydataOpParam.class));
+                    FMT_INV, id1));
         }
         assertEquals(isExpOccurred, true);
     }
@@ -76,18 +98,24 @@ public class AnydataNegativeScenarioTest {
      * Test anydata add to data node negative test scenario when given
      * referenced node is not of type list/container.
      */
-//    @Test
+    @Test
     public void addToData3Test() {
         boolean isExpOccurred = false;
         context.getContext();
-//        try {
-//            context.getRegistry().registerAnydataSchema(Mydata.class,
-//                                                        ListAnydata.class);
-//        } catch (IllegalArgumentException e) {
-//            isExpOccurred = true;
-//            assertEquals(e.getMessage(), String.format(
-//                    INVAL_ANYDATA, ListAnydata.class));
-//        }
+        ModelObjectId id = null;
+        try {
+            id = new ModelObjectId.Builder()
+                    .addChild(AnyTestOpParam.class)
+                    .build();
+            ModelObjectId id1 = new ModelObjectId.Builder()
+                    .addChild(DefaultL1.class, null)
+                    .addChild(DefaultMydata.class)
+                    .build();
+            context.getRegistry().registerAnydataSchema(id1, id);
+        } catch (IllegalArgumentException e) {
+            isExpOccurred = true;
+            assertEquals(e.getMessage(), String.format(FMT_INV, id));
+        }
         assertEquals(isExpOccurred, true);
     }
 
@@ -95,18 +123,50 @@ public class AnydataNegativeScenarioTest {
      * Test anydata add to data node negative test scenario when given
      * referenced node is not of type list/container.
      */
-//    @Test
+    @Test
     public void addToData4Test() {
         boolean isExpOccurred = false;
-//        context.getContext();
-//        try {
-//            context.getRegistry().registerAnydataSchema(Mydata.class,
-//                                                        List52Keys.class);
-//        } catch (IllegalArgumentException e) {
-//            isExpOccurred = true;
-//            assertEquals(e.getMessage(), String.format(
-//                    INVAL_ANYDATA, List52Keys.class.getCanonicalName()));
-//        }
+        context.getContext();
+        ModelObjectId id = null;
+        try {
+            id = new ModelObjectId.Builder()
+                    .addChild(DefaultList52.class)
+                    .build();
+            ModelObjectId id1 = new ModelObjectId.Builder()
+                    .addChild(DefaultL1.class, null)
+                    .addChild(DefaultMydata.class)
+                    .build();
+            context.getRegistry().registerAnydataSchema(id1, id);
+        } catch (IllegalArgumentException e) {
+            isExpOccurred = true;
+            assertEquals(e.getMessage(), String.format(
+                    FMT_INV, id));
+        }
+        assertEquals(isExpOccurred, true);
+    }
+
+    /**
+     * Test anydata add to data node negative test scenario when given
+     * referenced identifer is invalid for anydata.
+     */
+    @Test
+    public void addToData5Test() {
+        boolean isExpOccurred = false;
+        context.getContext();
+        ModelObjectId id = null;
+        try {
+            id = new ModelObjectId.Builder()
+                    .addChild(DefaultC1.class).addChild(DefaultMydata.class)
+                    .build();
+            ModelObjectId id1 = new ModelObjectId.Builder()
+                    .addChild(AnyTestOpParam.class)
+                    .build();
+            context.getRegistry().registerAnydataSchema(id, id1);
+        } catch (IllegalArgumentException e) {
+            isExpOccurred = true;
+            assertEquals(e.getMessage(), String.format(
+                    FMT_INV, id));
+        }
         assertEquals(isExpOccurred, true);
     }
 }

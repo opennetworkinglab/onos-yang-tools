@@ -148,6 +148,8 @@ public final class JavaCodeGeneratorUtil {
                             if (codeGenNode instanceof YangLeavesHolder ||
                                     codeGenNode instanceof SchemaDataNode) {
                                 codeGenNode.setParentContext();
+                                // updating the parent context and Ysn
+                                // context info map for augmented node
                                 if (!translateComplete && codeGenNode
                                         instanceof YangAugmentableNode) {
                                     List<YangAugment> augList =

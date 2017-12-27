@@ -169,20 +169,31 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
     }
 
     @Override
-    public void registerAnydataSchema(ModelObjectId ac, ModelObjectId cc) throws
+    public void registerAnydataSchema(ModelObjectId aid, ModelObjectId cid) throws
             IllegalArgumentException {
-        ModIdToRscIdConverter idConverter = new ModIdToRscIdConverter(this);
-        YangSchemaNode anySchema = ((YangSchemaNode) idConverter.fetchResourceId(ac).appInfo());
-        if (anySchema != null && anySchema.getYangSchemaNodeType() == YANG_ANYDATA_NODE) {
-            YangSchemaNode cSchema = ((YangSchemaNode) idConverter.fetchResourceId(cc).appInfo());
-            if (cSchema != null) {
-                YangSchemaNode clonedNode = anySchema.addSchema(cSchema);
-                updateTreeContext(clonedNode, null, false, false);
+        YangSchemaNode anySchema = null;
+        try {
+            ModIdToRscIdConverter conv = new ModIdToRscIdConverter(this);
+            anySchema = ((YangSchemaNode) conv.fetchResourceId(aid).appInfo());
+            if (anySchema != null &&
+                    anySchema.getYangSchemaNodeType() == YANG_ANYDATA_NODE) {
+                YangSchemaNode cSchema = ((YangSchemaNode) conv
+                        .fetchResourceId(cid).appInfo());
+                if (cSchema != null) {
+                    YangSchemaNode clonedNode = anySchema.addSchema(cSchema);
+                    updateTreeContext(clonedNode, null, false, false);
+                } else {
+                    throw new IllegalArgumentException(errorMsg(FMT_INV, cid));
+                }
             } else {
-                throw new IllegalArgumentException(errorMsg(FMT_INV, cc));
+                throw new IllegalArgumentException(errorMsg(FMT_INV, aid));
             }
-        } else {
-            throw new IllegalArgumentException(errorMsg(FMT_INV, ac));
+        } catch (ModelConverterException e) {
+            ModelObjectId id = cid;
+            if (anySchema == null) {
+                id = aid;
+            }
+            throw new IllegalArgumentException(errorMsg(FMT_INV, id));
         }
     }
 

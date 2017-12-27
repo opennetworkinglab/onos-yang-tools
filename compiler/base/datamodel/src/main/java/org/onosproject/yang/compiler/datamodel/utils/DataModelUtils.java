@@ -117,8 +117,6 @@ import static org.onosproject.yang.model.LeafObjectType.STRING;
 public final class DataModelUtils {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
-    public static final String TYPEDEF = "Typedef";
-    public static final String IDENTITY = "Identity";
     public static final String FMT_NOT_EXIST =
             "Requested %s is not child in %s.";
     public static final String E_ID = "Schema id should not be null.";
@@ -127,11 +125,6 @@ public final class DataModelUtils {
                     " avoid the %s extension in the name.";
     public static final String E_INVALID = "This call is not valid for " +
             "YANG leaf/leaf-list";
-    public static final String DOT_REGEX = "\\.";
-    public static final String QNAME_PRE = "org.onosproject.yang.gen";
-    public static final String DEFAULT = "Default";
-    public static final String INVAL_ANYDATA =
-            "Requested %s is not valid node for anydata.";
     private static final String SLASH = File.separator;
     private static final String E_DATATYPE = "Data type not supported.";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
