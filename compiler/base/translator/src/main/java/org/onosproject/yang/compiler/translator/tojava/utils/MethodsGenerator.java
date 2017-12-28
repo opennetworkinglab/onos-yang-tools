@@ -870,6 +870,7 @@ public final class MethodsGenerator {
         StringBuilder builder = new StringBuilder(getOverRideString());
         builder.append(methodSignature(HASH_CODE_STRING, EMPTY_STRING, PUBLIC,
                                        null, INT, null, CLASS_TYPE));
+        // FIXME this can end up generating Objects.hash against arrays
         line = getReturnString(OBJECT_STRING + SUFFIX_S + PERIOD + HASH +
                                        OPEN_PARENTHESIS, EIGHT_SPACE_INDENTATION);
         builder.append(line);

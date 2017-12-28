@@ -56,6 +56,7 @@ public class ResourceIdTest {
         .testEquals();
     }
 
+    @Test
     public void appendNodeKeys() throws CloneNotSupportedException {
         ResourceId devices = ResourceId.builder()
             .append(ridA.nodeKeys().subList(1, 2))

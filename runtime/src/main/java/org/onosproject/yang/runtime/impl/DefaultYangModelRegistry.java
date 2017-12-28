@@ -151,7 +151,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             updateRegClassStore(param);
             modelIdStore.put(id, model);
         } else if ((info != null) && (!registerClassStore
-                .containsKey(info.getModuleClass()))) {
+                .containsValue(info.getModuleClass()))) {
             updateRegClassStore(param);
         } else {
             throw new IllegalArgumentException(E_MEXIST);

@@ -936,6 +936,7 @@ public final class DataModelUtils {
 
             case UNION:
                 return ((YangUnion) dataType.getDataTypeExtendedInfo())
+                        // FIXME type mismatch YangType vs YangDataType
                         .getTypeList().contains(EMPTY);
             default:
                 return dataType.getDataType().equals(EMPTY);
@@ -1381,7 +1382,7 @@ public final class DataModelUtils {
                 holder.addUniqueLeaf(leaf);
             }
             List<YangLeaf> leaves = holder.getUniqueLeaves();
-            Map<YangLeaf, Integer> map = new HashMap<YangLeaf, Integer>();
+            Map<YangLeaf, Integer> map = new HashMap<>();
             for (YangLeaf lf : leaves) {
                 if (map.containsKey(lf)) {
                     throw new DataModelException(E_UNIQUE);
