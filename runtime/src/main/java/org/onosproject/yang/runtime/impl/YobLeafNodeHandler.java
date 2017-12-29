@@ -94,7 +94,7 @@ class YobLeafNodeHandler extends YobHandler {
                 IllegalAccessException | NoSuchFieldException e) {
             log.error(L_FAIL_TO_INVOKE_METHOD, parentClass.getName());
             throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + parentClass
-                    .getName());
+                    .getName(), e);
         }
     }
 }

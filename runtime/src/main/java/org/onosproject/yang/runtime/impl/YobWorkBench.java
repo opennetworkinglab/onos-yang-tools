@@ -249,13 +249,13 @@ class YobWorkBench {
             method.invoke(parentObj, curObj);
         } catch (NoSuchFieldException e) {
             log.error(L_FAIL_TO_GET_FIELD, parentClassName);
-            throw new ModelConverterException(E_FAIL_TO_GET_FIELD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_GET_FIELD + parentClassName, e);
         } catch (NoSuchMethodException e) {
             log.error(L_FAIL_TO_GET_METHOD, parentClassName);
-            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + parentClassName, e);
         } catch (InvocationTargetException | IllegalAccessException e) {
             log.error(L_FAIL_TO_INVOKE_METHOD, parentClassName);
-            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + parentClassName);
+            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + parentClassName, e);
         }
     }
 
@@ -383,10 +383,10 @@ class YobWorkBench {
             method.invoke(builder, instance);
         } catch (NoSuchMethodException e) {
             log.error(L_FAIL_TO_GET_METHOD, ADD_AUGMENT_METHOD);
-            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + ADD_AUGMENT_METHOD);
+            throw new ModelConverterException(E_FAIL_TO_GET_METHOD + ADD_AUGMENT_METHOD, e);
         } catch (InvocationTargetException | IllegalAccessException e) {
             log.error(L_FAIL_TO_INVOKE_METHOD, ADD_AUGMENT_METHOD);
-            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + ADD_AUGMENT_METHOD);
+            throw new ModelConverterException(E_FAIL_TO_INVOKE_METHOD + ADD_AUGMENT_METHOD, e);
         }
     }
 

@@ -748,7 +748,7 @@ public class DataTreeBuilderHelper {
         try {
             childClass = moduleClass.getClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
-            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + className);
+            throw new ModelConverterException(E_FAIL_TO_LOAD_CLASS + className, e);
         }
         if (curNode.getType().equals(SINGLE_INSTANCE_NODE)) {
             return parentObj.anydata(childClass).get(0);

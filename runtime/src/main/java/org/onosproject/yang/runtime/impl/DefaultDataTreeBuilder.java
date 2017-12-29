@@ -689,7 +689,7 @@ class DefaultDataTreeBuilder {
             } catch (NoSuchMethodException e) {
                 throw new ModelConverterException(
                         "Failed to create data node for leaf "
-                                + leaf.getName());
+                                + leaf.getName(), e);
             }
         }
     }

@@ -354,7 +354,7 @@ class ModIdToRscIdConverter {
             return getAttributeOfObject(keys, getCamelCase(keyName, null));
         } catch (NoSuchMethodException e) {
             throw new ModelConverterException("invalid key value in model id for list" +
-                                                      "." + keys.getClass().getName());
+                                                      "." + keys.getClass().getName(), e);
         }
     }
 
