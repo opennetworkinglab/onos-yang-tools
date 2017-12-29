@@ -397,13 +397,7 @@ public final class JavaFileGeneratorUtils {
                                           ERROR_MSG_FOR_GEN_CODE);
         }
 
-        boolean isFileCreated;
         try {
-            isFileCreated = file.createNewFile();
-            if (!isFileCreated) {
-                throw new IOException("Failed to create " + file.getName() +
-                                              " class file.");
-            }
             appendContents(file, className, genType, imports, pkg);
         } catch (IOException e) {
             throw new IOException("Failed to append contents in " + file.getName() +
@@ -431,13 +425,7 @@ public final class JavaFileGeneratorUtils {
                                           " is already generated for: " + name + "\n" +
                                           ERROR_MSG_FOR_GEN_CODE);
         }
-        boolean isFileCreated;
         try {
-            isFileCreated = file.createNewFile();
-            if (!isFileCreated) {
-                throw new IOException("Failed to create " + file.getName() +
-                                              " class file.");
-            }
             appendContents(file, genType, imports, curNode, name);
         } catch (IOException e) {
             throw new IOException("Failed to append contents in " + file.getName() +

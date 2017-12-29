@@ -22,9 +22,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.onosproject.yang.compiler.utils.UtilConstants.EIGHT_SPACE_INDENTATION;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FOUR_SPACE_INDENTATION;
@@ -112,20 +109,15 @@ public final class FileSystemUtil {
                                         boolean isClose)
             throws IOException {
 
-        List<FileWriter> fileWriterStore = new ArrayList<>();
 
-        FileWriter fileWriter = new FileWriter(inputFile, true);
-        fileWriterStore.add(fileWriter);
-        PrintWriter outputPrintWriter = new PrintWriter(fileWriter, true);
         if (!isClose) {
+            FileWriter fileWriter = new FileWriter(inputFile, true);
+            PrintWriter outputPrintWriter = new PrintWriter(fileWriter, true);
             outputPrintWriter.write(contentTobeAdded);
             outputPrintWriter.flush();
             outputPrintWriter.close();
         } else {
-            for (FileWriter curWriter : fileWriterStore) {
-                curWriter.flush();
-                curWriter.close();
-            }
+            // nothing to do
         }
     }
 
@@ -141,7 +133,7 @@ public final class FileSystemUtil {
 
         if (file != null) {
             updateFileHandle(file, null, true);
-            if (toBeDeleted) {
+            if (toBeDeleted && file.exists()) {
                 boolean deleted = file.delete();
                 if (!deleted) {
                     throw new IOException("Failed to delete temporary file " + file.getName());
@@ -157,15 +149,7 @@ public final class FileSystemUtil {
      * @throws IOException when failed to close the file handle
      */
     public static void closeFile(File file) throws IOException {
-
-        if (file != null) {
-            updateFileHandle(file, null, true);
-            boolean deleted = file.delete();
-            if (!deleted) {
-                throw new IOException("Failed to delete temporary file " +
-                                              file.getName());
-            }
-        }
+        closeFile(file, true);
     }
     // TODO follow coding guidelines in remaining of this file.
 }
