@@ -56,4 +56,14 @@ public interface LeafSchemaContext extends SchemaContext {
      * as leaf namespace
      */
     YangNamespace getValueNamespace(String value);
+
+    /**
+     * Returns type of the leaf.
+     *
+     * @param value leaf value in string
+     * @return type of leaf
+     * @throws IllegalArgumentException when input value is not as per the
+     *                                  schema
+     */
+    LeafType getLeafType(String value) throws IllegalArgumentException;
 }

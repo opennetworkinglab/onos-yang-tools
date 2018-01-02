@@ -260,7 +260,7 @@ final class ModelConverterUtil {
      *
      * @param holder    leaf/leaf-list holder
      * @param holderObj leaf/leaf-list holder object
-     * @param leaf leaf schema object?
+     * @param leaf      leaf schema object?
      * @param name      leaf/leaf-list name
      * @param fieldObj  object of the leaf/leaf-list field
      * @param dataType  type of the leaf/leaf-list
@@ -312,6 +312,16 @@ final class ModelConverterUtil {
             case LEAFREF:
                 YangLeafRef leafRef = (YangLeafRef) dataType
                         .getDataTypeExtendedInfo();
+                Object refLeaf = leafRef.getReferredLeafOrLeafList();
+                if (refLeaf instanceof YangLeaf) {
+                    holder = ((YangSchemaNode) ((YangLeaf) refLeaf)
+                            .getContainedIn());
+                    name = ((YangLeaf) refLeaf).getName();
+                } else if (refLeaf instanceof YangLeafList) {
+                    holder = ((YangSchemaNode) ((YangLeafList) refLeaf)
+                            .getContainedIn());
+                    name = ((YangLeafList) refLeaf).getName();
+                }
                 return getObjFromType(holder, holderObj, leaf, name, fieldObj,
                                       leafRef.getEffectiveDataType());
 

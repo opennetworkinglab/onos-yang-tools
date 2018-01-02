@@ -24,6 +24,7 @@ import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.KeyLeaf;
 import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.LeafNode;
+import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.ListKey;
 import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.model.ResourceId;
@@ -238,6 +239,35 @@ public final class TestUtils implements DataNodeListener {
             } else {
                 assertEquals(((LeafNode) node).value().toString(), value);
             }
+        }
+    }
+
+    /**
+     * Validates the give data node content.
+     *  @param node  data node
+     * @param n     name
+     * @param ns    namespace
+     * @param type  leaf node type
+     * @param value value of leaf
+     * @param isleaf
+     */
+    public static void validateDataNode(DataNode node, String n, String ns,
+                                        LeafType type,
+                                        String value, boolean isleaf) {
+        NodeKey k = node.key();
+        SchemaId id = k.schemaId();
+        assertEquals(id.name(), n);
+        assertEquals(id.namespace(), ns);
+        if (isleaf) {
+            assertEquals(node.type(), SINGLE_INSTANCE_LEAF_VALUE_NODE);
+        } else {
+            assertEquals(node.type(), MULTI_INSTANCE_LEAF_VALUE_NODE);
+        }
+        assertEquals(((LeafNode) node).leafType(), type);
+        if (((LeafNode) node).value() == null) {
+            assertNull(value);
+        } else {
+            assertEquals(((LeafNode) node).value().toString(), value);
         }
     }
 

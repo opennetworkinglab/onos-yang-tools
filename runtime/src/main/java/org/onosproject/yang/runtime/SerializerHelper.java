@@ -24,6 +24,7 @@ import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.ListSchemaContext;
 import org.onosproject.yang.model.ResourceId;
 import org.onosproject.yang.model.SchemaContext;
@@ -318,6 +319,8 @@ public final class SerializerHelper {
             boolean initWithRId = false;
             HelperContext info = (HelperContext) builder.appInfo();
             ExtResourceIdBldr curBldr = info.getResourceIdBuilder();
+            LeafSchemaContext schema;
+            LeafType lType;
 
             if (curBldr != null) {
                 rIdBldr = info.getResourceIdBuilder();
@@ -357,18 +360,24 @@ public final class SerializerHelper {
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             throw new IllegalArgumentException(E_RESID);
                         }
-                        valObject = getLeaf(value, childSchema);
-                        valNamespace = getValidValNamespace(value, childSchema,
+                        schema = (LeafSchemaContext) childSchema;
+                        valObject = getLeaf(value, schema);
+                        valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        builder = LeafNode.builder(name, namespace).type(nodeType)
-                                .value(valObject).valueNamespace(valNamespace);
+                        lType = schema.getLeafType(value);
+                        builder = LeafNode.builder(name, namespace)
+                                .type(nodeType).value(valObject)
+                                .valueNamespace(valNamespace).leafType(lType);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = getLeafList(value, childSchema);
-                        valNamespace = getValidValNamespace(value, childSchema,
+                        schema = (LeafSchemaContext) childSchema;
+                        valObject = getLeafList(value, schema);
+                        valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        builder = LeafNode.builder(name, namespace).type(nodeType)
-                                .value(valObject).valueNamespace(valNamespace);
+                        lType = schema.getLeafType(value);
+                        builder = LeafNode.builder(name, namespace)
+                                .type(nodeType).value(valObject)
+                                .valueNamespace(valNamespace).leafType(lType);
                         builder = builder.addLeafListValue(valObject);
                         break;
                     default:
@@ -383,24 +392,28 @@ public final class SerializerHelper {
             } else {
                 switch (nodeType) {
                     case SINGLE_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = getLeaf(value, childSchema);
-                        valNamespace = getValidValNamespace(value, childSchema,
+                        schema = (LeafSchemaContext) childSchema;
+                        valObject = getLeaf(value, schema);
+                        valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
+                        lType = schema.getLeafType(value);
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             builder = builder.addKeyLeaf(
                                     name, namespace, valObject);
                         }
                         builder = builder.createChildBuilder(
                                 name, namespace, valObject, valNamespace)
-                                .type(nodeType);
+                                .type(nodeType).leafType(lType);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
-                        valObject = getLeafList(value, childSchema);
-                        valNamespace = getValidValNamespace(value, childSchema,
+                        schema = (LeafSchemaContext) childSchema;
+                        valObject = getLeafList(value, schema);
+                        valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
+                        lType = schema.getLeafType(value);
                         builder = builder.createChildBuilder(
                                 name, namespace, valObject, valNamespace)
-                                .type(nodeType);
+                                .type(nodeType).leafType(lType);
                         builder = builder.addLeafListValue(valObject);
                         break;
                     default:
@@ -422,40 +435,36 @@ public final class SerializerHelper {
      * value.
      *
      * @param val value in string
-     * @param ctx schema context
+     * @param ctx leaf schema context
      * @return object of value
      * @throws IllegalArgumentException a violation of data type rules
      */
-    private static Object getLeafList(String val, SchemaContext ctx)
+    private static Object getLeafList(String val, LeafSchemaContext ctx)
             throws IllegalArgumentException {
-        LeafSchemaContext schema;
         try {
-            schema = (LeafSchemaContext) ctx;
-            ((YangLeafList) schema).getDataType().isValidValue(val);
+            ((YangLeafList) ctx).getDataType().isValidValue(val);
         } catch (DataModelException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-        return schema.fromString(val);
+        return ctx.fromString(val);
     }
 
     /**
      * Returns the corresponding datatype value object for given leaf value.
      *
      * @param val value in string
-     * @param ctx schema context
+     * @param ctx leaf schema context
      * @return object of value
      * @throws IllegalArgumentException a violation of data type rules
      */
-    private static Object getLeaf(String val, SchemaContext ctx)
+    private static Object getLeaf(String val, LeafSchemaContext ctx)
             throws IllegalArgumentException {
-        LeafSchemaContext schema;
         try {
-            schema = (LeafSchemaContext) ctx;
-            ((YangLeaf) schema).getDataType().isValidValue(val);
+            ((YangLeaf) ctx).getDataType().isValidValue(val);
         } catch (DataModelException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-        return schema.fromString(val);
+        return ctx.fromString(val);
     }
 
 
@@ -463,16 +472,15 @@ public final class SerializerHelper {
      * Returns valid value namespace which is module's namespace.
      *
      * @param val    value in string
-     * @param ctx    schema context
+     * @param ctx    leaf schema context
      * @param actual valNamespace either module name of namespace
      * @return validated value module's namespace
      * @throws IllegalArgumentException if input namespace is invalid
      */
-    private static String getValidValNamespace(String val, SchemaContext ctx,
+    private static String getValidValNamespace(String val, LeafSchemaContext ctx,
                                                String actual)
             throws IllegalArgumentException {
-        LeafSchemaContext schema = (LeafSchemaContext) ctx;
-        YangNamespace expected = schema.getValueNamespace(val);
+        YangNamespace expected = ctx.getValueNamespace(val);
         if (actual == null) {
             if (expected == null ||
                     expected.getModuleNamespace().equals(ctx.getSchemaId().namespace())) {

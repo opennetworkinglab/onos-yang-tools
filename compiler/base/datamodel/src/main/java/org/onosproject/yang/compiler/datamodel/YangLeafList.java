@@ -24,6 +24,7 @@ import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.LeafObjectType;
 import org.onosproject.yang.model.LeafRestriction;
 import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;
 import org.onosproject.yang.model.YangNamespace;
@@ -674,6 +675,11 @@ public abstract class YangLeafList extends DefaultLocationInfo
     public YangNamespace getValueNamespace(String value) {
         return LeafContextUtil.getValueNamespace(dataType, value,
                                                  dataType.getDataType());
+    }
+
+    @Override
+    public LeafType getLeafType(String v) {
+        return LeafContextUtil.getLeafType(dataType, v, dataType.getDataType());
     }
 
     @Override

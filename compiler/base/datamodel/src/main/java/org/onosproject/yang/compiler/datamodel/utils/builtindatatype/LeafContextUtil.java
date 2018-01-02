@@ -16,17 +16,27 @@
 
 package org.onosproject.yang.compiler.datamodel.utils.builtindatatype;
 
+import org.onosproject.yang.compiler.datamodel.YangBits;
 import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
+import org.onosproject.yang.compiler.datamodel.YangEnum;
+import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
 import org.onosproject.yang.compiler.datamodel.YangIdentityRef;
 import org.onosproject.yang.compiler.datamodel.YangLeafRef;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
+import org.onosproject.yang.model.LeafType;
 import org.onosproject.yang.model.YangNamespace;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.SortedSet;
+
+import static org.onosproject.yang.compiler.utils.UtilConstants.SPACE;
 
 public final class LeafContextUtil {
 
@@ -34,6 +44,13 @@ public final class LeafContextUtil {
     private static final String E_DATATYPE = "Data type not supported.";
     private static final String T = "true";
     private static final String F = "false";
+    // RFC 4648
+    private static final String BIN_REGEX = "^(?:[A-Za-z0-9+/]{4})*" +
+            "(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0" +
+            "-9+/]{4})$";
+    // allows the null/empty value
+    private static final String BREGEX = "^(?:[A-Za-z0-9+/]{4})*" +
+            "(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$";
 
     /**
      * Restricts creation of object providers instance.
@@ -84,10 +101,38 @@ public final class LeafContextUtil {
                     return Boolean.parseBoolean(v);
                 }
                 throw new IllegalArgumentException(E_DATATYPE);
-            case BINARY:
-            case BITS:
-            case IDENTITYREF:
             case ENUMERATION:
+                try {
+                    SortedSet<YangEnum> set = ((YangEnumeration) typeInfo
+                            .getDataTypeExtendedInfo()).getEnumSet();
+                    for (YangEnum en : set) {
+                        if (en.getNamedValue().equals(v)) {
+                            return v;
+                        }
+                    }
+                } catch (Exception e) {
+                    // do nothing
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
+            case BITS:
+                try {
+                    YangBits e = ((YangBits) typeInfo
+                            .getDataTypeExtendedInfo());
+                    String[] bitSet = v.split(SPACE);
+                    Set set = new HashSet(Arrays.asList(bitSet));
+                    if (e.getBitNameMap().keySet().containsAll(set)) {
+                        return v;
+                    }
+                } catch (Exception e) {
+                    // do nothing
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
+            case BINARY:
+                if (v.matches(BREGEX)) {
+                    return v;
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
+            case IDENTITYREF:
             case STRING:
             case INSTANCE_IDENTIFIER:
                 return v;
@@ -211,6 +256,105 @@ public final class LeafContextUtil {
             YangType t = it.next();
             try {
                 return getObject(t, leafValue, t.getDataType());
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+        }
+        throw new IllegalArgumentException("Invalid value of data");
+    }
+
+    /**
+     * Returns leaf type from string value.
+     *
+     * @param typeInfo refers to YANG type information
+     * @param v        v argument is leaf value
+     * @param dataType yang data type
+     * @return values leaf type of corresponding given data type
+     * @throws IllegalArgumentException if input is not valid
+     */
+    public static LeafType getLeafType(YangType typeInfo, String v,
+                                       YangDataTypes dataType)
+            throws IllegalArgumentException {
+        YangDataTypes type;
+        if (dataType != null) {
+            type = dataType;
+        } else {
+            type = typeInfo.getDataType();
+        }
+        switch (type) {
+            case INT8:
+                return LeafType.INT8;
+            case UINT8:
+                return LeafType.UINT8;
+            case INT16:
+                return LeafType.INT16;
+            case UINT16:
+                return LeafType.UINT16;
+            case INT32:
+                return LeafType.INT32;
+            case UINT32:
+                return LeafType.UINT32;
+            case INT64:
+                return LeafType.INT64;
+            case UINT64:
+                return LeafType.UINT64;
+            case EMPTY:
+                if (v == null || v.equals("") || (v.equals(T) || v.equals(F))) {
+                    return LeafType.EMPTY;
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
+            case BOOLEAN:
+                if (v.equals(T) || v.equals(F)) {
+                    return LeafType.BOOLEAN;
+                }
+                throw new IllegalArgumentException(E_DATATYPE);
+            case BINARY:
+                return LeafType.BINARY;
+            case BITS:
+                return LeafType.BITS;
+            case IDENTITYREF:
+                return LeafType.IDENTITYREF;
+            case ENUMERATION:
+                return LeafType.ENUMERATION;
+            case STRING:
+                return LeafType.STRING;
+            case INSTANCE_IDENTIFIER:
+                return LeafType.INSTANCE_IDENTIFIER;
+            case DECIMAL64:
+                return LeafType.DECIMAL64;
+            case LEAFREF:
+                YangType refType = ((YangLeafRef) typeInfo
+                        .getDataTypeExtendedInfo()).getEffectiveDataType();
+                return getLeafType(refType, v, refType.getDataType());
+            case DERIVED:
+                // referred typedef's list of type will always has only one type
+                YangType rt = ((YangDerivedInfo) typeInfo
+                        .getDataTypeExtendedInfo()).getReferredTypeDef()
+                        .getTypeList().get(0);
+                return getLeafType(rt, v, rt.getDataType());
+            case UNION:
+                return parseUnionLeafType(typeInfo, v);
+            default:
+                throw new IllegalArgumentException(E_DATATYPE);
+        }
+    }
+
+    /**
+     * Returns the leaf type for given data type with respective value.
+     *
+     * @param type      data type of value
+     * @param leafValue value
+     * @return leaf type of data type containing the value
+     */
+    private static LeafType parseUnionLeafType(YangType type, String
+            leafValue) {
+        Iterator<YangType<?>> it = ((YangUnion) type.getDataTypeExtendedInfo())
+                .getTypeList().listIterator();
+        while (it.hasNext()) {
+            YangType t = it.next();
+            try {
+                getObject(t, leafValue, t.getDataType());
+                return getLeafType(t, leafValue, t.getDataType());
             } catch (IllegalArgumentException e) {
                 continue;
             }

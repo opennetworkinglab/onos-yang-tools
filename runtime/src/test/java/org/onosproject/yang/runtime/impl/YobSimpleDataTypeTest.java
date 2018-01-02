@@ -25,12 +25,14 @@ import org.onosproject.yang.gen.v1.ytbdatatypes.rev20160826.ytbdatatypes.Leaf7;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.DataNode.Builder;
 import org.onosproject.yang.model.DefaultResourceData;
+import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ResourceData;
 
 import java.util.Base64;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,17 +40,36 @@ import static org.hamcrest.core.Is.is;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.ASTERISK;
 import static org.onosproject.yang.gen.v1.simpledatatypes.rev20131112.simpledatatypes.tpdfun0.Tpdfun0Enum.SUCCESSFUL_EXIT;
 import static org.onosproject.yang.gen.v1.simpledatatypesll.rev20131112.simpledatatypesll.cont1.Lfenum1Enum.GRACE_PERIOD_EXPIRED;
+import static org.onosproject.yang.model.DataNode.Type.SINGLE_INSTANCE_NODE;
+import static org.onosproject.yang.model.LeafType.BINARY;
+import static org.onosproject.yang.model.LeafType.BITS;
+import static org.onosproject.yang.model.LeafType.BOOLEAN;
+import static org.onosproject.yang.model.LeafType.DECIMAL64;
+import static org.onosproject.yang.model.LeafType.EMPTY;
+import static org.onosproject.yang.model.LeafType.ENUMERATION;
+import static org.onosproject.yang.model.LeafType.IDENTITYREF;
+import static org.onosproject.yang.model.LeafType.INSTANCE_IDENTIFIER;
+import static org.onosproject.yang.model.LeafType.INT16;
+import static org.onosproject.yang.model.LeafType.INT32;
+import static org.onosproject.yang.model.LeafType.INT64;
+import static org.onosproject.yang.model.LeafType.INT8;
+import static org.onosproject.yang.model.LeafType.STRING;
+import static org.onosproject.yang.model.LeafType.UINT16;
+import static org.onosproject.yang.model.LeafType.UINT32;
+import static org.onosproject.yang.model.LeafType.UINT64;
+import static org.onosproject.yang.model.LeafType.UINT8;
 import static org.onosproject.yang.runtime.SerializerHelper.addDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.exitDataNode;
 import static org.onosproject.yang.runtime.SerializerHelper.initializeDataNode;
+import static org.onosproject.yang.runtime.impl.TestUtils.validateDataNode;
 
 /**
  * Tests the YANG object building for different data types.
  */
 public class YobSimpleDataTypeTest {
 
-    private static final String DATA_TYPE_NAME_SPACE = "simple:data:types";
-    private static final String DATA_TYPE_NAME_SPACE_LL =
+    public static final String DT_NS = "simple:data:types";
+    private static final String DT_LL =
             "simple:data:types:ll";
     private static final String VALUE_NAMESPACE = "yms:test:ytb:data:types";
     TestYangSerializerContext context = new TestYangSerializerContext();
@@ -58,170 +79,170 @@ public class YobSimpleDataTypeTest {
     private DataNode buildDataNodeForSimpleDataTypes() {
         dBlr = initializeDataNode(context);
         value = null;
-        dBlr = addDataNode(dBlr, "cont", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "cont", DT_NS, value, null);
 
         value = "-128";
-        dBlr = addDataNode(dBlr, "lfnint8Min", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint8Min", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "127";
-        dBlr = addDataNode(dBlr, "lfnint8Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint8Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-32768";
-        dBlr = addDataNode(dBlr, "lfnint16Min", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint16Min", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "32767";
-        dBlr = addDataNode(dBlr, "lfnint16Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint16Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-2147483648";
-        dBlr = addDataNode(dBlr, "lfnint32Min", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint32Min", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "2147483647";
-        dBlr = addDataNode(dBlr, "lfnint32Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint32Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "10090";
-        dBlr = addDataNode(dBlr, "lfnint64Min", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint64Min", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "100700";
-        dBlr = addDataNode(dBlr, "lfnint64Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnint64Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "255";
-        dBlr = addDataNode(dBlr, "lfnuint8Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnuint8Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "65535";
-        dBlr = addDataNode(dBlr, "lfnuint16Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnuint16Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "10000";
-        dBlr = addDataNode(dBlr, "lfnuint32Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfnuint32Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "32656256558";
-        dBlr = addDataNode(dBlr, "lfuint64Max", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfuint64Max", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "string1";
-        dBlr = addDataNode(dBlr, "lfstr", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfstr", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "string2";
-        dBlr = addDataNode(dBlr, "lfstr1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfstr1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "true";
-        dBlr = addDataNode(dBlr, "lfbool1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfbool1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "false";
-        dBlr = addDataNode(dBlr, "lfbool2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfbool2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "false";
-        dBlr = addDataNode(dBlr, "lfbool3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfbool3", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-922337203685477580.8";
-        dBlr = addDataNode(dBlr, "lfdecimal1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfdecimal1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-92233720368547758.08";
-        dBlr = addDataNode(dBlr, "lfdecimal2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfdecimal2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-9223372036854775.808";
-        dBlr = addDataNode(dBlr, "lfdecimal3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfdecimal3", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-922337203685477.5808";
-        dBlr = addDataNode(dBlr, "lfdecimal4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfdecimal4", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-9223372036854.775808";
-        dBlr = addDataNode(dBlr, "lfdecimal6", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfdecimal6", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "3.3ms";
-        dBlr = addDataNode(dBlr, "lfenum", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfenum", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "bit1";
-        dBlr = addDataNode(dBlr, "lfbits", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfbits", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "aGV5";
-        dBlr = addDataNode(dBlr, "lfbinary", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfbinary", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "path";
-        dBlr = addDataNode(dBlr, "lfref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "100";
-        dBlr = addDataNode(dBlr, "lfref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfref2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "";
-        dBlr = addDataNode(dBlr, "lfempty", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfempty", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "cost";
-        dBlr = addDataNode(dBlr, "lfunion1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "-92233720368547758.08";
-        dBlr = addDataNode(dBlr, "lfunion2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "true";
-        dBlr = addDataNode(dBlr, "lfunion4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion4", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "color";
-        dBlr = addDataNode(dBlr, "lfunion5", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion5", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "b1";
-        dBlr = addDataNode(dBlr, "lfunion7", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion7", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "bandwidth";
-        dBlr = addDataNode(dBlr, "lfunion8", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion8", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "200";
-        dBlr = addDataNode(dBlr, "lfunion9", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion9", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "true";
-        dBlr = addDataNode(dBlr, "lfunion10", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion10", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "b1";
-        dBlr = addDataNode(dBlr, "lfunion11", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion11", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "true";
-        dBlr = addDataNode(dBlr, "lfunion12", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion12", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "b2";
-        dBlr = addDataNode(dBlr, "lfunion13", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion13", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "one";
-        dBlr = addDataNode(dBlr, "lfunion14", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfunion14", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "iden";
-        dBlr = addDataNode(dBlr, "identityref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "identityref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "pro";
@@ -229,174 +250,339 @@ public class YobSimpleDataTypeTest {
         dBlr = exitDataNode(dBlr);
 
         value = "successful exit";
-        dBlr = addDataNode(dBlr, "lfenum1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfenum1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "*";
-        dBlr = addDataNode(dBlr, "lfenum2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lfenum2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         value = "/cont";
-        dBlr = addDataNode(dBlr, "inst-iden", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "inst-iden", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
 
         dBlr = getLeafRefData(dBlr);
+        validateDataNodeForSimpleDataTypes(dBlr.build());
         dBlr = exitDataNode(dBlr);
         return dBlr.build();
     }
 
+    public static void validateDataNodeForSimpleDataTypes(DataNode node) {
+        DataNode n = node;
+        validateDataNode(n, "cont", DT_NS, SINGLE_INSTANCE_NODE,
+                         true, null);
+        Iterator<DataNode> it3 = ((InnerNode) n).childNodes().values()
+                .iterator();
+        n = it3.next();
+        validateDataNode(n, "lfnint8Min", DT_NS, INT8, "-128", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint8Max", DT_NS, INT8, "127", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint16Min", DT_NS, INT16, "-32768", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint16Max", DT_NS, INT16, "32767", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint32Min", DT_NS, INT32, "-2147483648", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint32Max", DT_NS, INT32, "2147483647", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint64Min", DT_NS, INT64, "10090", true);
+        n = it3.next();
+        validateDataNode(n, "lfnint64Max", DT_NS, INT64, "100700", true);
+        n = it3.next();
+        validateDataNode(n, "lfnuint8Max", DT_NS, UINT8, "255", true);
+        n = it3.next();
+        validateDataNode(n, "lfnuint16Max", DT_NS, UINT16, "65535", true);
+        n = it3.next();
+        validateDataNode(n, "lfnuint32Max", DT_NS, UINT32, "10000", true);
+        n = it3.next();
+        validateDataNode(n, "lfuint64Max", DT_NS, UINT64, "32656256558", true);
+        n = it3.next();
+        validateDataNode(n, "lfstr", DT_NS, STRING, "string1", true);
+        n = it3.next();
+        validateDataNode(n, "lfstr1", DT_NS, STRING, "string2", true);
+        n = it3.next();
+        validateDataNode(n, "lfbool1", DT_NS, BOOLEAN, "true", true);
+        n = it3.next();
+        validateDataNode(n, "lfbool2", DT_NS, BOOLEAN, "false", true);
+        n = it3.next();
+        validateDataNode(n, "lfbool3", DT_NS, BOOLEAN, "false", true);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal1", DT_NS, DECIMAL64,
+                         "-922337203685477580.8", true);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal2", DT_NS, DECIMAL64,
+                         "-92233720368547758.08", true);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal3", DT_NS, DECIMAL64,
+                         "-9223372036854775.808", true);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal4", DT_NS, DECIMAL64,
+                         "-922337203685477.5808", true);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal6", DT_NS, DECIMAL64,
+                         "-9223372036854.775808", true);
+        n = it3.next();
+        validateDataNode(n, "lfenum", DT_NS, ENUMERATION, "3.3ms", true);
+        n = it3.next();
+        validateDataNode(n, "lfbits", DT_NS, BITS, "bit1", true);
+        n = it3.next();
+        validateDataNode(n, "lfbinary", DT_NS, BINARY, "aGV5", true);
+        n = it3.next();
+        validateDataNode(n, "lfref1", DT_NS, STRING, "path", true);
+        n = it3.next();
+        validateDataNode(n, "lfref2", DT_NS, INT8, "100", true);
+        n = it3.next();
+        validateDataNode(n, "lfempty", DT_NS, EMPTY, null, true);
+        n = it3.next();
+        validateDataNode(n, "lfunion1", DT_NS, STRING, "cost", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion2", DT_NS, DECIMAL64,
+                         "-92233720368547758.08", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion4", DT_NS, BOOLEAN, "true", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion5", DT_NS, STRING, "color", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion7", DT_NS, BITS, "b1", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion8", DT_NS, STRING, "bandwidth", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion9", DT_NS, UINT16, "200", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion10", DT_NS, BOOLEAN, "true", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion11", DT_NS, BITS, "b1", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion12", DT_NS, EMPTY, "true", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion13", DT_NS, BITS, "b2", true);
+        n = it3.next();
+        validateDataNode(n, "lfunion14", DT_NS, ENUMERATION, "one", true);
+        n = it3.next();
+        validateDataNode(n, "identityref1", DT_NS, IDENTITYREF, "iden", true);
+        n = it3.next();
+        validateDataNode(n, "identityref2", DT_NS, IDENTITYREF, "pro", true);
+        n = it3.next();
+        validateDataNode(n, "lfenum1", DT_NS, ENUMERATION, "successful exit", true);
+        n = it3.next();
+        validateDataNode(n, "lfenum2", DT_NS, ENUMERATION, "*", true);
+        n = it3.next();
+        validateDataNode(n, "inst-iden", DT_NS, INSTANCE_IDENTIFIER, "/cont", true);
+        validateLeafRef(it3);
+    }
+
+    static void validateLeafRef(Iterator<DataNode> it3) {
+
+        DataNode n = it3.next();
+        validateDataNode(n, "lref1", DT_NS, INT8, "8", true);
+        n = it3.next();
+        validateDataNode(n, "lref2", DT_NS, IDENTITYREF, "val", true);
+        n = it3.next();
+        validateDataNode(n, "lref3", DT_NS, ENUMERATION, "zero", true);
+        n = it3.next();
+        validateDataNode(n, "lref4", DT_NS, BITS, "b2 b3", true);
+        n = it3.next();
+        validateDataNode(n, "lref5", DT_NS, DECIMAL64, "-92233720368547758.08",
+                         true);
+        n = it3.next();
+        validateDataNode(n, "lref6", DT_NS, INT8, "10", true);
+        n = it3.next();
+        validateDataNode(n, "lref7", DT_NS, ENUMERATION, "enum4", true);
+        n = it3.next();
+        validateDataNode(n, "lref8", DT_NS, DECIMAL64, "-9223372036854.775808",
+                         true);
+        n = it3.next();
+        validateDataNode(n, "lref9", DT_NS, BINARY, "MTAxMDEwMTAx", true);
+        n = it3.next();
+        validateDataNode(n, "lref10", DT_NS, EMPTY, null, true);
+        n = it3.next();
+        validateDataNode(n, "lref11", DT_NS, EMPTY, null, true);
+        n = it3.next();
+        validateDataNode(n, "lref12", DT_NS, BITS, "b3", true);
+        n = it3.next();
+        validateDataNode(n, "lref13", DT_NS, EMPTY, null, true);
+        n = it3.next();
+        validateDataNode(n, "lref14", DT_NS, BITS, "b1 b2 b3", true);
+        n = it3.next();
+        validateDataNode(n, "lref15", DT_NS, INSTANCE_IDENTIFIER, "/cont", true);
+        n = it3.next();
+        validateDataNode(n, "lref16", DT_NS, IDENTITYREF, "physical", true);
+        n = it3.next();
+        validateDataNode(n, "lref17", DT_NS, UINT64, "784985", true);
+        n = it3.next();
+        validateDataNode(n, "lref18", DT_NS, BINARY, "MTExMTExMTE=", true);
+        n = it3.next();
+        validateDataNode(n, "lref19", DT_NS, ENUMERATION, "hundred", true);
+        n = it3.next();
+        validateDataNode(n, "lref20", DT_NS, STRING, "leafref", true);
+        n = it3.next();
+        validateDataNode(n, "iref1", DT_NS, IDENTITYREF, "val", true);
+        n = it3.next();
+        validateDataNode(n, "iref3", DT_NS, IDENTITYREF, "physical", true);
+        n = it3.next();
+        validateDataNode(n, "iref2", DT_NS, IDENTITYREF, "pro", false);
+        n = it3.next();
+        validateDataNode(n, "iref4", DT_NS, IDENTITYREF, "virtual", false);
+    }
+
     private Builder getLeafRefData(Builder dBlr) {
         value = "8";
-        dBlr = addDataNode(dBlr, "lref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "val";
-        dBlr = addDataNode(dBlr, "lref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "zero";
-        dBlr = addDataNode(dBlr, "lref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref3", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b2 b3";
-        dBlr = addDataNode(dBlr, "lref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref4", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "-92233720368547758.08";
-        dBlr = addDataNode(dBlr, "lref5", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref5", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "10";
-        dBlr = addDataNode(dBlr, "lref6", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref6", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "enum4";
-        dBlr = addDataNode(dBlr, "lref7", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref7", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "-9223372036854.775808";
-        dBlr = addDataNode(dBlr, "lref8", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref8", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "MTAxMDEwMTAx";
-        dBlr = addDataNode(dBlr, "lref9", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref9", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "";
-        dBlr = addDataNode(dBlr, "lref10", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref10", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "";
-        dBlr = addDataNode(dBlr, "lref11", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref11", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b3";
-        dBlr = addDataNode(dBlr, "lref12", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref12", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "";
-        dBlr = addDataNode(dBlr, "lref13", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref13", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b1 b2 b3";
-        dBlr = addDataNode(dBlr, "lref14", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref14", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "/cont";
-        dBlr = addDataNode(dBlr, "lref15", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref15", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "physical";
-        dBlr = addDataNode(dBlr, "lref16", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "lref16", DT_NS, value,
                            VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
         value = "784985";
-        dBlr = addDataNode(dBlr, "lref17", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref17", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "MTExMTExMTE=";
-        dBlr = addDataNode(dBlr, "lref18", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref18", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "hundred";
-        dBlr = addDataNode(dBlr, "lref19", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref19", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "leafref";
-        dBlr = addDataNode(dBlr, "lref20", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref20", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "val";
-        dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
-        dBlr = exitDataNode(dBlr);
-        value = "pro";
-        dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "physical";
-        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "iref3", DT_NS, value,
                            VALUE_NAMESPACE, null);
+        dBlr = exitDataNode(dBlr);
+        value = "pro";
+        dBlr = addDataNode(dBlr, "iref2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "virtual";
-        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "iref4", DT_NS, value,
                            VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
-        dBlr = addDataNode(dBlr, "cont3", DATA_TYPE_NAME_SPACE, null, null);
+        dBlr = addDataNode(dBlr, "cont3", DT_NS, null, null);
+        dBlr = getLeafListBuilder(dBlr);
+        dBlr = exitDataNode(dBlr);
+        return dBlr;
+    }
+
+    private Builder getLeafListBuilder(Builder dBlr) {
         value = "108";
-        dBlr = addDataNode(dBlr, "llref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "val";
-        dBlr = addDataNode(dBlr, "llref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "one";
-        dBlr = addDataNode(dBlr, "llref3", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref3", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b1 b3";
-        dBlr = addDataNode(dBlr, "llref4", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref4", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "-922337203685470058.08";
-        dBlr = addDataNode(dBlr, "llref5", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref5", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "121";
-        dBlr = addDataNode(dBlr, "llref6", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref6", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "3.3ms";
-        dBlr = addDataNode(dBlr, "llref7", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref7", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "-9223372036000.775808";
-        dBlr = addDataNode(dBlr, "llref8", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref8", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "MTExMTExMTE=";
-        dBlr = addDataNode(dBlr, "llref9", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref9", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "";
-        dBlr = addDataNode(dBlr, "llref11", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref11", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b2";
-        dBlr = addDataNode(dBlr, "llref12", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref12", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "";
-        dBlr = addDataNode(dBlr, "llref13", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref13", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "b1";
-        dBlr = addDataNode(dBlr, "llref14", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref14", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "/cont/con2";
-        dBlr = addDataNode(dBlr, "llref15", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref15", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "virtual";
-        dBlr = addDataNode(dBlr, "llref16", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "llref16", DT_NS, value,
                            "yms:test:ytb:data:types", null);
         dBlr = exitDataNode(dBlr);
         value = "78498522";
-        dBlr = addDataNode(dBlr, "llref17", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref17", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "MDEwMTAxMDEw";
-        dBlr = addDataNode(dBlr, "llref18", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref18", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "ten";
-        dBlr = addDataNode(dBlr, "llref19", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref19", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "leaflistref";
-        dBlr = addDataNode(dBlr, "llref20", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "llref20", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "check";
-        dBlr = addDataNode(dBlr, "lref21", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "lref21", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "val";
-        dBlr = addDataNode(dBlr, "iref1", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref1", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "pro";
-        dBlr = addDataNode(dBlr, "iref2", DATA_TYPE_NAME_SPACE, value, null);
+        dBlr = addDataNode(dBlr, "iref2", DT_NS, value, null);
         dBlr = exitDataNode(dBlr);
         value = "physical";
-        dBlr = addDataNode(dBlr, "iref3", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "iref3", DT_NS, value,
                            VALUE_NAMESPACE, null);
         dBlr = exitDataNode(dBlr);
         value = "virtual";
-        dBlr = addDataNode(dBlr, "iref4", DATA_TYPE_NAME_SPACE, value,
+        dBlr = addDataNode(dBlr, "iref4", DT_NS, value,
                            VALUE_NAMESPACE, null);
-        dBlr = exitDataNode(dBlr);
         dBlr = exitDataNode(dBlr);
         return dBlr;
     }
@@ -405,7 +591,7 @@ public class YobSimpleDataTypeTest {
     private DataNode buildDnForLeafListSimpleDataTypes() {
         dBlr = initializeDataNode(context);
         value = null;
-        dBlr = addDataNode(dBlr, "cont1", DATA_TYPE_NAME_SPACE_LL, value, null);
+        dBlr = addDataNode(dBlr, "cont1", DT_LL, value, null);
 
         value = "-128";
         dBlr = addDataNode(dBlr, "lfnint8Min", null, value, null);
@@ -578,11 +764,114 @@ public class YobSimpleDataTypeTest {
         value = "*";
         dBlr = addDataNode(dBlr, "lfenum2", null, value, null);
         dBlr = exitDataNode(dBlr);
-
+        validateLeafListDataTypes(dBlr.build());
         dBlr = exitDataNode(dBlr);
 
         return dBlr.build();
     }
+
+    private void validateLeafListDataTypes(DataNode node) {
+        DataNode n = node;
+        validateDataNode(n, "cont1", DT_LL, SINGLE_INSTANCE_NODE,
+                         true, null);
+        Iterator<DataNode> it3 = ((InnerNode) n).childNodes().values()
+                .iterator();
+        n = it3.next();
+        validateDataNode(n, "lfnint8Min", DT_LL, INT8, "-128", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint8Max", DT_LL, INT8, "127", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint16Min", DT_LL, INT16, "-32768", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint16Max", DT_LL, INT16, "32767", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint32Min", DT_LL, INT32, "-2147483648", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint32Max", DT_LL, INT32, "2147483647", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint64Min", DT_LL, INT64, "10090", false);
+        n = it3.next();
+        validateDataNode(n, "lfnint64Max", DT_LL, INT64, "100700", false);
+        n = it3.next();
+        validateDataNode(n, "lfnuint8Max", DT_LL, UINT8, "255", false);
+        n = it3.next();
+        validateDataNode(n, "lfnuint16Max", DT_LL, UINT16, "65535", false);
+        n = it3.next();
+        validateDataNode(n, "lfnuint32Max", DT_LL, UINT32, "10000", false);
+        n = it3.next();
+        validateDataNode(n, "lfuint64Max", DT_LL, UINT64, "32656256558", false);
+        n = it3.next();
+        validateDataNode(n, "lfstr", DT_LL, STRING, "string1", false);
+        n = it3.next();
+        validateDataNode(n, "lfstr1", DT_LL, STRING, "string2", false);
+        n = it3.next();
+        validateDataNode(n, "lfbool1", DT_LL, BOOLEAN, "true", false);
+        n = it3.next();
+        validateDataNode(n, "lfbool2", DT_LL, BOOLEAN, "false", false);
+        n = it3.next();
+        validateDataNode(n, "lfbool3", DT_LL, BOOLEAN, "false", false);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal1", DT_LL, DECIMAL64,
+                         "-922337203685477580.8", false);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal2", DT_LL, DECIMAL64,
+                         "-92233720368547758.08", false);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal3", DT_LL, DECIMAL64,
+                         "-9223372036854775.808", false);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal4", DT_LL, DECIMAL64,
+                         "-922337203685477.5808", false);
+        n = it3.next();
+        validateDataNode(n, "lfdecimal6", DT_LL, DECIMAL64,
+                         "-9223372036854.775808", false);
+        n = it3.next();
+        validateDataNode(n, "lfenum", DT_LL, ENUMERATION, "enum1", false);
+        n = it3.next();
+        validateDataNode(n, "lfbits", DT_LL, BITS, "bit1", false);
+        n = it3.next();
+        validateDataNode(n, "lfbinary", DT_LL, BINARY, "aGVsbG8=", false);
+        n = it3.next();
+        validateDataNode(n, "lfref1", DT_LL, STRING, "path", false);
+        n = it3.next();
+        validateDataNode(n, "lfref2", DT_LL, INT8, "100", false);
+        n = it3.next();
+        validateDataNode(n, "lfempty", DT_LL, EMPTY, null, false);
+        n = it3.next();
+        validateDataNode(n, "lfunion1", DT_LL, STRING, "cost", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion2", DT_LL, DECIMAL64,
+                         "-92233720368547758.08", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion4", DT_LL, BOOLEAN, "true", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion5", DT_LL, STRING, "color", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion7", DT_LL, BITS, "b1", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion8", DT_LL, STRING, "bandwidth", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion9", DT_LL, UINT16, "200", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion10", DT_LL, BOOLEAN, "true", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion11", DT_LL, BITS, "b1", false);
+        n = it3.next();
+        // need to be handled later
+        validateDataNode(n, "lfunion12", DT_LL, EMPTY, "true", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion13", DT_LL, BITS, "b2", false);
+        n = it3.next();
+        validateDataNode(n, "lfunion14", DT_LL, ENUMERATION, "one", false);
+        n = it3.next();
+        validateDataNode(n, "identityref1", DT_LL, IDENTITYREF, "iden", false);
+        n = it3.next();
+        validateDataNode(n, "lfenum1", DT_LL, ENUMERATION,
+                         "grace period expired", false);
+        n = it3.next();
+        validateDataNode(n, "lfenum2", DT_LL, ENUMERATION, "*", false);
+    }
+
 
     @Test
     public void allDataTypesTest() {
