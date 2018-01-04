@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.onosproject.yang.model.LeafType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,25 +72,49 @@ public class DefaultJsonBuilder implements JsonBuilder {
             default:
                 log.error("Unknown support type {} for this method.", nodeType);
         }
-
     }
 
     @Override
     public void addNodeWithValueTopHalf(String nodeName, String value,
-                                        String valNamespace) {
+                                        String valNamespace, LeafType type) {
         if (isNullOrEmpty(nodeName)) {
             return;
         }
         appendField(nodeName);
-        treeString.append(QUOTE);
         if (valNamespace != null) {
+            treeString.append(QUOTE);
             treeString.append(valNamespace);
             treeString.append(COLON);
         }
-        treeString.append(value);
-
-        treeString.append(QUOTE);
+        appendLeafValue(type, value, valNamespace);
         treeString.append(COMMA);
+    }
+
+    /**
+     * Appends the value with quotes orr without quotes based on given
+     * leaf-type.
+     *
+     * @param type current leaf type
+     * @param v    value
+     * @param ns   namespace for value in case of identity ref
+     */
+    private void appendLeafValue(LeafType type, String v, String ns) {
+        switch (type) {
+            case INT8:
+            case INT16:
+            case UINT8:
+            case INT32:
+            case UINT16:
+            case UINT32:
+                treeString.append(v);
+                break;
+            default:
+                if (ns == null) {
+                    treeString.append(QUOTE);
+                }
+                treeString.append(v);
+                treeString.append(QUOTE);
+        }
     }
 
     @Override
@@ -108,18 +133,16 @@ public class DefaultJsonBuilder implements JsonBuilder {
     }
 
     @Override
-    public void addValueToLeafListNode(String value, String valNamespace) {
-        if (isNullOrEmpty(value)) {
+    public void addValueToLeafListNode(String v, String ns, LeafType t) {
+        if (isNullOrEmpty(v)) {
             return;
         }
-
-        treeString.append(QUOTE);
-        treeString.append(value);
-        if (valNamespace != null) {
+        if (ns != null) {
+            treeString.append(QUOTE);
+            treeString.append(ns);
             treeString.append(COLON);
-            treeString.append(valNamespace);
         }
-        treeString.append(QUOTE);
+        appendLeafValue(t, v, ns);
         treeString.append(COMMA);
     }
 

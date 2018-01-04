@@ -70,9 +70,8 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
                     valNamespace = getModuleNameFromNameSpace(
                             jsonSerializerContext, sLeafNode.valueNamespace());
                 }
-                jsonBuilder.addNodeWithValueTopHalf(nodeName,
-                                                    sLeafNode.asString(),
-                                                    valNamespace);
+                jsonBuilder.addNodeWithValueTopHalf(nodeName, sLeafNode.asString(),
+                                                    valNamespace, sLeafNode.leafType());
                 break;
             case MULTI_INSTANCE_LEAF_VALUE_NODE:
                 if (siblingType == FIRST_INSTANCE ||
@@ -84,8 +83,9 @@ public class DataNodeJsonVisitor implements DataNodeVisitor {
                     valNamespace = getModuleNameFromNameSpace(
                             jsonSerializerContext, mLeafNode.valueNamespace());
                 }
-                jsonBuilder.addValueToLeafListNode(mLeafNode.asString(),
-                                                   valNamespace);
+                jsonBuilder.addValueToLeafListNode(
+                        mLeafNode.asString(), valNamespace,
+                        mLeafNode.leafType());
                 break;
             default:
                 break;

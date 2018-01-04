@@ -62,13 +62,21 @@ public class JsonSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
 
-    private static String outputIdTestJson = "{\"identity-test:con1\":{\"inte" +
-            "rface\":\"identity-types:physical\",\"interfaces\":{\"int-list" +
-            "\":[{\"iden\":\"identity-types-second:virtual\",\"available\":" +
-            "{\"ll\":[\"Loopback:identity-types\",\"Giga:identity-test\",\"" +
-            "Ethernet:identity-types-second\"]}},{\"iden\":\"optical\",\"av" +
-            "ailable\":{\"ll\":[\"Giga\"]}}]}}}";
+    private static String outputIdTestJson = "{\"identity-test:con1\":{" +
+            "\"interface\":\"identity-types:physical\",\"interfaces\":{" +
+            "\"int-list\":[{\"iden\":\"identity-types-second:virtual\"," +
+            "\"available\":{\"ll\":[\"identity-types:Loopback\"," +
+            "\"identity-test:Giga\",\"identity-types-second:Ethernet\"]}}," +
+            "{\"iden\":\"optical\",\"available\":{\"ll\":[\"Giga\"]}}]}}}";
 
+    private static String outputIdTestJson1 = "{\"jsonlist:c2\":{\"leaflist1" +
+            "\":[\"a\",\"b\",\"c\"],\"leaf1\":1,\"leaf2\":2,\"leaf3\":3," +
+            "\"leaf4\":4,\"leaf5\":5,\"leaf6\":6,\"leaf7\":\"7\",\"leaf8\"" +
+            ":\"8\",\"leaf9\":\"true\",\"leaf10\":\"-922337203685477580.8\"" +
+            ",\"ll1\":[1,10],\"ll2\":[2,20],\"ll3\":[3,30],\"ll4\":[4,40],\"" +
+            "ll5\":[5,50],\"ll6\":[6,60],\"ll7\":[\"7\",\"70\"],\"ll8\":[\"" +
+            "8\",\"80\"],\"ll9\":[\"true\",\"false\"],\"ll10\":[" +
+            "\"-922337203685477580.8\",\"-922337203685477480.8\"]}}";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -103,6 +111,42 @@ public class JsonSerializerTest {
         try {
             rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
             assertEquals(true, rootNodeOutput != null);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void jsonListTest() throws IOException {
+        String path = "src/test/resources/testinput1.json";
+        // decode
+        DefaultCompositeStream external =
+                new DefaultCompositeStream("jsonlist:top1", parseInput(path));
+        CompositeData compositeData = jsonSerializer.decode(external, context);
+        ResourceData resourceData = compositeData.resourceData();
+        ResourceId rid = resourceData.resourceId();
+        DataNode rootNode = resourceData.dataNodes().get(0);
+
+        // encode
+        RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
+        runtimeContextBuilder.setDataFormat("JSON");
+        DefaultResourceData.Builder resourceDataBuilder = DefaultResourceData.builder();
+        resourceDataBuilder.addDataNode(rootNode);
+        resourceDataBuilder.resourceId(rid);
+
+        ResourceData resourceDataOutput = resourceDataBuilder.build();
+        DefaultCompositeData.Builder compositeDataBuilder = DefaultCompositeData.builder();
+        compositeDataBuilder.resourceData(resourceDataOutput);
+        CompositeData compositeData1 = compositeDataBuilder.build();
+        // CompositeData --- YangRuntimeService ---> CompositeStream.
+        CompositeStream compositeStreamOutPut = jsonSerializer.encode(compositeData1,
+                                                                      context);
+        InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
+        ObjectNode rootNodeOutput;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+            assertEquals(rootNodeOutput.toString(), outputIdTestJson1);
         } catch (IOException e) {
             throw e;
         }

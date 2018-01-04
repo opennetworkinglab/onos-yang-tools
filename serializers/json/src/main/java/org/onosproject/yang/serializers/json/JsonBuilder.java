@@ -18,6 +18,7 @@ package org.onosproject.yang.serializers.json;
 
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.onosproject.yang.model.LeafType;
 
 import java.util.Set;
 
@@ -43,12 +44,13 @@ public interface JsonBuilder {
      * both single instance and multi instance node. Protocols aware of nature
      * of node will use it for single instance value node addition.
      *
-     * @param nodeName name of child to be added
-     * @param value    value of the child node
+     * @param nodeName     name of child to be added
+     * @param value        value of the child node
      * @param valNamespace value namespace
+     * @param type         leaf value type
      */
     void addNodeWithValueTopHalf(String nodeName, String value,
-                                 String valNamespace);
+                                 String valNamespace, LeafType type);
 
     /**
      * Adds a child with list of values to JSON data tree. This method is
@@ -63,10 +65,11 @@ public interface JsonBuilder {
     /**
      * Adds value to a leaf list node.
      *
-     * @param value value to be added
+     * @param value        value to be added
      * @param valNamespace value namespace
+     * @param type         leaf-list value type
      */
-    void addValueToLeafListNode(String value, String valNamespace);
+    void addValueToLeafListNode(String value, String valNamespace, LeafType type);
 
     /**
      * Adds the bottom half(a right brace/bracket) of a JSON
