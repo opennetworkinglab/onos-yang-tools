@@ -34,7 +34,6 @@ import static org.onosproject.yang.compiler.translator.tojava.GeneratedTempFileT
 import static org.onosproject.yang.compiler.translator.tojava.JavaAttributeInfo.getAttributeInfoForTheData;
 import static org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator.getQualifiedTypeInfoOfCurNode;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGenerator.generateServiceInterfaceFile;
-import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.addResolvedAugmentedDataNodeImports;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.createPackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.MethodsGenerator.getRpcServiceMethod;
 import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
@@ -113,7 +112,9 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
 
-        addResolvedAugmentedDataNodeImports(curNode);
+        // Commenting out call to add resolved augmented info as its not
+        // required for service interface creation.
+        //addResolvedAugmentedDataNodeImports(curNode);
         JavaQualifiedTypeInfoTranslator typeInfo =
                 new JavaQualifiedTypeInfoTranslator();
         typeInfo.setClassInfo(RPC_SERVICE);
