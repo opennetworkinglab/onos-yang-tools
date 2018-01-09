@@ -30,6 +30,7 @@ public interface ModelConverter {
      *
      * @param data resource data
      * @return model object data of specified resource data
+     * @throws ModelConverterException when fails to perform model conversion
      */
     ModelObjectData createModel(ResourceData data);
 
@@ -42,6 +43,7 @@ public interface ModelConverter {
      *
      * @param modelData model object data
      * @return resource data corresponds to model object
+     * @throws ModelConverterException when fails to perform model conversion
      */
     ResourceData createDataNode(ModelObjectData modelData);
 }
