@@ -37,6 +37,7 @@ import org.onosproject.yang.model.DefaultResourceData.Builder;
 import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.LeafNode;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectData;
 import org.onosproject.yang.model.ModelObjectId;

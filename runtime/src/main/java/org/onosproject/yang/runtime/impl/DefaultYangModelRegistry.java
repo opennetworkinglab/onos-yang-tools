@@ -27,6 +27,7 @@ import org.onosproject.yang.compiler.datamodel.YangSubModule;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.tool.YangModuleExtendedInfo;
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.SchemaId;

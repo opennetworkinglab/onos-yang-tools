@@ -35,6 +35,7 @@ import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.AtomicPath;
 import org.onosproject.yang.model.LeafSchemaContext;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.model.MultiInstanceLeaf;
 import org.onosproject.yang.model.MultiInstanceNode;
 import org.onosproject.yang.model.SingleInstanceLeaf;

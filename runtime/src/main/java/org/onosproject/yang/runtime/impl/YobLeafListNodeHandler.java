@@ -22,6 +22,7 @@ import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.javadatamodel.JavaQualifiedTypeInfoContainer;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.LeafNode;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.runtime.YangModelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

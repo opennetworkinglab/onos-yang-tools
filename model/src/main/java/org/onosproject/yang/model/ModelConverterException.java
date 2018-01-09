@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package org.onosproject.yang.runtime.impl;
+package org.onosproject.yang.model;
 
 /**
  * Represents exception that needs to be handled by model converter.
  */
-// extending ModelConvertorException for backward compatibility,
-// directly extend RuntimeException when removing Exception class with typo
-@SuppressWarnings("deprecation")
-class ModelConverterException
-    extends ModelConvertorException {
+public class ModelConverterException extends RuntimeException {
 
     private static final long serialVersionUID = 4586537426529302237L;
 
@@ -32,7 +28,7 @@ class ModelConverterException
      *
      * @param exceptionMessage message with which exception must be thrown
      */
-    ModelConverterException(String exceptionMessage) {
+    public ModelConverterException(String exceptionMessage) {
         super(exceptionMessage);
     }
 
@@ -42,7 +38,7 @@ class ModelConverterException
      * @param exceptionMessage message with which exception must be thrown
      * @param cause cause of the exception
      */
-    ModelConverterException(String exceptionMessage, Throwable cause) {
+    public ModelConverterException(String exceptionMessage, Throwable cause) {
         super(exceptionMessage, cause);
     }
 
@@ -51,7 +47,7 @@ class ModelConverterException
      *
      * @param cause cause of the exception
      */
-    ModelConverterException(Throwable cause) {
+    public ModelConverterException(Throwable cause) {
         super(cause);
     }
 }

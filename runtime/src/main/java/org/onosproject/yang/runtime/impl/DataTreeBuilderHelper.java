@@ -34,6 +34,7 @@ import org.onosproject.yang.model.InnerNode;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.LeafSchemaContext;
 import org.onosproject.yang.model.LeafType;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.model.YangNamespace;
 
 import java.util.ArrayList;

@@ -38,6 +38,7 @@ import org.onosproject.yang.model.LeafListKey;
 import org.onosproject.yang.model.LeafModelObject;
 import org.onosproject.yang.model.LeafNode;
 import org.onosproject.yang.model.ListKey;
+import org.onosproject.yang.model.ModelConverterException;
 import org.onosproject.yang.model.ModelObject;
 import org.onosproject.yang.model.ModelObjectId;
 import org.onosproject.yang.model.MultiInstanceObject;

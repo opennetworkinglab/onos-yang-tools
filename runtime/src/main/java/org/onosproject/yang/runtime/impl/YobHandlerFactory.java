@@ -17,6 +17,7 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.model.DataNode;
+import org.onosproject.yang.model.ModelConverterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
