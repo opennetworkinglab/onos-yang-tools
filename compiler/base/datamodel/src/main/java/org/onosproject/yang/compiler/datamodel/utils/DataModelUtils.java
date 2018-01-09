@@ -916,7 +916,9 @@ public final class DataModelUtils {
      *
      * @param dataType the data type
      * @return true, for empty resolved data-type; false otherwise
+     * @deprecated use LeafContextUtil.getLeafType instead
      */
+    @Deprecated
     public static boolean validateEmptyDataType(YangType dataType) {
         switch (dataType.getDataType()) {
             case DERIVED:

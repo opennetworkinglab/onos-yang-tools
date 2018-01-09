@@ -16,11 +16,10 @@
 
 package org.onosproject.yang.compiler.datamodel;
 
+import java.util.Map;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.model.SchemaContext;
 import org.onosproject.yang.model.YangNamespace;
-
-import java.util.Map;
 
 /**
  * Abstraction of YANG data node, used by YMS to abstractly refer the data
@@ -44,7 +43,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws DataModelException data model exception in searching the child
      */
     YangSchemaNodeContextInfo getChildSchema(YangSchemaNodeIdentifier dataNodeIdentifier)
-            throws DataModelException;
+        throws DataModelException;
 
     /**
      * Validates whether the leaf/leaf-list value is valid as per YANG. It is
@@ -54,7 +53,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws DataModelException a violation in data model rule
      */
     void isValueValid(String value)
-            throws DataModelException;
+        throws DataModelException;
 
     /**
      * Returns count of mandatory child nodes, this is used by YMS to identify
@@ -64,7 +63,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws DataModelException a violation in data model rule
      */
     int getMandatoryChildCount()
-            throws DataModelException;
+        throws DataModelException;
 
     /**
      * Returns map of default child nodes, this is used by YMS to identify
@@ -75,7 +74,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @return map of default child nodes
      */
     Map<YangSchemaNodeIdentifier, YangSchemaNode> getDefaultChild(
-            YangSchemaNodeIdentifier dataNodeIdentifier);
+        YangSchemaNodeIdentifier dataNodeIdentifier);
 
     /**
      * Get Java class's package corresponding to the schema node.
@@ -128,7 +127,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws DataModelException a violation in data model rule
      */
     boolean isNotificationPresent()
-            throws DataModelException;
+        throws DataModelException;
 
     /**
      * Checks for the presence of rpc in module/sub-module. Exception
@@ -149,7 +148,7 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws DataModelException a violation in data model rule
      */
     YangSchemaNode getNotificationSchemaNode(String notificationNameInEnum)
-            throws DataModelException;
+        throws DataModelException;
 
     /**
      * Returns referred schema node in case of grouping.
@@ -165,7 +164,9 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      *
      * @return true if empty data-type is present, false otherwise
      * @throws DataModelException when fails to do data model operations
+     * @deprecated use LeafSchemaContext getLeafType() instead
      */
+    @Deprecated
     boolean isEmptyDataType() throws DataModelException;
 
     /**
@@ -190,5 +191,5 @@ public interface YangSchemaNode extends LocationInfo, SchemaContext {
      * @throws IllegalArgumentException when fails to do data model operations
      */
     YangSchemaNode addSchema(YangSchemaNode containedSchema)
-            throws IllegalArgumentException;
+        throws IllegalArgumentException;
 }
