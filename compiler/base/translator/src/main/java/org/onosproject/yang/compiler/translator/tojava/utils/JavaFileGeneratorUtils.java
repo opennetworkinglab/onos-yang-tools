@@ -16,7 +16,6 @@
 
 package org.onosproject.yang.compiler.translator.tojava.utils;
 
-import org.onosproject.yang.compiler.datamodel.InvalidOpTypeHolder;
 import org.onosproject.yang.compiler.datamodel.YangAppDataStructure;
 import org.onosproject.yang.compiler.datamodel.YangAtomicPath;
 import org.onosproject.yang.compiler.datamodel.YangAugment;
@@ -39,7 +38,6 @@ import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.JavaImportData;
 import org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaBeanFragmentFiles;
-import org.onosproject.yang.compiler.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaEnumerationFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaEventFragmentFiles;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaFragmentFiles;
@@ -126,7 +124,6 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.KEYS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LEAFREF;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEG_ONE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.NEW_LINE;
-import static org.onosproject.yang.compiler.utils.UtilConstants.OP_PARAM;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PACKAGE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PUBLIC;
@@ -716,56 +713,6 @@ public final class JavaFileGeneratorUtils {
             }
         }
         return isPresent;
-    }
-
-    /**
-     * Adds resolved augmented node imports to manager class.
-     *
-     * @param parent parent node
-     */
-    public static void addResolvedAugmentedDataNodeImports(YangNode parent) {
-        List<YangAtomicPath> targets = getSetOfNodeIdentifiers(parent);
-        if (targets.isEmpty()) {
-            return;
-        }
-
-        YangNode node = targets.get(0).getResolvedNode();
-        if (node instanceof InvalidOpTypeHolder) {
-            return;
-        }
-
-        TempJavaCodeFragmentFiles tempJavaCodeFragmentFiles = (
-                (JavaCodeGeneratorInfo) parent)
-                .getTempJavaCodeFragmentFiles();
-        YangNode augmentedNode;
-        JavaQualifiedTypeInfoTranslator typeInfo;
-        String curNodeName;
-        JavaFileInfoTranslator parentInfo = ((JavaFileInfoContainer) parent)
-                .getJavaFileInfo();
-        for (YangAtomicPath nodeId : targets) {
-            augmentedNode = nodeId.getResolvedNode().getParent();
-            curNodeName = getCurNodeName(augmentedNode, parentInfo
-                    .getPluginConfig());
-
-            typeInfo =
-                    getQTypeInfoOfNode(
-                            augmentedNode, curNodeName + OP_PARAM,
-                            parentInfo.getPluginConfig());
-
-            tempJavaCodeFragmentFiles.getServiceTempFiles()
-                    .getJavaImportData().addImportInfo(
-                    typeInfo, parentInfo.getJavaName(),
-                    parentInfo.getPackage());
-            typeInfo =
-                    getQTypeInfoOfNode(
-                            augmentedNode, curNodeName, parentInfo
-                                    .getPluginConfig());
-
-            tempJavaCodeFragmentFiles.getServiceTempFiles()
-                    .getJavaImportData().addImportInfo(
-                    typeInfo, parentInfo.getJavaName(),
-                    parentInfo.getPackage());
-        }
     }
 
     /**

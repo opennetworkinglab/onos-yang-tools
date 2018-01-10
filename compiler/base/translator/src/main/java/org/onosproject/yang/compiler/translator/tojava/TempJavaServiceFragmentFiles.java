@@ -112,9 +112,6 @@ public class TempJavaServiceFragmentFiles extends TempJavaFragmentFiles {
     public void generateJavaFile(int fileType, YangNode curNode)
             throws IOException {
 
-        // Commenting out call to add resolved augmented info as its not
-        // required for service interface creation.
-        //addResolvedAugmentedDataNodeImports(curNode);
         JavaQualifiedTypeInfoTranslator typeInfo =
                 new JavaQualifiedTypeInfoTranslator();
         typeInfo.setClassInfo(RPC_SERVICE);

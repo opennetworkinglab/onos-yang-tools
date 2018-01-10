@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.translator.tojava.javamodel;
 
+import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.YangDerivedInfo;
 import org.onosproject.yang.compiler.datamodel.YangEnumeration;
 import org.onosproject.yang.compiler.datamodel.YangIdentity;
@@ -25,13 +26,11 @@ import org.onosproject.yang.compiler.datamodel.YangNode;
 import org.onosproject.yang.compiler.datamodel.YangType;
 import org.onosproject.yang.compiler.datamodel.YangTypeDef;
 import org.onosproject.yang.compiler.datamodel.YangUnion;
-import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorInfo;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoContainer;
 import org.onosproject.yang.compiler.translator.tojava.JavaFileInfoTranslator;
-import org.onosproject.yang.compiler.utils.UtilConstants;
 import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
 
 import java.util.Stack;
@@ -46,6 +45,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.BOOLEAN_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.BYTE_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLLECTION_IMPORTS;
+import static org.onosproject.yang.compiler.utils.UtilConstants.IDENTITY;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INTEGER_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAVA_LANG;
@@ -58,6 +58,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SHORT_WRAPPER;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SQUARE_BRACKETS;
 import static org.onosproject.yang.compiler.utils.UtilConstants.STRING_DATA_TYPE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.TYPEDEF;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCamelCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getCapitalCase;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.getPackageDirPathFromJavaJPackage;
@@ -239,7 +240,7 @@ public final class AttributesJavaDataType {
                 .getDataTypeExtendedInfo();
         YangTypeDef typeDef = derivedInfo.getReferredTypeDef();
         if (typeDef.isNameConflict()) {
-            name = name + UtilConstants.TYPEDEF;
+            name = name + TYPEDEF;
         }
         return getCapitalCase(getCamelCase(name, pluginConfig));
     }
@@ -426,12 +427,12 @@ public final class AttributesJavaDataType {
     /**
      * Returns type package.
      *
-     * @param info             YANG code generator info
-     * @param conflictResolver object of YANG to java naming conflict util
+     * @param info YANG code generator info
+     * @param conf object of YANG to java naming conflict util
      * @return type java package
      */
-    private static String getTypePackage(JavaCodeGeneratorInfo info,
-                                         YangToJavaNamingConflictUtil conflictResolver) {
+    public static String getTypePackage(JavaCodeGeneratorInfo info,
+                                        YangToJavaNamingConflictUtil conf) {
         YangNode node = (YangNode) info;
         // Check for referred schema type node for grouping scenario.
         while (node.getReferredSchema() != null) {
@@ -439,7 +440,7 @@ public final class AttributesJavaDataType {
         }
         info = (JavaCodeGeneratorInfo) node;
         if (info.getJavaFileInfo().getPackage() == null) {
-            return getPackageFromParent(node.getParent(), conflictResolver);
+            return getPackageFromParent(node.getParent(), conf);
         }
         return info.getJavaFileInfo().getPackage();
     }
@@ -572,7 +573,7 @@ public final class AttributesJavaDataType {
     }
 
     /**
-     * Returns identity ref import class.
+     * Returns identity-ref import class name.
      *
      * @param type YANG type
      * @param cnfg YANG to java naming conflict util
@@ -585,11 +586,23 @@ public final class AttributesJavaDataType {
             return OBJECT_STRING;
         }
         YangIdentity identity = ir.getReferredIdentity();
-        String name = identity.getName();
-        if (identity.isNameConflict()) {
-            name = name + UtilConstants.IDENTITY;
+        return getCapitalCase(getIdJavaName(identity, cnfg));
+    }
+
+    /**
+     * Returns java name of the YANG identity.
+     *
+     * @param id   YANG identity
+     * @param cnfg YANG to java naming conflict util
+     * @return identity java name
+     */
+    public static String getIdJavaName(YangIdentity id,
+                                       YangToJavaNamingConflictUtil cnfg) {
+        String name = id.getName();
+        if (id.isNameConflict()) {
+            name = name + IDENTITY;
         }
-        return getCapitalCase(getCamelCase(name, cnfg));
+        return getCamelCase(name, cnfg);
     }
 
     /**

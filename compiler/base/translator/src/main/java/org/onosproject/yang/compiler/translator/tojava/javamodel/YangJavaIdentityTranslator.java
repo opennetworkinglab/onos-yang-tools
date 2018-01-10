@@ -25,6 +25,7 @@ import org.onosproject.yang.compiler.translator.tojava.JavaImportData;
 import org.onosproject.yang.compiler.translator.tojava.JavaQualifiedTypeInfoTranslator;
 import org.onosproject.yang.compiler.translator.tojava.TempJavaCodeFragmentFiles;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,8 @@ import java.util.List;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_IDENTITY_CLASS;
 import static org.onosproject.yang.compiler.translator.tojava.GeneratedJavaFileType.GENERATE_INTERFACE_WITH_BUILDER;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.updatePackageInfo;
+import static org.onosproject.yang.compiler.translator.tojava.javamodel.AttributesJavaDataType.getIdJavaName;
+import static org.onosproject.yang.compiler.translator.tojava.javamodel.AttributesJavaDataType.getTypePackage;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getDerivedPkfInfo;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.getFileObject;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaFileGeneratorUtils.initiateJavaFileGeneration;
@@ -122,14 +125,14 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
      * Prepare the information for java code generation corresponding to YANG
      * container info.
      *
-     * @param yangPlugin YANG plugin config
+     * @param plg YANG plugin config
      * @throws TranslatorException translator operation fail
      */
     @Override
-    public void generateCodeEntry(YangPluginConfig yangPlugin) throws TranslatorException {
+    public void generateCodeEntry(YangPluginConfig plg) throws TranslatorException {
         try {
 
-            updatePackageInfo(this, yangPlugin);
+            updatePackageInfo(this, plg);
             JavaQualifiedTypeInfoTranslator basePkgInfo =
                     new JavaQualifiedTypeInfoTranslator();
             JavaFileInfoTranslator itsInfo = getJavaFileInfo();
@@ -137,32 +140,44 @@ public class YangJavaIdentityTranslator extends YangJavaIdentity
             String className = getCapitalCase(name);
             String path = itsInfo.getPackageFilePath();
             createPackage(this);
+
             List<String> imports = null;
             boolean isQualified;
             List<YangIdentity> idList = getExtendList();
-            if (getBaseNode() != null && getBaseNode().getReferredIdentity() != null) {
-                if (!(getBaseNode().getReferredIdentity() instanceof YangJavaIdentityTranslator)) {
-                    throw new TranslatorException(getErrorMsg(FAIL_AT_ENTRY, this,
-                                                              EMPTY_STRING));
+
+            if (getBaseNode() != null &&
+                    getBaseNode().getReferredIdentity() != null) {
+                if (!(getBaseNode().getReferredIdentity()
+                        instanceof YangJavaIdentityTranslator)) {
+                    throw new TranslatorException(
+                            getErrorMsg(FAIL_AT_ENTRY, this, EMPTY_STRING));
                 }
                 YangJavaIdentityTranslator base =
-                        (YangJavaIdentityTranslator) getBaseNode().getReferredIdentity();
+                        (YangJavaIdentityTranslator) getBaseNode()
+                                .getReferredIdentity();
                 JavaFileInfoTranslator info = base.getJavaFileInfo();
-                String baseClassName = getCapitalCase(info.getJavaName());
-                String basePkg = info.getPackage();
-                basePkgInfo.setClassInfo(baseClassName);
-                basePkgInfo.setPkgInfo(basePkg);
-                isQualified = importData.addImportInfo(basePkgInfo, className,
-                                                       javaFileInfo.getPackage());
+                YangToJavaNamingConflictUtil conf = plg.getConflictResolver();
+
+                if (info.getPackage() == null || info.getJavaName() == null) {
+                    info.setJavaName(getIdJavaName(base, conf));
+                    info.setPackage(getTypePackage(base, conf));
+                }
+
+                basePkgInfo.setClassInfo(getCapitalCase(info.getJavaName()));
+                basePkgInfo.setPkgInfo(info.getPackage());
+                isQualified = importData.addImportInfo(
+                        basePkgInfo, className, javaFileInfo.getPackage());
                 if (!isQualified) {
                     imports = importData.getImports(true);
                 }
             }
+
             imports = getImportOfDerId(idList, imports, className);
+            File file = getFileObject(path, className,
+                                      JAVA_FILE_EXTENSION, itsInfo);
+            initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS,
+                                       imports, this, className);
 
-            File file = getFileObject(path, className, JAVA_FILE_EXTENSION, itsInfo);
-
-            initiateJavaFileGeneration(file, GENERATE_IDENTITY_CLASS, imports, this, className);
             //Add to string and from string method to class
             addStringMethodsToClass(file, name, idList);
             insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
