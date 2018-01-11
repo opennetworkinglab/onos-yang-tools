@@ -118,7 +118,7 @@ public final class LeafContextUtil {
                 try {
                     YangBits e = ((YangBits) typeInfo
                             .getDataTypeExtendedInfo());
-                    String[] bitSet = v.split(SPACE);
+                    String[] bitSet = v.trim().split(SPACE);
                     Set set = new HashSet(Arrays.asList(bitSet));
                     if (e.getBitNameMap().keySet().containsAll(set)) {
                         return v;
