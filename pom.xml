@@ -32,6 +32,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <onos-build-conf.version>1.12.0</onos-build-conf.version>
         <guava.version>22.0</guava.version>
+        <errorprone.version>2.2.0</errorprone.version>
+        <betachecker.version>1.0</betachecker.version>
     </properties>
 
     <modules>
@@ -58,18 +60,20 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <version>5.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.3</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
@@ -86,11 +90,54 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <compilerId>javac-with-errorprone</compilerId>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <annotationProcessorPaths>
+                      <path>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava-beta-checker</artifactId>
+                        <version>${betachecker.version}</version>
+                      </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                      <compilerArg>-Xpkginfo:always</compilerArg>
+                      <arg>-Xep:BetaApi:WARN</arg>
+                      <!-- FIXME remove below once generated code is fixed -->
+                      <arg>-XepExcludedPaths:${project.build.directory}/generated-sources/.*</arg>
+                    </compilerArgs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <compilerArgs>
+                              <arg>-Xep:BetaApi:OFF</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                      <groupId>org.codehaus.plexus</groupId>
+                      <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                      <version>2.8.2</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>com.google.errorprone</groupId>
+                      <artifactId>error_prone_core</artifactId>
+                      <!-- override plexus-compiler-javac-errorprone's dependency with the
+                           latest Error Prone version -->
+                      <version>${errorprone.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -147,4 +194,39 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.21</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>

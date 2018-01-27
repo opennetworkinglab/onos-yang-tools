@@ -39,11 +39,6 @@
             <artifactId>onos-yang-serializers-utils</artifactId>
             <version>2.4-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>RELEASE</version>
-        </dependency>
     </dependencies>
 
     <build>

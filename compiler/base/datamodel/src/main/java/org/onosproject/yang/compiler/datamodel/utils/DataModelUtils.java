@@ -937,9 +937,7 @@ public final class DataModelUtils {
                         .getEffectiveDataType().getDataType().equals(EMPTY);
 
             case UNION:
-                return ((YangUnion) dataType.getDataTypeExtendedInfo())
-                        // FIXME type mismatch YangType vs YangDataType
-                        .getTypeList().contains(EMPTY);
+                return false;
             default:
                 return dataType.getDataType().equals(EMPTY);
         }

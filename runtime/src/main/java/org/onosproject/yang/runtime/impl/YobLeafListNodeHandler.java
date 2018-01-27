@@ -94,7 +94,7 @@ class YobLeafListNodeHandler extends YobHandler {
                     .getDataType().getDataType() == IDENTITYREF) {
                 ParameterizedType type = (ParameterizedType)
                         genericListType.getActualTypeArguments()[0];
-                genericListClass = type.getClass().getClass();
+                genericListClass = Class.class;
             } else {
                 genericListClass = (Class<?>) genericListType.getActualTypeArguments()[0];
             }

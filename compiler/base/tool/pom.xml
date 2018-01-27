@@ -34,18 +34,17 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-parser</artifactId>
-            <version>2.4-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-api</artifactId>
-            <version>2.4-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
