@@ -1142,7 +1142,7 @@ public final class UtilConstants {
                     "package", "private", "protected", "public", "return",
                     "short", "static", "strictfp", "super", "switch",
                     "synchronized", "this", "throw", "throws", "transient",
-                    "true", "try", "void", "volatile", "while",
+                    "true", "try", "void", "volatile", "while", "override",
                     "list", // Not a Java keyword
                     "map", // Not a Java keyword
                     "arrayList", // Not a Java keyword
