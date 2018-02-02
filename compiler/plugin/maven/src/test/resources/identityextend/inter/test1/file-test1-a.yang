@@ -1,0 +1,21 @@
+module file-test1-a {
+    yang-version 1;
+    namespace
+      "http://test1.org/ns/file/a";
+    prefix t1fa;
+
+    revision "2009-11-21" {
+      description
+        "sample module in progress.";
+    }
+
+    identity id1;
+
+    identity id2 {
+       base "id1";
+    }
+
+    identity id3 {
+       base "id1";
+    }
+}

@@ -70,6 +70,9 @@ public abstract class YangIdentity
     //YANG reference of the identity.
     private String reference;
 
+    //Status if identity is added to all the parent.
+    private boolean isAddedToAllParent;
+
     /*
      * Identity extend list to contain list of all the direct/indirect derived
      * identities.
@@ -212,5 +215,23 @@ public abstract class YangIdentity
     @Override
     public void setConflictFlag() {
         nameConflict = true;
+    }
+
+    /**
+     * Returns if the identity is added to all the parent nodes.
+     *
+     * @return returns true if added; false otherwise
+     */
+    public boolean isAddedToAllParent() {
+        return isAddedToAllParent;
+    }
+
+    /**
+     * Sets if the identity is added to all the parent nodes.
+     *
+     * @param addedToAllParent sets true if added; false otherwise
+     */
+    public void setAddedToAllParent(boolean addedToAllParent) {
+        isAddedToAllParent = addedToAllParent;
     }
 }

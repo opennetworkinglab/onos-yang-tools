@@ -16,6 +16,7 @@
 package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
+import org.onosproject.yang.compiler.datamodel.utils.IdentityHandler;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.onosproject.yang.model.YangNamespace;
@@ -962,6 +963,18 @@ public abstract class YangSubModule
     public void resolveUniqueLinking() throws DataModelException {
         for (YangUniqueHolder holder : uniqueHolderList) {
             validateUniqueInList(holder);
+        }
+    }
+
+    /**
+     * Adds all the derived identities to the base identity.
+     *
+     * @throws DataModelException a violation of data model rules
+     */
+    public void resolveIdentityExtendList() throws DataModelException {
+        for (YangResolutionInfo base : baseResolutionList) {
+            new IdentityHandler((YangBase) base.getEntityToResolveInfo()
+                    .getEntityToResolve());
         }
     }
 

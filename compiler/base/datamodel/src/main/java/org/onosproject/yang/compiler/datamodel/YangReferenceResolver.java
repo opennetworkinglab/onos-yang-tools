@@ -149,6 +149,13 @@ public interface YangReferenceResolver {
     void resolveUniqueLinking() throws DataModelException;
 
     /**
+     * Resolves identity extend list.
+     *
+     * @throws DataModelException a violation in data model rule
+     */
+    void resolveIdentityExtendList() throws DataModelException;
+
+    /**
      * Adds references to include.
      *
      * @param yangNodeSet YANG node info set

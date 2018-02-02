@@ -1,0 +1,35 @@
+module file-test1-c {
+    yang-version 1;
+    namespace
+      "http://test1.org/ns/file/c";
+    prefix t1fc;
+
+    import file-test1-a {
+        prefix t1fa;
+    }
+
+    import file-test1-b {
+        prefix t1fb;
+    }
+
+    revision "2009-11-21" {
+      description
+        "sample module in progress.";
+    }
+
+    identity id8 {
+       base t1fa:id1;
+    }
+
+    identity id9 {
+       base t1fa:id1;
+    }
+
+    identity id10 {
+       base t1fb:id4;
+    }
+
+    identity id11 {
+       base t1fb:id4;
+    }
+}

@@ -1,0 +1,17 @@
+module fileb {
+    yang-version 1;
+    namespace
+      "http://netconfcentral.org/ns/file/b";
+    prefix fb;
+
+    revision "2009-11-20" {
+      description
+        "sample module in progress.";
+    }
+
+    identity int-type {
+    	description
+        "Base identity from which specific interface types are
+        derived.";
+    }
+}

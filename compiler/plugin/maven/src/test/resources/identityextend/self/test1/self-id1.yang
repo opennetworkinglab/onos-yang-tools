@@ -1,0 +1,37 @@
+module self-id1 {
+
+    namespace "self-id1";
+
+    prefix self-id1;
+
+    identity id3 {
+       base "id2";
+    }
+
+    identity id8 {
+       base "id2";
+    }
+
+    identity id2 {
+        base "id1";
+    }
+
+    identity id1;
+
+    identity id4 {
+       base "id3";
+    }
+
+    identity id5 {
+       base "id4";
+    }
+
+    identity id6 {
+       base "id4";
+    }
+
+    identity id7 {
+       base "id6";
+    }
+
+}

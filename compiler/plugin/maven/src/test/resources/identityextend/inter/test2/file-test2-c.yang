@@ -1,0 +1,63 @@
+module file-test2-c {
+    yang-version 1;
+    namespace
+      "http://test2.org/ns/file/c";
+    prefix t2fc;
+
+    import file-test2-b {
+        prefix t2fb;
+    }
+
+    revision "2009-11-21" {
+      description
+        "sample module in progress.";
+    }
+
+    identity id7 {
+       base t2fb:id6;
+    }
+
+    identity id8 {
+       base t2fb:id6;
+    }
+
+    identity id9 {
+       base t2fb:id6;
+    }
+
+    identity id10 {
+       base t2fb:id6;
+    }
+
+    identity id11 {
+       base id7;
+    }
+
+    identity id12 {
+       base id8;
+    }
+
+    identity id13 {
+       base id9;
+    }
+
+    identity id14 {
+       base id10;
+    }
+
+    identity id15 {
+       base id11;
+    }
+
+    identity id16 {
+       base id11;
+    }
+
+    identity id17 {
+       base id11;
+    }
+
+    identity id18 {
+       base id11;
+    }
+}

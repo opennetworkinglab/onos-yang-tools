@@ -1,0 +1,23 @@
+module filea {
+    yang-version 1;
+    namespace
+      "http://netconfcentral.org/ns/file/a";
+    prefix fa;
+
+    import fileb {
+        prefix f2;
+    }
+
+    revision "2009-11-20" {
+      description
+        "sample module in progress.";
+    }
+
+    container cc1 {
+        leaf type  {
+            type identityref {
+                base f2:int-type;
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+module filec {
+    yang-version 1;
+    namespace
+      "http://netconfcentral.org/ns/file/c";
+    prefix fc;
+
+    import fileb {
+        prefix f2;
+    }
+
+    revision "2009-11-20" {
+      description
+        "sample module in progress.";
+    }
+
+    identity ja-t {
+        base f2:int-type;
+    }
+
+    identity gtp {
+        base ja-t;
+    }
+
+    identity pdnEtherLoop1 {
+        base ja-t;
+    }
+
+    identity pdnEtherLoop2 {
+        base ja-t;
+    }
+
+    identity opticalChannelGroup {
+        base ja-t;
+    }
+
+    identity homepna {
+        base ja-t;
+    }
+}

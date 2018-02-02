@@ -96,6 +96,42 @@ public class YangLinkerManager
         processInterFileLinking(yangNodeSet);
 
         processUniqueLinking(yangNodeSet);
+
+        processIdentityExtendList(yangNodeSet);
+    }
+
+    /**
+     * Processes the identities and add it to all the parents respectively.
+     *
+     * @param nodeSet set of YANG files info
+     */
+    public void processIdentityExtendList(Set<YangNode> nodeSet) {
+        List<YangNode> list = new LinkedList<>();
+        list.addAll(nodeSet);
+        sort(list);
+        for (YangNode yangNode : list) {
+            try {
+                YangReferenceResolver resolver =
+                        ((YangReferenceResolver) yangNode);
+                resolver.resolveIdentityExtendList();
+            } catch (DataModelException e) {
+                String errorInfo = "Error in file: " + yangNode.getName() +
+                        " in " + yangNode.getFileName() + " at " +
+                        "line: " + e.getLineNumber() + " at position: " +
+                        e.getCharPositionInLine() + NEW_LINE +
+                        e.getLocalizedMessage();
+                throw new LinkerException(errorInfo);
+                // TODO add file path in exception message in util manager.
+            } catch (LinkerException e) {
+                String errorInfo = "Error in file: " + yangNode.getName() +
+                        " in " + yangNode.getFileName() + " at " +
+                        "line: " + e.getLineNumber() + " at position: " +
+                        e.getCharPositionInLine() + NEW_LINE +
+                        e.getLocalizedMessage();
+                throw new LinkerException(errorInfo);
+                // TODO add file path in exception message in util manager.
+            }
+        }
     }
 
     /**

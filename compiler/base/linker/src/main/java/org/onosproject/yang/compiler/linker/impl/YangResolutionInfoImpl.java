@@ -855,15 +855,7 @@ public class YangResolutionInfoImpl<T> extends DefaultLocationInfo
     private void addToIdentityExtendList(YangIdentity baseIdentity, YangIdentity
             referredIdentity) {
         YangIdentity referredId = referredIdentity;
-        while (referredId != null) {
-            referredId.addToExtendList(baseIdentity);
-            YangBase base = referredId.getBaseNode();
-            if (base == null) {
-                return;
-            } else {
-                referredId = base.getReferredIdentity();
-            }
-        }
+        referredId.addToExtendList(baseIdentity);
     }
 
     /**
