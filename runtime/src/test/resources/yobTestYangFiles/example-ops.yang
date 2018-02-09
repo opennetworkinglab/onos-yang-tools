@@ -1,0 +1,33 @@
+module example-ops {
+   namespace "https://example.com/ns/example-ops";
+   prefix "ops";
+   revision "2016-07-07" {
+   description "Initial version.";
+      reference "example.com document 3-3373.";
+   }
+
+   rpc reboot {
+       input {
+           leaf delay {
+               type string;
+           }
+           leaf message {
+               type string;
+           }
+           leaf language {
+               type string;
+           }
+       }
+       output {
+           leaf reboot-time {
+               type string;
+           }
+           leaf message {
+               type string;
+           }
+           leaf language {
+               type string;
+           }
+       }
+   }
+}

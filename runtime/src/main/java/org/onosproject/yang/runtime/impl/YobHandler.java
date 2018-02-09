@@ -17,6 +17,7 @@
 package org.onosproject.yang.runtime.impl;
 
 import org.onosproject.yang.compiler.datamodel.YangNode;
+import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.runtime.YangModelRegistry;
@@ -42,6 +43,12 @@ abstract class YobHandler {
      */
     YobWorkBench createObject(YangSchemaNode schemaNode,
                               DefaultYangModelRegistry reg) {
+        if (schemaNode instanceof YangRpc) {
+            // object should not be created for rpc node
+            return new YobWorkBench(null, null, null,
+                                    schemaNode);
+        }
+
         YangSchemaNode node = schemaNode;
         String setterName;
         YangNode n = (YangNode) node;

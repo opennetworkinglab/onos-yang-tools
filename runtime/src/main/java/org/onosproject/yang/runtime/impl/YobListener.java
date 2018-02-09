@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.runtime.impl;
 
+import org.onosproject.yang.compiler.datamodel.YangRpc;
 import org.onosproject.yang.compiler.datamodel.YangSchemaNode;
 import org.onosproject.yang.model.DataNode;
 import org.onosproject.yang.model.InnerNode;
@@ -173,7 +174,13 @@ class YobListener implements DataNodeListener {
         YobWorkBench curWb;
         YobWorkBench parentWb = null;
         if (node instanceof InnerNode) {
-            if (wbStack.size() == 1) {
+            /*
+             * If its top level node, it should not be set to parent or
+             * if node is RPC input or output node, it should not be set to
+             * parent.
+             */
+            if (wbStack.size() == 1 || (!wbStack.isEmpty() &&
+                wbStack.peek().schemaNode().getParentContext() instanceof YangRpc)) {
                 curWb = wbStack.pop();
                 YobHandler nodeHandler = handlerFactory.getYobHandlerForContext(node.type());
                 nodeHandler.buildObject(curWb, registry);
