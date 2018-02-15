@@ -18,7 +18,12 @@ set -x
 
 export OYT_TAG=$OYT_VERSION
 
+function cleanup {
+  ssh -p 29418 gerrit.onosproject.org projectlock unlock onos-yang-tools $OYT_BRANCH
+}
+
 ssh -p 29418 gerrit.onosproject.org projectlock lock onos-yang-tools $OYT_BRANCH
+trap cleanup EXIT
 
 mvn versions:set -DnewVersion=$OYT_VERSION versions:commit
 mvn -Prelease clean deploy
@@ -30,6 +35,5 @@ git commit -am"Bumping version to $OYT_SNAPSHOT"
 git push origin $OYT_BRANCH
 git push origin $OYT_TAG
 
-ssh -p 29418 gerrit.onosproject.org projectlock unlock onos-yang-tools $OYT_BRANCH
 
 unset OYT_VERSION OYT_SNAPSHOT OYT_BRANCH OYT_TAG
