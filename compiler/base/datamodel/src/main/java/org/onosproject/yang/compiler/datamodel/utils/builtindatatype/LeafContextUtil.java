@@ -100,7 +100,7 @@ public final class LeafContextUtil {
                 if (v.equals(T) || v.equals(F)) {
                     return Boolean.parseBoolean(v);
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid boolean value: " + v);
             case ENUMERATION:
                 try {
                     SortedSet<YangEnum> set = ((YangEnumeration) typeInfo
@@ -113,7 +113,7 @@ public final class LeafContextUtil {
                 } catch (Exception e) {
                     // do nothing
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid " + typeInfo + " value: " + v);
             case BITS:
                 try {
                     YangBits e = ((YangBits) typeInfo
@@ -126,12 +126,12 @@ public final class LeafContextUtil {
                 } catch (Exception e) {
                     // do nothing
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid " + typeInfo + " value: " + v);
             case BINARY:
                 if (v.matches(BREGEX)) {
                     return v;
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid " + typeInfo + " value: " + v);
             case IDENTITYREF:
             case STRING:
             case INSTANCE_IDENTIFIER:
@@ -151,7 +151,7 @@ public final class LeafContextUtil {
             case UNION:
                 return parseUnionTypeInfo(typeInfo, v);
             default:
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Unexpected data type " + type);
         }
     }
 
@@ -208,7 +208,7 @@ public final class LeafContextUtil {
             case UNION:
                 return getUnionValNamespace(typeInfo, v);
             default:
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Unexpected data type " + type);
         }
     }
 
@@ -223,7 +223,7 @@ public final class LeafContextUtil {
                 return i.getYangSchemaNodeIdentifier().getNameSpace();
             }
         }
-        throw new IllegalArgumentException("Invalid value of data");
+        throw new IllegalArgumentException("Invalid value of data: " + v);
     }
 
     private static YangNamespace getUnionValNamespace(YangType type,
@@ -239,7 +239,7 @@ public final class LeafContextUtil {
                 continue;
             }
         }
-        throw new IllegalArgumentException("Invalid value of data");
+        throw new IllegalArgumentException("Invalid value of data: " + leafValue);
     }
 
     /**
@@ -260,7 +260,7 @@ public final class LeafContextUtil {
                 continue;
             }
         }
-        throw new IllegalArgumentException("Invalid value of data");
+        throw new IllegalArgumentException("Invalid value of data: " + leafValue);
     }
 
     /**
@@ -302,12 +302,12 @@ public final class LeafContextUtil {
                 if (v == null || v.equals("") || (v.equals(T) || v.equals(F))) {
                     return LeafType.EMPTY;
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid empty value: " + v);
             case BOOLEAN:
                 if (v.equals(T) || v.equals(F)) {
                     return LeafType.BOOLEAN;
                 }
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Invalid boolean value: " + v);
             case BINARY:
                 return LeafType.BINARY;
             case BITS:
@@ -335,7 +335,7 @@ public final class LeafContextUtil {
             case UNION:
                 return parseUnionLeafType(typeInfo, v);
             default:
-                throw new IllegalArgumentException(E_DATATYPE);
+                throw new IllegalArgumentException("Unexpected data type " + type);
         }
     }
 

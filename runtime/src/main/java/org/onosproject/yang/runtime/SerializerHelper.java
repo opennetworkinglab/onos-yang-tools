@@ -124,7 +124,7 @@ public final class SerializerHelper {
                 builder.appInfo(parentCont);
             }
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw e;
         }
         return builder;
     }
@@ -178,7 +178,7 @@ public final class SerializerHelper {
                     try {
                         checkElementCount(name, keyLeafs.size(), value.size());
                     } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException(e.getMessage());
+                        throw e;
                     }
 
                     // After validation adding the key nodes under the list node.
@@ -201,7 +201,7 @@ public final class SerializerHelper {
                         errorMsg(FMT_NOT_EXIST, name));
             }
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw e;
         }
 
         builder.appInfo(child);
@@ -425,7 +425,7 @@ public final class SerializerHelper {
             nodeInfo.setResourceIdBuilder(rIdBldr);
             builder.appInfo(nodeInfo);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw e;
         }
         return builder;
     }
@@ -444,7 +444,7 @@ public final class SerializerHelper {
         try {
             ((YangLeafList) ctx).getDataType().isValidValue(val);
         } catch (DataModelException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
         return ctx.fromString(val);
     }
@@ -462,7 +462,7 @@ public final class SerializerHelper {
         try {
             ((YangLeaf) ctx).getDataType().isValidValue(val);
         } catch (DataModelException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
         return ctx.fromString(val);
     }

@@ -25,6 +25,8 @@ import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.DataTypeExc
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangUint64;
 
+import com.google.common.base.MoreObjects;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -397,7 +399,7 @@ public class YangType<T> extends DefaultLocationInfo
                         .listIterator();
                 boolean isValidated = false;
                 while (listIterator.hasNext()) {
-                    YangType<?> type = (YangType<?>) listIterator.next();
+                    YangType<?> type = listIterator.next();
                     try {
                         type.isValidValue(value);
                         // If it is not thrown exception then validation is success
@@ -462,7 +464,7 @@ public class YangType<T> extends DefaultLocationInfo
                     }
                 } else if (dataType == YangDataTypes.DECIMAL64) {
                     YangDerivedInfo derivedInfo = (YangDerivedInfo) getDataTypeExtendedInfo();
-                    YangTypeDef typedef = (YangTypeDef) derivedInfo.getReferredTypeDef();
+                    YangTypeDef typedef = derivedInfo.getReferredTypeDef();
                     YangType<YangDecimal64> decimal64Type =
                             (YangType<YangDecimal64>) typedef.getTypeList().iterator().next();
                     YangDecimal64<YangRangeRestriction> decimal64 = decimal64Type.getDataTypeExtendedInfo();
@@ -555,5 +557,18 @@ public class YangType<T> extends DefaultLocationInfo
             throws CloneNotSupportedException {
         YangType<T> clonedNode = (YangType<T>) super.clone();
         return clonedNode;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("nodeId", nodeId)
+                .add("dataType", dataType)
+                .add("dataTypeExtendedInfo", dataTypeExtendedInfo)
+                .add("resolvableStatus", resolvableStatus)
+                .add("isTypeForInterFileGroupingResolution", isTypeForInterFileGroupingResolution)
+                .add("isTypeNotResolvedTillRootNode", isTypeNotResolvedTillRootNode)
+                .toString();
     }
 }
