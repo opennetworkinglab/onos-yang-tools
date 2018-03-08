@@ -224,7 +224,7 @@ public class YangCompilerManager implements YangCompilerService {
             } catch (IOException e) {
                 throw new YangCompilerException(
                         "Failed to fetch dependent schema from given " +
-                                "path :" + path.toString());
+                                "path :" + path.toString(), e);
             }
         }
         return depNodes;
@@ -262,7 +262,7 @@ public class YangCompilerManager implements YangCompilerService {
         } catch (LinkerException e) {
             printLog(e.getFileName(), e.getLineNumber(), e.getCharPositionInLine(),
                      e.getMessage(), e.getLocalizedMessage());
-            throw new YangCompilerException(e.getMessage());
+            throw new YangCompilerException(e.getMessage(), e);
         }
     }
 
@@ -391,7 +391,7 @@ public class YangCompilerManager implements YangCompilerService {
             boolean isCreated = targetDir.mkdirs();
             if (!isCreated) {
                 throw new YangCompilerException(
-                        "failed to create yang resource directory.");
+                        "failed to create yang resource directory: " + path);
             }
         }
 

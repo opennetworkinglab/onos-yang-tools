@@ -120,7 +120,7 @@ public class YangLinkerManager
                         "line: " + e.getLineNumber() + " at position: " +
                         e.getCharPositionInLine() + NEW_LINE +
                         e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             } catch (LinkerException e) {
                 String errorInfo = "Error in file: " + yangNode.getName() +
@@ -128,7 +128,7 @@ public class YangLinkerManager
                         "line: " + e.getLineNumber() + " at position: " +
                         e.getCharPositionInLine() + NEW_LINE +
                         e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             }
         }
@@ -151,7 +151,7 @@ public class YangLinkerManager
                             yangNode.getFileName() + " at " +
                             "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                             + e.getLocalizedMessage();
-                    throw new LinkerException(errorInfo);
+                    throw new LinkerException(errorInfo, e);
                     // TODO add file path in exception message in util manager.
                 }
             }
@@ -175,7 +175,7 @@ public class YangLinkerManager
                             yangNode.getFileName() + " at " +
                             "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                             + e.getLocalizedMessage();
-                    throw new LinkerException(errorInfo);
+                    throw new LinkerException(errorInfo, e);
                     // TODO add file path in exception message in util manager.
                 }
             }
@@ -199,7 +199,7 @@ public class YangLinkerManager
                             yangNode.getFileName() + " at " +
                             "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                             + e.getLocalizedMessage();
-                    throw new LinkerException(errorInfo);
+                    throw new LinkerException(errorInfo, e);
                     // TODO add file path in exception message in util manager.
                 }
             }
@@ -236,14 +236,14 @@ public class YangLinkerManager
                         yangNode.getFileName() + " at " +
                         "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                         + e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             } catch (LinkerException e) {
                 String errorInfo = "Error in file: " + yangNode.getName() + " in " +
                         yangNode.getFileName() + " at " +
                         "line: " + e.getLineNumber() + " at position: " + e.getCharPositionInLine() + NEW_LINE
                         + e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             }
         }
@@ -271,7 +271,7 @@ public class YangLinkerManager
                         "line: " + e.getLineNumber() + " at position: " +
                         e.getCharPositionInLine() + NEW_LINE +
                         e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             } catch (LinkerException e) {
                 String errorInfo = "Error in file: " + yangNode.getName() +
@@ -279,7 +279,7 @@ public class YangLinkerManager
                         "line: " + e.getLineNumber() + " at position: " +
                         e.getCharPositionInLine() + NEW_LINE +
                         e.getLocalizedMessage();
-                throw new LinkerException(errorInfo);
+                throw new LinkerException(errorInfo, e);
                 // TODO add file path in exception message in util manager.
             }
         }

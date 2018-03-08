@@ -713,7 +713,7 @@ public final class YangLinkerUtils {
                                             " at position: " + e.getCharPositionInLine()
                                             + e.getLocalizedMessage();
                                     throw new LinkerException("Failed to add type info in grouping to resolution "
-                                                                      + errorInfo);
+                                                                      + errorInfo, e);
                                 }
                             }
                         }
@@ -754,7 +754,7 @@ public final class YangLinkerUtils {
                     try {
                         addResolutionInfo(resolutionInfo);
                     } catch (DataModelException e) {
-                        throw new LinkerException("Failed to add leaf type info in grouping, to resolution ");
+                        throw new LinkerException("Failed to add leaf type info in grouping, to resolution ", e);
                     }
                 } else if (type.getDataType() == IDENTITYREF) {
                     YangIdentityRef identityRef = (YangIdentityRef) type.getDataTypeExtendedInfo();
@@ -763,13 +763,14 @@ public final class YangLinkerUtils {
 
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
+                            new YangResolutionInfoImpl<>(identityRef, (YangNode) leavesHolder,
                                                                         identityRef.getLineNumber(),
                                                                         identityRef.getCharPosition());
                     try {
                         addResolutionInfo(resolutionInfo);
                     } catch (DataModelException e) {
-                        throw new LinkerException("Failed to add leaf identity ref info in grouping, to resolution ");
+                        throw new LinkerException("Failed to add leaf identity ref info in grouping, to resolution ",
+                                                  e);
                     }
                 }
             }
@@ -784,7 +785,7 @@ public final class YangLinkerUtils {
 
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangType>(type, (YangNode) leavesHolder,
+                            new YangResolutionInfoImpl<>(type, (YangNode) leavesHolder,
                                                                  type.getLineNumber(), type.getCharPosition());
                     try {
                         addResolutionInfo(resolutionInfo);
@@ -797,7 +798,7 @@ public final class YangLinkerUtils {
                     identityRef.setIdentityForInterFileGroupingResolution(true);
                     // Add resolution information to the list
                     YangResolutionInfoImpl resolutionInfo =
-                            new YangResolutionInfoImpl<YangIdentityRef>(identityRef, (YangNode) leavesHolder,
+                            new YangResolutionInfoImpl<>(identityRef, (YangNode) leavesHolder,
                                                                         identityRef.getLineNumber(),
                                                                         identityRef.getCharPosition());
                     try {

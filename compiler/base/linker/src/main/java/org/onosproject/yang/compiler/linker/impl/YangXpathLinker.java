@@ -438,7 +438,7 @@ public class YangXpathLinker<T> {
         try {
             id = id.substring(ind + 1, id.length() - 1);
         } catch (StringIndexOutOfBoundsException e) {
-            throw new LinkerException("Invalid augment path");
+            throw new LinkerException("Invalid augment path: " + id);
         }
         StringBuilder str = new StringBuilder();
         String[] arr;

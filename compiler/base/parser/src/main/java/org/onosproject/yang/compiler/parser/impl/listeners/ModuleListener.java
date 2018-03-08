@@ -144,7 +144,7 @@ public final class ModuleListener {
             resolver.resolveSelfFileLinking(YANG_BASE);
             resolver.resolveSelfFileLinking(YANG_IDENTITYREF);
         } catch (DataModelException e) {
-            LinkerException linkerException = new LinkerException(e.getMessage());
+            LinkerException linkerException = new LinkerException(e.getMessage(), e);
             linkerException.setLine(e.getLineNumber());
             linkerException.setCharPosition(e.getCharPositionInLine());
             linkerException.setFileName(listener.getFileName());

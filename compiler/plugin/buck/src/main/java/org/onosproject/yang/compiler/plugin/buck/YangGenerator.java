@@ -80,7 +80,7 @@ public class YangGenerator {
                     }
                 } catch (IOException e) {
                     throw new YangCompilerException(
-                            "Failed to parse dependent schema path");
+                            "Failed to parse dependent schema path", e);
                 }
             }
             bldr.setCodeGenDir(Paths.get(outputDirectory));

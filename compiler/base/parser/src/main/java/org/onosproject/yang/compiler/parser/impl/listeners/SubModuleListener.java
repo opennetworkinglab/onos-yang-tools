@@ -145,7 +145,7 @@ public final class SubModuleListener {
             ((YangReferenceResolver) listener.getParsedDataStack().peek())
                     .resolveSelfFileLinking(ResolvableType.YANG_IDENTITYREF);
         } catch (DataModelException e) {
-            LinkerException linkerException = new LinkerException(e.getMessage());
+            LinkerException linkerException = new LinkerException(e.getMessage(), e);
             linkerException.setLine(e.getLineNumber());
             linkerException.setCharPosition(e.getCharPositionInLine());
             linkerException.setFileName(listener.getFileName());
