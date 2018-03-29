@@ -354,9 +354,9 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
             if (regClass == null) {
                 regClass = registerClassStore.get(interfaceName);
             }
-        }
-        if (regClass == null) {
-            log.error("{} node should not be null.");
+            if (regClass == null) {
+                log.error("Nothing registered for {} or {}", serviceName, interfaceName);
+            }
         }
         return regClass;
     }
