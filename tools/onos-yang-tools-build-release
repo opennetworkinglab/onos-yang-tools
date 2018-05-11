@@ -34,6 +34,3 @@ mvn versions:set -DnewVersion=$OYT_SNAPSHOT versions:commit
 git commit -am"Bumping version to $OYT_SNAPSHOT"
 git push origin $OYT_BRANCH
 git push origin $OYT_TAG
-
-
-unset OYT_VERSION OYT_SNAPSHOT OYT_BRANCH OYT_TAG
