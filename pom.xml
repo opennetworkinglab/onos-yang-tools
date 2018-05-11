@@ -28,6 +28,11 @@
     <version>2.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <prerequisites>
+        <maven>3.0.5</maven>
+    </prerequisites>
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <onos-build-conf.version>1.12.0</onos-build-conf.version>
@@ -83,10 +88,40 @@
             <artifactId>org.eclipse.jdt.core</artifactId>
             <version>3.10.0</version>
         </dependency-->
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.21</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0.5</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -158,6 +193,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <!-- 3.0.0 has issue excluding generated code -->
                 <version>2.17</version>
                 <dependencies>
                     <dependency>
@@ -167,12 +203,12 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <!-- begin: workaround for unexpected NullPointerException on Eclipse -->
-                    <sourceDirectory>${project.build.sourceDirectory}
-                    </sourceDirectory>
-                    <testSourceDirectory>${project.build.testSourceDirectory}
-                    </testSourceDirectory>
-                    <!-- end: workaround for unexpected NullPointerException on Eclipse -->
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+                    </testSourceDirectories>
                     <configLocation>onos/checkstyle-mvn.xml</configLocation>
                     <suppressionsLocation>onos/suppressions.xml
                     </suppressionsLocation>

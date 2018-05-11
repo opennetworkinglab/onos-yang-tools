@@ -41,12 +41,12 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-model</artifactId>
-            <version>2.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-tool</artifactId>
-            <version>2.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

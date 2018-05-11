@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onos-yang-compiler-plugin-utils</artifactId>
-            <version>2.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

@@ -26,7 +26,7 @@ ssh -p 29418 gerrit.onosproject.org projectlock lock onos-yang-tools $OYT_BRANCH
 trap cleanup EXIT
 
 mvn versions:set -DnewVersion=$OYT_VERSION versions:commit
-mvn -Prelease clean deploy
+mvn -Prelease clean deploy -DdeployAtEnd=true
 git commit -am"Releasing $OYT_VERSION"
 git tag -sm"Tagging $OYT_VERSION" $OYT_VERSION
 

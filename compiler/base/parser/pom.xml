@@ -108,6 +108,18 @@
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
+                     <excludes>**/generated-sources/**/*</excludes>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>
