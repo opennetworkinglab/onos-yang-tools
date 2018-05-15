@@ -35,7 +35,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <onos-build-conf.version>1.12.0</onos-build-conf.version>
+        <onos-build-conf.version>1.13.1</onos-build-conf.version>
         <guava.version>22.0</guava.version>
         <errorprone.version>2.2.0</errorprone.version>
         <betachecker.version>1.0</betachecker.version>

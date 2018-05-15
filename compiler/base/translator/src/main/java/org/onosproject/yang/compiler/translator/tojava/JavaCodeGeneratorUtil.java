@@ -17,6 +17,7 @@
 package org.onosproject.yang.compiler.translator.tojava;
 
 import com.google.common.base.Throwables;
+
 import org.onosproject.yang.compiler.datamodel.RpcNotificationContainer;
 import org.onosproject.yang.compiler.datamodel.SchemaDataNode;
 import org.onosproject.yang.compiler.datamodel.TraversalType;
@@ -33,6 +34,7 @@ import org.onosproject.yang.compiler.datamodel.YangUses;
 import org.onosproject.yang.compiler.translator.exception.InvalidNodeForTranslatorException;
 import org.onosproject.yang.compiler.translator.exception.TranslatorException;
 import org.onosproject.yang.compiler.utils.io.YangPluginConfig;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,12 +46,14 @@ import static org.onosproject.yang.compiler.datamodel.TraversalType.SIBLING;
 import static org.onosproject.yang.compiler.translator.tojava.YangJavaModelUtils.updateJavaInfo;
 import static org.onosproject.yang.compiler.translator.tojava.utils.JavaIdentifierSyntax.getEnumJavaAttribute;
 import static org.onosproject.yang.compiler.utils.io.impl.YangIoUtils.searchAndDeleteTempDir;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Representation of java code generator based on application schema.
  */
 public final class JavaCodeGeneratorUtil {
 
+    private static final Logger log = getLogger(JavaCodeGeneratorUtil.class);
     /**
      * Creates a java code generator utility object.
      */
@@ -159,7 +163,7 @@ public final class JavaCodeGeneratorUtil {
                                         for (YangAugment a : augList) {
                                             a.setLeafNameSpaceAndAddToParentSchemaMap();
                                             a.setLeafParentContext();
-                                            processAugNode((YangAugment) a);
+                                            processAugNode(a);
                                         }
                                     }
                                 }
@@ -189,7 +193,7 @@ public final class JavaCodeGeneratorUtil {
                     }
                     continue;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Encountered exception", e);
                     close(codeGenNode, yangPlugin, rootNode);
                     throw new TranslatorException(e.getMessage());
                 }
@@ -203,9 +207,9 @@ public final class JavaCodeGeneratorUtil {
                         generateCodeExit(codeGenNode, yangPlugin, rootNode);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Encountered exception", e);
                     close(codeGenNode, yangPlugin, rootNode);
-                    Throwables.propagateIfInstanceOf(e, TranslatorException.class);
+                    Throwables.throwIfInstanceOf(e, TranslatorException.class);
                     throw new TranslatorException(e);
                 }
                 curTraversal = SIBLING;
@@ -216,9 +220,9 @@ public final class JavaCodeGeneratorUtil {
                         generateCodeExit(codeGenNode, yangPlugin, rootNode);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Encountered exception", e);
                     close(codeGenNode, yangPlugin, rootNode);
-                    Throwables.propagateIfInstanceOf(e, TranslatorException.class);
+                    Throwables.throwIfInstanceOf(e, TranslatorException.class);
                     throw new TranslatorException(e);
                 }
                 curTraversal = PARENT;
