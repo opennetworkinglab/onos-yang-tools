@@ -25,14 +25,14 @@ function cleanup {
 ssh -p 29418 gerrit.onosproject.org projectlock lock onos-yang-tools $OYT_BRANCH
 trap cleanup EXIT
 
-mvn versions:set -DnewVersion=$OYT_VERSION versions:commit
-mvn -Prelease clean deploy -DdeployAtEnd=true
+mvn -B versions:set -DnewVersion=$OYT_VERSION versions:commit
+mvn -B -Prelease clean deploy -DdeployAtEnd=true
 git commit -am"Releasing $OYT_VERSION"
 git tag -sm"Tagging $OYT_VERSION" $OYT_VERSION
 
-mvn versions:set -DnewVersion=$OYT_SNAPSHOT versions:commit
+mvn -B versions:set -DnewVersion=$OYT_SNAPSHOT versions:commit
 git commit -am"Bumping version to $OYT_SNAPSHOT"
 git push origin $OYT_BRANCH
 git push origin $OYT_TAG
 
-mvn -Prelease nexus-staging:release
+mvn -B -Prelease nexus-staging:release
