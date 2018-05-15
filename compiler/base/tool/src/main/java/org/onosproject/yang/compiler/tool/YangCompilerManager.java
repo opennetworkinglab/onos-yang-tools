@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.tool;
 
+import org.apache.commons.io.IOUtils;
 import org.onosproject.yang.compiler.api.YangCompilationParam;
 import org.onosproject.yang.compiler.api.YangCompiledOutput;
 import org.onosproject.yang.compiler.api.YangCompilerException;
@@ -621,9 +622,8 @@ public class YangCompilerManager implements YangCompilerService {
                          FileOutputStream fileOutputStream =
                                  new FileOutputStream(serializedFile)) {
 
-                        while (inputStream.available() > 0) {
-                            fileOutputStream.write(inputStream.read());
-                        }
+                        IOUtils.copy(inputStream, fileOutputStream);
+                        fileOutputStream.close();
                         if (serializedFile.getName().endsWith(YANG_META_DATA)) {
                             model = deSerializeDataModel(serializedFile.toString());
                         }
