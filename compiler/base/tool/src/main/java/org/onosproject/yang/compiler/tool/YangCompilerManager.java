@@ -39,6 +39,8 @@ import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.model.YangModuleId;
 import org.slf4j.Logger;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -364,8 +366,8 @@ public class YangCompilerManager implements YangCompilerService {
         setNodeInfo(yangFileInfoSet, nodeInfo);
         model = processYangModel(path, nodeInfo, id, false);
         String serFileName = path + YANG_META_DATA;
-        try (FileOutputStream fileOutputStream = new FileOutputStream(serFileName);
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+        try (FileOutputStream out = new FileOutputStream(serFileName);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(out))) {
             objectOutputStream.writeObject(model);
         }
     }
@@ -469,7 +471,7 @@ public class YangCompilerManager implements YangCompilerService {
      */
     private static void serializeModuleMetaData(String serFileName, YangNode node) {
         try (FileOutputStream outStream = new FileOutputStream(serFileName);
-             ObjectOutputStream objOutStream = new ObjectOutputStream(outStream)) {
+             ObjectOutputStream objOutStream = new ObjectOutputStream(new BufferedOutputStream(outStream))) {
             objOutStream.writeObject(node);
         } catch (IOException e) {
             log.info("Error while serializing YANG node", e);
@@ -539,7 +541,7 @@ public class YangCompilerManager implements YangCompilerService {
     /**
      * Returns de-serializes YANG data-model.
      *
-     * @param info serialized File Info
+     * @param info serialized File path
      * @return de-serializes YANG data-model
      * @throws IOException when fails do IO operations
      */
@@ -548,7 +550,7 @@ public class YangCompilerManager implements YangCompilerService {
         YangModel model;
         try (FileInputStream fileInputStream = new FileInputStream(info);
              ObjectInputStream objectInputStream =
-                     new ObjectInputStream(fileInputStream)) {
+                     new ObjectInputStream(new BufferedInputStream(fileInputStream))) {
             model = ((YangModel) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
             throw new IOException(info + " failed to fetch nodes due to " + e
