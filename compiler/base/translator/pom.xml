@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.onosproject</groupId>
         <artifactId>onos-yang-compiler-base</artifactId>
-        <version>2.4.7</version>
+        <version>2.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>onos-yang-compiler-translator</artifactId>
