@@ -16,6 +16,7 @@
 
 package org.onosproject.yang.compiler.datamodel.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.onosproject.yang.compiler.datamodel.CollisionDetector;
 import org.onosproject.yang.compiler.datamodel.ConflictResolveNode;
 import org.onosproject.yang.compiler.datamodel.DefaultYangNamespace;
@@ -897,9 +898,7 @@ public final class DataModelUtils {
                 InputStream inputStream = jar.getInputStream(file);
 
                 FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
-                while (inputStream.available() > 0) {
-                    fileOutputStream.write(inputStream.read());
-                }
+                IOUtils.copy(inputStream, fileOutputStream);
                 fileOutputStream.close();
                 inputStream.close();
                 //As of now only one metadata files will be there so if we
