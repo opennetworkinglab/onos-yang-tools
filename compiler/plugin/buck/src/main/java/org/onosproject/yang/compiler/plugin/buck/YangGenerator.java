@@ -77,6 +77,8 @@ public class YangGenerator {
             //Need to get dependent schema paths to give inter jar dependencies.
             for (String jar : depJar) {
                 try {
+                    // Note: when there's multiple deps, it all gets copied to
+                    // same directory.
                     File path = parseDepSchemaPath(jar, outputDirectory);
                     if (path != null) {
                         bldr.addDependentSchema(Paths.get(path.getAbsolutePath()));

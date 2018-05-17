@@ -607,16 +607,18 @@ public class YangCompilerManager implements YangCompilerService {
     }
 
     /**
-     * Parses jar file and returns YANG model.
+     * Extracts .yang files and YangMetaData from jar file to
+     * target directory and returns YangModel found.
      *
      * @param jarFile   jar file to be parsed
-     * @param directory directory where to search
-     * @return YANG model
+     * @param directory directory where to extract files to
+     * @return YangModel found
      * @throws IOException when fails to do IO operations
      */
     public static YangModel parseJarFile(String jarFile, String directory)
             throws IOException {
 
+        log.trace("Searching YangModel in {}", jarFile);
         YangModel model = null;
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<?> enumEntries = jar.entries();
@@ -643,8 +645,13 @@ public class YangCompilerManager implements YangCompilerService {
 
                         IOUtils.copy(inputStream, fileOutputStream);
                         fileOutputStream.close();
-                        if (serializedFile.getName().endsWith(YANG_META_DATA)) {
+                        // FIXME hack to return first model found
+                        if (model == null &&
+                            serializedFile.getName().endsWith(YANG_META_DATA)) {
                             model = deSerializeDataModel(serializedFile.toString());
+                            log.trace(" found {} at {}",
+                                      model.getYangModelId(),
+                                      serializedFile.getName());
                         }
                     }
                 }

@@ -120,6 +120,8 @@ final class YangPluginUtils {
                 project, localRepository, remoteRepos);
         List<Path> serFilePaths = new ArrayList<>();
         for (String dependency : depJars) {
+            // Note: when there's multiple deps, it all gets copied to
+            // same directory.
             File path = parseDepSchemaPath(dependency, directory);
             if (path != null) {
                 serFilePaths.add(Paths.get(path.getAbsolutePath()));

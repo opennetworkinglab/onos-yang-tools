@@ -67,11 +67,15 @@ import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.builtindatatype.YangDataTypes;
 import org.onosproject.yang.model.LeafObjectType;
 import org.onosproject.yang.model.SchemaId;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,11 +115,14 @@ import static org.onosproject.yang.model.LeafObjectType.INT;
 import static org.onosproject.yang.model.LeafObjectType.LONG;
 import static org.onosproject.yang.model.LeafObjectType.SHORT;
 import static org.onosproject.yang.model.LeafObjectType.STRING;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents utilities for data model tree.
  */
 public final class DataModelUtils {
+    private static final Logger log = getLogger(DataModelUtils.class);
+
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String FMT_NOT_EXIST =
@@ -865,49 +872,56 @@ public final class DataModelUtils {
     }
 
     /**
-     * Parses jar file and returns list of serialized file names.
+     * Extracts contents from jar file and returns path to YangMetaData.
      *
      * @param jarFile   jar file to be parsed
-     * @param directory directory where to search
-     * @return list of serialized files
+     * @param directory directory where to output
+     * @return path to serialized YangMetaData file copied in {@code directory}
      * @throws IOException when fails to do IO operations
      */
     public static File parseDepSchemaPath(String jarFile, String directory)
             throws IOException {
-        JarFile jar = new JarFile(jarFile);
-        Enumeration<?> enumEntries = jar.entries();
-        File serializedFile = null;
-        while (enumEntries.hasMoreElements()) {
-            JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.getName().endsWith(".ser")) {
+        log.trace("From jarfile: {}", jarFile);
+        try (JarFile jar = new JarFile(jarFile)) {
+            Enumeration<?> enumEntries = jar.entries();
+            File serializedFile = null;
+            while (enumEntries.hasMoreElements()) {
+                JarEntry file = (JarEntry) enumEntries.nextElement();
+                if (file.getName().endsWith("YangMetaData.ser")) {
 
-                if (file.getName().contains(SLASH)) {
-                    String[] strArray = file.getName().split(SLASH);
-                    String tempPath = "";
-                    for (int i = 0; i < strArray.length - 1; i++) {
-                        tempPath = SLASH + tempPath + SLASH + strArray[i];
+                    Path jarRelPath = Paths.get(file.getName());
+                    Path outBase = Paths.get(directory);
+                    String inFilename = Paths.get(jarFile).getFileName().toString();
+                    String inBasename = inFilename.substring(0, inFilename.length() - ".jar".length());
+                    // inject input jar basename right before the filename.
+                    Path serializedPath = outBase
+                            .resolve(jarRelPath.getParent())
+                            .resolve(inBasename)
+                            .resolve(jarRelPath.getFileName());
+
+                    if (Files.isDirectory(serializedPath)) {
+                        Files.createDirectories(serializedPath.getParent());
+                        continue;
+                    } else {
+                        Files.createDirectories(serializedPath.getParent());
                     }
-                    File dir = new File(directory + tempPath);
-                    dir.mkdirs();
-                }
-                serializedFile = new File(directory + SLASH + file.getName());
-                if (file.isDirectory()) {
-                    serializedFile.mkdirs();
-                    continue;
-                }
-                InputStream inputStream = jar.getInputStream(file);
+                    serializedFile = serializedPath.toFile();
+                    log.trace(" writing {} to {}", file.getName(), serializedFile);
+                    InputStream inputStream = jar.getInputStream(file);
 
-                FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
-                IOUtils.copy(inputStream, fileOutputStream);
-                fileOutputStream.close();
-                inputStream.close();
-                //As of now only one metadata files will be there so if we
-                // found one then we should break the loop.
-                break;
+                    FileOutputStream fileOutputStream = new FileOutputStream(serializedFile);
+                    IOUtils.copy(inputStream, fileOutputStream);
+                    fileOutputStream.close();
+                    inputStream.close();
+
+                    //As of now only one metadata files will be there so if we
+                    // found one then we should break the loop.
+                    return serializedFile;
+                }
             }
         }
-        jar.close();
-        return serializedFile;
+        // Not found
+        return null;
     }
 
     /**
