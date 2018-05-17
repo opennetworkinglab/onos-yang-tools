@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getDateInStringFormat;
 import static org.onosproject.yang.compiler.translator.tojava.JavaCodeGeneratorUtil.translate;
 import static org.onosproject.yang.runtime.helperutils.YangApacheUtils.getYangModel;
@@ -86,11 +87,13 @@ public final class RuntimeHelper {
                 if (date != null) {
                     revName = name + "@" + date;
                 }
-                node = (YangNode) yangSchemaStore.get(name).get(revName);
+                ConcurrentMap<String, YangSchemaNode> ss = yangSchemaStore.get(name);
+                checkNotNull(ss, "schema %s not found", name);
+                node = (YangNode) ss.get(revName);
             } else {
-                selfNodes.add((YangNode) node);
+                selfNodes.add(node);
             }
-            nodes.add((YangNode) node);
+            nodes.add(node);
         }
         //Target linking.
         addLinkerAndJavaInfo(nodes);

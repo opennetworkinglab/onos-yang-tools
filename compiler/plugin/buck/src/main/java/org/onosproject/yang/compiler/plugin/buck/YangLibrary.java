@@ -73,8 +73,10 @@ public class YangLibrary extends AbstractBuildRule {
     @AddToRuleKey
     private final String ruleVersion = pluginJarHash;
 
+    // src path to yang files
     @AddToRuleKey
     private final ImmutableSortedSet<SourcePath> srcs;
+
     private final BuildRuleParams params;
 
     private final Path genSrcsDirectory;

@@ -57,8 +57,8 @@ public class ResourceIdNegative2Test {
             addToResourceId(rIdBlr, "l1", LNS, valueSet);
         } catch (IllegalArgumentException e) {
             isExpOccurred = true;
-            assertEquals(e.getMessage(), E_TOO_MANY);
+            assertEquals(E_TOO_MANY, e.getMessage());
         }
-        assertEquals(isExpOccurred, true);
+        assertEquals(true, isExpOccurred);
     }
 }

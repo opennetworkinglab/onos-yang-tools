@@ -18,8 +18,11 @@ package org.onosproject.yang.compiler.datamodel;
 
 import org.onosproject.yang.model.YangNamespace;
 
+import com.google.common.base.MoreObjects;
+
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents YANG data node identifier which is a combination of name and namespace.
@@ -117,6 +120,20 @@ public class YangSchemaNodeIdentifier extends DefaultLocationInfo
 
     @Override
     public int hashCode() {
-        return 0;
+        // if one of moduleName or moduleNamespace is null,
+        // it is not used for comparison, even if the other one is non-null
+        return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("name", name)
+                .add("moduleName",
+                     Optional.ofNullable(namespace).map(YangNamespace::getModuleName).orElse(null))
+                .add("moduleNamespace",
+                     Optional.ofNullable(namespace).map(YangNamespace::getModuleNamespace).orElse(null))
+                .toString();
     }
 }

@@ -21,20 +21,22 @@ import org.onosproject.yang.compiler.api.YangCompilerException;
 import org.onosproject.yang.compiler.api.YangCompilerService;
 import org.onosproject.yang.compiler.tool.DefaultYangCompilationParam;
 import org.onosproject.yang.compiler.tool.YangCompilerManager;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.parseDepSchemaPath;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.YANG_RESOURCES;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Generates Java sources from a Yang model.
  */
 public class YangGenerator {
+    private static final Logger log = getLogger(YangGenerator.class);
 
     private final List<File> models;
     private final List<String> depJar;
@@ -64,6 +66,7 @@ public class YangGenerator {
      */
     public void execute() throws YangParsingException {
         synchronized (YangGenerator.class) {
+            log.info("modelId: {}", modelId);
             //Yang compiler service.
             YangCompilerService compiler = new YangCompilerManager();
 

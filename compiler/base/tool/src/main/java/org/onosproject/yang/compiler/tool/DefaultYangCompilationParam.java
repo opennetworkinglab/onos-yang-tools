@@ -17,6 +17,7 @@
 package org.onosproject.yang.compiler.tool;
 
 import org.onosproject.yang.compiler.api.YangCompilationParam;
+import org.slf4j.Logger;
 
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
@@ -25,11 +26,14 @@ import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Collections.unmodifiableSet;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Represents default YANG compilation parameter.
  */
 public final class DefaultYangCompilationParam implements YangCompilationParam {
+
+    private static final Logger log = getLogger(DefaultYangCompilationParam.class);
 
     private final Set<Path> yangFiles;
     private final Set<Path> dependentSchemas;

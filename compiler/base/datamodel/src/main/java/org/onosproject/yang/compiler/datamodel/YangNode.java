@@ -890,6 +890,7 @@ public abstract class YangNode
      *
      * @return YANG schema node context info map
      */
+    @Override
     public Map<YangSchemaNodeIdentifier,
             YangSchemaNodeContextInfo> getYsnContextInfoMap() {
         return ysnContextInfoMap;
@@ -1158,5 +1159,10 @@ public abstract class YangNode
             throws IllegalArgumentException {
         throw new IllegalArgumentException("Schema can only be added for " +
                                                    "Anydata.");
+    }
+
+    @Override
+    public String toString() {
+        return yangSchemaNodeIdentifier.toString();
     }
 }

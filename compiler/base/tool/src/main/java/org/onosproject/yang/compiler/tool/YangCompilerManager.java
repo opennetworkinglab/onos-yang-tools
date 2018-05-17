@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Paths.get;
@@ -167,7 +168,16 @@ public class YangCompilerManager implements YangCompilerService {
                 processSerialization(resourceGenDir, param.getModelId());
 
                 // Resolve dependencies using linker.
-                resolveDependenciesUsingLinker();
+                try {
+                    resolveDependenciesUsingLinker();
+                } catch (Exception e) {
+                    log.error("DependentSchemas: {}",
+                              dependentSchema(param.getDependentSchemas())
+                                  .stream()
+                                  .map(YangNode::getName)
+                                  .collect(Collectors.toList()), e);
+                    throw e;
+                }
 
                 // Perform translation to JAVA.
                 translateToJava(config);
@@ -221,9 +231,15 @@ public class YangCompilerManager implements YangCompilerService {
     private Set<YangNode> dependentSchema(Set<Path> dependentSchemaPath) {
         Set<YangNode> depNodes = new LinkedHashSet<>();
         for (Path path : dependentSchemaPath) {
+            log.trace("from file:{}", path.getParent());
             try {
-                depNodes.addAll(getYangNodes(
-                        deSerializeDataModel(path.toString())));
+                Set<YangNode> yangNodes = getYangNodes(deSerializeDataModel(path.toString()));
+                if (log.isTraceEnabled()) {
+                    log.trace(" got: {}", yangNodes.stream()
+                                              .map(YangNode::getName)
+                                              .collect(Collectors.toList()));
+                }
+                depNodes.addAll(yangNodes);
             } catch (IOException e) {
                 throw new YangCompilerException(
                         "Failed to fetch dependent schema from given " +
@@ -265,6 +281,7 @@ public class YangCompilerManager implements YangCompilerService {
         } catch (LinkerException e) {
             printLog(e.getFileName(), e.getLineNumber(), e.getCharPositionInLine(),
                      e.getMessage(), e.getLocalizedMessage());
+            log.error("Linking failed", e);
             throw new YangCompilerException(e.getMessage(), e);
         }
     }

@@ -20,6 +20,8 @@ package org.onosproject.yang.compiler.tool;
 import java.util.Objects;
 import org.onosproject.yang.compiler.datamodel.YangNode;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * Represents YANG file information.
  */
@@ -133,5 +135,13 @@ public class YangFileInfo {
     @Override
     public int hashCode() {
         return Objects.hashCode(yangFileName);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("yangFileName", yangFileName)
+                .add("isInterJar", isInterJar)
+                .toString();
     }
 }

@@ -61,7 +61,6 @@ import static org.onosproject.yang.runtime.RuntimeHelper.getNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getSelfNodes;
 import static org.onosproject.yang.runtime.RuntimeHelper.getServiceName;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.AT;
-import static org.onosproject.yang.runtime.impl.UtilsConstants.E_MEXIST;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NEXIST;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NOT_VAL;
 import static org.onosproject.yang.runtime.impl.UtilsConstants.E_NULL;
@@ -151,11 +150,11 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         if (!modelIdStore.containsKey(id)) {
             updateRegClassStore(param);
             modelIdStore.put(id, model);
-        } else if ((info != null) && (!registerClassStore
-                .containsValue(info.getModuleClass()))) {
+        } else if ((info != null) &&
+                   (!registerClassStore.containsValue(info.getModuleClass()))) {
             updateRegClassStore(param);
         } else {
-            throw new IllegalArgumentException(E_MEXIST);
+            throw new IllegalArgumentException("ModelId " + id + " already exist");
         }
 
         //Register all the YANG nodes, excluding nodes from dependent jar.
@@ -167,6 +166,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
         //update child context
         updateChildContext(curNodes);
+        log.info("ModelId: {} registered!", id);
     }
 
     @Override

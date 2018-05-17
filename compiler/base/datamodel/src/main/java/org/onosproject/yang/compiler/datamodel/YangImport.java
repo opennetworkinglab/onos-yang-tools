@@ -18,12 +18,14 @@ package org.onosproject.yang.compiler.datamodel;
 import org.onosproject.yang.compiler.datamodel.exceptions.DataModelException;
 import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
+import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.findReferredNode;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /*
  *  Reference:RFC 6020.
@@ -73,6 +75,8 @@ public class YangImport extends DefaultLocationInfo
         implements Parsable, Serializable {
 
     private static final long serialVersionUID = 806201642L;
+
+    private static final Logger log = getLogger(YangImport.class);
 
     /**
      * Name of the module that is being imported.
@@ -228,6 +232,7 @@ public class YangImport extends DefaultLocationInfo
          */
         if (importedModuleRevision != null) {
             String importedModuleNameWithRevision = importedModuleName + "@" + importedModuleRevision;
+            log.trace("find {} in {}", importedModuleNameWithRevision, yangNodeSet);
             moduleNode = findReferredNode(yangNodeSet, importedModuleNameWithRevision);
         }
 
@@ -236,6 +241,7 @@ public class YangImport extends DefaultLocationInfo
          * revision if can't find with revision.
          */
         if (moduleNode == null) {
+            log.trace("find {} in {}", importedModuleName, yangNodeSet);
             moduleNode = findReferredNode(yangNodeSet, importedModuleName);
         }
 

@@ -20,8 +20,6 @@ public final class UtilsConstants {
 
     static final String AT = "@";
     static final String E_NEXIST = "node with {} namespace not found.";
-    static final String E_MEXIST =
-            "Model with given modelId already exist";
     static final String E_NULL = "Model must not be null";
     static final String E_NOT_VAL = "Model id is invalid";
     static final String REV_REGEX =

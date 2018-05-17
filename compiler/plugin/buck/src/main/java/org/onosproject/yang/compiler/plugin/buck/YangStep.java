@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+
 import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.JAR;
 import static org.onosproject.yang.compiler.utils.UtilConstants.LIB;
@@ -37,15 +39,18 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.LIB_PATH;
 import static org.onosproject.yang.compiler.utils.UtilConstants.OUT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.PERIOD;
 import static org.onosproject.yang.compiler.utils.UtilConstants.SLASH;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Buck build step to trigger Yang Java source file generation.
  */
 public class YangStep extends AbstractExecutionStep {
+    private static final Logger log = getLogger(YangStep.class);
 
     private static final String DESCRIPTION = "yang-compile";
     private final ImmutableSortedSet<BuildRule> deps;
     private final ProjectFilesystem filesystem;
+    // .yang models
     private final List<Path> srcs;
     private final Path output;
     private final String modelId;
@@ -66,6 +71,7 @@ public class YangStep extends AbstractExecutionStep {
             throws IOException, InterruptedException {
 
         synchronized (YangStep.class) {
+            log.debug("Step: {} {}", this.getShortName(), this.modelId);
             List<File> sourceFiles = srcs.stream().map(Path::toFile)
                     .collect(Collectors.toList());
             try {
@@ -87,6 +93,7 @@ public class YangStep extends AbstractExecutionStep {
         if (deps != null) {
             for (BuildRule rule : deps) {
                 String name = rule.getBuildTarget().getFullyQualifiedName();
+                log.debug("Processing dep name {}", name);
                 if (!name.contains(LIB_PATH)) {
                     builder = new StringBuilder();
                     if (name.contains(COLON)) {
