@@ -1,0 +1,26 @@
+module ietf-otn-topology-test {
+  yang-version 1.1;
+
+  namespace "urn:ietf:params:xml:ns:yang:ietf-otn-topology-test";
+  prefix "otntopo";
+
+  import ietf-network-test {
+    prefix "nw";
+  }
+
+  import ietf-te-topology-test {
+    prefix "tet";
+  }
+
+  revision 2017-10-30 {
+  }
+
+  augment "/nw:networks/nw:network/nw:node/tet:te/"
+          + "tet:te-node-attributes/tet:connectivity-matrices/"
+          + "tet:connectivity-matrix/tet:path-constraints/"
+          + "tet:te-bandwidth/tet:technology" {
+    leaf sample {
+        type string;
+    }
+  }
+}

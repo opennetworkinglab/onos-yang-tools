@@ -325,6 +325,10 @@ public class YangXpathLinker<T> {
             if (tempPath.getNodeIdentifier().getPrefix() == null) {
                 tempAugment = resolveIntraFileAugment(tempPath, root);
             } else {
+                if (!tempPath.getNodeIdentifier().getPrefix().equals(curPrefix)) {
+                    curPrefix = tempPath.getNodeIdentifier().getPrefix();
+                    root = getImportedNode(rootNode, tempPath.getNodeIdentifier());
+                }
                 tempAugment = resolveInterFileAugment(tempPath, root, index);
             }
             if (tempAugment != null) {
@@ -534,13 +538,7 @@ public class YangXpathLinker<T> {
      */
     private YangNode resolveInterFileAugment(YangAtomicPath tempPath,
                                              YangNode root, int size) {
-
-        YangNode tempAugment;
-        if (!tempPath.getNodeIdentifier().getPrefix().equals(curPrefix)) {
-            curPrefix = tempPath.getNodeIdentifier().getPrefix();
-            root = getImportedNode(rootNode, tempPath.getNodeIdentifier());
-        }
-        tempAugment = getAugment(tempPath.getNodeIdentifier(), root, absPaths);
+        YangNode tempAugment = getAugment(tempPath.getNodeIdentifier(), root, absPaths);
         if (tempAugment == null) {
             return resolveInterToInterFileAugment(root, size);
         }

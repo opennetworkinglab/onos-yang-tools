@@ -1,0 +1,75 @@
+module ietf-te-topology-test {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-te-topology-test";
+
+  prefix "tet";
+
+  import ietf-te-types-test {
+    prefix "te-types";
+  }
+
+  import ietf-network-test {
+    prefix "nw";
+  }
+
+
+  revision "2018-02-21" {
+  }
+
+  grouping connectivity-matrix-entry-path-attributes {
+    uses te-types:generic-path-constraints;
+  } // connectivity-matrix-entry-path-attributes
+
+
+  grouping te-node-augment {
+    uses te-node-config;
+  } // te-node-augment
+
+  grouping te-node-config {
+    uses te-node-config-attributes;
+  } // te-node-config
+
+  grouping te-node-config-attributes {
+    container te-node-attributes {
+      uses te-node-connectivity-matrices;
+    } // te-node-attributes
+  } // te-node-config-attributes
+
+  grouping te-node-connectivity-matrices {
+    container connectivity-matrices {
+      uses connectivity-matrix-entry-path-attributes;
+      list connectivity-matrix {
+        key "id";
+        leaf id {
+          type uint32;
+        }
+      } // connectivity-matrix
+    } // connectivity-matrices
+  } // te-node-connectivity-matrices
+
+  grouping te-node-connectivity-matrix-attributes {
+    uses connectivity-matrix-entry-path-attributes;
+  } // te-node-connectivity-matrix-attributes
+
+
+  /*
+   * Data nodes  */
+  augment "/nw:networks/nw:network/nw:node" {
+    leaf te-node-id {
+      type string;
+      description
+        "The identifier of a node in the TE topology.
+         A node is specific to a topology to which it belongs.";
+    }
+    container te {
+      uses te-node-augment;
+    } // te
+  }
+
+  augment
+    "/nw:networks/nw:network/nw:node/te/te-node-attributes/"
+    + "connectivity-matrices/connectivity-matrix" {
+    uses te-node-connectivity-matrix-attributes;
+  }
+
+}

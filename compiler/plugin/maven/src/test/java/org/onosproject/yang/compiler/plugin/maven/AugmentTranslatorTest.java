@@ -624,4 +624,28 @@ public class AugmentTranslatorTest {
         YangPluginConfig.compileCode(COMP);
         deleteDirectory(DIR);
     }
+
+    @Test
+    public void processMultipleAugment() throws IOException,
+            ParserException, MojoExecutionException {
+
+        deleteDirectory(DIR);
+        String dir = "src/test/resources/multipleaugment";
+
+        Set<Path> paths = new HashSet<>();
+        for (String file : getYangFiles(dir)) {
+            paths.add(Paths.get(file));
+        }
+
+        utilManager.createYangFileInfoSet(paths);
+        utilManager.parseYangFileInfoSet();
+        utilManager.createYangNodeSet();
+        utilManager.resolveDependenciesUsingLinker();
+
+        YangPluginConfig yangPluginConfig = new YangPluginConfig();
+        yangPluginConfig.setCodeGenDir(DIR);
+        utilManager.translateToJava(yangPluginConfig);
+        YangPluginConfig.compileCode(COMP);
+        deleteDirectory(DIR);
+    }
 }

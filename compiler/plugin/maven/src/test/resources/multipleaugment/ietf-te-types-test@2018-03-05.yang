@@ -1,0 +1,32 @@
+module ietf-te-types-test {
+
+  namespace "urn:ietf:params:xml:ns:yang:ietf-te-types-test";
+
+  /* Replace with IANA when assigned */
+  prefix "te-types";
+
+  revision "2018-03-05" {
+  }
+
+  grouping te-bandwidth {
+    container te-bandwidth {
+      choice technology {
+        case generic {
+          leaf generic {
+            type string;
+          }
+        }
+      }
+    }
+  }
+
+  grouping common-constraints_config {
+    uses te-types:te-bandwidth;
+  }
+
+  grouping generic-path-constraints {
+    container path-constraints {
+      uses common-constraints_config;
+    }
+  }
+}

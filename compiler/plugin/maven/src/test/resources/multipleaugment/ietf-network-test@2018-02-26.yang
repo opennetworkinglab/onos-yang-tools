@@ -1,0 +1,23 @@
+module ietf-network-test {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-network-test";
+  prefix nw;
+
+  revision 2018-02-26 {
+  }
+
+  container networks {
+    list network {
+      key "network-id";
+      leaf network-id {
+        type string;
+      }
+      list node {
+        key "node-id";
+        leaf node-id {
+          type string;
+        }
+      }
+    }
+  }
+}
