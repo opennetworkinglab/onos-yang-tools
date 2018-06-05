@@ -150,8 +150,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
         if (!modelIdStore.containsKey(id)) {
             updateRegClassStore(param);
             modelIdStore.put(id, model);
-        } else if ((info != null) &&
-                   (!registerClassStore.containsValue(info.getModuleClass()))) {
+        } else if (info != null) {
             updateRegClassStore(param);
         } else {
             throw new IllegalArgumentException("ModelId " + id + " already exist");
