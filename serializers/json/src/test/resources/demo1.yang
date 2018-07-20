@@ -24,24 +24,37 @@ module demo1 {
                 leaf name {
                     type string;
                     description "name of logistics-supervisor";
+                }
+                leaf departmentId {
+                    type string;
+                    description "name of department";
+                 }
             }
 
-            leaf departmentId {
-                type string;
-                description "name of department";
-            }
-        }
-
-        container Purchasing-supervisor {
-            leaf purchasing-specialist {
-                type string;
-                description "name of the purchasing-specialist person";
+            list General-supervisor {
+                key "name";
+                leaf name {
+                    type string;
+                }
             }
 
-            leaf-list support {
-                type string;
-                description "name of the support person";
+            list Supervisor {
+                key "name";
+                leaf name {
+                    type string;
+                }
             }
+
+            container Purchasing-supervisor {
+                leaf purchasing-specialist {
+                    type string;
+                    description "name of the purchasing-specialist person";
+                }
+
+                leaf-list support {
+                    type string;
+                    description "name of the support person";
+                }
             }
 
             leaf-list Warehouse-supervisor {

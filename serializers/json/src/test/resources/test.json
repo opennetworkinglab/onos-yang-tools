@@ -21,6 +21,22 @@
             "departmentId": "string6"
           }
         ],
+        "General-supervisor": [
+          {
+            "name": "string5"
+          },
+          {
+            "name": "string6"
+          },
+          {
+            "name": "string7"
+          }
+        ],
+        "Supervisor" : [
+          {
+            "name": "string8"
+          }
+        ],
         "Purchasing-supervisor": {
           "purchasing-specialist": "string7",
           "support": [

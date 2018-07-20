@@ -161,6 +161,7 @@ public final class EncoderUtils {
             case UNKNOWN_TYPE:
             case LAST_INSTANCE:
             case NOT_MULTI_INSTANCE_NODE:
+            case SINGLE_INSTANCE_IN_MULTI_NODE:
                 /*
                  * If type of previous child is unknown or last instance,
                  * that means the current child is the first sibling. If
