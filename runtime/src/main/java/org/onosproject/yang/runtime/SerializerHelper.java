@@ -361,20 +361,30 @@ public final class SerializerHelper {
                             throw new IllegalArgumentException(E_RESID);
                         }
                         schema = (LeafSchemaContext) childSchema;
+
+                        lType = schema.getLeafType(value);
+                        if (!lType.equals(LeafType.IDENTITYREF) && valNamespace != null) {
+                            value = valNamespace + ":" + value;
+                            valNamespace = null;
+                        }
+
                         valObject = getLeaf(value, schema);
                         valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        lType = schema.getLeafType(value);
                         builder = LeafNode.builder(name, namespace)
                                 .type(nodeType).value(valObject)
                                 .valueNamespace(valNamespace).leafType(lType);
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
                         schema = (LeafSchemaContext) childSchema;
+                        lType = schema.getLeafType(value);
+                        if (!lType.equals(LeafType.IDENTITYREF) && valNamespace != null) {
+                            value = valNamespace + ":" + value;
+                            valNamespace = null;
+                        }
                         valObject = getLeafList(value, schema);
                         valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        lType = schema.getLeafType(value);
                         builder = LeafNode.builder(name, namespace)
                                 .type(nodeType).value(valObject)
                                 .valueNamespace(valNamespace).leafType(lType);
@@ -393,10 +403,14 @@ public final class SerializerHelper {
                 switch (nodeType) {
                     case SINGLE_INSTANCE_LEAF_VALUE_NODE:
                         schema = (LeafSchemaContext) childSchema;
+                        lType = schema.getLeafType(value);
+                        if (!lType.equals(LeafType.IDENTITYREF) && valNamespace != null) {
+                            value = valNamespace + ":" + value;
+                            valNamespace = null;
+                        }
                         valObject = getLeaf(value, schema);
                         valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        lType = schema.getLeafType(value);
                         if (((YangLeaf) childSchema).isKeyLeaf()) {
                             builder = builder.addKeyLeaf(
                                     name, namespace, valObject);
@@ -407,10 +421,14 @@ public final class SerializerHelper {
                         break;
                     case MULTI_INSTANCE_LEAF_VALUE_NODE:
                         schema = (LeafSchemaContext) childSchema;
+                        lType = schema.getLeafType(value);
+                        if (!lType.equals(LeafType.IDENTITYREF) && valNamespace != null) {
+                            value = valNamespace + ":" + value;
+                            valNamespace = null;
+                        }
                         valObject = getLeafList(value, schema);
                         valNamespace = getValidValNamespace(value, schema,
                                                             valNamespace);
-                        lType = schema.getLeafType(value);
                         builder = builder.createChildBuilder(
                                 name, namespace, valObject, valNamespace)
                                 .type(nodeType).leafType(lType);

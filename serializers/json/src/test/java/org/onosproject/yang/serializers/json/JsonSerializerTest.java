@@ -117,6 +117,42 @@ public class JsonSerializerTest {
     }
 
     @Test
+    public void colonTest() throws IOException {
+        String path = "src/test/resources/colontest.json";
+        // decode
+        DefaultCompositeStream external =
+            new DefaultCompositeStream("demo1:device", parseInput(path));
+        CompositeData compositeData = jsonSerializer.decode(external, context);
+        ResourceData resourceData = compositeData.resourceData();
+        ResourceId rid = resourceData.resourceId();
+        DataNode rootNode = resourceData.dataNodes().get(0);
+
+        // encode
+        RuntimeContext.Builder runtimeContextBuilder = DefaultRuntimeContext.builder();
+        runtimeContextBuilder.setDataFormat("JSON");
+        DefaultResourceData.Builder resourceDataBuilder = DefaultResourceData.builder();
+        resourceDataBuilder.addDataNode(rootNode);
+        resourceDataBuilder.resourceId(rid);
+
+        ResourceData resourceDataOutput = resourceDataBuilder.build();
+        DefaultCompositeData.Builder compositeDataBuilder = DefaultCompositeData.builder();
+        compositeDataBuilder.resourceData(resourceDataOutput);
+        CompositeData compositeData1 = compositeDataBuilder.build();
+        // CompositeData --- YangRuntimeService ---> CompositeStream.
+        CompositeStream compositeStreamOutPut = jsonSerializer.encode(compositeData1,
+            context);
+        InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
+        ObjectNode rootNodeOutput;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+            assertEquals(true, rootNodeOutput != null);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    @Test
     public void jsonListTest() throws IOException {
         String path = "src/test/resources/testinput1.json";
         // decode
