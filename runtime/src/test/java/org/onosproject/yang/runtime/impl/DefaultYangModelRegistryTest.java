@@ -25,6 +25,7 @@ import org.onosproject.yang.model.DefaultYangModuleId;
 import org.onosproject.yang.model.YangModel;
 import org.onosproject.yang.model.YangModule;
 import org.onosproject.yang.model.YangModuleId;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,11 +42,14 @@ import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.proce
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.processSchemaRegistry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.registry;
 import static org.onosproject.yang.runtime.impl.MockYangSchemaNodeProvider.unRegister;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Unit test for model registry.
  */
 public class DefaultYangModelRegistryTest {
+
+    private static final Logger log = getLogger(DefaultYangModelRegistryTest.class);
 
     private static final String SCHEMA_NAME_3 = "ietf-network3";
     private static final String INTERFACE_NAME_3 =
@@ -166,7 +170,7 @@ public class DefaultYangModelRegistryTest {
         try {
             node = ((YangNode) objectInputStream.readObject());
         } catch (ClassNotFoundException e) {
-            System.out.println(e);
+            log.error("Class not found", e);
         }
         objectInputStream.close();
         assertThat(true, is(

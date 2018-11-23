@@ -797,7 +797,7 @@ public final class DataModelUtils {
                     } catch (DataModelException e) {
                         throw e;
                     } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
+                        log.error("Error in cloning", e);
                         throw new DataModelException("Could not clone Type node " +
                                                              leaf.getDataType().getDataTypeName() + " in " +
                                                              leaf.getDataType().getLineNumber() + " at " +

@@ -200,7 +200,7 @@ public class YangCompilerManager implements YangCompilerService {
                         translatorErrorHandler(curYangFileInfo.getRootNode(),
                                                config);
                     } catch (IOException ex) {
-                        e.printStackTrace();
+                        log.error("Error in processing the files", e);
                         throw ex;
                     }
                 }

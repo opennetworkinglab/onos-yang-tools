@@ -40,6 +40,7 @@ import org.onosproject.yang.runtime.DefaultCompositeData;
 import org.onosproject.yang.runtime.DefaultCompositeStream;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -52,11 +53,14 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  *
  */
 public class XmlSerializerTest {
+
+    private static final Logger log = getLogger(XmlSerializerTest.class);
 
     public static final String LNS = "yrt:list.anydata";
     private static final String LIST_NS = "yrt:list";
@@ -232,7 +236,7 @@ public class XmlSerializerTest {
                 sb.append(temp);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error in processing the path {}", path, e);
         }
         return IOUtils.toInputStream(sb);
     }

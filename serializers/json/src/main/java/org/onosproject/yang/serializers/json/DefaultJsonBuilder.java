@@ -204,7 +204,8 @@ public class DefaultJsonBuilder implements JsonBuilder {
             m.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
             node = (ObjectNode) m.readTree(getTreeString());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error in processing the tree", e);
+            log.debug("tree {}", getTreeString());
         }
         return node;
     }

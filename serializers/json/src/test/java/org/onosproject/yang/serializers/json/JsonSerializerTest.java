@@ -37,6 +37,7 @@ import org.onosproject.yang.runtime.DefaultRuntimeContext;
 import org.onosproject.yang.runtime.RuntimeContext;
 import org.onosproject.yang.runtime.YangSerializer;
 import org.onosproject.yang.runtime.YangSerializerContext;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -53,11 +54,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Unit Test for Json Serializer.
  */
 public class JsonSerializerTest {
+
+    private static final Logger log = getLogger(JsonSerializerTest.class);
 
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
@@ -342,7 +346,7 @@ public class JsonSerializerTest {
                 sb.append(temp);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error in processing the path {}", path, e);
         }
         return IOUtils.toInputStream(sb);
     }
@@ -362,7 +366,7 @@ public class JsonSerializerTest {
                 sb.append(temp);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error in processing the path {}", path, e);
         }
         return sb.toString();
     }
