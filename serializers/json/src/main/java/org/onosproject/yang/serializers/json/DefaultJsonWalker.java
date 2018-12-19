@@ -186,7 +186,8 @@ public class DefaultJsonWalker implements JsonWalker {
             JsonNode element = elements.next();
             JsonNodeType eleType = element.getNodeType();
 
-            if (eleType == JsonNodeType.STRING || eleType == JsonNodeType.NUMBER) {
+            if (eleType == JsonNodeType.STRING || eleType == JsonNodeType.NUMBER ||
+                    eleType == JsonNodeType.BOOLEAN) {
                 addLeafDataNode(fieldName, element.asText(),
                                 MULTI_INSTANCE_LEAF_VALUE_NODE);
                 dataNodeBuilder = SerializerHelper.exitDataNode(dataNodeBuilder);
@@ -202,7 +203,8 @@ public class DefaultJsonWalker implements JsonWalker {
         while (elements.hasNext()) {
             JsonNode element = elements.next();
             JsonNodeType eleType = element.getNodeType();
-            if (eleType != JsonNodeType.STRING && eleType != JsonNodeType.NUMBER) {
+            if (eleType != JsonNodeType.STRING && eleType != JsonNodeType.NUMBER &&
+                    eleType != JsonNodeType.BOOLEAN) {
                 return false;
             }
         }

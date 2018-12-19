@@ -44,6 +44,9 @@
             "string82",
             "string83"
           ]
+        },
+        "cont8" : {
+          "leaf9" : true
         }
       }
    ]

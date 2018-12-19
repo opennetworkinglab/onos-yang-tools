@@ -79,6 +79,11 @@ module demo1 {
                   type string;
                }
             }
+            container cont8 {
+               leaf leaf9 {
+                  type boolean;
+               }
+            }
         }
     }
 
