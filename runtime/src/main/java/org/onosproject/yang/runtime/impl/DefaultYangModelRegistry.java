@@ -165,7 +165,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
 
         //update child context
         updateChildContext(curNodes);
-        log.info("ModelId: {} registered!", id);
+        log.debug("ModelId: {} registered!", id);
     }
 
     @Override
@@ -389,7 +389,7 @@ public class DefaultYangModelRegistry implements YangModelRegistry,
                                      appNode);
         }
 
-        log.info("successfully registered this application {}", name);
+        log.debug("successfully registered this application {}", name);
     }
 
     /**

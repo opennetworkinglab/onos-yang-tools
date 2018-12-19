@@ -23,11 +23,13 @@ import org.onosproject.yang.model.NodeKey;
 import org.onosproject.yang.runtime.YangSerializerContext;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.yang.model.DataNode.Type.MULTI_INSTANCE_LEAF_VALUE_NODE;
@@ -67,9 +69,8 @@ public final class EncoderUtils {
                 FIRST_INSTANCE : NOT_MULTI_INSTANCE_NODE;
         walkDataNodeTree(treeNodeListener, dataNode, siblingType);
 
-        jsonBuilder.finalizeJson((dataNode.type() == MULTI_INSTANCE_NODE) ? true : false);
-        ObjectNode resultData = jsonBuilder.getTreeNode();
-        return resultData;
+        jsonBuilder.finalizeJson(dataNode.type() == MULTI_INSTANCE_NODE);
+        return jsonBuilder.getTreeNode();
     }
 
     private static void walkDataNodeTree(DataNodeVisitor dataNodeVisitor,
@@ -109,18 +110,16 @@ public final class EncoderUtils {
          */
 
         DataNodeSiblingPositionType prevChildType = UNKNOWN_TYPE;
-        DataNodeSiblingPositionType currChildType = UNKNOWN_TYPE;
+        DataNodeSiblingPositionType currChildType;
 
         /*
-         * Dynamic Config preserves the order of child nodes.
-         * So, we no longer need to sort the children.
+         * Dynamic Config does not preserve the order of child nodes.
+         * For cases where an array of objects gets fragmented by an internal key
          */
-        //List<DataNode> sortedChildList = sortChildrenList(childrenList);
-        //checkNotNull(sortedChildList, "sorted children list cannot be null");
-        Collection<DataNode> dataNodeList = childrenList.values();
-        Iterator<DataNode> it = dataNodeList.iterator();
+        List<DataNode> sortedChildList = sortChildrenList(childrenList);
+        Iterator<DataNode> it = sortedChildList.iterator();
         DataNode currChild = it.next();
-        DataNode nextChild = null;
+        DataNode nextChild;
         boolean lastChildNotProcessed = true;
         while (lastChildNotProcessed) {
             /*
@@ -197,35 +196,23 @@ public final class EncoderUtils {
         return curChildSiblingType;
     }
 
-    private static List<DataNode> sortChildrenList(
-            Map<NodeKey, DataNode> childrenList) {
-        if (childrenList == null || childrenList.isEmpty()) {
-            // the children list is either not yet created or empty.
-            return null;
-        }
+    private static List<DataNode> sortChildrenList(Map<NodeKey, DataNode> childrenList) {
 
         List<DataNode> sortedList = new ArrayList<>();
         Map<String, List<DataNode>> groupedBucket = new HashMap<>();
 
-        Iterator it = childrenList.entrySet().iterator();
-
-        while (it.hasNext()) {
-            DataNode dataNode = ((Map.Entry<NodeKey, DataNode>) it.next()).getValue();
+        //Sort by name
+        for (Entry<NodeKey, DataNode> nodeKeyDataNodeEntry : childrenList.entrySet()) {
+            DataNode dataNode = nodeKeyDataNodeEntry.getValue();
             String nodeName = dataNode.key().schemaId().name();
-            List<DataNode> group = groupedBucket.get(nodeName);
-            if (group == null) {
-                group = new ArrayList<>();
-                groupedBucket.put(nodeName, group);
-            }
-
+            List<DataNode> group = groupedBucket.computeIfAbsent(nodeName, k -> new ArrayList<>());
             group.add(dataNode);
-
         }
-
-        for (Map.Entry<String, List<DataNode>> entry : groupedBucket.entrySet()) {
+        for (Entry<String, List<DataNode>> entry : groupedBucket.entrySet()) {
             sortedList.addAll(entry.getValue());
         }
 
-        return sortedList;
+        return sortedList.stream().sorted(Comparator.comparing(object -> object.key().schemaId().name()))
+                .collect(Collectors.toList());
     }
 }

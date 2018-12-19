@@ -53,6 +53,7 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.onosproject.yang.serializers.utils.SerializersUtil.convertRidToUri;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -66,21 +67,20 @@ public class JsonSerializerTest {
     private static YangSerializerContext context;
     private static YangSerializer jsonSerializer;
 
-    private static String outputIdTestJson = "{\"identity-test:con1\":{" +
-            "\"interface\":\"identity-types:physical\",\"interfaces\":{" +
-            "\"int-list\":[{\"iden\":\"identity-types-second:virtual\"," +
-            "\"available\":{\"ll\":[\"identity-types:Loopback\"," +
-            "\"identity-test:Giga\",\"identity-types-second:Ethernet\"]}}," +
-            "{\"iden\":\"optical\",\"available\":{\"ll\":[\"Giga\"]}}]}}}";
+    private static String outputIdTestJson = "{\"identity-test:con1\":" +
+            "{\"interface\":\"identity-types:physical\",\"interfaces\":" +
+            "{\"int-list\":[{\"available\":{\"ll\":[\"identity-types:Loopback\"," +
+            "\"identity-test:Giga\",\"identity-types-second:Ethernet\"]}," +
+            "\"iden\":\"identity-types-second:virtual\"},{\"available\":{" +
+            "\"ll\":[\"Giga\"]},\"iden\":\"optical\"}]}}}";
 
-    private static String outputIdTestJson1 = "{\"jsonlist:c2\":{\"leaflist1" +
-            "\":[\"a\",\"b\",\"c\"],\"leaf1\":1,\"leaf2\":2,\"leaf3\":3," +
-            "\"leaf4\":4,\"leaf5\":5,\"leaf6\":6,\"leaf7\":\"7\",\"leaf8\"" +
-            ":\"8\",\"leaf9\":true,\"leaf10\":\"-922337203685477580.8\"" +
-            ",\"ll1\":[1,10],\"ll2\":[2,20],\"ll3\":[3,30],\"ll4\":[4,40],\"" +
-            "ll5\":[5,50],\"ll6\":[6,60],\"ll7\":[\"7\",\"70\"],\"ll8\":[\"" +
-            "8\",\"80\"],\"ll9\":[true,false],\"ll10\":[" +
-            "\"-922337203685477580.8\",\"-922337203685477480.8\"]}}";
+    private static String outputIdTestJson1 = "{\"jsonlist:c2\":{\"leaf1\":1,\"" +
+            "leaf10\":\"-922337203685477580.8\",\"leaf2\":2,\"leaf3\":3," +
+            "\"leaf4\":4,\"leaf5\":5,\"leaf6\":6,\"leaf7\":\"7\"," +
+            "\"leaf8\":\"8\",\"leaf9\":true,\"leaflist1\":[\"a\",\"b\",\"c\"]," +
+            "\"ll1\":[1,10],\"ll10\":[\"-922337203685477580.8\",\"-922337203685477480.8\"]," +
+            "\"ll2\":[2,20],\"ll3\":[3,30],\"ll4\":[4,40],\"ll5\":[5,50],\"ll6\":[6,60]," +
+            "\"ll7\":[\"7\",\"70\"],\"ll8\":[\"8\",\"80\"],\"ll9\":[true,false]}}";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -112,12 +112,8 @@ public class JsonSerializerTest {
         InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
         ObjectNode rootNodeOutput;
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
-            assertEquals(true, rootNodeOutput != null);
-        } catch (IOException e) {
-            throw e;
-        }
+        rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+        assertNotNull(rootNodeOutput);
     }
 
     @Test
@@ -148,12 +144,8 @@ public class JsonSerializerTest {
         InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
         ObjectNode rootNodeOutput;
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
-            assertEquals(true, rootNodeOutput != null);
-        } catch (IOException e) {
-            throw e;
-        }
+        rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+        assertNotNull(rootNodeOutput);
     }
 
     @Test
@@ -184,12 +176,8 @@ public class JsonSerializerTest {
         InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
         ObjectNode rootNodeOutput;
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
-            assertEquals(rootNodeOutput.toString(), outputIdTestJson1);
-        } catch (IOException e) {
-            throw e;
-        }
+        rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+        assertEquals(rootNodeOutput.toString(), outputIdTestJson1);
     }
 
     @Test
@@ -220,16 +208,12 @@ public class JsonSerializerTest {
         InputStream inputStreamOutput = compositeStreamOutPut.resourceData();
         ObjectNode rootNodeOutput;
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
-            assertEquals(rootNodeOutput.toString(), outputIdTestJson);
-        } catch (IOException e) {
-            throw e;
-        }
+        rootNodeOutput = (ObjectNode) mapper.readTree(inputStreamOutput);
+        assertEquals(rootNodeOutput.toString(), outputIdTestJson);
     }
 
     @Test
-    public void identityValueNsErrorTest() throws IOException {
+    public void identityValueNsErrorTest() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Invalid input for value namespace");
         String path = "src/test/resources/id-test2.json";
