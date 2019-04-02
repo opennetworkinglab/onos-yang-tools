@@ -76,11 +76,11 @@ public class JsonSerializerTest {
 
     private static String outputIdTestJson1 = "{\"jsonlist:c2\":{\"leaf1\":1,\"" +
             "leaf10\":\"-922337203685477580.8\",\"leaf2\":2,\"leaf3\":3," +
-            "\"leaf4\":4,\"leaf5\":5,\"leaf6\":6,\"leaf7\":\"7\"," +
-            "\"leaf8\":\"8\",\"leaf9\":true,\"leaflist1\":[\"a\",\"b\",\"c\"]," +
+            "\"leaf4\":4,\"leaf5\":5,\"leaf6\":6,\"leaf7\":7," +
+            "\"leaf8\":8,\"leaf9\":true,\"leaflist1\":[\"a\",\"b\",\"c\"]," +
             "\"ll1\":[1,10],\"ll10\":[\"-922337203685477580.8\",\"-922337203685477480.8\"]," +
             "\"ll2\":[2,20],\"ll3\":[3,30],\"ll4\":[4,40],\"ll5\":[5,50],\"ll6\":[6,60]," +
-            "\"ll7\":[\"7\",\"70\"],\"ll8\":[\"8\",\"80\"],\"ll9\":[true,false]}}";
+            "\"ll7\":[7,70],\"ll8\":[8,80],\"ll9\":[true,false]}}";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
