@@ -106,8 +106,6 @@ public class DefaultJsonBuilder implements JsonBuilder {
             case INT32:
             case UINT16:
             case UINT32:
-            case INT64:
-            case UINT64:
             case BOOLEAN:
                 treeString.append(v);
                 break;
