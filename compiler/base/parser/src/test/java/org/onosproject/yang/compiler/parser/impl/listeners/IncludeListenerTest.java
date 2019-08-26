@@ -24,7 +24,7 @@ import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -35,8 +35,6 @@ import static org.junit.Assert.assertThat;
 public class IncludeListenerTest {
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
 
     /**
      * Checks if include listener with ; is valid and updates the data
@@ -75,7 +73,7 @@ public class IncludeListenerTest {
 
         // Checks for the sub module name in data model tree.
         assertThat(((YangModule) node).getIncludeList().get(0).getSubModuleName(), is("itut"));
-        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(simpleDateFormat.parse("2016-02-03")));
+        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(LocalDate.parse("2016-02-03")));
     }
 
     /**
@@ -88,9 +86,9 @@ public class IncludeListenerTest {
 
         // Checks for the sub module name in data model tree.
         assertThat(((YangModule) node).getIncludeList().get(0).getSubModuleName(), is("itut"));
-        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(simpleDateFormat.parse("2016-02-03")));
+        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(LocalDate.parse("2016-02-03")));
         assertThat(((YangModule) node).getIncludeList().get(1).getSubModuleName(), is("sdn"));
-        assertThat(((YangModule) node).getIncludeList().get(1).getRevision(), is(simpleDateFormat.parse("2014-02-03")));
+        assertThat(((YangModule) node).getIncludeList().get(1).getRevision(), is(LocalDate.parse("2014-02-03")));
     }
 
     /**
@@ -103,9 +101,9 @@ public class IncludeListenerTest {
 
         // Checks for the sub module name in data model tree.
         assertThat(((YangModule) node).getIncludeList().get(0).getSubModuleName(), is("itut"));
-        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(simpleDateFormat.parse("2016-02-03")));
+        assertThat(((YangModule) node).getIncludeList().get(0).getRevision(), is(LocalDate.parse("2016-02-03")));
         assertThat(((YangModule) node).getIncludeList().get(1).getSubModuleName(), is("sdn"));
-        assertThat(((YangModule) node).getIncludeList().get(1).getRevision(), is(simpleDateFormat.parse("2014-02-03")));
+        assertThat(((YangModule) node).getIncludeList().get(1).getRevision(), is(LocalDate.parse("2014-02-03")));
     }
 
     /**

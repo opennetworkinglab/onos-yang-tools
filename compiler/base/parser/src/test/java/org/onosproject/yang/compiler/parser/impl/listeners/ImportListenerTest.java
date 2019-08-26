@@ -24,7 +24,7 @@ import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -35,8 +35,6 @@ import static org.junit.Assert.assertThat;
 public class ImportListenerTest {
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
 
     /**
      * Checks if mandatory parameter prefix is present in import.
@@ -74,7 +72,7 @@ public class ImportListenerTest {
         YangNode node = manager.getDataModel("src/test/resources/ImportValidEntry.yang");
 
         // Checks for the revision value in data model tree.
-        assertThat(((YangModule) node).getImportList().get(0).getRevision(), is(simpleDateFormat.parse("2015-02-03")));
+        assertThat(((YangModule) node).getImportList().get(0).getRevision(), is(LocalDate.parse("2015-02-03")));
         // Checks for the prefix id in data model tree.
         assertThat(((YangModule) node).getImportList().get(0).getPrefixId(), is("On2"));
         // Checks for the module name in data model tree.

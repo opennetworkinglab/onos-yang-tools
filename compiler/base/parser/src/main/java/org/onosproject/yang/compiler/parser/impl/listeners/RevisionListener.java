@@ -23,7 +23,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.REVISION_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.RevisionStatementContext;
@@ -89,7 +89,7 @@ public final class RevisionListener {
         // Check for stack to be non empty.
         checkStackIsNotEmpty(listener, MISSING_HOLDER, REVISION_DATA, ctx.dateArgumentString().getText(), ENTRY);
 
-        Date date = getValidDateFromString(ctx.dateArgumentString().getText(), ctx);
+        LocalDate date = getValidDateFromString(ctx.dateArgumentString().getText(), ctx);
 
         YangRevision revisionNode = new YangRevision();
         revisionNode.setRevDate(date);
@@ -123,8 +123,8 @@ public final class RevisionListener {
                 case MODULE_DATA: {
                     YangModule module = (YangModule) tmpNode;
                     if (module.getRevision() != null) {
-                        Date curRevisionDate = module.getRevision().getRevDate();
-                        if (curRevisionDate.before(((YangRevision) tmpRevisionNode).getRevDate())) {
+                        LocalDate curRevisionDate = module.getRevision().getRevDate();
+                        if (curRevisionDate.isBefore(((YangRevision) tmpRevisionNode).getRevDate())) {
                             module.setRevision((YangRevision) tmpRevisionNode);
                         }
                     } else {
@@ -135,8 +135,8 @@ public final class RevisionListener {
                 case SUB_MODULE_DATA: {
                     YangSubModule subModule = (YangSubModule) tmpNode;
                     if (subModule.getRevision() != null) {
-                        Date curRevisionDate = subModule.getRevision().getRevDate();
-                        if (curRevisionDate.before(((YangRevision) tmpRevisionNode).getRevDate())) {
+                        LocalDate curRevisionDate = subModule.getRevision().getRevDate();
+                        if (curRevisionDate.isBefore(((YangRevision) tmpRevisionNode).getRevDate())) {
                             subModule.setRevision((YangRevision) tmpRevisionNode);
                         }
                     } else {

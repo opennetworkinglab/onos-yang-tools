@@ -20,7 +20,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /*
  *  Reference:RFC 6020.
@@ -55,7 +55,7 @@ public class YangRevision
     /**
      * Revision date. Date string in the format "YYYY-MM-DD"
      */
-    private Date revDate;
+    private LocalDate revDate;
 
     /**
      * Description of revision.
@@ -78,7 +78,7 @@ public class YangRevision
      *
      * @return the revision date
      */
-    public Date getRevDate() {
+    public LocalDate getRevDate() {
         return revDate;
     }
 
@@ -87,7 +87,7 @@ public class YangRevision
      *
      * @param revDate the revision date to set
      */
-    public void setRevDate(Date revDate) {
+    public void setRevDate(LocalDate revDate) {
         this.revDate = revDate;
     }
 

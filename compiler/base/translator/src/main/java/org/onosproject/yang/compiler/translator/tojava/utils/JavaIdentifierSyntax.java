@@ -25,10 +25,9 @@ import org.onosproject.yang.compiler.utils.io.YangToJavaNamingConflictUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.getParentNodeInGenCode;
@@ -111,10 +110,8 @@ public final class JavaIdentifierSyntax {
      * @param date YANG module revision
      * @return revision string
      */
-    private static String getYangRevisionStr(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        String dateInString = sdf.format(date);
-        String[] revisionArr = dateInString.split(HYPHEN);
+    private static String getYangRevisionStr(LocalDate date) {
+        String[] revisionArr = date.toString().split(HYPHEN);
 
         StringBuilder rev = new StringBuilder(REVISION_PREFIX)
                 .append(revisionArr[INDEX_ZERO]);

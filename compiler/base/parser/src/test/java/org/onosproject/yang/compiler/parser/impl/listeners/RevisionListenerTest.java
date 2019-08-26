@@ -24,7 +24,7 @@ import org.onosproject.yang.compiler.parser.impl.YangUtilsParserManager;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -35,8 +35,6 @@ import static org.junit.Assert.assertThat;
 public class RevisionListenerTest {
 
     private final YangUtilsParserManager manager = new YangUtilsParserManager();
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
 
     /**
      * Checks if revision doesn't have optional parameters "revision and
@@ -47,7 +45,7 @@ public class RevisionListenerTest {
 
         YangNode node = manager.getDataModel("src/test/resources/RevisionNoOptionalParameter.yang");
         // Checks for the version value in data model tree.
-        assertThat(((YangModule) node).getRevision().getRevDate(), is(simpleDateFormat.parse("2016-02-03")));
+        assertThat(((YangModule) node).getRevision().getRevDate(), is(LocalDate.parse("2016-02-03")));
     }
 
     /**
@@ -85,6 +83,33 @@ public class RevisionListenerTest {
     public void processWithMultipleRevision() throws IOException, ParserException, ParseException {
 
         YangNode node = manager.getDataModel("src/test/resources/MultipleRevision.yang");
-        assertThat((node).getRevision().getRevDate(), is(simpleDateFormat.parse("2013-07-15")));
+        assertThat((node).getRevision().getRevDate(), is(LocalDate.parse("2013-07-15")));
+    }
+
+    /**
+     * Checks revision month of date in single digit format.
+     */
+    @Test
+    public void processRevisionDateWithSingleDigitMonth() throws IOException, ParserException, ParseException {
+        YangNode node = manager.getDataModel("src/test/resources/RevisionMonthSingleDigit.yang");
+        assertThat((node).getRevision().getRevDate(), is(LocalDate.parse("2013-07-15")));
+    }
+
+    /**
+     * Checks revision day in single digit format.
+     */
+    @Test
+    public void processRevisionDateWithSingleDigitDay() throws IOException, ParserException, ParseException {
+        YangNode node = manager.getDataModel("src/test/resources/RevisionDaySingleDigit.yang");
+        assertThat((node).getRevision().getRevDate(), is(LocalDate.parse("2013-10-07")));
+    }
+
+    /**
+     * Checks revision day and month in single digit format.
+     */
+    @Test
+    public void processRevisionDateWithSingleDigitDayMonth() throws IOException, ParserException, ParseException {
+        YangNode node = manager.getDataModel("src/test/resources/RevisionDayMonthSingleDigit.yang");
+        assertThat((node).getRevision().getRevDate(), is(LocalDate.parse("2013-07-07")));
     }
 }

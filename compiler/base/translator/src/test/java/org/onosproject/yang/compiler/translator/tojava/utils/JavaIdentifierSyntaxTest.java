@@ -31,7 +31,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.core.Is.is;
@@ -52,7 +52,7 @@ public final class JavaIdentifierSyntaxTest {
 
     private static final String PARENT_PACKAGE = "test5/test6/test7";
     private static final String CHILD_PACKAGE = "test1-test2-test3";
-    private static final String DATE1 = "2000-1-5";
+    private static final String DATE1 = "2000-01-05";
     private static final String DATE2 = "1992-01-25";
     private static final String PARENT_WITH_PERIOD = "test5.test6.test7";
     private static final String CHILD_WITH_PERIOD = "test1test2test3";
@@ -174,7 +174,6 @@ public final class JavaIdentifierSyntaxTest {
     @Test
     public void getRootPackageWithRevTest()
             throws ParseException {
-        Date date = simpleDateFormat.parse(DATE2);
         String rootPkgWithRev = getRootPackage("1", CHILD_PACKAGE,
                                                getYangRevision(DATE2), null);
         assertThat(rootPkgWithRev.equals(
@@ -306,11 +305,7 @@ public final class JavaIdentifierSyntaxTest {
 
     private YangRevision getYangRevision(String date) {
         YangRevision revision = new YangRevision();
-        try {
-            revision.setRevDate(simpleDateFormat.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        revision.setRevDate(LocalDate.parse(date));
         return revision;
     }
 }

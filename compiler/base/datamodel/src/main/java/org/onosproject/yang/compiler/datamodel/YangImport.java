@@ -21,7 +21,7 @@ import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 import org.slf4j.Logger;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.findReferredNode;
@@ -96,7 +96,7 @@ public class YangImport extends DefaultLocationInfo
      * the most recent "revision" statement in the imported module. organization
      * which defined the YANG module.
      */
-    private Date revision;
+    private LocalDate revision;
 
     /**
      * Reference to node which is imported.
@@ -151,7 +151,7 @@ public class YangImport extends DefaultLocationInfo
      *
      * @return the revision of the imported module
      */
-    public Date getRevision() {
+    public LocalDate getRevision() {
         return revision;
     }
 
@@ -160,7 +160,7 @@ public class YangImport extends DefaultLocationInfo
      *
      * @param rev set the revision of the imported module
      */
-    public void setRevision(Date rev) {
+    public void setRevision(LocalDate rev) {
         revision = rev;
     }
 
@@ -224,7 +224,7 @@ public class YangImport extends DefaultLocationInfo
      */
     public void addReferenceToImport(Set<YangNode> yangNodeSet) throws DataModelException {
         String importedModuleName = getModuleName();
-        Date importedModuleRevision = getRevision();
+        LocalDate importedModuleRevision = getRevision();
         YangNode moduleNode = null;
         /*
          * Find the imported module node for a given module name with a

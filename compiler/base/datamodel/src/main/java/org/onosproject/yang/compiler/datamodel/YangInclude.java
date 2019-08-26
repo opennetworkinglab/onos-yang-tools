@@ -20,7 +20,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.datamodel.utils.YangConstructType;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static org.onosproject.yang.compiler.datamodel.utils.DataModelUtils.findReferredNode;
@@ -57,7 +57,7 @@ public class YangInclude extends DefaultLocationInfo
      * The include's "revision-date" statement is used to specify the exact
      * version of the submodule to import.
      */
-    private Date revision;
+    private LocalDate revision;
 
     /**
      * Reference to node which is included.
@@ -93,7 +93,7 @@ public class YangInclude extends DefaultLocationInfo
      *
      * @return the revision
      */
-    public Date getRevision() {
+    public LocalDate getRevision() {
         return revision;
     }
 
@@ -102,7 +102,7 @@ public class YangInclude extends DefaultLocationInfo
      *
      * @param revision the revision to set
      */
-    public void setRevision(Date revision) {
+    public void setRevision(LocalDate revision) {
         this.revision = revision;
     }
 
@@ -157,7 +157,7 @@ public class YangInclude extends DefaultLocationInfo
      */
     public YangSubModule addReferenceToInclude(Set<YangNode> yangNodeSet) throws DataModelException {
         String includedSubModuleName = getSubModuleName();
-        Date includedSubModuleRevision = getRevision();
+        LocalDate includedSubModuleRevision = getRevision();
         YangNode subModuleNode = null;
 
         /*

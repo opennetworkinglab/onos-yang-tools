@@ -22,7 +22,7 @@ import org.onosproject.yang.compiler.datamodel.utils.Parsable;
 import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.parser.impl.TreeWalkListener;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.onosproject.yang.compiler.datamodel.utils.YangConstructType.REVISION_DATE_DATA;
 import static org.onosproject.yang.compiler.parser.antlrgencode.GeneratedYangParser.RevisionDateStatementContext;
@@ -88,7 +88,7 @@ public final class RevisionDateListener {
         checkStackIsNotEmpty(listener, MISSING_HOLDER, REVISION_DATE_DATA, ctx.dateArgumentString().getText(),
                 ENTRY);
 
-        Date date = getValidDateFromString(ctx.dateArgumentString().getText(), ctx);
+        LocalDate date = getValidDateFromString(ctx.dateArgumentString().getText(), ctx);
 
         // Obtain the node of the stack.
         Parsable tmpNode = listener.getParsedDataStack().peek();

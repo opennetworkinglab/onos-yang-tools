@@ -76,7 +76,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -1476,8 +1475,7 @@ public final class DataModelUtils {
     public static String getDateInStringFormat(YangNode schemaNode) {
         if (schemaNode != null) {
             if (schemaNode.getRevision() != null) {
-                return new SimpleDateFormat(DATE_FORMAT)
-                        .format(schemaNode.getRevision().getRevDate());
+                return schemaNode.getRevision().getRevDate().toString();
             }
         }
         return null;

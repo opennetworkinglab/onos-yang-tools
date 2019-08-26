@@ -39,10 +39,8 @@ import org.onosproject.yang.compiler.parser.exceptions.ParserException;
 import org.onosproject.yang.compiler.translator.tojava.javamodel.YangJavaAugmentTranslator;
 import org.slf4j.Logger;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +68,7 @@ import static org.onosproject.yang.compiler.utils.UtilConstants.COLON;
 import static org.onosproject.yang.compiler.utils.UtilConstants.CURRENT;
 import static org.onosproject.yang.compiler.utils.UtilConstants.EMPTY_STRING;
 import static org.onosproject.yang.compiler.utils.UtilConstants.FALSE;
+import static org.onosproject.yang.compiler.utils.UtilConstants.HYPHEN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.IN;
 import static org.onosproject.yang.compiler.utils.UtilConstants.INVALID_TREE;
 import static org.onosproject.yang.compiler.utils.UtilConstants.ONE;
@@ -103,6 +102,8 @@ public final class ListenerUtil {
             Pattern.compile("\\[(.*?)\\]");
     private static final String XML = "xml";
     private static final int IDENTIFIER_LENGTH = 64;
+    private static final int VALUE_CHECK = 10;
+    private static final int ZERO = 0;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String REGEX_EQUAL = "[=]";
     private static final String REGEX_OPEN_BRACE = "[(]";
@@ -170,30 +171,6 @@ public final class ListenerUtil {
         parserException.setLine(ctx.getStart().getLine());
         parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
         throw parserException;
-    }
-
-    /**
-     * Validates the revision date.
-     *
-     * @param dateToValidate input revision date
-     * @return validation result, true for success, false for failure
-     */
-    public static boolean isDateValid(String dateToValidate) {
-        if (dateToValidate == null || !dateToValidate.matches(DATE_PATTERN)) {
-            return false;
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        sdf.setLenient(false);
-
-        try {
-            //if not valid, it will throw ParseException
-            sdf.parse(dateToValidate);
-        } catch (ParseException e) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -306,27 +283,6 @@ public final class ListenerUtil {
                                                                           " value " + value + " is not valid.");
             parserException.setLine(ctx.getStart().getLine());
             parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
-        }
-    }
-
-    /**
-     * Returns current date and makes it in usable format for revision.
-     *
-     * @return usable current date format for revision
-     */
-    public static Date getCurrentDateForRevision() {
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-
-        Date date = new Date();
-        String dateInString = dateFormat.format(date);
-        try {
-            //if not valid, it will throw ParseException
-            Date now = dateFormat.parse(dateInString);
-            return date;
-        } catch (ParseException e) {
-            ParserException parserException = new ParserException("YANG file error: Input date is not correct");
             throw parserException;
         }
     }
@@ -630,7 +586,7 @@ public final class ListenerUtil {
      * @param ctx          yang construct's context to get the line number and character position
      * @return date format for revision
      */
-    public static Date getValidDateFromString(String dateInString, ParserRuleContext ctx) {
+    public static LocalDate getValidDateFromString(String dateInString, ParserRuleContext ctx) {
         String dateArgument = removeQuotesAndHandleConcat(dateInString);
         if (!dateArgument.matches(DATE_PATTERN)) {
             ParserException parserException = new ParserException("YANG file error: Input date is not correct");
@@ -639,18 +595,20 @@ public final class ListenerUtil {
             throw parserException;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        sdf.setLenient(false);
+        String[] revisionArr = dateArgument.toString().split(HYPHEN);
 
-        try {
-            //if not valid, it will throw ParseException
-            return sdf.parse(dateArgument);
-        } catch (ParseException e) {
-            ParserException parserException = new ParserException("YANG file error: Input date is not correct");
-            parserException.setLine(ctx.getStart().getLine());
-            parserException.setCharPosition(ctx.getStart().getCharPositionInLine());
-            throw parserException;
+        StringBuilder rev = new StringBuilder(revisionArr[0]);
+        for (int i = 1; i < revisionArr.length; i++) {
+            rev.append(HYPHEN);
+            Integer val = Integer.parseInt(revisionArr[i]);
+            if (val < VALUE_CHECK) {
+                rev.append(ZERO);
+            }
+            rev.append(val);
         }
+
+        //if not valid, it will throw ParseException
+        return LocalDate.parse(rev);
     }
 
     /**
